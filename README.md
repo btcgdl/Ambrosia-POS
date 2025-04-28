@@ -1,7 +1,7 @@
 # Ambrosia-POS
 
 <p align="center">
-  <img src="imgs/Ambrosia.png" alt="Ambrosia Logo" width="200"/>
+  <img src="imgs/Ambrosia.png" alt="Ambrosia Logo" width="300"/>
 </p>
 
 Este repositorio contiene la documentación y detalles del proyecto de un sistema de punto de venta (POS) para restaurantes, desarrollado en Kotlin utilizando Compose Multiplatform. A continuación, se describen los archivos principales y su contenido:
