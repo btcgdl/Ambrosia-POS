@@ -1,4 +1,7 @@
 # Ambrosia-POS
+**Status: In Development**
+
+> This project is currently under active development. Features and functionalities described below are subject to change as development progresses.
 
 <p align="center">
   <img src="imgs/Ambrosia.png" alt="Ambrosia Logo" width="300"/>
