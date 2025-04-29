@@ -7,7 +7,7 @@
   <img src="imgs/Ambrosia.png" alt="Ambrosia Logo" width="300"/>
 </p>
 
-Este repositorio contiene la documentación y detalles del proyecto de un sistema de punto de venta (POS) para restaurantes, desarrollado en Kotlin utilizando Compose Multiplatform. A continuación, se describen los archivos principales y su contenido:
+Este repositorio contiene la documentación y detalles del proyecto de un sistema de punto de venta (POS) para restaurantes, con un frontend desarrollado en React y Electron, y un backend en Kotlin. A continuación, se describen los archivos principales y su contenido:
 
 ## Archivos Principales
 
