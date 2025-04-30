@@ -2,7 +2,7 @@
 
 ## Descripción General
 
-El sistema descrito es una aplicación de punto de venta (POS) para restaurantes, desarrollada en Kotlin utilizando Compose Multiplatform, un framework que permite compartir código de interfaz de usuario (UI) entre múltiples plataformas, incluyendo escritorio (Windows y Linux). Este sistema está diseñado para optimizar las operaciones diarias de un restaurante, como la gestión de pedidos, mesas y finanzas, con una interfaz moderna y reactiva. A continuación, se detallan los módulos del sistema, considerando las características solicitadas: inicio de sesión, selección de mesas, historial de pedidos, gestión de usuarios y asignación de permisos, creación de platillos, impresión de tickets y retirada de fondos. 
+El sistema descrito es una aplicación de punto de venta (POS) para restaurantes,con un frontend desarrollado en React y Electron, y un backend en Kotlin. Este sistema está diseñado para optimizar las operaciones diarias de un restaurante, como la gestión de pedidos, mesas y finanzas, con una interfaz moderna y reactiva. A continuación, se detallan los módulos del sistema, considerando las características solicitadas: inicio de sesión, selección de mesas, historial de pedidos, gestión de usuarios y asignación de permisos, creación de platillos, impresión de tickets y retirada de fondos. 
 
 ## Módulos Principales
 
