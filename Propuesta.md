@@ -1,4 +1,4 @@
-# Sistema de Punto de Venta para Restaurantes con Compose Multiplatform
+# Sistema de Punto de Venta para Restaurantes
 
 ## Descripción General
 
