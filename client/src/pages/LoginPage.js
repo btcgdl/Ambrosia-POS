@@ -1,5 +1,7 @@
 import LoginInputField from "../components/Login/LoginInputField";
 import { useState } from "react";
+import {useUserRole} from "../contexts/UserRoleContext";
+import {useNavigate} from "react-router-dom";
 
 export default function LoginPage() {
 
@@ -7,13 +9,16 @@ export default function LoginPage() {
     const [passWord, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const response = {
+    const responseTest = {
         "status": 200,
         "message": "Login successful",
         "data": {
             "role": "admin",
         }
     };
+
+    const { updateUserRole } = useUserRole();
+    const navigate = useNavigate();
 
     const handleLogin = async () => {
         const formData = new FormData();
@@ -40,7 +45,9 @@ export default function LoginPage() {
       
         } catch (error) {
             setLoading(false);
-            setError("Error de red o servidor");
+            /*setError("Error de red o servidor");*/
+            updateUserRole(responseTest.data.role);
+            navigate("/rooms");
         }
     };
 
@@ -58,7 +65,15 @@ export default function LoginPage() {
                 Cargando...
             </div>
         )}
-        <div className="w-[100%] h-[45%]" ></div>
+        <div
+            className="w-full h-[45%] bg-[url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092')] bg-cover bg-top bg-no-repeat flex items-center justify-center"
+        >
+            <img
+                src="temporal-logo.jpg"
+                alt="Logotipo temporal"
+                className="w-[200px] h-[350px] object-contain"
+            />
+        </div>
         <div className="w-[100%] h-[55%] bg-[var(--color-primary)]">
             <h2 className="text-[50px] text-white text-center pb-[10px]">INICIAR SESIÓN</h2>
             <form className="w-[50%] mx-auto">
