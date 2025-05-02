@@ -19,3 +19,33 @@ Este repositorio contiene la documentación y detalles del proyecto de un sistem
 El sistema está diseñado para optimizar las operaciones diarias de un restaurante, como la gestión de pedidos, mesas y finanzas, con una interfaz moderna y reactiva. Incluye funcionalidades como autenticación, gestión de usuarios, manejo de menús, pedidos, punto de venta, y más.
 
 Consulta los archivos mencionados para obtener más detalles sobre el proyecto.
+
+## Scripts de Desarrollo
+
+*Cliente (Frontend - React/Electron)*
+
+Para instalar las dependencias del cliente, ejecuta:
+
+```sh
+npm install
+```
+
+Para iniciar el entorno de desarrollo del cliente:
+
+```sh
+npm start
+```
+
+*Servidor (Backend - Kotlin/Gradle)*
+
+Para ejecutar el servidor en modo de desarrollo:
+
+```sh
+./gradlew run
+```
+
+Para construir el proyecto del servidor:
+
+```sh
+./gradlew build
+```
