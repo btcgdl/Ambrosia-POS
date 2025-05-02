@@ -8,7 +8,7 @@
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     alias(libs.plugins.kotlin.jvm)
-
+    alias(libs.plugins.ktor)
     // Apply the application plugin to add support for building a CLI application in Java.
     application
 }
@@ -21,6 +21,10 @@ repositories {
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation(libs.junit.jupiter)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.logback.classic)
+    testImplementation(libs.ktor.server.test.host)
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
