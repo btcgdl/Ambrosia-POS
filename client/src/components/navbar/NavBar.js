@@ -1,5 +1,5 @@
 ﻿import {useUserRole} from "../../contexts/UserRoleContext";
-import NavBarButton from "../Login/NavBarButton";
+import NavBarButton from "./NavBarButton";
 import {useNavigate} from "react-router-dom";
 
 export default function NavBar() {
@@ -18,15 +18,15 @@ export default function NavBar() {
 
             <div className="h-[80%] overflow-y-auto flex flex-col gap-7 py-4">
                 {userRole === "admin" && (<>
-                    <NavBarButton text="Platos" icon="egg-fried" onClick={()=>{}}/>
-                    <NavBarButton text="Espacios" icon="layout-text-window" onClick={()=>{}}/>
+                    <NavBarButton text="Platos" icon="egg-fried" onClick={()=>{navigate("/saucers")}}/>
+                    <NavBarButton text="Espacios" icon="layout-text-window" onClick={()=>{navigate("/spaces")}}/>
                 </>)}
                 <NavBarButton text="Pedidos" icon="receipt" onClick={()=>{}}/>
                 {userRole === "admin" && (<>
                     <NavBarButton text="Conf" icon="gear-fill" onClick={()=>{}}/>
-                    <NavBarButton text="Usuarios" icon="people-fill" onClick={()=>{}}/>
+                    <NavBarButton text="Usuarios" icon="people-fill" onClick={()=>{navigate("/users")}}/>
                 </>)}
-                <NavBarButton text="Salir" icon="box-arrow-right" onClick={()=>{}}/>
+                <NavBarButton text="Salir" icon="box-arrow-right" onClick={()=>{navigate("/")}}/>
             </div>
         </aside>
     </>)
