@@ -6,7 +6,7 @@ import { useMock } from "../contexts/MockSocketContext";
 export default function Users() {
     const { users, addUser, updateUser, deleteUser } = useMock();
     const [editing, setEditing] = useState(null);
-    const [form, setForm] = useState({ nombre: "", role: "waiter", password: "" });
+    const [form, setForm] = useState({ nombre: "", role: "waiter", password: "", pin: "" });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -20,12 +20,12 @@ export default function Users() {
         } else {
             addUser(form);
         }
-        setForm({ nombre: "", role: "waiter", password: "" });
+        setForm({ nombre: "", role: "waiter", password: "", pin: "" });
         setEditing(null);
     };
 
     const startEdit = (user) => {
-        setForm({ nombre: user.nombre, role: user.role, password: user.password });
+        setForm({ nombre: user.nombre, role: user.role, password: user.password, pin: user.pin });
         setEditing(user.id);
     };
 
@@ -65,6 +65,17 @@ export default function Users() {
                                 className="text-2xl p-3 rounded-lg"
                                 required
                             />
+                            <input
+                                name="pin"
+                                type="text"
+                                maxLength={6}
+                                value={form.pin}
+                                onChange={handleChange}
+                                placeholder="PIN (solo números)"
+                                className="text-2xl p-3 rounded-lg"
+                                required
+                                pattern="\d*"
+                            />
                             <button
                                 type="submit"
                                 className="bg-green-500 text-white text-2xl py-3 rounded-lg hover:bg-green-600"
@@ -80,7 +91,7 @@ export default function Users() {
                                     className="bg-white p-4 rounded-xl flex justify-between items-center text-2xl shadow-md"
                                 >
                                     <div>
-                                        <strong>{user.nombre}</strong> ({user.role})
+                                        <strong>{user.nombre}</strong> ({user.role}) – PIN: {user.pin}
                                     </div>
                                     <div className="flex gap-4">
                                         <button

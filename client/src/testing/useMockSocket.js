@@ -11,10 +11,11 @@ export function useMockSocket() {
     useEffect(() => {
         const initialData = {
             users: [
-                { id: 1, role: 'admin', nombre: 'angel', password: 'pass' },
-                { id: 2, role: 'admin', nombre: 'jordy', password: 'pass' },
-                { id: 3, role: 'waiter', nombre: 'sara', password: 'pass' },
-                { id: 4, role: 'waiter', nombre: 'regina', password: 'pass' },
+                { id: 1, role: 'admin', nombre: 'angel', password: 'pass' , pin: 1234},
+                { id: 2, role: 'admin', nombre: 'jordy', password: 'pass' , pin: 2345},
+                { id: 3, role: 'waiter', nombre: 'sara', password: 'pass' , pin: 3456},
+                { id: 4, role: 'waiter', nombre: 'regina', password: 'pass' , pin: 4567},
+                { id: 5, role: 'admin', nombre: 'a@b.c', password: 'chabelo' , pin: 5678},
             ],
             rooms: [
                 { id: 1, nombre: 'Sala Principal', mesasIds: [1, 2] },
@@ -31,6 +32,9 @@ export function useMockSocket() {
                 { id: 3, nombre: 'Sushi', categoria: 'Japonesa', precio: 150.0 },
             ],
             categories: ['Mexicana', 'Italiana', 'Japonesa'],
+            orders: [
+                { id: 1, userId: 1, estado: 'abierto', dishes:[] },
+            ],
         };
 
         const timeout = setTimeout(() => {
@@ -83,17 +87,44 @@ export function useMockSocket() {
     const deleteUser = (id) =>
         setUsers(prev => prev.filter(u => u.id !== id));
 
+    // PEDIDOS
+    const addOrder = (order) => {
+        const newOrder = { ...order, id: Date.now() };
+        setOrders(prev => [...prev, newOrder]);
+        return newOrder; // Importante para obtener el ID después de crear
+    };
+
+    const updateOrder = (order) => {
+        setOrders(prev => prev.map(o => o.id === order.id ? order : o));
+    };
+
+    const deleteOrder = (id) => {
+        setOrders(prev => prev.filter(o => o.id !== id));
+    };
+
+    const assignOrderToTable = (mesaId, pedidoId) => {
+                setTables(prev =>
+            prev.map(t =>
+                t.id === mesaId
+                    ? { ...t, pedidoId, estado: 'ocupada' }
+                    : t
+            )
+        );
+    };
+
     return {
         users, setUsers,
         rooms, setRooms,
         tables, setTables,
         dishes, setDishes,
         categories, setCategories,
+        orders, setOrders,
 
         addDish, updateDish, deleteDish,
         addCategory, deleteCategory,
         addTable, updateTable, deleteTable,
         addRoom, updateRoom, deleteRoom,
         addUser, updateUser, deleteUser,
+        addOrder, updateOrder, deleteOrder, assignOrderToTable
     };
 }
