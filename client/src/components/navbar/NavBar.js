@@ -21,7 +21,7 @@ export default function NavBar() {
                     <NavBarButton text="Platos" icon="egg-fried" onClick={()=>{navigate("/saucers")}}/>
                     <NavBarButton text="Espacios" icon="layout-text-window" onClick={()=>{navigate("/spaces")}}/>
                 </>)}
-                <NavBarButton text="Pedidos" icon="receipt" onClick={()=>{}}/>
+                <NavBarButton text="Pedidos" icon="receipt" onClick={()=>{navigate("/all-orders")}}/>
                 {userRole === "admin" && (<>
                     <NavBarButton text="Conf" icon="gear-fill" onClick={()=>{}}/>
                     <NavBarButton text="Usuarios" icon="people-fill" onClick={()=>{navigate("/users")}}/>
