@@ -14,7 +14,7 @@ export function useMockSocket() {
                 { id: 1, nombre: 'angel', pin: 1234},
                 { id: 2, nombre: 'jordy', password: 'pass' , pin: 2345},
                 { id: 3, nombre: 'sara', password: 'pass' , pin: 3456},
-                { id: 4, n`ombre: 'regina', password: 'pass' , pin: 4567},
+                { id: 4, nombre: 'regina', password: 'pass' , pin: 4567},
                 { id: 5, role: 'admin', nombre: 'a@b.c', password: 'chabelo' , pin: 5678},
             ],
             rooms: [
