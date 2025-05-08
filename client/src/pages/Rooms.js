@@ -1,10 +1,10 @@
 ﻿import NavBar from "../components/navbar/NavBar";
-import { useMockSocket } from "../testing/useMockSocket";
 import Header from "../components/header/Header";
 import Room from "../components/rooms/Room";
+import {useMock} from "../contexts/MockSocketContext";
 
 export default function Rooms() {
-    const { rooms } = useMockSocket();
+    const { rooms } = useMock();
     return(<>
         <div className="flex w-screen h-screen">
             <NavBar></NavBar>

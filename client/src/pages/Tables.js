@@ -1,11 +1,11 @@
 ﻿import NavBar from "../components/navbar/NavBar";
-import { useMockSocket } from "../testing/useMockSocket";
 import Header from "../components/header/Header";
 import {useParams} from "react-router-dom";
 import Table from "../components/tables/Table";
+import {useMock} from "../contexts/MockSocketContext";
 
 export default function Tables() {
-    const { rooms, tables } = useMockSocket();
+    const { rooms, tables } = useMock();
     const { roomId } = useParams();
 
     const selectedRoomTables = rooms?.find((room) => room.id === Number(roomId))?.mesasIds;

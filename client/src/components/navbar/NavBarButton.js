@@ -2,7 +2,7 @@
     return(<>
         <button
             onClick={onClick}
-            className="bg-[var(--color-secondary)] py-4"
+            className="bg-[var(--color-secondary)] py-4 cursor-pointer"
         >
             <i className={`bi bi-${icon} text-[20px] pr-1`}></i>{text}
         </button>

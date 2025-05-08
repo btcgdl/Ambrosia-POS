@@ -2,6 +2,7 @@ import LoginInputField from "../components/Login/LoginInputField";
 import { useState } from "react";
 import {useUserRole} from "../contexts/UserRoleContext";
 import {useNavigate} from "react-router-dom";
+import {useMock} from "../contexts/MockSocketContext";
 
 export default function LoginPage() {
 
@@ -19,8 +20,9 @@ export default function LoginPage() {
 
     const { updateUserRole } = useUserRole();
     const navigate = useNavigate();
+    const {users} = useMock();
 
-    const handleLogin = async () => {
+    /*const handleLogin = async () => {
         const formData = new FormData();
         formData.append("username", userName);
         formData.append("password", passWord);
@@ -42,14 +44,14 @@ export default function LoginPage() {
             } else {
                 setError(result.error || "Error desconocido");
             }
+            updateUserRole(responseTest.data.role);
+            navigate("/rooms");
       
         } catch (error) {
             setLoading(false);
-            /*setError("Error de red o servidor");*/
-            updateUserRole(responseTest.data.role);
-            navigate("/rooms");
+            /!*setError("Error de red o servidor");*!/
         }
-    };
+    };*/
 
 
 
@@ -94,7 +96,13 @@ export default function LoginPage() {
                     <button 
                         type="button" 
                         className="text-white w-[20%] py-1.5 bg-black/30"
-                        onClick={handleLogin}
+                        onClick={/*handleLogin*/()=>{
+                            const user = users.find(user => user.nombre === userName && user.password === passWord);
+                            if (user){
+                                updateUserRole(user.role);
+                                navigate("/rooms");
+                            }
+                        }}
                     >
                         ENTRAR
                     </button>
