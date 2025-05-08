@@ -6,3 +6,6 @@ build
 
 # Ignore Kotlin filesds
 .kotlin
+
+# Ignore IntelliJ IDEA project files
+.idea
