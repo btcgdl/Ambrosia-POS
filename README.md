@@ -1,4 +1,6 @@
 # Ambrosia-POS
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/JordyPirata/Ambrosia-POS)
+
 **Status: In Development**
 
 > This project is currently under active development. Features and functionalities described below are subject to change as development progresses.
