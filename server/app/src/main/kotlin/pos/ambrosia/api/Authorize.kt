@@ -10,7 +10,10 @@ import io.ktor.server.request.*
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LoginRequest(val role: String, val password: String)
+data class AuthRequest(val role: String, val password: String)
+
+@Serializable
+data class AuthResponse(val message: String, val id: String, val role: String)
 
 fun Application.configureAuth() {
     routing {
@@ -25,14 +28,13 @@ fun Application.configureAuth() {
 
 fun Route.authenticate() {
     post("/login") {
-        val loginRequest = call.receive<LoginRequest>()
+        val loginRequest = call.receive<AuthRequest>()
         val role = loginRequest.role
         val password = loginRequest.password
         if (role == "admin" && password == "admin") {
-            call.respondText("Login successful for role: $role", 
-                status = HttpStatusCode.OK)
+            call.respond(AuthResponse("Login successful", "12345", role))
         } else {
-            call.respondText("Invalid credentials", 
+            call.respondText("{\"mensaje\": \"Invalid credentials\"}", contentType = ContentType.Application.Json,
                 status = HttpStatusCode.Unauthorized)
         }
     }
