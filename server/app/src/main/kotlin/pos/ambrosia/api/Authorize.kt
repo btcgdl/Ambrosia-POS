@@ -32,6 +32,8 @@ fun Route.authenticate() {
         val role = loginRequest.role
         val password = loginRequest.password
         if (role == "admin" && password == "admin") {
+            // Add allow origins
+            call.response.headers.append(HttpHeaders.AccessControlAllowOrigin, "*")
             call.respond(AuthResponse("Login successful", "12345", role))
         } else {
             call.respondText("{\"mensaje\": \"Invalid credentials\"}", contentType = ContentType.Application.Json,
@@ -39,6 +41,7 @@ fun Route.authenticate() {
         }
     }
     post("/logout") {
-        call.respondText("Logout successful", status = HttpStatusCode.OK)
+        call.respondText("{\"mensaje\": \"Logout successful\"}", contentType = ContentType.Application.Json,
+            status = HttpStatusCode.OK)
     }
 }
