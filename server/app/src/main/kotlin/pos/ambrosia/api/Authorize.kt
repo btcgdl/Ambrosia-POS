@@ -24,7 +24,7 @@ fun Route.authenticate() {
         val loginRequest = call.receive<AuthRequest>()
         val authService = AuthService()
         val authResponse = authService.login(loginRequest)
-        call.respond(HttpStatusCode.OK, ApiResponse(true, authResponse))
+        call.respond(HttpStatusCode.OK, ApiResponse(data = authResponse))
 
     }
     post("/logout") {
