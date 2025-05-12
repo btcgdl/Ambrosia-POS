@@ -1,27 +1,20 @@
 package pos.ambrosia.api
 
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
+import pos.ambrosia.services.AuthService
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.request.*
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class AuthRequest(val role: String, val password: String)
-
-@Serializable
-data class AuthResponse(val message: String, val id: String, val role: String)
+import io.ktor.server.plugins.statuspages.*
+import pos.ambrosia.models.ApiResponse
+import pos.ambrosia.models.AuthRequest
 
 fun Application.configureAuth() {
     routing {
         route("/auth") {
             authenticate()
-        }
-        install(ContentNegotiation) {
-            json()
         }
     }
 }
@@ -29,19 +22,12 @@ fun Application.configureAuth() {
 fun Route.authenticate() {
     post("/login") {
         val loginRequest = call.receive<AuthRequest>()
-        val role = loginRequest.role
-        val password = loginRequest.password
-        if (role == "admin" && password == "admin") {
-            // Add allow origins
-            call.response.headers.append(HttpHeaders.AccessControlAllowOrigin, "*")
-            call.respond(AuthResponse("Login successful", "12345", role))
-        } else {
-            call.respondText("{\"mensaje\": \"Invalid credentials\"}", contentType = ContentType.Application.Json,
-                status = HttpStatusCode.Unauthorized)
-        }
+        val authService = AuthService()
+        val authResponse = authService.login(loginRequest)
+        call.respond(HttpStatusCode.OK, ApiResponse(true, authResponse))
+
     }
     post("/logout") {
-        call.respondText("{\"mensaje\": \"Logout successful\"}", contentType = ContentType.Application.Json,
-            status = HttpStatusCode.OK)
+        call.respond(HttpStatusCode.NoContent)
     }
 }
