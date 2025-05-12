@@ -26,7 +26,8 @@ dependencies {
 
     // logging
     implementation(libs.logback.classic)
-
+    implementation("io.ktor:ktor-server-cors:3.1.2")
+    implementation("io.ktor:ktor-server-status-pages:3.1.2")
     // This dependency is used by the application.
     implementation(libs.guava)
 }
