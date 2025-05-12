@@ -24,13 +24,13 @@ fun Application.module() {
     install(StatusPages)
     {
         exception<InvalidCredentialsException> { call, cause ->
-            call.respond(HttpStatusCode.Unauthorized, ApiResponse<String>(false, error = cause.message))
+            call.respond(HttpStatusCode.Unauthorized, ApiResponse<String>(data = cause.message))
         }
         exception<UnauthorizedApiException> { call, cause ->
-            call.respond(HttpStatusCode.Forbidden, ApiResponse<String>(false, error = cause.message))
+            call.respond(HttpStatusCode.Forbidden, ApiResponse<String>(data = cause.message))
         }
         exception<Throwable> { call, cause ->
-            call.respond(HttpStatusCode.InternalServerError, ApiResponse<String>(false, error = cause.message))
+            call.respond(HttpStatusCode.InternalServerError, ApiResponse<String>(data = cause.message))
         }
     }
     // Configure the application
