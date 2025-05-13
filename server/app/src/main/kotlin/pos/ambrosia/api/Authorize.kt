@@ -10,6 +10,7 @@ import io.ktor.server.request.*
 import io.ktor.server.plugins.statuspages.*
 import pos.ambrosia.models.ApiResponse
 import pos.ambrosia.models.AuthRequest
+import io.ktor.server.auth.*
 
 fun Application.configureAuth() {
     routing {
@@ -20,14 +21,15 @@ fun Application.configureAuth() {
 }
 
 fun Route.authenticate() {
-    post("/login") {
-        val loginRequest = call.receive<AuthRequest>()
-        val authService = AuthService()
-        val authResponse = authService.login(loginRequest)
-        call.respond(HttpStatusCode.OK, ApiResponse(data = authResponse))
-
-    }
-    post("/logout") {
-        call.respond(HttpStatusCode.NoContent)
+    authenticate("auth-basic") {
+        post("/login") {
+            val loginRequest = call.receive<AuthRequest>()
+            val authService = AuthService()
+            val authResponse = authService.login(loginRequest)
+            call.respond(HttpStatusCode.OK, ApiResponse(data = authResponse))
+        }
+        post("/logout") {
+            call.respond(HttpStatusCode.NoContent)
+        }
     }
 }

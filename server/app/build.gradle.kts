@@ -28,6 +28,8 @@ dependencies {
     implementation(libs.logback.classic)
     implementation("io.ktor:ktor-server-cors:3.1.2")
     implementation("io.ktor:ktor-server-status-pages:3.1.2")
+    implementation("io.ktor:ktor-server-auth:3.1.2")
+    implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
     // This dependency is used by the application.
     implementation(libs.guava)
 }
