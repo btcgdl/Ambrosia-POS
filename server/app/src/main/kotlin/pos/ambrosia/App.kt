@@ -1,6 +1,7 @@
 package pos.ambrosia
 
 import pos.ambrosia.api.*
+import io.ktor.server.auth.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -13,6 +14,12 @@ import pos.ambrosia.utils.UnauthorizedApiException
 import io.ktor.server.response.*
 import io.ktor.http.*
 import pos.ambrosia.models.ApiResponse
+import io.github.cdimascio.dotenv.Dotenv
+
+// Get the credentials from .env file
+val dotenv = Dotenv.configure()
+.directory("../../")
+.load();
 
 fun main() {
     embeddedServer(Netty, port = 5000, host = "127.0.0.1", module = Application::module)
@@ -39,6 +46,17 @@ fun Application.module() {
     }
     install(CORS) {
         anyHost()
+    }
+    install(Authentication) {
+        basic("auth-basic") {
+            realm = "POS Ambrosia API"
+            validate { credentials ->
+                val password = dotenv["TOKEN_HASH"]
+                if (credentials.name == "" && credentials.password == password) {
+                    
+                } else null
+            }
+        }
     }
     configureRouting()
     configureAuth()
