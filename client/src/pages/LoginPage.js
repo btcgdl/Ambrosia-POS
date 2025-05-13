@@ -2,56 +2,32 @@ import LoginInputField from "../components/Login/LoginInputField";
 import { useState } from "react";
 import {useUserRole} from "../contexts/UserRoleContext";
 import {useNavigate} from "react-router-dom";
-import {useMock} from "../contexts/MockSocketContext";
+import {login} from "../services/authService";
 
 export default function LoginPage() {
 
-    const [userName, setUserName] = useState("");
-    const [passWord, setPassword] = useState("");
+    const [role, setRole] = useState("");
+    const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const responseTest = {
-        "status": 200,
-        "message": "Login successful",
-        "data": {
-            "role": "admin",
-        }
-    };
-
-    const { updateUserRole } = useUserRole();
     const navigate = useNavigate();
-    const {users} = useMock();
+    const { updateUserRole } = useUserRole();
 
-    /*const handleLogin = async () => {
-        const formData = new FormData();
-        formData.append("username", userName);
-        formData.append("password", passWord);
+    const handleLogin = async (e) => {
+        e.preventDefault();
         setLoading(true);
         setError(null);
-      
         try {
-            const response = await fetch("https://tu-api.com/login", {
-                method: "POST",
-                body: formData
-            });
-      
-            const result = await response.json();
-            console.log("Respuesta del servidor:", result);
-            setLoading(false);
-      
-            if (response.ok) {
-                
-            } else {
-                setError(result.error || "Error desconocido");
-            }
-            updateUserRole(responseTest.data.role);
+            const response = await login({role, password});
+            updateUserRole(response.data.role);
             navigate("/rooms");
-      
+            setLoading(false);
         } catch (error) {
             setLoading(false);
-            /!*setError("Error de red o servidor");*!/
+            setError("Error de red o servidor");
+            console.log(error.message);
         }
-    };*/
+    };
 
 
 
@@ -78,37 +54,30 @@ export default function LoginPage() {
         </div>
         <div className="w-[100%] h-[55%] bg-[var(--color-primary)]">
             <h2 className="text-[50px] text-white text-center pb-[10px]">INICIAR SESIÓN</h2>
-            <form className="w-[50%] mx-auto">
+            <form className="w-[50%] mx-auto" onSubmit={handleLogin}>
                 <LoginInputField 
                     name="USUARIO" 
                     placeholder="Ingrese su usuario" 
-                    value={userName} 
-                    onChange={(e)=>{setUserName(e.target.value)}}
+                    value={role}
+                    onChange={(e)=>{setRole(e.target.value)}}
                 />
                 <LoginInputField 
                     name="CONTRASEÑA" 
                     placeholder="Ingrese su contraseña" 
-                    value={passWord} 
+                    value={password}
                     onChange={(e)=>{setPassword(e.target.value)}}
                     type="password"
                 />
                 <div className="flex justify-evenly">
                     <button 
-                        type="button" 
-                        className="text-white w-[20%] py-1.5 bg-black/30"
-                        onClick={/*handleLogin*/()=>{
-                            const user = users.find(user => user.nombre === userName && user.password === passWord);
-                            if (user){
-                                updateUserRole(user.role);
-                                navigate("/rooms");
-                            }
-                        }}
+                        type="submit"
+                        className="text-white w-[20%] py-1.5 bg-black/30 cursor-pointer"
                     >
                         ENTRAR
                     </button>
                     <button 
                         type="button" 
-                        className="text-white w-[20%] py-1.5 bg-black/30" 
+                        className="text-white w-[20%] py-1.5 bg-black/30 cursor-pointer"
                     >
                         SALIR
                     </button>

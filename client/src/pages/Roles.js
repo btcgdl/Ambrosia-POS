@@ -3,11 +3,11 @@ import NavBar from "../components/navbar/NavBar";
 import Header from "../components/header/Header";
 import { useMock } from "../contexts/MockSocketContext";
 
-export default function Users() {
-    const { users, addUser, updateUser, deleteUser } = useMock();
+export default function Roles() {
+    const { roles, addRole, updateRole, deleteRole } = useMock();
     const [editing, setEditing] = useState(null);
-    const [form, setForm] = useState({ nombre: "", pin: "" });
-    const [showPin, setShowPin] = useState(false);
+    const [form, setForm] = useState({ role: "", password: "" });
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -17,23 +17,23 @@ export default function Users() {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editing) {
-            updateUser({ ...form, id: editing });
+            updateRole({ ...form, id: editing });
         } else {
-            addUser(form);
+            addRole(form);
         }
-        setForm({ nombre: "", pin: "" });
+        setForm({ role: "", password: "" });
         setEditing(null);
-        setShowPin(false);
+        setShowPassword(false);
     };
 
-    const startEdit = (user) => {
-        setForm({ nombre: user.nombre, pin: user.pin });
-        setEditing(user.id);
-        setShowPin(false);
+    const startEdit = (role) => {
+        setForm({ role: role.role, password: role.password });
+        setEditing(role.id);
+        setShowPassword(false);
     };
 
-    const toggleShowPin = () => {
-        setShowPin((prev) => !prev);
+    const toggleShowPassword = () => {
+        setShowPassword((prev) => !prev);
     };
 
     return (
@@ -42,65 +42,63 @@ export default function Users() {
             <div className="w-[75%] h-full">
                 <Header />
                 <main className="h-[90%] w-full flex items-center justify-center">
-                    <div className="h-[90%] w-[90%] bg-amber-100 rounded-xl p-6 flex flex-col items-center gap-6 overflow-y-auto">
-                        <h2 className="text-3xl font-bold">Gestión de Usuarios</h2>
+                    <div className="h-[80%] w-[80%] bg-amber-200 rounded-xl p-6 flex flex-col items-center gap-6 overflow-y-auto">
+                        <h2 className="text-3xl font-bold">Gestión de Roles</h2>
 
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-xl">
                             <input
-                                name="nombre"
-                                value={form.nombre}
+                                name="role"
+                                value={form.role}
                                 onChange={handleChange}
-                                placeholder="Nombre"
+                                placeholder="Nombre del Rol"
                                 className="text-2xl p-3 rounded-lg"
                                 required
                             />
                             <div className="relative">
                                 <input
-                                    name="pin"
-                                    type={showPin ? "text" : "password"}
-                                    maxLength={6}
-                                    value={form.pin}
+                                    name="password"
+                                    type={showPassword ? "text" : "password"}
+                                    value={form.password}
                                     onChange={handleChange}
-                                    placeholder="PIN (solo números)"
+                                    placeholder="Contraseña"
                                     className="text-2xl p-3 rounded-lg w-full"
                                     required
-                                    pattern="\d*"
                                 />
                                 <button
                                     type="button"
-                                    onClick={toggleShowPin}
+                                    onClick={toggleShowPassword}
                                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-2xl"
                                 >
-                                    {showPin ? "👁️‍🗨️" : "👁️"}
+                                    {showPassword ? "👁️‍🗨️" : "👁️"}
                                 </button>
                             </div>
                             <button
                                 type="submit"
                                 className="bg-green-500 text-white text-2xl py-3 rounded-lg hover:bg-green-600"
                             >
-                                {editing ? "Actualizar Usuario" : "Agregar Usuario"}
+                                {editing ? "Actualizar Rol" : "Agregar Rol"}
                             </button>
                         </form>
 
                         <div className="w-full max-w-4xl mt-4 space-y-4">
-                            {users.map((user) => (
+                            {roles.map((role) => (
                                 <div
-                                    key={user.id}
+                                    key={role.id}
                                     className="bg-white p-4 rounded-xl flex justify-between items-center text-2xl shadow-md"
                                 >
                                     <div>
-                                        <strong>{user.nombre}</strong> – PIN: ****
+                                        <strong>{role.role}</strong> – Contraseña: ****
                                     </div>
                                     <div className="flex gap-4">
                                         <button
                                             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                                            onClick={() => startEdit(user)}
+                                            onClick={() => startEdit(role)}
                                         >
                                             Editar
                                         </button>
                                         <button
                                             className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                                            onClick={() => deleteUser(user.id)}
+                                            onClick={() => deleteRole(role.id)}
                                         >
                                             Eliminar
                                         </button>

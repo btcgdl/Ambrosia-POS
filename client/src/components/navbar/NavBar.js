@@ -25,6 +25,8 @@ export default function NavBar() {
                 {userRole === "admin" && (<>
                     <NavBarButton text="Conf" icon="gear-fill" onClick={()=>{}}/>
                     <NavBarButton text="Usuarios" icon="people-fill" onClick={()=>{navigate("/users")}}/>
+                    <NavBarButton text="Roles" icon="people-fill" onClick={()=>{navigate("/roles")}}/>
+                    <NavBarButton text="Inventario" icon="people-fill" onClick={()=>{navigate("/inventory")}}/>
                 </>)}
                 <NavBarButton text="Salir" icon="box-arrow-right" onClick={()=>{navigate("/")}}/>
             </div>
