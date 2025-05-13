@@ -39,6 +39,8 @@ fun Application.module() {
     }
     install(CORS) {
         anyHost()
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
     }
     configureRouting()
     configureAuth()
