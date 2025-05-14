@@ -80,7 +80,7 @@ echo
 if [[ $AUTO_YES -eq 1 ]]; then
     save_env="y"
 else
-    read -p "Do you want to save the hash and base32 to a .env file? [y/N]: " save_env
+    read -p "Do you want to save the hash and base32 to a .env file? [Y/n]: " save_env
 fi
 
 # Check if the .env file already exists and prompt replacement
@@ -88,7 +88,7 @@ if [ -f ".env" ] && [[ "$save_env" =~ ^[Yy]$ ]]; then
     if [[ $AUTO_YES -eq 1 ]]; then
         overwrite="y"
     else
-        read -p ".env file already exists. Do you want to overwrite it? [y/N]: " overwrite
+        read -p ".env file already exists. Do you want to overwrite it? [Y/n]: " overwrite
     fi
     if [[ ! "$overwrite" =~ ^[Yy]$ ]]; then
         echo "Exiting without saving."
