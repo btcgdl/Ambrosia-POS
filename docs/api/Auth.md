@@ -1,7 +1,7 @@
 ### 1. Autenticación
 
-- `POST /auth/login`: Autentica a un usuario específico dentro de la instancia de la aplicación (verificando credenciales) y establece el estado de la sesión del usuario actual para esta instancia. El `X-Auth-Token` aún es necesario para autenticar la aplicación cliente que realiza la llamada.
- - **Authorization: `X-Auth-Token` requerido.**
+- `POST /auth/login`: Autentica a un usuario específico dentro de la instancia de la aplicación (verificando credenciales) y establece el estado de la sesión del usuario actual para esta instancia. El `WWW-Authenticate` aún es necesario para autenticar la aplicación cliente que realiza la llamada.
+ - **Authorization: `WWW-Authenticate` requerido.**
  - **Request Body:**
   ``` JSON
   {
@@ -40,11 +40,11 @@
     "message": "Unauthorized API access"
   }
   ```
-- `POST /auth/logout`: Cierra la sesión del usuario actualmente loggeado en esta instancia de la aplicación. Esto borra el estado de la sesión del usuario en el servidor para este cliente particular (identificado por el X-Auth-Token). El X-Auth-Token sigue siendo válido para autenticar la aplicación, pero las operaciones que requieran un usuario loggeado o un rol específico podrían fallar después de esto.
- - Authorization: `X-Auth-Token` requerido.
+- `POST /auth/logout`: Cierra la sesión del usuario actualmente loggeado en esta instancia de la aplicación. Esto borra el estado de la sesión del usuario en el servidor para este cliente particular. El `WWW-Authenticate` sigue siendo válido para autenticar la aplicación, pero las operaciones que requieran un usuario loggeado o un rol específico podrían fallar después de esto.
+ - Authorization: `WWW-Authenticate` requerido.
  - cURL Example: 
  ```Bash
- curl -X POST "${API_BASE_URL}/auth/logout" \
+ curl -X POST http://127.0.0.1:5000/auth/logout \
 -H "X-Auth-Token: ${AUTH_TOKEN}"
 ```
 - **Response Body (Éxito - 204 No Content):** (Sin cuerpo)
