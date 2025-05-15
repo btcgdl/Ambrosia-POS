@@ -66,4 +66,5 @@ fun Application.module() {
     }
     configureRouting()
     configureAuth()
+    configureUsers()
 }

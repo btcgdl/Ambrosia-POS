@@ -13,3 +13,6 @@ data class ApiResponse<T>(val data: T? = null)
 
 @Serializable
 data class Message(val message: String)
+
+@Serializable
+data class User(val id: String, val name: String, val pin: Int)
