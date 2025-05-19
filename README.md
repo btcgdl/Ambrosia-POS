@@ -22,6 +22,14 @@ El sistema está diseñado para optimizar las operaciones diarias de un restaura
 
 Consulta los archivos mencionados para obtener más detalles sobre el proyecto.
 
+## Dependencias del Proyecto
+
+### Requisitos principales
+
+- **npm**: Para gestionar las dependencias del frontend (React/Electron).
+- **Gradle 8.1.4**: Para construir y gestionar el backend en Kotlin.
+- **JDK 21**: Java Development Kit versión 21, requerido para compilar y ejecutar el backend.
+
 ## Scripts de Desarrollo
 
 *Cliente (Frontend - React/Electron)*
