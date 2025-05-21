@@ -11,19 +11,22 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import pos.ambrosia.models.User
 import pos.ambrosia.services.UsersService
+import pos.ambrosia.db.connectToSqlite
+import java.sql.Connection
 
 fun Application.configureUsers() {
+    val connection: Connection = connectToSqlite()
+    val userService = UsersService(connection)
     routing {
         route("/users") {
-            users() 
+            users(userService)
         }
     }
 }
 
-fun Route.users() {
+fun Route.users(userService: UsersService) {
     authenticate("auth-basic") {
         get("") {
-            val userService = UsersService()
             val users = userService.getUsers()
             if (users.isEmpty()) {
                 call.respond(HttpStatusCode.NoContent, "No users found")
@@ -34,7 +37,6 @@ fun Route.users() {
         get("/{id}") {
             val id = call.parameters["id"]
             if (id != null) {
-                val userService = UsersService()
                 val user = userService.getUserById(id)
                 if (user != null) {
                     call.respond(HttpStatusCode.OK, user)
@@ -46,7 +48,6 @@ fun Route.users() {
             }
         }
         post("") {
-            val userService = UsersService()
             val user = call.receive<User>()
             userService.addUser(user)
             call.respond(HttpStatusCode.Created, "User added successfully")
@@ -54,7 +55,6 @@ fun Route.users() {
         put("/{id}") {
             val id = call.parameters["id"]
             if (id != null) {
-                val userService = UsersService()
                 val updatedUser = call.receive<User>()
                 val isUpdated = userService.updateUser(id, updatedUser)
                 if (isUpdated) {
@@ -69,7 +69,6 @@ fun Route.users() {
         delete("/{id}") {
             val id = call.parameters["id"]
             if (id != null) {
-                val userService = UsersService()
                 val isDeleted = userService.deleteUser(id)
                 if (isDeleted) {
                     call.respond(HttpStatusCode.NoContent, "User deleted successfully")

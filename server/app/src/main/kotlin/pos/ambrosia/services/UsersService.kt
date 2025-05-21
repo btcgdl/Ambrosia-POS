@@ -1,12 +1,14 @@
 package pos.ambrosia.services
 
 import pos.ambrosia.models.User
+import java.sql.Connection
 
-class UsersService {
+class UsersService(private val connection: Connection) {
+
     // Simulate a database of users
     private val users = mutableListOf<User>()
 
-    suspend fun addUser(user: User) {
+    suspend fun addUser(user: User) {   
         users.add(user)
     }
 

@@ -22,9 +22,8 @@ val dotenv = Dotenv.configure()
 .directory("../../")
 .load();
 
-fun main() {
-    embeddedServer(Netty, port = 5000, host = "127.0.0.1", module = Application::module)
-        .start(wait = true)
+fun main(args: Array<String>) {
+    EngineMain.main(args)
 }
 
 fun Application.module() {
