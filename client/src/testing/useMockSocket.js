@@ -56,7 +56,16 @@ export function useMockSocket() {
                 { id: 2, name: 'Proveedor B', ingredientIds: [3, 4] },
             ],
             restocks: [
-                { id: 1, ingredientId: 1, supplierId: 1, quantity: 10, totalCost: 1000, date: '2025-05-01' },
+                {
+                    id: 1,
+                    supplierId: 1,
+                    date: '2025-05-01',
+                    items: [
+                        { ingredientId: 1, quantity: 10, cost: 1000 },
+                        { ingredientId: 2, quantity: 5, cost: 100 },
+                    ],
+                    totalCost: 1100,
+                },
             ],
             ingredientCategories: ['Carnes', 'Vegetales', 'Lácteos', 'Granos'],
         };
@@ -165,19 +174,27 @@ export function useMockSocket() {
     // REABASTECIMIENTOS
     const addRestock = (restock) => {
         const newRestock = {
-            ...restock,
             id: Date.now(),
+            supplierId: restock.supplierId,
             date: new Date().toISOString().split('T')[0],
+            items: restock.items.map((item) => ({
+                ingredientId: item.ingredientId,
+                quantity: item.quantity,
+                cost: item.cost,
+            })),
+            totalCost: restock.totalCost,
         };
         setRestocks((prev) => [...prev, newRestock]);
-        // Sumar al stock del ingrediente
-        setIngredients((prev) =>
-            prev.map((ing) =>
-                ing.id === restock.ingredientId
-                    ? { ...ing, quantity: ing.quantity + restock.quantity }
-                    : ing
-            )
-        );
+        // Sumar al stock de los ingredientes
+        restock.items.forEach((item) => {
+            setIngredients((prev) =>
+                prev.map((ing) =>
+                    ing.id === item.ingredientId
+                        ? { ...ing, quantity: ing.quantity + item.quantity }
+                        : ing
+                )
+            );
+        });
         return newRestock;
     };
 
