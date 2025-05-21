@@ -44,11 +44,10 @@ export default function Ingredients() {
 
     return (
         <div className="flex w-screen h-screen">
-            <NavBar />
+            <InventoryNavBar />
             <div className="w-[75%] h-full flex flex-col">
                 <Header />
-                <InventoryNavBar />
-                <main className="h-[80%] w-full flex items-center justify-center">
+                <main className="h-[90%] w-full flex items-center justify-center">
                     <div className="h-[90%] w-[90%] bg-amber-100 rounded-xl p-6 flex flex-col items-center gap-6 overflow-y-auto">
                         <h2 className="text-3xl font-bold">Ingredientes</h2>
                         <div className="mb-4">
