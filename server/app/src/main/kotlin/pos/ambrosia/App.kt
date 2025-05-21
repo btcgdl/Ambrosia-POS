@@ -22,7 +22,7 @@ val dotenv = Dotenv.configure()
 .load();
 
 fun main() {
-    embeddedServer(Netty, port = 5000, host = "127.0.0.1", module = Application::module)
+    embeddedServer(Netty, port = 5000, host = "0.0.0.0", module = Application::module)
         .start(wait = true)
 }
 
