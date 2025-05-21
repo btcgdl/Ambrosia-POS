@@ -1,22 +1,26 @@
 import { useState } from "react";
-import NavBar from "../components/navbar/NavBar";
 import InventoryNavBar from "../components/inventory/InventoryNavBar";
 import Header from "../components/header/Header";
 import { useMock } from "../contexts/MockSocketContext";
 
 export default function Suppliers() {
-    const { suppliers, addSupplier, updateSupplier, deleteSupplier, ingredients } = useMock();
+    const { suppliers, addSupplier, updateSupplier, deleteSupplier, ingredients, ingredientCategories } = useMock();
     const [editingSupplier, setEditingSupplier] = useState(null);
     const [formSupplier, setFormSupplier] = useState({ name: "", ingredientIds: [] });
+    const [filterCategory, setFilterCategory] = useState("Todas");
 
     const handleChangeSupplier = (e) => {
         const { name, value } = e.target;
-        if (name === "ingredientIds") {
-            const ids = Array.from(e.target.selectedOptions, (option) => Number(option.value));
-            setFormSupplier((prev) => ({ ...prev, ingredientIds: ids }));
-        } else {
-            setFormSupplier((prev) => ({ ...prev, [name]: value }));
-        }
+        setFormSupplier((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleToggleIngredient = (ingredientId) => {
+        setFormSupplier((prev) => {
+            const ingredientIds = prev.ingredientIds.includes(ingredientId)
+                ? prev.ingredientIds.filter((id) => id !== ingredientId)
+                : [...prev.ingredientIds, ingredientId];
+            return { ...prev, ingredientIds };
+        });
     };
 
     const handleSubmitSupplier = (e) => {
@@ -35,13 +39,16 @@ export default function Suppliers() {
         setEditingSupplier(supplier.id);
     };
 
+    const filteredIngredients = filterCategory === "Todas"
+        ? ingredients
+        : ingredients.filter((ing) => ing.category === filterCategory);
+
     return (
         <div className="flex w-screen h-screen">
-            <NavBar />
+            <InventoryNavBar />
             <div className="w-[75%] h-full flex flex-col">
                 <Header />
-                <InventoryNavBar />
-                <main className="h-[80%] w-full flex items-center justify-center">
+                <main className="h-[90%] w-full flex items-center justify-center">
                     <div className="h-[90%] w-[90%] bg-amber-100 rounded-xl p-6 flex flex-col items-center gap-6 overflow-y-auto">
                         <h2 className="text-3xl font-bold">Proveedores</h2>
                         <form onSubmit={handleSubmitSupplier} className="flex flex-col gap-4 w-full max-w-xl mb-6">
@@ -53,17 +60,44 @@ export default function Suppliers() {
                                 className="text-2xl p-3 rounded-lg"
                                 required
                             />
-                            <select
-                                name="ingredientIds"
-                                multiple
-                                value={formSupplier.ingredientIds}
-                                onChange={handleChangeSupplier}
-                                className="text-2xl p-3 rounded-lg"
-                            >
-                                {ingredients.map((ing) => (
-                                    <option key={ing.id} value={ing.id}>{ing.name}</option>
-                                ))}
-                            </select>
+                            <div className="flex flex-col gap-2">
+                                <select
+                                    value={filterCategory}
+                                    onChange={(e) => setFilterCategory(e.target.value)}
+                                    className="text-2xl p-3 rounded-lg"
+                                >
+                                    <option value="Todas">Todas las categorías</option>
+                                    {ingredientCategories.map((category) => (
+                                        <option key={category} value={category}>{category}</option>
+                                    ))}
+                                </select>
+                                <div className="max-h-64 overflow-y-auto bg-white rounded-lg p-3">
+                                    {filteredIngredients.length > 0 ? (
+                                        filteredIngredients.map((ingredient) => (
+                                            <div
+                                                key={ingredient.id}
+                                                className={`flex items-center gap-3 p-3 rounded-lg ${
+                                                    formSupplier.ingredientIds.includes(ingredient.id)
+                                                        ? "bg-green-100"
+                                                        : "bg-white"
+                                                }`}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formSupplier.ingredientIds.includes(ingredient.id)}
+                                                    onChange={() => handleToggleIngredient(ingredient.id)}
+                                                    className="h-6 w-6"
+                                                />
+                                                <span className="text-2xl">
+                                                    {ingredient.name} ({ingredient.category})
+                                                </span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-2xl text-gray-500">No hay ingredientes en esta categoría</p>
+                                    )}
+                                </div>
+                            </div>
                             <button
                                 type="submit"
                                 className="bg-green-500 text-white text-2xl py-3 rounded-lg hover:bg-green-600"
@@ -78,7 +112,7 @@ export default function Suppliers() {
                                     className="bg-white p-4 rounded-xl flex justify-between items-center text-2xl shadow-md"
                                 >
                                     <div>
-                                        <strong>{supplier.name}</strong> – Ingredientes: {supplier.ingredientIds.map((id) => ingredients.find((ing) => ing.id === id)?.name).join(", ")}
+                                        <strong>{supplier.name}</strong> – Ingredientes: {supplier.ingredientIds.map((id) => ingredients.find((ing) => ing.id === id)?.name).filter(Boolean).join(", ")}
                                     </div>
                                     <div className="flex gap-4">
                                         <button
