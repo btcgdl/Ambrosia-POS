@@ -68,15 +68,10 @@ fun Application.module() {
             realm = "POS Ambrosia API"
             validate { credentials ->
                 // Try to get password from custom config, then environment variable, then default
-                val passwordFromConfig = AppConfig.getProperty("API_PASSWORD")
-                val passwordFromEnv = System.getenv("API_PASSWORD")
-                val apiPassword = passwordFromConfig ?: passwordFromEnv ?: "password"
+                val passwordFromConfig = AppConfig.getProperty("TOKEN_HASH")
+                val apiPassword = passwordFromConfig
 
-                // Example: expecting username "admin"
-                // You can adjust the expected username as needed or load it from config/env as well
-                val expectedUsername = AppConfig.getProperty("API_USERNAME") ?: System.getenv("API_USERNAME") ?: "admin"
-
-                if (credentials.name == expectedUsername && credentials.password == apiPassword) {
+                if (credentials.name == "" && credentials.password == apiPassword) {
                     // Valid credentials - UserIdPrincipal can be used if you need to identify the user later
                     UserIdPrincipal(credentials.name)
                 } else {
