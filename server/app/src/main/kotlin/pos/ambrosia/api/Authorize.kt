@@ -7,7 +7,6 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.request.*
-import io.ktor.server.plugins.statuspages.*
 import pos.ambrosia.models.ApiResponse
 import pos.ambrosia.models.AuthRequest
 import io.ktor.server.auth.*
@@ -15,12 +14,12 @@ import io.ktor.server.auth.*
 fun Application.configureAuth() {
     routing {
         route("/auth") {
-            authenticate()
+            auth()
         }
     }
 }
 
-fun Route.authenticate() {
+fun Route.auth() {
     authenticate("auth-basic") {
         post("/login") {
             val loginRequest = call.receive<AuthRequest>()

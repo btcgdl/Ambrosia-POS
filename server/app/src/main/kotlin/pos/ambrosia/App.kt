@@ -15,32 +15,44 @@ import io.ktor.server.response.*
 import io.ktor.http.*
 import pos.ambrosia.models.ApiResponse
 import pos.ambrosia.models.Message
-import io.github.cdimascio.dotenv.Dotenv
+import pos.ambrosia.config.AppConfig
+import java.sql.SQLException
+import org.slf4j.LoggerFactory
 
-// Get the credentials from .env file
-val dotenv = Dotenv.configure()
-.directory("../../")
-.load();
+private val logger = LoggerFactory.getLogger("pos.ambrosia.App")
 
-fun main() {
-    embeddedServer(Netty, port = 5000, host = "127.0.0.1", module = Application::module)
-        .start(wait = true)
+fun main(args: Array<String>) {
+    logger.info("Starting Ambrosia POS server...")
+    AppConfig.loadConfig() // Load custom config before starting the server
+    EngineMain.main(args)
 }
 
 fun Application.module() {
     // Exception handling
     install(StatusPages)
     {
+        exception<SQLException> { call, cause ->
+            logger.error("Database connection error: ${cause.message}", cause)
+            call.respond(HttpStatusCode.InternalServerError, Message("Error connecting to the database"))
+        }
         exception<Throwable> { call, cause ->
+            logger.error("Unhandled Throwable: ${cause.message}", cause)
             call.respondText(text = cause.message?: "", status = defaultExceptionStatusCode(cause)?: HttpStatusCode.InternalServerError)
         }
-        exception<InvalidCredentialsException> { call, _->
+        exception<InvalidCredentialsException> { call, cause ->
+            logger.warn("Invalid login attempt: ${cause.message}")
             call.respond(HttpStatusCode.Unauthorized, Message("Invalid credentials"))
         }
-        exception<UnauthorizedApiException> { call, _->
+        exception<Exception> { call, cause ->
+            logger.error("Unhandled exception: ${cause.message}", cause)
+            call.respond(HttpStatusCode.InternalServerError, Message("Internal server error"))
+        }
+        exception<UnauthorizedApiException> { call, cause ->
+            logger.warn("Unauthorized API access attempt: ${cause.message}")
             call.respond(HttpStatusCode.Forbidden, Message("Unauthorized API access"))
         }
         status(HttpStatusCode.NotFound) { call, status ->
+            logger.info("Resource not found: ${call.request}")
             call.respondText(text = "Unknown endpoint (check api doc)", status = status)
         }
     }
@@ -55,10 +67,20 @@ fun Application.module() {
         basic("auth-basic") {
             realm = "POS Ambrosia API"
             validate { credentials ->
-                val password = dotenv["TOKEN_HASH"]
-                if (credentials.name == "" && credentials.password == password) {
-                    
+                // Try to get password from custom config, then environment variable, then default
+                val passwordFromConfig = AppConfig.getProperty("API_PASSWORD")
+                val passwordFromEnv = System.getenv("API_PASSWORD")
+                val apiPassword = passwordFromConfig ?: passwordFromEnv ?: "password"
+
+                // Example: expecting username "admin"
+                // You can adjust the expected username as needed or load it from config/env as well
+                val expectedUsername = AppConfig.getProperty("API_USERNAME") ?: System.getenv("API_USERNAME") ?: "admin"
+
+                if (credentials.name == expectedUsername && credentials.password == apiPassword) {
+                    // Valid credentials - UserIdPrincipal can be used if you need to identify the user later
+                    UserIdPrincipal(credentials.name)
                 } else {
+                    // Invalid credentials
                     throw UnauthorizedApiException()
                 }
             }
@@ -66,4 +88,5 @@ fun Application.module() {
     }
     configureRouting()
     configureAuth()
+    configureUsers()
 }

@@ -18,7 +18,7 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     echo "Flags:"
     echo "  -y, --yes   Automatic yes to prompts; enables non-interactive mode."
     echo "              In this mode, the raw passphrase is NOT printed to stdout."
-    echo "              If a .env file exists, it will be overwritten without a prompt."
+    echo "              If a ambrosia.conf file exists, it will be overwritten without a prompt."
     echo
     echo "To decode the Base32 string in your console, use:"
     echo "  echo Base32String | base32 -d"
@@ -65,30 +65,30 @@ hash=$(printf "$passphrase" | sha256sum | awk '{print $1}')
 base32=$(echo -n "$passphrase" | base32 | tr -d '\n')
 
 # --- Display Results ---
-echo "🎲 Diceware passphrase:"
+echo "Api passphrase:"
 echo "$passphrase"
 echo
-echo "🔐 SHA-256 hash:"
+echo "Token hash (SHA-256):"
 echo "$hash"
 echo
-echo "🔢 Base32 (for easy verbal transmission):"
+echo "Token base32:"
 echo "$base32"
 echo
 
-# --- Save to .env file ---
-# Ask if the user wants to save to a .env file
+# --- Save to ambrosia.conf file ---
+# Ask if the user wants to save to a ambrosia.conf file
 if [[ $AUTO_YES -eq 1 ]]; then
     save_env="y"
 else
-    read -p "Do you want to save the hash and base32 to a .env file? [Y/n]: " save_env
+    read -p "Do you want to save the hash and base32 to a ambrosia.conf file? [Y/n]: " save_env
 fi
 
-# Check if the .env file already exists and prompt replacement
-if [ -f ".env" ] && [[ "$save_env" =~ ^[Yy]$ ]]; then
+# Check if the ambrosia.conf file already exists and prompt replacement
+if [ -f "ambrosia.conf" ] && [[ "$save_env" =~ ^[Yy]$ ]]; then
     if [[ $AUTO_YES -eq 1 ]]; then
         overwrite="y"
     else
-        read -p ".env file already exists. Do you want to overwrite it? [Y/n]: " overwrite
+        read -p "ambrosia.conf file already exists. Do you want to overwrite it? [Y/n]: " overwrite
     fi
     if [[ ! "$overwrite" =~ ^[Yy]$ ]]; then
         echo "Exiting without saving."
@@ -96,12 +96,21 @@ if [ -f ".env" ] && [[ "$save_env" =~ ^[Yy]$ ]]; then
     fi
 fi
 
-# If the user wants to save, create or overwrite the .env file
+# Make data directory if it doesn't exist in $HOME
+if [ ! -d "$HOME/.Ambrosia-POS" ]; then
+    mkdir "$HOME/.Ambrosia-POS"
+    echo "Created directory $HOME/.Ambrosia-POS"
+fi
+
+# If the user wants to save, create or overwrite the ambrosia.conf file
 if [[ "$save_env" =~ ^[Yy]$ ]]; then
-    echo "Creating .env file..."
-    echo "TOKEN_HASH=$hash" >> .env
-    echo "TOKEN_BASE32=$base32" >> .env
-    echo "Values saved to .env file."
+    echo 
+    echo "Creating ambrosia.conf in $HOME/.Ambrosia-POS"
+    echo "TOKEN_HASH=$hash" >> "$HOME/.Ambrosia-POS/ambrosia.conf"
+    echo "TOKEN_BASE32=$base32" >> "$HOME/.Ambrosia-POS/ambrosia.conf"
+    echo "Values saved to ambrosia.conf in $HOME/.Ambrosia-POS"
+    echo 
 else
     echo "Exiting without saving."
 fi
+
