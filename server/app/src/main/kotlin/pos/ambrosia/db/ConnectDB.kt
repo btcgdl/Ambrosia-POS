@@ -16,7 +16,7 @@ fun Application.connectToSqlite(): Connection
         DriverManager.getConnection("jdbc:sqlite:$DBPath")
     } catch (e: SQLException) {
         logger.error("Error connecting to SQLite database: ${e.message}")
-        logger.error("Shutting down the application use install.sh to install the application")
+        logger.error("Shutting down the application use ./install.sh to install the application")
         System.exit(1) // Exit the program with a non-zero status
         throw IllegalStateException("This code should not be reached") // To satisfy the compiler
     }

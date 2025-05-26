@@ -48,12 +48,12 @@ npm start
 
 *Servidor (Backend - Kotlin/Gradle)*
 
-*Generar Token*
+*Install App*
 
-Para generar un token de autenticación para pruebas o desarrollo:
+Para generar el data directory y el token del API
 
 ```sh
-./generate-token.sh
+./install.sh 
 ```
 
 Para ejecutar el servidor en modo de desarrollo:
