@@ -3,7 +3,7 @@
 ## User
 - **Description**: Users of the system.
 - **Fields**:
-    - `id`: number @unique UUID
+    - `id`: UUID @unique
     - `name`: string (255)
     - `pin`: number (6)
 - **Example**: `{id: 1, name: "Angel", pin: 123456}`
@@ -11,72 +11,70 @@
 ## Role
 - **Description**: Role of system.
 - **Fields**:
-    - `id`: number @unique
+    - `id`: UUID @unique
     - `name`: string (255)
     - `description`: string (255)
-- **Example**: `{id: 1, role: "admin", description: "Role for Administration"}`
+- **Example**: `{id: 1, name: "admin", description: "Role for Administration"}`
 
 ## Role_User
 - **Description**: Relation User Role.
 - **Fields**:
-    - `id_user`: number @Relation(User)
-    - `id_role`: number @Relation(Role)
+    - `id_user`: UUID @Relation(User)
+    - `id_role`: UUID @Relation(Role)
 - **Example**: `{id_user: 1, id_role:1}`
 
 ## Dishes
 - **Description**: Dishes for Menu.
 - **Fields**:
-    - `id`: number @unique
+    - `id`: UUID @unique
     - `name`: string (255)
-    - `price`: number
-- **Example**: `{id: 1, name: "Tacos al Pastor", category_id: 1, price: 80.0}`
+    - `price`: decimal (10,2)
+- **Example**: `{id: 1, name: "Tacos al Pastor", price: 80.0}`
 
 ## Dishes_Ingredient
 - **Description**: Relation Dishes Ingredients.
 - **Fields**:
-    - `id_dish`: number @Relation(dishes)
-    - `id_ingredient`: number @Relation(ingredient)
+    - `id_dish`: UUID @Relation(dishes)
+    - `id_ingredient`: UUID @Relation(ingredient)
     - `quantity`: number
-    - `unit`: string
-- **Example**: `{id_dish: 1, id_ingredient: 1, quantity: 2, unit: "kg"}`
+- **Example**: `{id_dish: 1, id_ingredient: 1, quantity: 2}`
 
 
 ## Dishes_Category
 - **Description**: Categories of dishes.
 - **Fields**:
-    -`id`: number @unique
+    -`id`: UUID @unique
     -`name`: string
 - **Example**: `{id: 1, name: "Mexicana"}`
 
 ## Ingredient 
 - **Description**: Ingredient on stock.
 - **Fields**: 
-    - `id`: number @unique
+    - `id`: UUID @unique
     - `name`: string
     - `quantity`: number
-    - `unit`: string
     - `lowStockThreshold`: number
-    - `costPerUnit`: number
-- **Example**: `{id: 1, name: "Peinecillo", quantity: 20, unit: "kg", lowStockThreshold: 5, costPerUnit: 100}`
+    - `costPerUnit`: decimal(10,2)
+- **Example**: `{id: 1, name: "Peinecillo", quantity: 20, lowStockThreshold: 5, costPerUnit: 100}`
 
 ## Category_Ingredients
 - **Description**: Category of ingredients.
 - **Fields**:
-    - `id`: number @unique
+    - `id`: UUID @unique
     - `name`: string
 - **Example**: `{id: 1, name: "Carnes"}`
 
 ## Ingredient_Category
 - **Description**: Relation Category with Ingredient.
 - **Fields**: 
-    - `id_category_ingredient`: number @Relation(category_ingredient)
-    - `id_ingredient`: number @Relation(ingredient)
+    - `id_category_ingredient`: UUID @Relation(category_ingredient)
+    - `id_ingredient`: UUID @Relation(ingredient)
 - **Example**: `{id_category_ingredient: 1, id_ingredient: 1}`
 
 ## Supplier
 - **Description**: Suppliers for ingredients.
 - **Fields**:
-    - `id`: number @unique
+    - `id`: UUID @unique
     - `name`: string
     - `contact`: string
     - `phone`: number
@@ -87,9 +85,9 @@
 ## Ingredient_Supplier
 - **Description**: Relation Suppliers with Ingredients.
 - **Fields**:
-    - `id_supplier`: number @Relation(supplier)
-    - `id_ingredient`: number @Relation(ingredient)
+    - `id_supplier`: UUID @Relation(supplier)
+    - `id_ingredient`: UUID @Relation(ingredient)
     - `date`: date
-    - `totalCost`: number
+    - `totalCost`: decimal(10,2)
     - `quantity`: number
 - **Example**: `{id_supplier: 1, id_ingredient: 1, date: "2025-05-26", totalCost: 10000.00, quantity: 10`}
