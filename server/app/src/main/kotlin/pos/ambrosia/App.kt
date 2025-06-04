@@ -62,6 +62,8 @@ fun Application.module() {
     }
     install(CORS) {
         anyHost()
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
     }
     install(Authentication) {
         basic("auth-basic") {
