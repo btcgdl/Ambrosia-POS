@@ -91,3 +91,46 @@
     - `totalCost`: decimal(10,2)
     - `quantity`: number
 - **Example**: `{id_supplier: 1, id_ingredient: 1, date: "2025-05-26", totalCost: 10000.00, quantity: 10`}
+
+## Order
+- **Description**: Table for orders.
+- **Fields**:
+    - `id`: UUID @unique
+    - `id_user`: UUID @Relation(user)
+    - `order_date`: datetime
+    - `status`: number
+    - `total_amount`: decimal(10,2)
+    - `notes`: string
+- **Example**: `{id: 1, id_user: 1, order_date: 2025-06-02 15:09, status: 2, total_amount: 590.23, notes: "sin chile"`}
+
+## Order_Dish
+- **Description**: Table for dishes.
+- **Fields**:
+    - `id`: UUID @unique
+    - `id_order` UUID @Relation(order)
+    - `id_dish`: UUID @Relation(dishes)
+    - `quantity`: number
+    - `price_at_order`: decimal(10,2)
+    - `notes`: string
+- **Example**: `{id: 1, id_order: 1, id_dish: 1, quantity: 2,price_at_order: 250.00, notes: "no tanta crema"`}
+
+## Payments_Order
+- **Description**: Table for payments for orders.
+- **Fields**:
+    - `id`: UUID @unique
+    - `id_order`: UUID @Relation(order)
+    - `payment_date`: datetime
+    - `amount`: decimal(10,2)
+    - `payment_method`: uuid @Relation(payment)
+    - `transaction_id`: string
+- **Example**: `{id: 1, id_order: 1, payment_date: 2025-06-02 15:38, amount: 780.0, payment_method: 1, transaction_id: lnasidasiojn213...`}
+
+## Payment
+- **Description**: Table for payment method
+- **Fields**:
+    - `id`: UUID @unique
+    - `currency`: decimal(10,2)
+    - `name`: string
+- **Example**: `{id: 1, currency: 12.00, name: "Satoshis! :)"`}
+
+
