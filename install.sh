@@ -14,7 +14,7 @@ readonly NUM_WORDS=6 # Number of words for the passphrase
 if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     echo "Usage: $0 [-y|--yes]"
     echo
-    echo "Generates a Diceware passphrase, its SHA-256 hash, and a Base32 encoding."
+    echo "Generates a Diceware passphrase, its SHA-256 hash, and a Base64 encoding."
     echo "The script expects '$WORDLIST' to be present in the current directory."
     echo
     echo "Flags:"
@@ -22,8 +22,8 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     echo "              In this mode, the raw passphrase is NOT printed to stdout."
     echo "              If a ambrosia.conf file exists, it will be overwritten without a prompt."
     echo
-    echo "To decode the Base32 string in your console, use:"
-    echo "  echo Base32String | base32 -d"
+    echo "To decode the Base64 string in your console, use:"
+    echo "  echo Base64String | base64 -d"
     exit 0
 fi
 
@@ -63,8 +63,8 @@ passphrase=$(for i in {1..6}; do get_word; done | paste -sd' ')
 # Calculate the hash SHA-256
 hash=$(printf "$passphrase" | sha256sum | awk '{print $1}')
 
-# Encode in Base32
-base32=$(echo -n "$passphrase" | base32 | tr -d '\n')
+# Encode in Base64
+base64=$(echo -n "$passphrase" | base64 | tr -d '\n')
 
 # --- Display Results ---
 echo "Api passphrase:"
@@ -73,8 +73,8 @@ echo
 echo "Token hash (SHA-256):"
 echo "$hash"
 echo
-echo "Token base32:"
-echo "$base32"
+echo "Token base64:"
+echo "$base64"
 echo
 
 # --- Save to ambrosia.conf file ---
@@ -82,7 +82,7 @@ echo
 if [[ $AUTO_YES -eq 1 ]]; then
     save_env="y"
 else
-    read -p "Do you want to save the hash and base32 to a ambrosia.conf file? [Y/n]: " save_env
+    read -p "Do you want to save the hash and base64 to a ambrosia.conf file? [Y/n]: " save_env
 fi
 
 # Check if the ambrosia.conf file already exists and prompt replacement
@@ -109,7 +109,7 @@ if [[ "$save_env" =~ ^[Yy]$ ]]; then
     echo 
     echo "Creating ambrosia.conf in $HOME/.Ambrosia-POS"
     echo "TOKEN_HASH=$hash" >> "$HOME/.Ambrosia-POS/ambrosia.conf"
-    echo "TOKEN_BASE32=$base32" >> "$HOME/.Ambrosia-POS/ambrosia.conf"
+    echo "TOKEN_BASE64=$base64" >> "$HOME/.Ambrosia-POS/ambrosia.conf"
     echo "Values saved to ambrosia.conf in $HOME/.Ambrosia-POS"
     echo 
 else
