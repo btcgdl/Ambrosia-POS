@@ -76,7 +76,6 @@ fun Application.module() {
                 try {
                     val BytePass = Base64.getDecoder().decode(credentials.password)
                     decodedPassword = String(BytePass)
-                    logger.info("Decoded password: $decodedPassword")
                 } catch (e: Exception) {
                     logger.error("Error decoding credentials")
                     throw UnauthorizedApiException()
