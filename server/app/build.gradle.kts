@@ -37,6 +37,10 @@ dependencies {
     implementation(libs.guava)
 }
 
+tasks.named<JavaExec>("run") {
+    jvmArgs("-Dlogback.configurationFile=Ambrosia-Logs.xml")
+}
+
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {

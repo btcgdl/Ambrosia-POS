@@ -48,8 +48,8 @@ fun Application.module() {
             logger.error("Unhandled exception: ${cause.message}", cause)
             call.respond(HttpStatusCode.InternalServerError, Message("Internal server error"))
         }
-        exception<UnauthorizedApiException> { call, cause ->
-            logger.warn("Unauthorized API access attempt: ${cause.message}")
+        exception<UnauthorizedApiException> { call, _ ->
+            logger.warn("Unauthorized API access attempt")
             call.respond(HttpStatusCode.Forbidden, Message("Unauthorized API access"))
         }
         status(HttpStatusCode.NotFound) { call, status ->
@@ -72,15 +72,22 @@ fun Application.module() {
             // Use a custom validation function to check credenti
             validate { credentials ->
                 // Decode the Base64 encoded username and password
-                val BytePass = Base64.getDecoder().decode(credentials.password)
-                val decodedPassword = String(BytePass)
+                val decodedPassword: String
+                try {
+                    val BytePass = Base64.getDecoder().decode(credentials.password)
+                    decodedPassword = String(BytePass)
+                } catch (e: Exception) {
+                    logger.error("Error decoding credentials")
+                    throw UnauthorizedApiException()
+                }
                 // Try to get password from custom config, then environment variable, then default
-                val passwordFromConfig = AppConfig.getProperty("TOKEN_BASE64")
+                val passwordFromConfig = AppConfig.getProperty("TOKEN_HASH")
                 val apiPassword = passwordFromConfig
 
                 if (credentials.name == "" && decodedPassword == apiPassword) {
                     // Valid credentials - UserIdPrincipal can be used if you need to identify the user later
                     UserIdPrincipal(credentials.name)
+                    logger.info("User authenticated successfully")
                 } else {
                     // Invalid credentials
                     throw UnauthorizedApiException()
