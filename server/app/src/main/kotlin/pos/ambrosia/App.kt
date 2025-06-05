@@ -48,8 +48,8 @@ fun Application.module() {
             logger.error("Unhandled exception: ${cause.message}", cause)
             call.respond(HttpStatusCode.InternalServerError, Message("Internal server error"))
         }
-        exception<UnauthorizedApiException> { call, cause ->
-            logger.warn("Unauthorized API access attempt: ${cause.message}")
+        exception<UnauthorizedApiException> { call, _ ->
+            logger.warn("Unauthorized API access attempt")
             call.respond(HttpStatusCode.Forbidden, Message("Unauthorized API access"))
         }
         status(HttpStatusCode.NotFound) { call, status ->
