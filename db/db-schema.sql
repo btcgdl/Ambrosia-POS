@@ -1,92 +1,148 @@
--- Create table for user
-CREATE TABLE User (
-    id UUID PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    pin INT NOT NULL CHECK (pin >= 100000 AND pin <= 999999) -- PIN 6 digits
+-- Restaurant Database Schema for SQLite3
+-- Created based on the provided documentation
+
+-- Enable foreign key constraints
+PRAGMA foreign_keys = ON;
+
+-- Users table
+CREATE TABLE users (
+    id BLOB PRIMARY KEY,
+    name TEXT NOT NULL,
+    pin INTEGER NOT NULL UNIQUE CHECK (pin >= 100000 AND pin <= 999999)
 );
 
--- Create table role
-CREATE TABLE Role (
-    id UUID PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description VARCHAR(255)
+-- Roles table
+CREATE TABLE roles (
+    id BLOB PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT
 );
 
--- Create table role_user
-CREATE TABLE Role_User (
-    id_user UUID,
-    id_role UUID,
-    PRIMARY KEY (id_user, id_role), 
-    FOREIGN KEY (id_user) REFERENCES User(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_role) REFERENCES Role(id) ON DELETE CASCADE
+-- Roles_Users junction table
+CREATE TABLE roles_users (
+    id_user BLOB NOT NULL,
+    id_role BLOB NOT NULL,
+    PRIMARY KEY (id_user, id_role),
+    FOREIGN KEY (id_user) REFERENCES users(id),
+    FOREIGN KEY (id_role) REFERENCES roles(id)
 );
 
--- Create table dishes_category
-CREATE TABLE Dishes_Category (
-    id UUID PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+-- Dishes_Category table
+CREATE TABLE dishes_category (
+    id BLOB PRIMARY KEY,
+    name TEXT NOT NULL
 );
 
--- Create table dishes
-CREATE TABLE Dishes (
-    id UUID PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    price DECIMAL(10,2) NOT NULL CHECK (price >= 0)
-   );
-
-
--- Create table ingredient
-CREATE TABLE Ingredient (
-    id UUID PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    quantity INT NOT NULL CHECK (quantity >= 0),
-    lowStockThreshold DECIMAL(10,2) NOT NULL CHECK (lowStockThreshold >= 0),
-    costPerUnit DECIMAL(10,2) NOT NULL CHECK (costPerUnit >= 0)
+-- Dishes table
+CREATE TABLE dishes (
+    id BLOB PRIMARY KEY,
+    name TEXT NOT NULL,
+    price REAL NOT NULL
 );
 
--- Create table dishes_ingredient
-CREATE TABLE Dishes_Ingredient (
-    id_dish UUID,
-    id_ingredient UUID,
-    quantity INT NOT NULL CHECK (quantity > 0),
+-- Category_Ingredients table
+CREATE TABLE category_ingredients (
+    id BLOB PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
+-- Ingredients table
+CREATE TABLE ingredients (
+    id BLOB PRIMARY KEY,
+    name TEXT NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 0,
+    low_stock_threshold INTEGER NOT NULL DEFAULT 0,
+    cost_per_unit REAL NOT NULL DEFAULT 0.00
+);
+
+-- Dishes_Ingredient junction table
+CREATE TABLE dishes_ingredient (
+    id_dish BLOB NOT NULL,
+    id_ingredient BLOB NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
     PRIMARY KEY (id_dish, id_ingredient),
-    FOREIGN KEY (id_dish) REFERENCES Dishes(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_ingredient) REFERENCES Ingredient(id) ON DELETE CASCADE
+    FOREIGN KEY (id_dish) REFERENCES dishes(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_ingredient) REFERENCES ingredients(id) ON DELETE CASCADE
 );
 
--- Create table category_ingredients
-CREATE TABLE Category_Ingredients (
-    id UUID PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
-);
-
--- Create table ingredient_category
-CREATE TABLE Ingredient_Category (
-    id_category_ingredient UUID,
-    id_ingredient UUID,
+-- Ingredient_Category junction table
+CREATE TABLE ingredient_category (
+    id_category_ingredient BLOB NOT NULL,
+    id_ingredient BLOB NOT NULL,
     PRIMARY KEY (id_category_ingredient, id_ingredient),
-    FOREIGN KEY (id_category_ingredient) REFERENCES Category_Ingredients(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_ingredient) REFERENCES Ingredient(id) ON DELETE CASCADE
+    FOREIGN KEY (id_category_ingredient) REFERENCES category_ingredients(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_ingredient) REFERENCES ingredients(id) ON DELETE CASCADE
 );
 
--- Create table supplier
-CREATE TABLE Supplier (
-    id UUID PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    contact VARCHAR(255),
-    phone VARCHAR(20),
-    email VARCHAR(255),
-    address VARCHAR(255)
+-- Suppliers table
+CREATE TABLE suppliers (
+    id BLOB PRIMARY KEY,
+    name TEXT NOT NULL,
+    contact TEXT,
+    phone TEXT,
+    email TEXT,
+    address TEXT
 );
 
--- Create table ingredient_supplier 
-CREATE TABLE Ingredient_Supplier (
-    id_supplier UUID,
-    id_ingredient UUID,
-    date DATE NOT NULL,
-    totalCost DECIMAL(10,2) NOT NULL CHECK (totalCost >= 0),
-    quantity INT NOT NULL CHECK (quantity > 0),
+-- Ingredient_Suppliers junction table
+CREATE TABLE ingredient_suppliers (
+    id_supplier BLOB NOT NULL,
+    id_ingredient BLOB NOT NULL,
+    date TEXT NOT NULL,
+    total_cost REAL NOT NULL,
+    quantity INTEGER NOT NULL,
     PRIMARY KEY (id_supplier, id_ingredient, date),
-    FOREIGN KEY (id_supplier) REFERENCES Supplier(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_ingredient) REFERENCES Ingredient(id) ON DELETE CASCADE
+    FOREIGN KEY (id_supplier) REFERENCES suppliers(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_ingredient) REFERENCES ingredients(id) ON DELETE CASCADE
 );
+
+-- Payments table
+CREATE TABLE payments (
+    id BLOB PRIMARY KEY,
+    currency REAL NOT NULL,
+    name TEXT NOT NULL
+);
+
+-- Tickets table
+CREATE TABLE tickets (
+    id BLOB PRIMARY KEY,
+    id_user BLOB NOT NULL,
+    order_date TEXT NOT NULL DEFAULT (datetime('now')),
+    status INTEGER NOT NULL DEFAULT 1,
+    total_amount REAL NOT NULL DEFAULT 0.00,
+    notes TEXT,
+    FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE RESTRICT
+);
+
+-- Tickets_Dish junction table
+CREATE TABLE tickets_dish (
+    id_ticket BLOB NOT NULL,
+    id_dish BLOB NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    price_at_order REAL NOT NULL,
+    notes TEXT,
+    PRIMARY KEY (id_ticket),
+    FOREIGN KEY (id_ticket) REFERENCES tickets(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_dish) REFERENCES dishes(id) ON DELETE RESTRICT
+);
+
+-- Payments_Tickets table
+CREATE TABLE payments_tickets (
+    id_ticket BLOB NOT NULL,
+    payment_date TEXT NOT NULL DEFAULT (datetime('now')),
+    amount REAL NOT NULL,
+    payment_method BLOB NOT NULL,
+    transaction_id TEXT,
+    PRIMARY KEY (id_ticket),
+    FOREIGN KEY (id_ticket) REFERENCES tickets(id) ON DELETE CASCADE,
+    FOREIGN KEY (payment_method) REFERENCES payments(id) ON DELETE RESTRICT
+);
+
+-- Create indexes for better performance
+CREATE INDEX idx_users_pin ON users(pin);
+CREATE INDEX idx_tickets_user ON tickets(id_user);
+CREATE INDEX idx_tickets_date ON tickets(order_date);
+CREATE INDEX idx_tickets_status ON tickets(status);
+CREATE INDEX idx_tickets_dish_order ON tickets_dish(id_ticket);
+CREATE INDEX idx_payments_tickets_order ON payments_tickets(id_ticket);
+CREATE INDEX idx_ingredient_suppliers_date ON ingredient_suppliers(date);
