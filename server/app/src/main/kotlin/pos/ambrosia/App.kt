@@ -1,6 +1,7 @@
 package pos.ambrosia
 
 import pos.ambrosia.api.*
+import java.util.Base64
 import io.ktor.server.auth.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -68,12 +69,16 @@ fun Application.module() {
     install(Authentication) {
         basic("auth-basic") {
             realm = "POS Ambrosia API"
+            // Use a custom validation function to check credenti
             validate { credentials ->
+                // Decode the Base64 encoded username and password
+                val BytePass = Base64.getDecoder().decode(credentials.password)
+                val decodedPassword = String(BytePass)
                 // Try to get password from custom config, then environment variable, then default
-                val passwordFromConfig = AppConfig.getProperty("TOKEN_HASH")
+                val passwordFromConfig = AppConfig.getProperty("TOKEN_BASE64")
                 val apiPassword = passwordFromConfig
 
-                if (credentials.name == "" && credentials.password == apiPassword) {
+                if (credentials.name == "" && decodedPassword == apiPassword) {
                     // Valid credentials - UserIdPrincipal can be used if you need to identify the user later
                     UserIdPrincipal(credentials.name)
                 } else {
