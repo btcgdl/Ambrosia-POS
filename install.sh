@@ -36,12 +36,12 @@ for arg in "$@"; do
     fi
 done
 
-# --- Prerequisite Check ---
-# Check if the wordlist file exists.
-if [ ! -f "$WORDLIST" ]; then
-    echo "Error: Wordlist '$WORDLIST' not found. Please ensure it is available." >&2
-    echo "Please download it from https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt" >&2
-    echo "and place it in the same directory as this script." >&2
+# --- Prerequisite: Download Wordlist ---
+# Always download the wordlist, use it, then delete it
+WORDLIST="eff_large_wordlist.txt"
+echo "Downloading wordlist..." >&2
+if ! curl -s -o "$WORDLIST" "$WORDLIST_URL"; then
+    echo "Error: Failed to download wordlist from $WORDLIST_URL" >&2
     exit 1
 fi
 
@@ -65,6 +65,9 @@ hash=$(printf "$passphrase" | sha256sum | awk '{print $1}')
 
 # Encode in Base64
 base64=$(echo -n "$passphrase" | base64 | tr -d '\n')
+
+# Delete the wordlist after use
+rm "$WORDLIST" >/dev/null 2>&1
 
 # --- Display Results ---
 echo "Api passphrase:"
@@ -116,4 +119,11 @@ else
     echo "Exiting without saving."
 fi
 
+# Check if ambrosia.db exists, if not, download it
+if [ ! -f "$HOME/.Ambrosia-POS/ambrosia.db" ]; then
+    echo "Downloading ambrosia.db from $DB_URL"
+    curl -s -o "$HOME/.Ambrosia-POS/ambrosia.db" "$DB_URL"
+else
+    echo "ambrosia.db already exists in $HOME/.Ambrosia-POS"
+fi
 # --- End of Script ---
