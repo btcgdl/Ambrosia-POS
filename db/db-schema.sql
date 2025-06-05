@@ -107,7 +107,7 @@ CREATE TABLE payments (
 CREATE TABLE tickets (
     id BLOB PRIMARY KEY,
     id_user BLOB NOT NULL,
-    order_date TEXT NOT NULL DEFAULT (datetime('now')),
+    ticket_date TEXT NOT NULL DEFAULT (datetime('now')),
     status INTEGER NOT NULL DEFAULT 1,
     total_amount REAL NOT NULL DEFAULT 0.00,
     notes TEXT,
@@ -141,7 +141,7 @@ CREATE TABLE payments_tickets (
 -- Create indexes for better performance
 CREATE INDEX idx_users_pin ON users(pin);
 CREATE INDEX idx_tickets_user ON tickets(id_user);
-CREATE INDEX idx_tickets_date ON tickets(order_date);
+CREATE INDEX idx_tickets_date ON tickets(ticket_date);
 CREATE INDEX idx_tickets_status ON tickets(status);
 CREATE INDEX idx_tickets_dish_order ON tickets_dish(id_ticket);
 CREATE INDEX idx_payments_tickets_order ON payments_tickets(id_ticket);
