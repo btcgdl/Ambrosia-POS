@@ -1,40 +1,118 @@
-import { useState } from "react";
-import NavBar from "../components/navbar/NavBar";
-import Header from "../components/header/Header";
-import { useMock } from "../contexts/MockSocketContext";
+import { useState, useEffect } from "react";
+import NavBar from "../../components/navbar/NavBar";
+import Header from "../../components/header/Header";
+import { getUsers, addUser, updateUser, deleteUser } from "./authService";
 
 export default function Users() {
-    const { users, addUser, updateUser, deleteUser } = useMock();
+    const [users, setUsers] = useState([]);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({ nombre: "", pin: "" });
     const [showPin, setShowPin] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        async function fetchUsers() {
+            try {
+                setIsLoading(true);
+                const response = await getUsers();
+                setUsers(response.data);
+            } catch (err) {
+                setError("Error al cargar los usuarios");
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        fetchUsers();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
+        setForm((prev) => ({ ...prev, [name]: name === "pin" ? value.replace(/\D/g, "") : value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (editing) {
-            updateUser({ ...form, id: editing });
-        } else {
-            addUser(form);
+        setError("");
+        setIsLoading(true);
+        try {
+            const pinAsInt = parseInt(form.pin, 10);
+            if (isNaN(pinAsInt)) {
+                throw new Error("El PIN debe ser un número válido");
+            }
+            const userData = { ...form, pin: pinAsInt };
+            if (editing) {
+                await updateUser({ ...userData, id: editing });
+            } else {
+                await addUser(userData);
+            }
+            const response = await getUsers();
+            setUsers(response.data);
+            setForm({ nombre: "", pin: "" });
+            setEditing(null);
+            setShowPin(false);
+        } catch (err) {
+            setError(err.message || "Error al guardar el usuario");
+        } finally {
+            setIsLoading(false);
         }
-        setForm({ nombre: "", pin: "" });
-        setEditing(null);
-        setShowPin(false);
     };
 
     const startEdit = (user) => {
-        setForm({ nombre: user.nombre, pin: user.pin });
+        setForm({ nombre: user.nombre, pin: user.pin.toString() });
         setEditing(user.id);
         setShowPin(false);
+    };
+
+    const handleDelete = async (userId) => {
+        setError("");
+        setIsLoading(true);
+        try {
+            await deleteUser(userId);
+            const response = await getUsers();
+            setUsers(response.data);
+        } catch (err) {
+            setError(err.message || "Error al eliminar el usuario");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const toggleShowPin = () => {
         setShowPin((prev) => !prev);
     };
+
+    if (isLoading && users.length === 0) {
+        return (
+            <div className="flex w-screen h-screen">
+                <NavBar />
+                <div className="w-[75%] h-full">
+                    <Header />
+                    <main className="h-[90%] w-full flex items-center justify-center">
+                        <div className="h-[90%] w-[90%] bg-amber-100 flex flex-col items-center justify-center p-6">
+                            <p className="text-3xl font-bold">Cargando usuarios...</p>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        );
+    }
+
+    if (error && users.length === 0) {
+        return (
+            <div className="flex w-screen h-screen">
+                <NavBar />
+                <div className="w-[75%] h-full">
+                    <Header />
+                    <main className="h-[90%] w-full flex items-center justify-center">
+                        <div className="h-[90%] w-[90%] bg-amber-100 flex flex-col items-center justify-center p-6">
+                            <p className="text-3xl font-bold text-red-600">{error}</p>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex w-screen h-screen">
@@ -45,6 +123,8 @@ export default function Users() {
                     <div className="h-[90%] w-[90%] bg-amber-100 rounded-xl p-6 flex flex-col items-center gap-6 overflow-y-auto">
                         <h2 className="text-3xl font-bold">Gestión de Usuarios</h2>
 
+                        {error && <p className="text-red-600 text-xl">{error}</p>}
+
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-xl">
                             <input
                                 name="nombre"
@@ -53,6 +133,7 @@ export default function Users() {
                                 placeholder="Nombre"
                                 className="text-2xl p-3 rounded-lg"
                                 required
+                                disabled={isLoading}
                             />
                             <div className="relative">
                                 <input
@@ -65,11 +146,13 @@ export default function Users() {
                                     className="text-2xl p-3 rounded-lg w-full"
                                     required
                                     pattern="\d*"
+                                    disabled={isLoading}
                                 />
                                 <button
                                     type="button"
                                     onClick={toggleShowPin}
                                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-2xl"
+                                    disabled={isLoading}
                                 >
                                     {showPin ? "👁️‍🗨️" : "👁️"}
                                 </button>
@@ -77,6 +160,7 @@ export default function Users() {
                             <button
                                 type="submit"
                                 className="bg-green-500 text-white text-2xl py-3 rounded-lg hover:bg-green-600"
+                                disabled={isLoading}
                             >
                                 {editing ? "Actualizar Usuario" : "Agregar Usuario"}
                             </button>
@@ -95,12 +179,14 @@ export default function Users() {
                                         <button
                                             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
                                             onClick={() => startEdit(user)}
+                                            disabled={isLoading}
                                         >
                                             Editar
                                         </button>
                                         <button
                                             className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                                            onClick={() => deleteUser(user.id)}
+                                            onClick={() => handleDelete(user.id)}
+                                            disabled={isLoading}
                                         >
                                             Eliminar
                                         </button>
