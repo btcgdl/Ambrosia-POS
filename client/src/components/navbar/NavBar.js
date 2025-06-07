@@ -16,7 +16,7 @@ export default function NavBar() {
                 <p className="text-white text-[15px]">{userRole?.toUpperCase()}</p>
             </div>
 
-            <div className="h-[80%] overflow-y-auto flex flex-col gap-7 py-4">
+            <div className="h-[80%] overflow-y-auto flex flex-col gap-7 py-4 scrollbar-hide">
                 {userRole === "admin" && (<>
                     <NavBarButton text="Platos" icon="egg-fried" onClick={()=>{navigate("/dishes")}}/>
                     <NavBarButton text="Espacios" icon="layout-text-window" onClick={()=>{navigate("/spaces")}}/>

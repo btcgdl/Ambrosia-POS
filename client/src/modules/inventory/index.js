@@ -6,8 +6,7 @@ import * as inventoryService from './inventoryService';
 import { addModule } from '../../core/moduleRegistry';
 
 
-addModule({
-    name: 'inventory',
+addModule('inventory', {
     routes: [
         { path: '/inventory/suppliers', component: Suppliers },
         { path: '/inventory/ingredients', component: Ingredients },

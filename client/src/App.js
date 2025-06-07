@@ -45,7 +45,10 @@ function App() {
                 <UserRoleProvider>
                     <BrowserRouter>
                         <Routes>
-                            {Object.entries(modules).map(([name, module]) =>
+                            {
+                            Object.entries(modules).map(([name, module]) =>
+                                console.log(`Cargando rutas del módulo: ${name}`) ||
+                                
                                 config.modules[name] &&
                                 module.routes.map((route) => (
 
