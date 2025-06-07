@@ -1,30 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import NavBar from "../components/navbar/NavBar";
-import Header from "../components/header/Header";
-import { useMock } from "../contexts/MockSocketContext";
+import NavBar from "../../components/navbar/NavBar";
+import Header from "../../components/header/Header";
+import { getAllOrders } from "./ordersService";
 
 export default function Orders() {
-    const { orders, users, tables } = useMock();
-    const navigate = useNavigate();
+    const [orders, setOrders] = useState([]);
     const [filter, setFilter] = useState("en-curso"); // Filtro inicial: en-curso
+    const navigate = useNavigate();
 
-    // Función para calcular el total de una orden
-    const calculateTotal = (dishes) => {
-        return dishes?.reduce((sum, item) => sum + item.dish.precio, 0) || 0;
-    };
-
-    // Función para obtener el nombre del mozo
-    const getMozoName = (userId) => {
-        const user = users.find((u) => u.id === userId);
-        return user ? user.nombre : "Desconocido";
-    };
-
-    // Función para obtener la mesa asignada
-    const getTableName = (pedidoId) => {
-        const table = tables.find((t) => t.pedidoId === pedidoId);
-        return table ? table.nombre : "Sin mesa";
-    };
+    // Cargar datos al montar el componente
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const response = await getAllOrders();
+                setOrders(response.data);
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+            }
+        }
+        fetchData();
+    }, []);
 
     // Manejar clic en una orden
     const handleOrderClick = (pedidoId) => {
@@ -97,9 +93,9 @@ export default function Orders() {
                                             >
                                                 <span>Orden #{order.id}</span>
                                                 <span>Estado: {order.estado}</span>
-                                                <span>Total: ${calculateTotal(order.dishes).toFixed(2)}</span>
-                                                <span>Mozo: {getMozoName(order.userId)}</span>
-                                                <span>Mesa: {getTableName(order.id)}</span>
+                                                <span>Total: ${order.total.toFixed(2)}</span>
+                                                <span>Mozo: {order.mozo}</span>
+                                                <span>Mesa: {order.table}</span>
                                             </button>
                                         </li>
                                     ))}

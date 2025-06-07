@@ -1,7 +1,7 @@
 import { useState } from "react";
-import InventoryNavBar from "../components/inventory/InventoryNavBar";
-import Header from "../components/header/Header";
-import { useMock } from "../contexts/MockSocketContext";
+import InventoryNavBar from "../../components/inventory/InventoryNavBar";
+import Header from "../../components/header/Header";
+import { useMock } from "../../contexts/MockSocketContext";
 
 export default function Restocks() {
     const { restocks, addRestock, ingredients, suppliers } = useMock();

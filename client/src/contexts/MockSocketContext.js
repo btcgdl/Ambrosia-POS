@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { useMockSocket } from "../testing/useMockSocket";
+import { useMockSocket } from "../useMockSocket";
 
 const MockSocketContext = createContext(null);
 

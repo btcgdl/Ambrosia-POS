@@ -1,8 +1,8 @@
-// RoomForm.jsx
 import { useState, useEffect } from "react";
 
 export default function RoomForm({ onSubmit, initialData, onCancel }) {
     const [nombre, setNombre] = useState("");
+    const [error, setError] = useState("");
 
     useEffect(() => {
         if (initialData) {
@@ -12,16 +12,23 @@ export default function RoomForm({ onSubmit, initialData, onCancel }) {
         }
     }, [initialData]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!nombre.trim()) return;
-
-        const room = {
-            ...initialData,
-            nombre,
-        };
-        onSubmit(room);
-        setNombre("");
+        if (!nombre.trim()) {
+            setError("El nombre es requerido");
+            return;
+        }
+        try {
+            setError("");
+            await onSubmit({
+                ...initialData,
+                nombre: nombre.trim(),
+                mesasIds: initialData?.mesasIds || [],
+            });
+            setNombre("");
+        } catch (err) {
+            setError(err.message || "Error al guardar la sala");
+        }
     };
 
     return (
@@ -29,6 +36,7 @@ export default function RoomForm({ onSubmit, initialData, onCancel }) {
             <h2 className="text-xl font-bold mb-2">
                 {initialData ? "Editar Sala" : "Nueva Sala"}
             </h2>
+            {error && <p className="text-red-600 text-sm mb-2">{error}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                     type="text"
@@ -47,7 +55,10 @@ export default function RoomForm({ onSubmit, initialData, onCancel }) {
                     {initialData && (
                         <button
                             type="button"
-                            onClick={onCancel}
+                            onClick={() => {
+                                onCancel();
+                                setError("");
+                            }}
                             className="px-4 py-2 bg-gray-400 text-white rounded"
                         >
                             Cancelar

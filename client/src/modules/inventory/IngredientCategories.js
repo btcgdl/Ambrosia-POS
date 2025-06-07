@@ -1,8 +1,8 @@
 import { useState } from "react";
-import NavBar from "../components/navbar/NavBar";
-import InventoryNavBar from "../components/inventory/InventoryNavBar";
-import Header from "../components/header/Header";
-import { useMock } from "../contexts/MockSocketContext";
+import NavBar from "../../components/navbar/NavBar";
+import InventoryNavBar from "../../components/inventory/InventoryNavBar";
+import Header from "../../components/header/Header";
+import { useMock } from "../../contexts/MockSocketContext";
 
 export default function IngredientCategories() {
     const { ingredientCategories, addIngredientCategory, deleteIngredientCategory } = useMock();

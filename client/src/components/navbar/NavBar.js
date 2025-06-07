@@ -18,7 +18,7 @@ export default function NavBar() {
 
             <div className="h-[80%] overflow-y-auto flex flex-col gap-7 py-4">
                 {userRole === "admin" && (<>
-                    <NavBarButton text="Platos" icon="egg-fried" onClick={()=>{navigate("/saucers")}}/>
+                    <NavBarButton text="Platos" icon="egg-fried" onClick={()=>{navigate("/dishes")}}/>
                     <NavBarButton text="Espacios" icon="layout-text-window" onClick={()=>{navigate("/spaces")}}/>
                 </>)}
                 <NavBarButton text="Pedidos" icon="receipt" onClick={()=>{navigate("/all-orders")}}/>

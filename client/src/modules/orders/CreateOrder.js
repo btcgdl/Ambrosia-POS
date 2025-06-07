@@ -1,16 +1,15 @@
-import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useMock } from "../contexts/MockSocketContext";
-import NavBar from "../components/navbar/NavBar";
-import Header from "../components/header/Header";
+import { useParams, useNavigate } from "react-router-dom";
+import NavBar from "../../components/navbar/NavBar";
+import Header from "../../components/header/Header";
+import { createOrder } from "./ordersService";
 
 export default function CreateOrder() {
     const { tableId } = useParams();
     const navigate = useNavigate();
-    const { users, addOrder, assignOrderToTable } = useMock();
-
     const [pin, setPin] = useState("");
     const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleButtonClick = (num) => {
         if (pin.length < 4) {
@@ -22,27 +21,34 @@ export default function CreateOrder() {
         setPin(pin.slice(0, -1));
     };
 
-    const handleCreateOrder = () => {
-        const waiter = users.find((u) => u.pin === Number(pin));
-        if (!waiter) {
-            setError("PIN inválido. Intenta de nuevo.");
-            return;
+    const handleCreateOrder = async () => {
+        setIsLoading(true);
+        setError("");
+        try {
+            const response = await createOrder(pin, tableId);
+            navigate(`/modify-order/${response.data.id}?isNew=true`);
+        } catch (error) {
+            setError(error.message || "Error al crear el pedido");
+        } finally {
+            setIsLoading(false);
         }
-
-        const newOrder = {
-            id: Number(`${Date.now()}`),
-            userId: waiter.id,
-            dishes: [],
-            estado: "abierto",
-            createdAt: new Date().toISOString(),
-        };
-
-        addOrder(newOrder);
-        if (tableId) {
-            assignOrderToTable(Number(tableId), newOrder.id);
-        }
-        navigate(`/modify-order/${newOrder.id}?isNew=true`);
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex w-screen h-screen">
+                <NavBar />
+                <div className="w-[75%] h-full">
+                    <Header />
+                    <main className="h-[90%] w-full flex items-center justify-center">
+                        <div className="h-[80%] w-[80%] bg-amber-200 flex flex-col items-center justify-center p-6">
+                            <p className="text-3xl font-bold">Creando pedido...</p>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex w-screen h-screen">
@@ -74,6 +80,7 @@ export default function CreateOrder() {
                                     key={num}
                                     className="bg-gray-800 text-white py-6 px-8 text-3xl rounded-lg hover:bg-gray-700"
                                     onClick={() => handleButtonClick(num)}
+                                    disabled={isLoading}
                                 >
                                     {num}
                                 </button>
@@ -82,6 +89,7 @@ export default function CreateOrder() {
                                 <button
                                     className="bg-gray-800 text-white py-6 px-8 text-3xl rounded-lg hover:bg-gray-700"
                                     onClick={() => handleButtonClick(0)}
+                                    disabled={isLoading}
                                 >
                                     0
                                 </button>
@@ -92,12 +100,14 @@ export default function CreateOrder() {
                             <button
                                 className="bg-red-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-red-600"
                                 onClick={handleClear}
+                                disabled={isLoading}
                             >
                                 Borrar
                             </button>
                             <button
                                 onClick={handleCreateOrder}
                                 className="bg-green-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-green-600"
+                                disabled={isLoading || pin.length < 4}
                             >
                                 Crear Pedido
                             </button>
