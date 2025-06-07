@@ -29,9 +29,16 @@ dependencies {
     implementation("io.ktor:ktor-server-cors:3.1.2")
     implementation("io.ktor:ktor-server-status-pages:3.1.2")
     implementation("io.ktor:ktor-server-auth:3.1.2")
-    implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
+    implementation("org.xerial:sqlite-jdbc:3.49.1.0")
+    implementation("io.ktor:ktor-server-swagger:3.1.2")
+    implementation("io.ktor:ktor-server-openapi:3.1.2")
+    implementation("org.openapitools:openapi-generator:6.6.0")
     // This dependency is used by the application.
     implementation(libs.guava)
+}
+
+tasks.named<JavaExec>("run") {
+    jvmArgs("-Dlogback.configurationFile=Ambrosia-Logs.xml")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
