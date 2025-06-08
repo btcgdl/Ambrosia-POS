@@ -3,6 +3,9 @@ package pos.ambrosia
 import pos.ambrosia.api.*
 import java.util.Base64
 import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import com.auth0.jwt.*
+import com.auth0.jwt.algorithms.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -66,29 +69,28 @@ fun Application.module() {
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
     }
+    val secret = AppConfig.getProperty("TOKEN_HASH")
+    val issuer = environment.config.property("jwt.issuer").getString()
+    val audience = environment.config.property("jwt.audience").getString()
+    val myRealm = environment.config.property("jwt.realm").getString()
     install(Authentication) {
-        basic("auth-basic") {
-            realm = "POS Ambrosia API"
-            // Use a custom validation function to check credenti
-            validate { credentials ->
-                // Decode the Base64 encoded username and password
-                val decodedPassword: String
-                
-                val BytePass = Base64.getDecoder().decode(credentials.password)
-                decodedPassword = String(BytePass)
-                
-                // Try to get password from custom config, then environment variable, then default
-                val passwordFromConfig = AppConfig.getProperty("TOKEN_HASH")
-                val apiPassword = passwordFromConfig
-
-                if (credentials.name == "" && decodedPassword == apiPassword) {
-                    // Valid credentials - UserIdPrincipal can be used if you need to identify the user later
-                    UserIdPrincipal(credentials.name)
-                    logger.info("User authenticated successfully")
-                } else {
-                    // Invalid credentials
-                    throw UnauthorizedApiException()
-                }
+        jwt("auth-jwt") {
+            // Use a custom validation function to check credentials
+            verifier(JWT
+                    .require(Algorithm.HMAC256(secret))
+                    .withIssuer(issuer)
+                    .withAudience(audience)
+                    .withClaim("realm", myRealm)
+                    .build())
+            validate { credential ->
+            if (credential.payload.getClaim("username").asString() != "") {
+                JWTPrincipal(credential.payload)
+            } else {
+                null
+            }
+        }
+            challenge { _, _ ->
+                throw UnauthorizedApiException()
             }
         }
     }
