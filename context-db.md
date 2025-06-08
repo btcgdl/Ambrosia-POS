@@ -47,9 +47,9 @@
     -`name`: string
 - **Example**: `{id: 1, name: "Mexicana"}`
 
-## Ingredient 
+## Ingredient
 - **Description**: Ingredient on stock.
-- **Fields**: 
+- **Fields**:
     - `id`: UUID @unique
     - `name`: string
     - `quantity`: number
@@ -66,7 +66,7 @@
 
 ## Ingredient_Category
 - **Description**: Relation Category with Ingredient.
-- **Fields**: 
+- **Fields**:
     - `id_category_ingredient`: UUID @Relation(category_ingredient)
     - `id_ingredient`: UUID @Relation(ingredient)
 - **Example**: `{id_category_ingredient: 1, id_ingredient: 1}`
@@ -133,4 +133,13 @@
     - `name`: string
 - **Example**: `{id: 1, currency: 12.00, name: "Satoshis! :)"`}
 
-
+## Shifts
+- **Description**:
+- **Fields**:
+    - `id`: UUID @unique
+    - `user_id`: UUID @Relation(user)
+    - `shift_date`: date
+    - `start_time`: time
+    - `end_time`: time
+    - `notes`: string
+    - **Example**: `{id: 1, user_id: 1, shift_date: 2025-06-02, start_time: 12:00:00, end_time: 8:00:00, notes: "Falto Feria" }`
