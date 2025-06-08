@@ -3,22 +3,49 @@ import { useState } from "react";
 export default function DishManager({ dishes, categories, addDish, updateDish, deleteDish }) {
     const [newDish, setNewDish] = useState({ nombre: "", categoria: "", precio: "" });
     const [editingDish, setEditingDish] = useState(null);
+    const [error, setError] = useState("");
 
-    const handleSaveDish = () => {
-        if (!newDish.nombre || !newDish.categoria || !newDish.precio) return;
-        addDish({ ...newDish, precio: parseFloat(newDish.precio) });
-        setNewDish({ nombre: "", categoria: "", precio: "" });
+    const validateDish = (dish) => {
+        if (!dish.nombre.trim()) return "El nombre es requerido";
+        if (!dish.categoria) return "La categoría es requerida";
+        if (!dish.precio || isNaN(dish.precio) || parseFloat(dish.precio) <= 0) return "El precio debe ser un número mayor a 0";
+        return "";
     };
 
-    const handleUpdateDish = () => {
-        if (!editingDish.nombre || !editingDish.categoria || !editingDish.precio) return;
-        updateDish({ ...editingDish, precio: parseFloat(editingDish.precio) });
-        setEditingDish(null);
+    const handleSaveDish = async () => {
+        const validationError = validateDish(newDish);
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+        try {
+            setError("");
+            await addDish({ ...newDish, precio: parseFloat(newDish.precio), ingredients: [] });
+            setNewDish({ nombre: "", categoria: "", precio: "" });
+        } catch (err) {
+            setError(err.message || "Error al agregar el platillo");
+        }
+    };
+
+    const handleUpdateDish = async () => {
+        const validationError = validateDish(editingDish);
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+        try {
+            setError("");
+            await updateDish({ ...editingDish, precio: parseFloat(editingDish.precio), ingredients: editingDish.ingredients || [] });
+            setEditingDish(null);
+        } catch (err) {
+            setError(err.message || "Error al actualizar el platillo");
+        }
     };
 
     return (
         <div className="w-2/3 h-full flex flex-col gap-4">
             <h2 className="text-3xl font-bold">Platillos</h2>
+            {error && <p className="text-red-600 text-xl">{error}</p>}
             <div className="flex gap-2">
                 <input
                     value={newDish.nombre}
@@ -32,6 +59,8 @@ export default function DishManager({ dishes, categories, addDish, updateDish, d
                     placeholder="Precio"
                     className="p-4 rounded text-xl w-[120px]"
                     type="number"
+                    min="0"
+                    step="0.01"
                 />
                 <select
                     value={newDish.categoria}
@@ -60,6 +89,8 @@ export default function DishManager({ dishes, categories, addDish, updateDish, d
                                     onChange={(e) => setEditingDish({ ...editingDish, precio: e.target.value })}
                                     className="p-2 rounded mr-2 w-[100px]"
                                     type="number"
+                                    min="0"
+                                    step="0.01"
                                 />
                                 <select
                                     value={editingDish.categoria}
@@ -71,11 +102,11 @@ export default function DishManager({ dishes, categories, addDish, updateDish, d
                                     ))}
                                 </select>
                                 <button onClick={handleUpdateDish} className="bg-green-500 text-white px-4 py-2 rounded text-lg mr-2">✔</button>
-                                <button onClick={() => setEditingDish(null)} className="bg-gray-400 text-white px-4 py-2 rounded text-lg">✖</button>
+                                <button onClick={() => { setEditingDish(null); setError(""); }} className="bg-gray-400 text-white px-4 py-2 rounded text-lg">✖</button>
                             </>
                         ) : (
                             <>
-                                <span className="flex-1">{dish.nombre} - ${dish.precio} ({dish.categoria})</span>
+                                <span className="flex-1">{dish.nombre} - ${dish.precio} ({dish.categoria || 'Sin categoría'})</span>
                                 <div className="flex gap-2">
                                     <button onClick={() => setEditingDish(dish)} className="bg-blue-500 text-white px-4 py-2 rounded text-lg">Editar</button>
                                     <button onClick={() => deleteDish(dish.id)} className="bg-red-500 text-white px-4 py-2 rounded text-lg">Eliminar</button>

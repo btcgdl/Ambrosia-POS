@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 export default function TableForm({ onSubmit, onCancel, initialData }) {
     const [nombre, setNombre] = useState("");
     const [estado, setEstado] = useState("libre");
+    const [error, setError] = useState("");
 
     useEffect(() => {
         if (initialData) {
@@ -14,22 +15,30 @@ export default function TableForm({ onSubmit, onCancel, initialData }) {
         }
     }, [initialData]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!nombre.trim()) return;
-
-        onSubmit({
-            ...initialData,
-            nombre,
-            estado,
-        });
-
-        setNombre("");
-        setEstado("libre");
+        if (!nombre.trim()) {
+            setError("El nombre es requerido");
+            return;
+        }
+        try {
+            setError("");
+            await onSubmit({
+                ...initialData,
+                nombre: nombre.trim(),
+                estado,
+                pedidoId: initialData?.pedidoId || null,
+            });
+            setNombre("");
+            setEstado("libre");
+        } catch (err) {
+            setError(err.message || "Error al guardar la mesa");
+        }
     };
 
     return (
         <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow space-y-3">
+            {error && <p className="text-red-600 text-sm">{error}</p>}
             <div>
                 <label className="block text-sm font-medium">Nombre de la Mesa</label>
                 <input
@@ -54,7 +63,10 @@ export default function TableForm({ onSubmit, onCancel, initialData }) {
             <div className="flex justify-end gap-2">
                 <button
                     type="button"
-                    onClick={onCancel}
+                    onClick={() => {
+                        onCancel();
+                        setError("");
+                    }}
                     className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
                 >
                     Cancelar
