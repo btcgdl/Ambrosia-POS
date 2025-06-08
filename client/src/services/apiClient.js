@@ -3,7 +3,7 @@ const TOKEN = process.env.REACT_APP_TOKEN_HASH;
 export async function apiClient(endpoint, { method = 'GET', headers = {}, body } = {}) {
 
     if (TOKEN) {
-        const token = btoa(`:${TOKEN}`);
+        const token = btoa(`${TOKEN}`);
         headers['Authorization'] = `Basic ${token}`;
     }
 

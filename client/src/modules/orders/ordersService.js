@@ -27,6 +27,8 @@ export async function getAllOrders() {
                 table: tableName,
             };
         });
+        console.log({data: combinedOrders});
+        
 
         return { data: combinedOrders };
     }

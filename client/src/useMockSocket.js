@@ -51,6 +51,7 @@
     cash: [
         { id: 1, date: '2025-05-01', amount: 1000, type: 'ingreso', description: 'Venta inicial' },
     ],
+    cashierOpen: true,
 };
 
 let state = { ...initialData };
@@ -305,6 +306,11 @@ export const mockService = {
         state.ingredientCategories = state.ingredientCategories.filter(c => c !== category);
         return category;
     },
+    getCashierOpen: () => state.cashierOpen,
+    setCashierOpen: (open) => {
+        state.cashierOpen = open;
+        return open;
+    }
 };
 
 export function useMockSocket() {

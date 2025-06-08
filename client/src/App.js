@@ -11,6 +11,7 @@ import { getModules } from "./core/moduleRegistry";
 import './modules/auth';
 import './modules/dishes';
 import './modules/orders';
+import { CashierProvider } from './contexts/cashierContext';
 
 function App() {
     const [modules, setModules] = useState(getModules());
@@ -43,25 +44,27 @@ function App() {
         <div className="App">
             <MockSocketProvider>
                 <UserRoleProvider>
-                    <BrowserRouter>
-                        <Routes>
-                            {
-                            Object.entries(modules).map(([name, module]) =>
-                                console.log(`Cargando rutas del módulo: ${name}`) ||
-                                
-                                config.modules[name] &&
-                                module.routes.map((route) => (
+                    <CashierProvider>
+                        <BrowserRouter>
+                            <Routes>
+                                {
+                                Object.entries(modules).map(([name, module]) =>
+                                    console.log(`Cargando rutas del módulo: ${name}`) ||
+                                    
+                                    config.modules[name] &&
+                                    module.routes.map((route) => (
 
-                                    <Route
-                                        key={route.path}
-                                        path={route.path}
-                                        element={<route.component />}
-                                    />
-                                ))
-                            )}
-                            <Route path="*" element={<div>404 - Página no encontrada</div>} />
-                        </Routes>
-                    </BrowserRouter>
+                                        <Route
+                                            key={route.path}
+                                            path={route.path}
+                                            element={<route.component />}
+                                        />
+                                    ))
+                                )}
+                                <Route path="*" element={<div>404 - Página no encontrada</div>} />
+                            </Routes>
+                        </BrowserRouter>
+                    </CashierProvider>
                 </UserRoleProvider>
             </MockSocketProvider>
         </div>
