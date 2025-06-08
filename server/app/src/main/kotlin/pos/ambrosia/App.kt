@@ -73,13 +73,10 @@ fun Application.module() {
             validate { credentials ->
                 // Decode the Base64 encoded username and password
                 val decodedPassword: String
-                try {
-                    val BytePass = Base64.getDecoder().decode(credentials.password)
-                    decodedPassword = String(BytePass)
-                } catch (e: Exception) {
-                    logger.error("Error decoding credentials")
-                    throw UnauthorizedApiException()
-                }
+                
+                val BytePass = Base64.getDecoder().decode(credentials.password)
+                decodedPassword = String(BytePass)
+                
                 // Try to get password from custom config, then environment variable, then default
                 val passwordFromConfig = AppConfig.getProperty("TOKEN_HASH")
                 val apiPassword = passwordFromConfig
