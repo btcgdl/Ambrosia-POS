@@ -22,11 +22,11 @@ private val logger = LoggerFactory.getLogger("pos.ambrosia.App")
 
 fun main(args: Array<String>) {
     logger.info("Starting Ambrosia POS server...")
-    AppConfig.loadConfig() // Load custom config before starting the server
     EngineMain.main(args)
 }
 
 fun Application.module() {
+    AppConfig.loadConfig() // Load custom config
     // Configure the application
     Handler()// Install exception handlers
     install(ContentNegotiation) { json() }
@@ -35,7 +35,7 @@ fun Application.module() {
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
     }
-    AppConfig.loadConfig()
+    
     val secret = AppConfig.getProperty("TOKEN_HASH")
     val issuer = environment.config.property("jwt.issuer").getString()
     val audience = environment.config.property("jwt.audience").getString()
