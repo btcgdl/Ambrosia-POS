@@ -29,6 +29,7 @@ dependencies {
     implementation("io.ktor:ktor-server-cors:3.1.2")
     implementation("io.ktor:ktor-server-status-pages:3.1.2")
     implementation("io.ktor:ktor-server-auth:3.1.2")
+    implementation("io.ktor:ktor-server-auth-jwt:3.1.2")
     implementation("org.xerial:sqlite-jdbc:3.49.1.0")
     implementation("io.ktor:ktor-server-swagger:3.1.2")
     implementation("io.ktor:ktor-server-openapi:3.1.2")
