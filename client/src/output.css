@@ -825,6 +825,13 @@
   --color-primary: #a13032;
   --color-secondary: #c69316;
 }
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
 @property --tw-translate-x {
   syntax: "*";
   inherits: false;
