@@ -6,6 +6,7 @@
     - `id`: UUID @unique
     - `name`: string (255)
     - `pin`: number (6)
+    - `refreshToken`: string
 - **Example**: `{id: 1, name: "Angel", pin: 123456}`
 
 ## Role

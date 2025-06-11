@@ -10,7 +10,8 @@ CREATE TABLE users (
     pin INTEGER NOT NULL UNIQUE CHECK (
         pin >= 100000
         AND pin <= 999999
-    )
+    ),
+    refreshToken TEXT
 );
 
 -- Roles table
