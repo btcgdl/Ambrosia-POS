@@ -11,7 +11,9 @@ CREATE TABLE users (
         AND pin <= 9999
     ),
     refresh_token TEXT,
-    is_deleted BOOLEAN NOT NULL DEFAULT 0
+    is_deleted BOOLEAN NOT NULL DEFAULT 0,
+    role_id BLOB NOT NULL,
+    FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE RESTRICT
 );
 
 -- Roles table
