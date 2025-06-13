@@ -29,7 +29,7 @@ class UsersService(private val connection: Connection) {
         val generatedKeys = statement.generatedKeys
         if (generatedKeys.next()) {
             val id = generatedKeys.getString(1)
-            return id
+            return id'''
         } else {
             return null
         }
