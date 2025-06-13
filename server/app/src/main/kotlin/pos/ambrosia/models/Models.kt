@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable data class Message(val message: String)
 
-@Serializable data class User(val id: String, val name: String, val pin: Int)
+@Serializable data class User(val id: String, val name: String, val pin: String, val refreshToken: String)
