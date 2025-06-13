@@ -1,4 +1,4 @@
-/*package pos.ambrosia.api
+package pos.ambrosia.api
 
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -25,7 +25,7 @@ fun Application.configureUsers() {
 }
 
 fun Route.users(userService: UsersService) {
-    authenticate("auth-basic") {
+    authenticate("auth-jwt") {
         get("") {
             val users = userService.getUsers()
             if (users.isEmpty()) {
@@ -80,4 +80,4 @@ fun Route.users(userService: UsersService) {
             }
         }
     }
-    }*/
+    }

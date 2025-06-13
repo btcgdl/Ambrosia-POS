@@ -1,162 +1,212 @@
 -- Restaurant Database Schema for SQLite3
--- Created based on the provided documentation
 -- Enable foreign key constraints
 PRAGMA foreign_keys = ON;
 
--- Users table
+-- Users table (PIN corregido a 4 dígitos)
 CREATE TABLE users (
     id BLOB PRIMARY KEY,
     name TEXT NOT NULL,
     pin INTEGER NOT NULL UNIQUE CHECK (
-        pin >= 100000
-        AND pin <= 999999
-    )
+        pin >= 1000
+        AND pin <= 9999
+    ),
+    refresh_token TEXT,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0
 );
 
 -- Roles table
 CREATE TABLE roles (
     id BLOB PRIMARY KEY,
+    role TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0
+);
+
+-- Spaces table (NUEVA)
+CREATE TABLE spaces (
+    id BLOB PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0
+);
+
+-- Tables table (NUEVA)  
+CREATE TABLE tables (
+    id BLOB PRIMARY KEY,
     name TEXT NOT NULL,
-    description TEXT
+    status TEXT NOT NULL DEFAULT 'available' CHECK (status IN ('available', 'occupied', 'reserved')),
+    space_id BLOB NOT NULL,
+    order_id BLOB,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0,
+    FOREIGN KEY (space_id) REFERENCES spaces (id) ON DELETE CASCADE
 );
 
--- Roles_Users junction table
-CREATE TABLE roles_users (
-    id_user BLOB NOT NULL,
-    id_role BLOB NOT NULL,
-    PRIMARY KEY (id_user, id_role),
-    FOREIGN KEY (id_user) REFERENCES users (id),
-    FOREIGN KEY (id_role) REFERENCES roles (id)
+-- Dish Categories table
+CREATE TABLE dish_categories (
+    id BLOB PRIMARY KEY, 
+    name TEXT NOT NULL UNIQUE
 );
 
--- Dishes_Category table
-CREATE TABLE dishes_category (id BLOB PRIMARY KEY, name TEXT NOT NULL);
-
--- Dishes table
+-- Dishes table (con relación a categoría)
 CREATE TABLE dishes (
     id BLOB PRIMARY KEY,
     name TEXT NOT NULL,
-    price REAL NOT NULL
+    price REAL NOT NULL,
+    category_id BLOB NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0,
+    FOREIGN KEY (category_id) REFERENCES dish_categories (id)
 );
 
--- Category_Ingredients table
-CREATE TABLE category_ingredients (id BLOB PRIMARY KEY, name TEXT NOT NULL);
+-- Ingredient Categories table
+CREATE TABLE ingredient_categories (
+    id BLOB PRIMARY KEY, 
+    name TEXT NOT NULL UNIQUE
+);
 
--- Ingredients table
+-- Ingredients table (coma extra removida y con relación a categoría)
 CREATE TABLE ingredients (
     id BLOB PRIMARY KEY,
     name TEXT NOT NULL,
-    quantity INTEGER NOT NULL DEFAULT 0,
-    low_stock_threshold INTEGER NOT NULL DEFAULT 0,
-    cost_per_unit REAL NOT NULL DEFAULT 0.00
+    category_id BLOB NOT NULL,
+    quantity REAL NOT NULL DEFAULT 0,
+    unit TEXT NOT NULL DEFAULT 'kg',
+    low_stock_threshold REAL NOT NULL DEFAULT 0,
+    cost_per_unit REAL NOT NULL DEFAULT 0.00,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0,
+    FOREIGN KEY (category_id) REFERENCES ingredient_categories (id)
 );
 
 -- Dishes_Ingredient junction table
 CREATE TABLE dishes_ingredient (
     id_dish BLOB NOT NULL,
     id_ingredient BLOB NOT NULL,
-    quantity INTEGER NOT NULL DEFAULT 1,
+    quantity REAL NOT NULL DEFAULT 1,
     PRIMARY KEY (id_dish, id_ingredient),
     FOREIGN KEY (id_dish) REFERENCES dishes (id) ON DELETE CASCADE,
-    FOREIGN KEY (id_ingredient) REFERENCES ingredients (id) ON DELETE CASCADE
-);
-
--- Ingredient_Category junction table
-CREATE TABLE ingredient_category (
-    id_category_ingredient BLOB NOT NULL,
-    id_ingredient BLOB NOT NULL,
-    PRIMARY KEY (id_category_ingredient, id_ingredient),
-    FOREIGN KEY (id_category_ingredient) REFERENCES category_ingredients (id) ON DELETE CASCADE,
     FOREIGN KEY (id_ingredient) REFERENCES ingredients (id) ON DELETE CASCADE
 );
 
 -- Suppliers table
 CREATE TABLE suppliers (
     id BLOB PRIMARY KEY,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE,
     contact TEXT,
     phone TEXT,
     email TEXT,
-    address TEXT
+    address TEXT,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0
 );
 
--- Ingredient_Suppliers junction table
+-- Ingredient_Suppliers junction table (TU ESTRUCTURA MANTENIDA)
 CREATE TABLE ingredient_suppliers (
     id_supplier BLOB NOT NULL,
     id_ingredient BLOB NOT NULL,
     date TEXT NOT NULL,
     total_cost REAL NOT NULL,
-    quantity INTEGER NOT NULL,
+    quantity REAL NOT NULL,
     PRIMARY KEY (id_supplier, id_ingredient, date),
     FOREIGN KEY (id_supplier) REFERENCES suppliers (id) ON DELETE CASCADE,
     FOREIGN KEY (id_ingredient) REFERENCES ingredients (id) ON DELETE CASCADE
 );
 
--- Payments table
+-- Orders table (NUEVA - para pedidos)
+CREATE TABLE orders (
+    id BLOB PRIMARY KEY,
+    user_id BLOB NOT NULL,
+    table_id BLOB,
+    waiter TEXT,
+    status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed', 'paid')),
+    total REAL NOT NULL DEFAULT 0.00,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    is_deleted BOOLEAN NOT NULL DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (table_id) REFERENCES tables (id)
+);
+
+-- Orders_Dishes junction table (NUEVA)
+CREATE TABLE orders_dishes (
+    id BLOB PRIMARY KEY,
+    order_id BLOB NOT NULL,
+    dish_id BLOB NOT NULL,
+    instance_id TEXT NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    price_at_order REAL NOT NULL,
+    notes TEXT,
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
+    FOREIGN KEY (dish_id) REFERENCES dishes (id) ON DELETE CASCADE
+);
+
+-- Payments table (currency corregido a TEXT)
 CREATE TABLE payments (
     id BLOB PRIMARY KEY,
-    currency REAL NOT NULL,
+    currency TEXT NOT NULL,
     name TEXT NOT NULL
 );
 
--- Tickets table
+-- Tickets table (ahora vinculada a orders)
 CREATE TABLE tickets (
     id BLOB PRIMARY KEY,
-    id_user BLOB NOT NULL,
-    ticket_date TEXT NOT NULL DEFAULT (datetime ('now')),
+    order_id BLOB NOT NULL,
+    user_id BLOB NOT NULL,
+    ticket_date TEXT NOT NULL DEFAULT (datetime('now')),
     status INTEGER NOT NULL DEFAULT 1,
     total_amount REAL NOT NULL DEFAULT 0.00,
     notes TEXT,
-    FOREIGN KEY (id_user) REFERENCES users (id) ON DELETE RESTRICT
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
--- Tickets_Dish junction table
+-- Tickets_Dish junction table (CLAVE PRIMARIA CORREGIDA)
 CREATE TABLE tickets_dish (
     id_ticket BLOB NOT NULL,
     id_dish BLOB NOT NULL,
     quantity INTEGER NOT NULL DEFAULT 1,
     price_at_order REAL NOT NULL,
     notes TEXT,
-    PRIMARY KEY (id_ticket),
+    PRIMARY KEY (id_ticket, id_dish), -- CORREGIDA: clave primaria compuesta
     FOREIGN KEY (id_ticket) REFERENCES tickets (id) ON DELETE CASCADE,
-    FOREIGN KEY (id_dish) REFERENCES dishes (id) ON DELETE RESTRICT
+    FOREIGN KEY (id_dish) REFERENCES dishes (id) ON DELETE CASCADE
 );
 
--- Payments_Tickets table
+-- Payments_Tickets table (con ID propio)
 CREATE TABLE payments_tickets (
-    id_ticket BLOB NOT NULL,
-    payment_date TEXT NOT NULL DEFAULT (datetime ('now')),
+    id BLOB PRIMARY KEY,
+    ticket_id BLOB NOT NULL,
+    payment_date TEXT NOT NULL DEFAULT (datetime('now')),
     amount REAL NOT NULL,
     payment_method BLOB NOT NULL,
     transaction_id TEXT,
-    PRIMARY KEY (id_ticket),
-    FOREIGN KEY (id_ticket) REFERENCES tickets (id) ON DELETE CASCADE,
-    FOREIGN KEY (payment_method) REFERENCES payments (id) ON DELETE RESTRICT
+    FOREIGN KEY (ticket_id) REFERENCES tickets (id) ON DELETE CASCADE,
+    FOREIGN KEY (payment_method) REFERENCES payments (id) ON DELETE CASCADE
 );
 
--- Shifts table
+-- Shifts table (referencia corregida)
 CREATE TABLE shifts (
-    id BLOB UNIQUE,
+    id BLOB PRIMARY KEY,
     user_id BLOB NOT NULL,
     shift_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME,
     notes VARCHAR(255),
-    PRIMARY KEY (id, user_id),
-    FOREIGN KEY (user_id) REFERENCES Users (id)
+    is_deleted BOOLEAN NOT NULL DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 -- Create indexes for better performance
 CREATE INDEX idx_users_pin ON users (pin);
-
-CREATE INDEX idx_tickets_user ON tickets (id_user);
-
+CREATE INDEX idx_tables_space ON tables (space_id);
+CREATE INDEX idx_tables_order ON tables (order_id);
+CREATE INDEX idx_dishes_category ON dishes (category_id);
+CREATE INDEX idx_ingredients_category ON ingredients (category_id);
+CREATE INDEX idx_orders_user ON orders (user_id);
+CREATE INDEX idx_orders_table ON orders (table_id);
+CREATE INDEX idx_orders_status ON orders (status);
+CREATE INDEX idx_orders_dishes_order ON orders_dishes (order_id);
+CREATE INDEX idx_tickets_order ON tickets (order_id);
+CREATE INDEX idx_tickets_user ON tickets (user_id);
 CREATE INDEX idx_tickets_date ON tickets (ticket_date);
-
 CREATE INDEX idx_tickets_status ON tickets (status);
-
 CREATE INDEX idx_tickets_dish_order ON tickets_dish (id_ticket);
-
-CREATE INDEX idx_payments_tickets_order ON payments_tickets (id_ticket);
-
+CREATE INDEX idx_payments_tickets_order ON payments_tickets (ticket_id);
 CREATE INDEX idx_ingredient_suppliers_date ON ingredient_suppliers (date);
+CREATE INDEX idx_ingredient_suppliers_supplier ON ingredient_suppliers (id_supplier);
+CREATE INDEX idx_ingredient_suppliers_ingredient ON ingredient_suppliers (id_ingredient);
