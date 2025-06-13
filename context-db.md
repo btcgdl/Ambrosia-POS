@@ -9,6 +9,7 @@
   - `pin`: INTEGER NOT NULL UNIQUE (4 digits: 1000-9999)
   - `refresh_token`: TEXT
   - `is_deleted`: BOOLEAN NOT NULL DEFAULT 0
+  - `role_id`: BLOB @Relation(Role)
 - **Example**: `{id: "uuid-blob", name: "Angel", pin: 1234, refresh_token: "token", is_deleted: false}`
 
 ## Role
