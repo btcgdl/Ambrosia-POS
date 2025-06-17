@@ -5,6 +5,8 @@ import pos.ambrosia.models.Auth
 import pos.ambrosia.models.AuthRequest
 import pos.ambrosia.utils.SecurePinProcessor
 
+// Deprecated: Too many responsibilities see UsersService.kt and TokenService.kt
+@Deprecated("This class is deprecated and will be removed in a future release.")
 class AuthService(private val connection: Connection) {
     companion object {
         private const val GET_USER_CREDENTIALS_BY_NAME = "SELECT * FROM users WHERE users.name = ?"
