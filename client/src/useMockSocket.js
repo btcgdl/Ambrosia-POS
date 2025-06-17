@@ -51,6 +51,7 @@
     cash: [
         { id: 1, date: '2025-05-01', amount: 1000, type: 'ingreso', description: 'Venta inicial' },
     ],
+    turnOpen:false,
 };
 
 let state = { ...initialData };
@@ -305,6 +306,13 @@ export const mockService = {
         state.ingredientCategories = state.ingredientCategories.filter(c => c !== category);
         return category;
     },
+    setTurnOpen: (open) => {
+        state.turnOpen = open;
+        return open;
+    },
+    getTurnOpen: () => {
+        return state.turnOpen;
+    }
 };
 
 export function useMockSocket() {

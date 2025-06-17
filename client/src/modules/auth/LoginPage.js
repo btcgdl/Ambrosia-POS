@@ -19,7 +19,7 @@ export default function LoginPage() {
         try {
             const response = await login({ role, password });
             updateUserRole(response.data.role);
-            navigate("/all-orders");
+            navigate("/open-turn");
             setLoading(false);
         } catch (error) {
             setLoading(false);

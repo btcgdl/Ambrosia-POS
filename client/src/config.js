@@ -3,7 +3,7 @@
         auth: true,
         dishes: true,
         orders: true,
-        cash: false,
+        cashier: true,
         inventory: true,
         spaces: true,
     },

@@ -27,6 +27,7 @@ export default function NavBar() {
                     <NavBarButton text="Usuarios" icon="people-fill" onClick={()=>{navigate("/users")}}/>
                     <NavBarButton text="Roles" icon="people-fill" onClick={()=>{navigate("/roles")}}/>
                     <NavBarButton text="Inventario" icon="people-fill" onClick={()=>{navigate("/inventory/ingredients")}}/>
+                    <NavBarButton text="Cerrar turno" icon="people-fill" onClick={()=>{navigate("/close-turn")}}/>
                 </>)}
                 <NavBarButton text="Salir" icon="box-arrow-right" onClick={()=>{navigate("/")}}/>
             </div>
