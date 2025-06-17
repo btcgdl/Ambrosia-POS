@@ -13,6 +13,7 @@ import java.sql.Connection
 import pos.ambrosia.db.connectToSqlite
 import pos.ambrosia.models.User
 import pos.ambrosia.services.UsersService
+import pos.ambrosia.utils.UserNotFoundException
 
 fun Application.configureUsers() {
   val connection: Connection = connectToSqlite()
@@ -36,7 +37,7 @@ fun Route.users(userService: UsersService) {
       if (user != null) {
         call.respond(HttpStatusCode.OK, user)
       } else {
-        call.respond(HttpStatusCode.NotFound, "User with ID: $id not found")
+        throw UserNotFoundException()
       }
     } else {
       call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")

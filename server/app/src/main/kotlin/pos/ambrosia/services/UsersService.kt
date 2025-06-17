@@ -16,7 +16,7 @@ class UsersService(private val connection: Connection) {
 
     private const val GET_USERS =
             """
-            SELECT u.id, u.name, u.refreshToken, r.role 
+            SELECT u.id, u.name, u.refresh_token, u.pin, r.role 
             FROM users u
             JOIN roles r ON u.role_id = r.id
             WHERE u.is_deleted = 0
@@ -24,7 +24,7 @@ class UsersService(private val connection: Connection) {
 
     private const val GET_USER_BY_ID =
             """
-            SELECT u.id, u.name, u.refreshToken, r.role
+            SELECT u.id, u.name, u.refresh_token, r.role
             FROM users u
             JOIN roles r ON u.role_id = r.id
             WHERE u.id = ? AND u.is_deleted = 0
@@ -32,7 +32,7 @@ class UsersService(private val connection: Connection) {
 
     private const val UPDATE_USER =
             """
-            UPDATE users SET name = ?, refreshToken = ? WHERE id = ?
+            UPDATE users SET name = ?, refresh_token = ? WHERE id = ?
         """
 
     private const val DELETE_USER = "UPDATE users SET is_deleted = 1 WHERE id = ?"
@@ -102,7 +102,7 @@ class UsersService(private val connection: Connection) {
     while (resultSet.next()) {
       val id = resultSet.getString("id")
       val name = resultSet.getString("name")
-      val refreshToken = resultSet.getString("refreshToken")
+      val refreshToken = resultSet.getString("refresh_token")
       val role = resultSet.getString("role")
       val pin = resultSet.getString("pin")
       users.add(User(id = id, name = name, pin = pin, refreshToken = refreshToken, role = role))
@@ -117,7 +117,7 @@ class UsersService(private val connection: Connection) {
     if (resultSet.next()) {
       val userId = resultSet.getString("id")
       val name = resultSet.getString("name")
-      val refreshToken = resultSet.getString("refreshToken")
+      val refreshToken = resultSet.getString("refresh_token")
       val role = resultSet.getString("role")
       val pin = resultSet.getString("pin")
       return User(id = userId, name = name, pin = pin, refreshToken = refreshToken, role = role)
@@ -142,4 +142,3 @@ class UsersService(private val connection: Connection) {
     return rowsDeleted > 0
   }
 }
-
