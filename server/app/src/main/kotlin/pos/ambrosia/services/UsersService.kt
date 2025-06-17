@@ -1,17 +1,72 @@
 package pos.ambrosia.services
 
 import pos.ambrosia.utils.SecurePinProcessor
-import pos.ambrosia.models.User
 import java.sql.Connection
+import pos.ambrosia.models.User
 import java.sql.Statement
 
+
+//TODO: Verify AI generated code
 class UsersService(private val connection: Connection) {
     companion object {
-        private const val ADD_USER = "INSERT INTO users VALUES (?,?,?,?)"
-        private const val GET_USERS = "SELECT users.id, users.name, users.refreshToken FROM users"
-        private const val GET_USER_BY_ID = "SELECT users.id, users.name, users.refreshToken FROM users WHERE users.id = ?"
-        private const val UPDATE_USER = "UPDATE users SET users.name = ?, users.pin = ?, users.refreshToken = ? WHERE users.id = ?"
-        private const val DELETE_USER = "UPDATE users SET users.is_deleted = true WHERE users.id = ?"
+        
+        private const val ADD_USER = """
+            INSERT INTO users (id, name, pin, refresh_token, role_id) VALUES (?, ?, ?, ?, ?)
+        """
+
+        private const val GET_USERS = """
+            SELECT u.id, u.name, u.refreshToken, r.role 
+            FROM users u
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.is_deleted = 0
+        """
+
+        private const val GET_USER_BY_ID = """
+            SELECT u.id, u.name, u.refreshToken, r.role
+            FROM users u
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.id = ? AND u.is_deleted = 0
+        """
+
+        private const val UPDATE_USER = """
+            UPDATE users SET name = ?, refreshToken = ? WHERE id = ?
+        """
+        
+        private const val DELETE_USER = "UPDATE users SET is_deleted = 1 WHERE id = ?"
+        
+        private const val GET_USER_FOR_AUTH = """
+            SELECT u.id, u.name, u.pin, r.role
+            FROM users u
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.name = ? AND u.is_deleted = 0
+        """
+    }
+
+    fun authenticateUser(name: String, pin: CharArray): User? {
+        connection.prepareStatement(GET_USER_FOR_AUTH).use { statement ->
+            statement.setString(1, name)
+            statement.executeQuery().use { rs ->
+                if (rs.next()) {
+                    val userIdString = rs.getString("id")
+                    val storedPinHashBase64 = rs.getString("pin")
+                    val storedPinHash = SecurePinProcessor.base64ToByteArray(storedPinHashBase64)
+
+                    val isValidPin = SecurePinProcessor.verifyPin(pin, userIdString, storedPinHash)
+                    pin.fill('\u0000')
+
+                    if (isValidPin) {
+                        return User(
+                            id = userIdString,
+                            name = rs.getString("name"),
+                            pin = "",
+                            refreshToken = null,
+                            role = rs.getString("role")
+                        )
+                    }
+                }
+            }
+        }
+        return null
     }
 
     suspend fun addUser(user: User): String? {   
@@ -43,7 +98,9 @@ class UsersService(private val connection: Connection) {
             val id = resultSet.getString("id")
             val name = resultSet.getString("name")
             val refreshToken = resultSet.getString("refreshToken")
-            users.add(User(id = id, name = name, pin = "", refreshToken = refreshToken)) // Pin is not returned for security reasons
+            val role = resultSet.getString("role")
+            val pin = resultSet.getString("pin") 
+            users.add(User(id = id, name = name, pin = pin, refreshToken = refreshToken, role = role))
         }
         return users
     }
@@ -56,7 +113,9 @@ class UsersService(private val connection: Connection) {
             val userId = resultSet.getString("id")
             val name = resultSet.getString("name")
             val refreshToken = resultSet.getString("refreshToken")
-            return User(id = userId, name = name, pin = "", refreshToken = refreshToken) // Pin is not returned for security reasons
+            val role = resultSet.getString("role")
+            val pin = resultSet.getString("pin")
+            return User(id = userId, name = name, pin = pin, refreshToken = refreshToken, role = role)
         }
         return null
     }
