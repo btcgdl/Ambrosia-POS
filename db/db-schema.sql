@@ -6,10 +6,7 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE users (
     id BLOB PRIMARY KEY,
     name TEXT NOT NULL,
-    pin INTEGER NOT NULL UNIQUE CHECK (
-        pin >= 1000
-        AND pin <= 9999
-    ),
+    pin INTEGER NOT NULL UNIQUE,
     refresh_token TEXT,
     is_deleted BOOLEAN NOT NULL DEFAULT 0,
     role_id BLOB NOT NULL,
