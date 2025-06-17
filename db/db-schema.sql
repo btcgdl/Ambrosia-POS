@@ -42,7 +42,8 @@ CREATE TABLE tables (
 -- Dish Categories table
 CREATE TABLE dish_categories (
     id BLOB PRIMARY KEY, 
-    name TEXT NOT NULL UNIQUE
+    name TEXT NOT NULL UNIQUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0
 );
 
 -- Dishes table (con relación a categoría)
@@ -58,7 +59,8 @@ CREATE TABLE dishes (
 -- Ingredient Categories table
 CREATE TABLE ingredient_categories (
     id BLOB PRIMARY KEY, 
-    name TEXT NOT NULL UNIQUE
+    name TEXT NOT NULL UNIQUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0
 );
 
 -- Ingredients table (coma extra removida y con relación a categoría)
