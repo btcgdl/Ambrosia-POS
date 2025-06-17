@@ -15,9 +15,6 @@ export default function OpenTurn() {
     const report = {
         date: '1/1/2023',
         balance: '400',
-        [{
-            
-        }]
     }
 
     const handleAmountChange = (e) => {
