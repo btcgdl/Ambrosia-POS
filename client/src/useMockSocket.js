@@ -52,6 +52,16 @@
         { id: 1, date: '2025-05-01', amount: 1000, type: 'ingreso', description: 'Venta inicial' },
     ],
     turnOpen:false,
+    tickets: [
+        {
+            id: 1,
+            orderId: 1,
+            date: "2025-06-21",
+            amount: 1000,
+            paymentMethod: "Efectivo",
+            userName: "Angel",
+        },
+    ],
 };
 
 let state = { ...initialData };
@@ -143,6 +153,21 @@ export const mockService = {
         state.orders = existingOrder
             ? state.orders.map((o) => (o.id === newOrder.id ? newOrder : o))
             : [...state.orders, newOrder];
+
+        if (newOrder.estado === "pagado") {
+            const user = state.users.find((u) => u.id === newOrder.userId);
+            const userName = user ? user.nombre : "Desconocido";
+            const amount = newOrder.dishes.reduce((sum, item) => sum + (item.dish?.precio || 0), 0);
+            const ticket = {
+                orderId: newOrder.id,
+                date: new Date().toISOString().split("T")[0],
+                amount,
+                paymentMethod: newOrder.paymentMethod || "Efectivo",
+                userName,
+            };
+            state.tickets = [...state.tickets, { ...ticket, id: Date.now() }];
+        }
+
         return newOrder;
     },
     getRooms: () => state.rooms,
@@ -312,7 +337,46 @@ export const mockService = {
     },
     getTurnOpen: () => {
         return state.turnOpen;
-    }
+    },
+    addTicket: (ticket) => {
+        const newTicket = { ...ticket, id: Date.now() };
+        state.tickets = [...state.tickets, newTicket];
+        return newTicket;
+    },
+
+    getTickets: () => state.tickets,
+    getReport: (startDate, endDate) => {
+        const tickets = state.tickets.filter((ticket) => {
+            const ticketDate = new Date(ticket.date);
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            return ticketDate >= start && ticketDate <= end;
+        });
+
+        const reportsByDate = tickets.reduce((acc, ticket) => {
+            const date = ticket.date;
+            if (!acc[date]) {
+                acc[date] = { date, balance: 0, tickets: [] };
+            }
+            acc[date].balance += ticket.amount;
+            acc[date].tickets.push({
+                amount: ticket.amount,
+                paymentMethod: ticket.paymentMethod,
+                userName: ticket.userName,
+            });
+            return acc;
+        }, {});
+
+        const reports = Object.values(reportsByDate);
+        const totalBalance = reports.reduce((sum, report) => sum + report.balance, 0);
+
+        return {
+            startDate,
+            endDate,
+            totalBalance,
+            reports,
+        };
+    },
 };
 
 export function useMockSocket() {

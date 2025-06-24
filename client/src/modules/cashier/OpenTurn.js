@@ -19,7 +19,6 @@ export default function OpenTurn() {
 
     const handleAmountChange = (e) => {
         const value = e.target.value;
-        // Solo permitir números y punto decimal
         if (/^\d*\.?\d*$/.test(value)) {
             setInitialAmount(value);
         }
@@ -29,7 +28,6 @@ export default function OpenTurn() {
         e.preventDefault();
         setError("");
 
-        // Validar que se haya ingresado una cantidad
         if (!initialAmount || initialAmount === "0" || initialAmount === "0.00") {
             setError("Debes ingresar una cantidad válida para abrir el turno");
             return;
@@ -43,18 +41,12 @@ export default function OpenTurn() {
 
         setIsLoading(true);
         try {
-            // Aquí llamarías tu servicio para abrir turno
-            // await openTurnService(amount);
             console.log("Abriendo turno con cantidad inicial:", amount);
 
-            // Simular llamada al servicio
 
             await setTurnOpen(true);
             updateTurn(true);
             navigate("/all-orders");
-
-
-            // Redirigir o mostrar éxito
 
         } catch (err) {
             setError(err.message || "Error al abrir el turno");

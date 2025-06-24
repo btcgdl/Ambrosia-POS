@@ -16,3 +16,13 @@ export async function setTurnOpen(open){
         return { data: mockService.setTurnOpen(open) };
     }
 }
+
+export async function getReport(startDate, endDate) {
+    try {
+        return await apiClient(`/get-report?startDate=${startDate}&endDate=${endDate}`);
+    } catch (error) {
+        return {
+            data: mockService.getReport(startDate, endDate),
+        };
+    }
+}

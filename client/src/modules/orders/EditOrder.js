@@ -26,6 +26,8 @@ export default function EditOrder() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [undoStack, setUndoStack] = useState([]);
+    const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
 
     useEffect(() => {
         async function fetchData() {
@@ -130,6 +132,43 @@ export default function EditOrder() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handlePayOrder = () => {
+        setShowPaymentDialog(true);
+    };
+
+    const handleConfirmPayment = async () => {
+        if (!selectedPaymentMethod) {
+            setError("Por favor, selecciona un método de pago");
+            return;
+        }
+        setIsLoading(true);
+        setError("");
+        try {
+            const response = await updateOrder(pedidoId, {
+                estado: "pagado",
+                paymentMethod: selectedPaymentMethod,
+            });
+            setOrder(response.data);
+            const tables = await getTables();
+            const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
+            if (table) {
+                await updateTable(table.id, { pedidoId: null, estado: "libre" });
+            }
+            setShowPaymentDialog(false);
+            setSelectedPaymentMethod("");
+            navigate("/all-orders");
+        } catch (err) {
+            setError("Error al procesar el pago");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleCancelPayment = () => {
+        setShowPaymentDialog(false);
+        setSelectedPaymentMethod("");
     };
 
     const filteredDishes = dishes.filter((dish) => dish.categoria === selectedCategory);
@@ -332,7 +371,7 @@ export default function EditOrder() {
                                                 </button>
                                                 <button
                                                     className="bg-green-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-green-600"
-                                                    onClick={() => handleChangeOrderStatus("pagado")}
+                                                    onClick={handlePayOrder}
                                                     disabled={isLoading}
                                                 >
                                                     Pagar
@@ -341,6 +380,51 @@ export default function EditOrder() {
                                         )}
                                     </div>
                                 </div>
+                                {/* Payment Method Dialog */}
+                                {showPaymentDialog && (
+                                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                        <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
+                                            <h3 className="text-2xl font-bold text-center">Seleccionar Método de Pago</h3>
+                                            <div className="flex flex-col gap-4">
+                                                <button
+                                                    className={`py-4 px-6 text-xl rounded-lg ${
+                                                        selectedPaymentMethod === "Efectivo"
+                                                            ? "bg-green-500 text-white"
+                                                            : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                                                    }`}
+                                                    onClick={() => setSelectedPaymentMethod("Efectivo")}
+                                                >
+                                                    💵 Efectivo
+                                                </button>
+                                                <button
+                                                    className={`py-4 px-6 text-xl rounded-lg ${
+                                                        selectedPaymentMethod === "Tarjeta"
+                                                            ? "bg-blue-500 text-white"
+                                                            : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                                                    }`}
+                                                    onClick={() => setSelectedPaymentMethod("Tarjeta")}
+                                                >
+                                                    💳 Tarjeta
+                                                </button>
+                                            </div>
+                                            <div className="flex justify-between gap-4">
+                                                <button
+                                                    className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
+                                                    onClick={handleCancelPayment}
+                                                >
+                                                    Cancelar
+                                                </button>
+                                                <button
+                                                    className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
+                                                    onClick={handleConfirmPayment}
+                                                    disabled={!selectedPaymentMethod || isLoading}
+                                                >
+                                                    Confirmar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
