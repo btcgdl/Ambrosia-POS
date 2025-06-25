@@ -11,39 +11,37 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
-import java.util.Date
-import pos.ambrosia.config.AppConfig
 import pos.ambrosia.db.connectToSqlite
+import pos.ambrosia.logger
 import pos.ambrosia.models.AuthRequest
-import pos.ambrosia.services.AuthService
+import pos.ambrosia.services.TokenService
+import pos.ambrosia.services.UsersService
 import pos.ambrosia.utils.*
 
 fun Application.configureAuth() {
-    val connection: Connection = connectToSqlite()
-    val authService = AuthService(connection)
-    routing { route("/auth") { auth(authService) } }
+  val connection: Connection = connectToSqlite()
+  val userService = UsersService(connection)
+  val tokenService = TokenService(environment)
+  routing { route("/auth") { auth(userService, tokenService) } }
 }
 
-fun Route.auth(authService: AuthService) {
-    val secret = AppConfig.getProperty("TOKEN_HASH")
-    val issuer = environment.config.property("jwt.issuer").getString()
-    val audience = environment.config.property("jwt.audience").getString()
-    val myRealm = environment.config.property("jwt.realm").getString()
+fun Route.auth(userService: UsersService, tokenService: TokenService) {
 
-    post("/login") {
-        val loginRequest = call.receive<AuthRequest>()
-        val authResponse = authService.login(loginRequest)
-        if (authResponse == null) {
-            throw InvalidCredentialsException()
-        }
-        val token =
-                JWT.create()
-                        .withAudience(audience)
-                        .withIssuer(issuer)
-                        .withClaim("username", authResponse.name)
-                        .withExpiresAt(Date(System.currentTimeMillis() + 60000))
-                        .sign(Algorithm.HMAC256(secret))
-        call.respond(hashMapOf("token" to token))
+  post("/login") {
+    val loginRequest = call.receive<AuthRequest>()
+    logger.info("Data for request: " + loginRequest.name + ", " + loginRequest.pin)
+    val userResponse =
+            userService.authenticateUser(loginRequest.name, loginRequest.pin.toCharArray())
+    logger.info(userResponse?.role)
+    if (userResponse == null) {
+      throw InvalidCredentialsException()
     }
-    authenticate("auth-jwt") { post("/logout") { call.respond(HttpStatusCode.NoContent) } }
+    val accessTokenResponse = tokenService.generateAccessToken(userResponse)
+    val refreshTokenResponse = tokenService.generateRefreshToken()
+
+    call.respond(
+            hashMapOf("accessToken" to accessTokenResponse, "refreshToken" to refreshTokenResponse)
+    )
+  }
+  authenticate("auth-jwt") { post("/logout") { call.respond(HttpStatusCode.NoContent) } }
 }
