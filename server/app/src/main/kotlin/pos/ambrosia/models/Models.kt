@@ -14,10 +14,9 @@ data class Auth(val id: String, val name: String)
 
 @Serializable
 data class User(
-        val id: String,
+        val id: String?,
         val name: String,
         val pin: String,
         val refreshToken: String?,
         val role: String?
 )
-

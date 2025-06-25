@@ -2,6 +2,7 @@ package pos.ambrosia.services
 
 import java.sql.Connection
 import java.sql.Statement
+import pos.ambrosia.logger
 import pos.ambrosia.models.User
 import pos.ambrosia.utils.SecurePinProcessor
 
@@ -24,7 +25,7 @@ class UsersService(private val connection: Connection) {
 
     private const val GET_USER_BY_ID =
             """
-            SELECT u.id, u.name, u.refresh_token, r.role
+            SELECT u.id, u.name, u.refresh_token, u.pin, r.role
             FROM users u
             JOIN roles r ON u.role_id = r.id
             WHERE u.id = ? AND u.is_deleted = 0
@@ -32,7 +33,7 @@ class UsersService(private val connection: Connection) {
 
     private const val UPDATE_USER =
             """
-            UPDATE users SET name = ?, refresh_token = ? WHERE id = ?
+            UPDATE users SET name = ?, pin = ?, refresh_token = ?, role_id = ? WHERE id = ?
         """
 
     private const val DELETE_USER = "UPDATE users SET is_deleted = 1 WHERE id = ?"
@@ -47,27 +48,27 @@ class UsersService(private val connection: Connection) {
   }
 
   fun authenticateUser(name: String, pin: CharArray): User? {
-    connection.prepareStatement(GET_USER_FOR_AUTH).use { statement ->
-      statement.setString(1, name)
-      statement.executeQuery().use { rs ->
-        if (rs.next()) {
-          val userIdString = rs.getString("id")
-          val storedPinHashBase64 = rs.getString("pin")
-          val storedPinHash = SecurePinProcessor.base64ToByteArray(storedPinHashBase64)
+    val statement = connection.prepareStatement(GET_USER_FOR_AUTH)
+    statement.setString(1, name)
+    val resultSet = statement.executeQuery()
+    if (resultSet.next()) {
+      val userIdString = resultSet.getString("id")
+      val storedPinHashBase64 = resultSet.getString("pin")
+      logger.info(userIdString)
+      val storedPinHash = SecurePinProcessor.base64ToByteArray(storedPinHashBase64)
 
-          val isValidPin = SecurePinProcessor.verifyPin(pin, userIdString, storedPinHash)
-          pin.fill('\u0000')
+      val isValidPin = SecurePinProcessor.verifyPin(pin, userIdString, storedPinHash)
+      pin.fill('\u0000')
 
-          if (isValidPin) {
-            return User(
-                    id = userIdString,
-                    name = rs.getString("name"),
-                    pin = "",
-                    refreshToken = null,
-                    role = rs.getString("role")
-            )
-          }
-        }
+      logger.info(isValidPin.toString())
+      if (isValidPin) {
+        return User(
+                id = userIdString,
+                name = resultSet.getString("name"),
+                pin = pin.toString(),
+                refreshToken = null,
+                role = resultSet.getString("role")
+        )
       }
     }
     return null
@@ -76,11 +77,12 @@ class UsersService(private val connection: Connection) {
   suspend fun addUser(user: User): String? {
     val statement = connection.prepareStatement(ADD_USER, Statement.RETURN_GENERATED_KEYS)
     // TODO: HASH ID FOR USERS SHA256
-    val genereatedId = user.id.ifEmpty { java.util.UUID.randomUUID().toString() }
+    val genereatedId = java.util.UUID.randomUUID().toString()
     statement.setString(1, genereatedId)
+    logger.info(genereatedId)
     statement.setString(2, user.name)
     // Encrypt the pin before storing it
-    val encryptedPin = SecurePinProcessor.hashPinForStorage(genereatedId.toCharArray(), user.pin)
+    val encryptedPin = SecurePinProcessor.hashPinForStorage(user.pin.toCharArray(), genereatedId)
     statement.setString(3, SecurePinProcessor.byteArrayToBase64(encryptedPin))
     statement.setString(4, user.refreshToken)
     statement.setString(5, user.role)
@@ -125,12 +127,16 @@ class UsersService(private val connection: Connection) {
     return null
   }
 
-  suspend fun updateUser(id: String, updatedUser: User): Boolean {
+  suspend fun updateUser(id: String?, updatedUser: User): Boolean {
+    if (id == null) return false
     val statement = connection.prepareStatement(UPDATE_USER)
     statement.setString(1, updatedUser.name)
-    statement.setString(2, updatedUser.pin)
+
+    val encryptedPin = SecurePinProcessor.hashPinForStorage(id.toCharArray(), updatedUser.pin)
+    statement.setString(2, SecurePinProcessor.byteArrayToBase64(encryptedPin))
     statement.setString(3, updatedUser.refreshToken)
-    statement.setString(4, id)
+    statement.setString(4, updatedUser.role)
+    statement.setString(5, updatedUser.id)
     val rowsUpdated = statement.executeUpdate()
     return rowsUpdated > 0
   }

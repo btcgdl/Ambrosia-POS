@@ -11,6 +11,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
 import pos.ambrosia.db.connectToSqlite
+import pos.ambrosia.logger
 import pos.ambrosia.models.User
 import pos.ambrosia.services.UsersService
 import pos.ambrosia.utils.UserNotFoundException
@@ -53,6 +54,7 @@ fun Route.users(userService: UsersService) {
     if (id != null) {
       val updatedUser = call.receive<User>()
       val isUpdated = userService.updateUser(id, updatedUser)
+      logger.info(isUpdated.toString())
       if (isUpdated) {
         call.respond(HttpStatusCode.OK, "User updated successfully")
       } else {
