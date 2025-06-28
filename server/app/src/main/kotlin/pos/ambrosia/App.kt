@@ -73,4 +73,5 @@ fun Application.module() {
   configurePayments()
   configureTickets()
   configureShifts()
+  configureWallet()
 }

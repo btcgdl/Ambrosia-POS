@@ -6,10 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable data class TokenResponse(val accessToken: String, val refreshToken: String)
 
-@Deprecated("This class is deprecated and will be removed")
-@Serializable
-data class Auth(val id: String, val name: String)
-
 @Serializable data class Message(val message: String)
 
 @Serializable
