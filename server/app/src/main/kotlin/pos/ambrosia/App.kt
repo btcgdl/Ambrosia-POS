@@ -74,4 +74,5 @@ fun Application.module() {
   configureTickets()
   configureShifts()
   configureWallet()
+  configureRoles()
 }
