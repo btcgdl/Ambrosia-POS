@@ -64,4 +64,6 @@ fun Application.module() {
   configureAuth()
   configureUsers()
   configureRoles()
+  configureDishes()
+  configureSpaces()
 }
