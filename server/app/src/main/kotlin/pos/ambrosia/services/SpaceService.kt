@@ -5,7 +5,7 @@ import pos.ambrosia.models.Space
 
 class SpaceService(private val connection: Connection) {
     companion object {
-        private const val ADD_SPACE = "INSERT INTO spaces (id, name) VALUES (?, ?, ?)"
+        private const val ADD_SPACE = "INSERT INTO spaces (id, name) VALUES (?, ?)"
         private const val GET_SPACES = "SELECT id, name FROM spaces WHERE is_deleted = 0"
         private const val GET_SPACE_BY_ID =
                 "SELECT id, name FROM spaces WHERE id = ? AND is_deleted = 0"
