@@ -7,9 +7,9 @@ import io.ktor.server.application.*
 import io.ktor.server.application.ApplicationEnvironment
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 import pos.ambrosia.config.AppConfig
 import pos.ambrosia.models.User
+import kotlin.time.toDurationUnit
 
 class TokenService(environment: ApplicationEnvironment) {
 
@@ -31,9 +31,12 @@ class TokenService(environment: ApplicationEnvironment) {
                   .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(15)))
                   .sign(algorithm)
 
-  fun generateRefreshToken(): String {
-    val randomBytes = Random.nextBytes(32)
-    return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes)
-  }
+  fun generateRefreshToken(): String =
+          JWT.create()
+                  .withAudience(audience)
+                  .withIssuer(issuer)
+                  .withExpiresAt(
+                          Date(System.currentTimeMillis() + TimeUnit.HOURS.toDurationUnit(8)
+                  )
+                  .sign(algorithm)
 }
-
