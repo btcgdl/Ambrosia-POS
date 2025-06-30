@@ -9,7 +9,6 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import pos.ambrosia.config.AppConfig
 import pos.ambrosia.models.User
-import kotlin.time.toDurationUnit
 
 class TokenService(environment: ApplicationEnvironment) {
 
@@ -35,8 +34,6 @@ class TokenService(environment: ApplicationEnvironment) {
           JWT.create()
                   .withAudience(audience)
                   .withIssuer(issuer)
-                  .withExpiresAt(
-                          Date(System.currentTimeMillis() + TimeUnit.HOURS.toDurationUnit(8)
-                  )
+                  .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24)))
                   .sign(algorithm)
 }

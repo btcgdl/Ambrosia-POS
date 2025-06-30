@@ -17,7 +17,7 @@ CREATE TABLE users (
 CREATE TABLE roles (
     id BLOB PRIMARY KEY,
     role TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL,
+    password TEXT,
     is_deleted BOOLEAN NOT NULL DEFAULT 0
 );
 
