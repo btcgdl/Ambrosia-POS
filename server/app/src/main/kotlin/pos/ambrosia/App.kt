@@ -75,4 +75,6 @@ fun Application.module() {
   configureShifts()
   configureWallet()
   configureRoles()
+  configureDishes()
+  configureSpaces()
 }
