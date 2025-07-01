@@ -11,5 +11,7 @@ addModule('cashier', {
         { path: '/reports', component: Reports },
     ],
     services: cashierService,
-    navItems: [],
+    navItems: [
+        { path: '/reports', label: 'Reportes y caja', icon: 'bar-chart-line', roles: ['admin'] },
+    ],
 });

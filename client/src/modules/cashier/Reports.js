@@ -7,7 +7,8 @@ import Header from "../../components/header/Header";
 
 
 
-import { getReport } from "./cashierService"; // Adjust the path as needed
+import { getReport } from "./cashierService";
+import {useNavigate} from "react-router-dom"; // Adjust the path as needed
 
 const getReportData = async (startDate, endDate) => {
     try {
@@ -35,6 +36,8 @@ export default function Reports() {
     const [reportData, setReportData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+
+    const navigate = useNavigate();
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -72,8 +75,7 @@ export default function Reports() {
     };
 
     const handleCloseTurn = () => {
-        // Aquí iría la lógica para cerrar turno
-        console.log("Cerrando turno...");
+        navigate('/close-turn')
     };
 
     const setQuickDateRange = (days) => {

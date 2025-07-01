@@ -8,6 +8,6 @@ addModule('dishes', {
     ],
     services: dishesService,
     navItems: [
-        { path: '/dishes', label: 'Platillos' },
+        { path: '/dishes', label: 'Platillos', icon: 'egg-fried', roles: ['admin'] },
     ],
 });

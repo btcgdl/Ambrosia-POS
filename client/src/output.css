@@ -22,6 +22,7 @@
     --color-green-50: oklch(98.2% 0.018 155.826);
     --color-green-100: oklch(96.2% 0.044 156.743);
     --color-green-200: oklch(92.5% 0.084 155.995);
+    --color-green-400: oklch(79.2% 0.209 151.711);
     --color-green-500: oklch(72.3% 0.219 149.579);
     --color-green-600: oklch(62.7% 0.194 149.214);
     --color-green-700: oklch(52.7% 0.154 150.069);
@@ -45,6 +46,8 @@
     --container-xl: 36rem;
     --container-2xl: 42rem;
     --container-4xl: 56rem;
+    --text-xs: 0.75rem;
+    --text-xs--line-height: calc(1 / 0.75);
     --text-sm: 0.875rem;
     --text-sm--line-height: calc(1.25 / 0.875);
     --text-lg: 1.125rem;
@@ -254,6 +257,9 @@
   .mx-auto {
     margin-inline: auto;
   }
+  .my-2 {
+    margin-block: calc(var(--spacing) * 2);
+  }
   .mt-2 {
     margin-top: calc(var(--spacing) * 2);
   }
@@ -301,6 +307,9 @@
   }
   .h-16 {
     height: calc(var(--spacing) * 16);
+  }
+  .h-40 {
+    height: calc(var(--spacing) * 40);
   }
   .h-\[10\%\] {
     height: 10%;
@@ -367,6 +376,9 @@
   }
   .w-16 {
     width: calc(var(--spacing) * 16);
+  }
+  .w-40 {
+    width: calc(var(--spacing) * 40);
   }
   .w-\[20\%\] {
     width: 20%;
@@ -547,6 +559,9 @@
   .border-amber-300 {
     border-color: var(--color-amber-300);
   }
+  .border-black {
+    border-color: var(--color-black);
+  }
   .border-gray-200 {
     border-color: var(--color-gray-200);
   }
@@ -558,6 +573,9 @@
   }
   .border-green-200 {
     border-color: var(--color-green-200);
+  }
+  .border-green-400 {
+    border-color: var(--color-green-400);
   }
   .border-red-400 {
     border-color: var(--color-red-400);
@@ -730,6 +748,9 @@
   .text-right {
     text-align: right;
   }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
   .text-2xl {
     font-size: var(--text-2xl);
     line-height: var(--tw-leading, var(--text-2xl--line-height));
@@ -777,6 +798,9 @@
   .font-semibold {
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
+  }
+  .text-black {
+    color: var(--color-black);
   }
   .text-blue-800 {
     color: var(--color-blue-800);
@@ -938,6 +962,17 @@
   .disabled\:bg-gray-400 {
     &:disabled {
       background-color: var(--color-gray-400);
+    }
+  }
+  .print\:w-\[80mm\] {
+    @media print {
+      width: 80mm;
+    }
+  }
+  .print\:text-xs {
+    @media print {
+      font-size: var(--text-xs);
+      line-height: var(--tw-leading, var(--text-xs--line-height));
     }
   }
 }

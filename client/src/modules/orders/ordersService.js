@@ -59,6 +59,17 @@ export async function getUsers() {
     }
 }
 
+export async function getUserById(userId) {
+    try {
+        const response = await apiClient(`/users/${userId}`);
+        return response;
+    } catch (error) {
+        const user = mockService.getUsers().find((u) => u.id === Number(userId));
+        if (!user) throw new Error('Usuario no encontrado');
+        return { data: user };
+    }
+}
+
 export async function getTables() {
     try {
         return await apiClient('/spaces/tables');
@@ -131,7 +142,7 @@ export async function createOrder(pin, tableId = null) {
         const orderResponse = await addOrder(newOrder);
 
         if (tableId) {
-            const tables = mockService.getTables();
+            const tables = (await getTables()).data;
             const table = tables.find((t) => t.id === Number(tableId));
             if (!table) throw new Error('Mesa no encontrada');
             if (table.estado !== 'libre') throw new Error('La mesa no está libre');
@@ -197,5 +208,33 @@ export async function updateTable(tableId, updatedTable) {
         newTables[tableIndex] = { ...newTables[tableIndex], ...updatedTable };
         mockService.addTable(newTables[tableIndex]);
         return { data: newTables[tableIndex] };
+    }
+}
+
+export async function addTicket(ticket) {
+    try {
+        return await apiClient('/tickets', {
+            method: 'POST',
+            body: ticket,
+        });
+    } catch (error) {
+        return mockService.addTicket(ticket);
+    }
+}
+
+export async function updateTicket(ticketId, updatedTicket) {
+    try {
+        return await apiClient(`/tickets/${ticketId}`, {
+            method: 'PATCH',
+            body: updatedTicket,
+        });
+    } catch (error) {
+        const tickets = mockService.getTickets();
+        const ticketIndex = tickets.findIndex((t) => t.id === Number(ticketId));
+        if (ticketIndex === -1) throw new Error('Ticket no encontrado');
+
+        const updated = { ...tickets[ticketIndex], ...updatedTicket };
+        mockService.addTicket(updated);
+        return { data: updated };
     }
 }

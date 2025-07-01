@@ -12,7 +12,7 @@ addModule('auth', {
     ],
     services: authService,
     navItems: [
-        { path: '/roles', label: 'Roles' },
-        { path: '/users', label: 'Usuarios' },
+        { path: '/roles', label: 'Roles', icon: 'people-fill', roles: ['admin'] },
+        { path: '/users', label: 'Usuarios', icon: 'person-lock', roles: ['admin'] },
     ],
 });

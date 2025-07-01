@@ -4,6 +4,7 @@ import Header from "../../components/header/Header";
 import {setTurnOpen} from "./cashierService";
 import {useNavigate} from "react-router-dom";
 import {useTurn} from "./useTurn";
+import {getHomeRoute} from "../../utils/getHomeRoute";
 
 export default function OpenTurn() {
     const [initialAmount, setInitialAmount] = useState("");
@@ -46,7 +47,7 @@ export default function OpenTurn() {
 
             await setTurnOpen(true);
             updateTurn(true);
-            navigate("/all-orders");
+            navigate(getHomeRoute());
 
         } catch (err) {
             setError(err.message || "Error al abrir el turno");

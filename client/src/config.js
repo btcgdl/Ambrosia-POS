@@ -4,7 +4,7 @@
         dishes: true,
         orders: true,
         cashier: true,
-        inventory: true,
+        inventory: false,
         spaces: true,
     },
 };

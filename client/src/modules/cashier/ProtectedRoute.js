@@ -13,7 +13,6 @@ export function ProtectedRoute({ children }) {
 
     useEffect(() => {
         if (!notProtectedRoutes.includes(location.pathname)) {
-            console.log(openTurn);
             if (!openTurn && userRole) {
                 navigate('/open-turn', { replace: true });
             }

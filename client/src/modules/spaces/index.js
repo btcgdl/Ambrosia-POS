@@ -12,7 +12,6 @@ addModule('spaces', {
     ],
     services: spacesService,
     navItems: [
-        { path: '/rooms', label: 'Salas' },
-        { path: '/spaces', label: 'Administrar Espacios' },
+        { path: '/spaces', label: 'Administrar Espacios', icon: 'layout-text-window', roles: ['admin'] },
     ],
 });

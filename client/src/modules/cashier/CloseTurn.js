@@ -1,11 +1,15 @@
 ﻿import { useState } from "react";
 import NavBar from "../../components/navbar/NavBar";
 import Header from "../../components/header/Header";
+import {setTurnOpen} from "./cashierService";
+import {useNavigate} from "react-router-dom";
 
 export default function CloseTurn() {
     const [finalAmount, setFinalAmount] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
+    const navigate = useNavigate();
+    const [success, setSuccess] = useState(false);
 
     const handleAmountChange = (e) => {
         const value = e.target.value;
@@ -18,8 +22,8 @@ export default function CloseTurn() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
+        setSuccess(false);
 
-        // Validar que se haya ingresado una cantidad
         if (!finalAmount) {
             setError("Debes ingresar la cantidad final de dinero en caja");
             return;
@@ -33,16 +37,10 @@ export default function CloseTurn() {
 
         setIsLoading(true);
         try {
-            // Aquí llamarías tu servicio para cerrar turno
-            // await closeTurnService(amount);
-            console.log("Cerrando turno con cantidad final:", amount);
-
-            // Simular llamada al servicio
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            // Redirigir o mostrar éxito
-            alert("Turno cerrado exitosamente");
-
+            await setTurnOpen(false);
+            setSuccess(true);
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            navigate("/");
         } catch (err) {
             setError(err.message || "Error al cerrar el turno");
         } finally {
@@ -70,6 +68,12 @@ export default function CloseTurn() {
                         {error && (
                             <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-xl text-xl max-w-2xl w-full text-center">
                                 {error}
+                            </div>
+                        )}
+
+                        {success && (
+                            <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-xl text-xl max-w-2xl w-full text-center">
+                                Turno cerrado exitosamente
                             </div>
                         )}
 
