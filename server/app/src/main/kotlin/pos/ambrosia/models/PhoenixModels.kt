@@ -25,7 +25,7 @@ data class Channel(
     val balanceSat: Long,
     val inboundLiquiditySat: Long,
     val capacitySat: Long,
-    val foundingTxId: String
+    val fundingTxId: String
 )
 
 @Serializable

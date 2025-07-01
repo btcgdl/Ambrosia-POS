@@ -9,11 +9,14 @@ import org.slf4j.LoggerFactory
 object AppConfig {
     private val logger = LoggerFactory.getLogger("pos.ambrosia.App")
     private val properties = Properties()
-    private const val CONFIG_FILE_PATH = ".Ambrosia-POS/ambrosia.conf" // Relative to user\'s home directory
+    private val phoenixProperties = Properties()
+    private const val CONFIG_FILE_PATH = ".Ambrosia-POS/ambrosia.conf"
+    private const val PHOENIX_PATH = ".phoenix/phoenix.conf" 
 
     fun loadConfig() {
         val userHome = System.getProperty("user.home")
         val configFile = File(userHome, CONFIG_FILE_PATH)
+        val phoenixFile = File(userHome, PHOENIX_PATH)
 
         try {
             FileInputStream(configFile).use { fis ->
@@ -22,11 +25,23 @@ object AppConfig {
             logger.info("Configuration loaded from {}", configFile)
         } catch (e: Exception) {
             logger.error("Error loading configuration from {}", configFile)
-            // Fallback or default values can be set here if needed
+        }
+
+        try {
+            FileInputStream(phoenixFile).use { fis ->
+                phoenixProperties.load(fis)
+            }
+            logger.info("Phoenix configuration loaded from {}", phoenixFile)
+        } catch (e: Exception) {
+            logger.error("Error loading Phoenix configuration from {}", phoenixFile)
         }
     }
 
     fun getProperty(key: String, defaultValue: String? = null): String? {
         return properties.getProperty(key) ?: defaultValue
+    }
+    
+    fun getPhoenixProperty(key: String, defaultValue: String? = null): String? {
+        return phoenixProperties.getProperty(key) ?: defaultValue
     }
 }
