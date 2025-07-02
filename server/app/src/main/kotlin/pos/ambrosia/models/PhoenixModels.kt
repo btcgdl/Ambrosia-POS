@@ -16,8 +16,6 @@ data class NodeInfo(
     val blockHeight: Int?,
     val version: String
 )
-
-
 @Serializable
 data class Channel(
     val state: String,
@@ -37,7 +35,7 @@ data class CreateInvoiceRequest(
 )
 
 @Serializable
-data class InvoiceResponse(
+data class CreateInvoiceResponse(
     val amountSat: Long?,
     val paymentHash: String,
     val serialized: String
@@ -45,8 +43,9 @@ data class InvoiceResponse(
 
 @Serializable
 data class PayInvoiceRequest(
-    val invoice: String,
     val amountSat: Long? = null
+    val invoice: String,
+    
 )
 
 @Serializable
@@ -72,4 +71,24 @@ data class IncomingPayment(
     val fees: Long,
     val completedAt: Long? = null,
     val createdAt: Long
+)
+
+@Serializable
+data class CreateOffer(
+    val description: String? = null,
+    val amountSat: Long? = null
+)
+
+@Serializable
+data class PayOfferRequest(
+    val amountSat: Long? = null,
+    val offer: String,
+    val message: String? = null
+)
+
+@Serializable
+data class PayOnchainRequest(
+    val amountSat: Long,
+    val address: String,
+    val feerateSatByte: Long
 )

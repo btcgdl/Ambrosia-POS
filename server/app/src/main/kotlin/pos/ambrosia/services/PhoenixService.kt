@@ -80,9 +80,8 @@ class PhoenixService(
     /**
      * Create a new Bolt11 invoice on Phoenix
      */
-    suspend fun createInvoice(request: CreateInvoiceRequest): InvoiceResponse {
+    suspend fun createInvoice(request: CreateInvoiceRequest): CreateInvoiceResponse {
         try {
-            logger.info(request.toString())
             val response: HttpResponse = httpClient.submitForm(
                 url = "$phoenixUrl/createinvoice",
                 formParameters = Parameters.build {
@@ -97,13 +96,125 @@ class PhoenixService(
             }
             
             val responseText = response.bodyAsText()
-            return Json.decodeFromString<InvoiceResponse>(responseText)
+            return Json.decodeFromString<CreateInvoiceResponse>(responseText)
         } catch (e: Exception) {
             throw PhoenixServiceException("Failed to create invoice on Phoenix: ${e.message}")
         }
     }
+    
     /**
      * Create a new Bolt12 offer on Phoenix
      */
-    
+    suspend fun createOffer(request: CreateOffer): String {
+        try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$phoenixUrl/createoffer",
+                formParameters = Parameters.build {
+                    request.description?.let { append("description", it) }
+                    request.amountSat?.let { append("amountSat", it.toString()) }
+                }
+            )
+            if (response.status.value != 200) {
+                throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
+            }
+            
+            return response.bodyAsText()
+        } catch (e: Exception) {
+            throw PhoenixServiceException("Failed to create offer on Phoenix: ${e.message}")
+        }
+    }
+
+    /**
+     * Pay a Bolt11 invoice on Phoenix
+     */
+    suspend fun payInvoice(request: PayInvoiceRequest): PaymentResponse
+    {
+        try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$phoenixUrl/payinvoice",
+                formParameters = Parameters.build {
+                    append("invoice", request.invoice)
+                    request.amountSat?.let { append("amountSat", it.toString()) }
+                }
+            ) 
+            if (response.status.value != 200) {
+                throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
+            }
+            val responseText = response.bodyAsText()
+            return Json.decodeFromString<PaymentResponse>(responseText)
+        
+        } catch (e: Exception) {
+            throw PhoenixServiceException("Failed to pay invoice on Phoenix: ${e.message}")
+        }
+    }
+
+    /**
+     * Pay a Bolt12 offer on Phoenix
+     */
+    suspend fun payOffer(request: PayOfferRequest): PaymentResponse {
+        try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$phoenixUrl/payoffer",
+                formParameters = Parameters.build {
+                    append("offer", request.offer)
+                    request.amountSat?.let { append("amountSat", it.toString()) }
+                    request.message?.let { append("message", it) }
+                }
+            )
+            if (response.status.value != 200) {
+                throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
+            }
+            val responseText = response.bodyAsText()
+            return Json.decodeFromString<PaymentResponse>(responseText)
+        
+        } catch (e: Exception) {
+            throw PhoenixServiceException("Failed to pay offer on Phoenix: ${e.message}")
+        }
+    }
+
+    /**
+     * Pay Onchain transaction on Phoenix
+     */
+    suspend fun payOnchain(request: PayOnchainRequest): PaymentResponse {
+        try {
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$phoenixUrl/payonchain",
+                formParameters = Parameters.build {
+                    append("address", request.address)
+                    append("amountSat", request.amountSat.toString())
+                    append("feerateSatByte", request.feerateSatByte.toString())
+                }
+            )
+            if (response.status.value != 200) {
+                throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
+            }
+            val responseText = response.bodyAsText()
+            return Json.decodeFromString<PaymentResponse>(responseText)
+        
+        } catch (e: Exception) {
+            throw PhoenixServiceException("Failed to pay onchain transaction on Phoenix: ${e.message}")
+        }
+    }
+
+    /**
+     * Bump the fee of all pending onchain transactions
+     */
+    suspend fun bumpOnchainFees(feerateSatByte: Int): String {
+        try {
+            val response: HttpResponse = httpClient.submitForm(
+                url ="$phoenixUrl/bumpfee",
+                formParameters = Parameters.build {
+                    append("feerateSatByte", feerateSatByte.toString())
+                }
+            )
+            if (response.status.value != 200) {
+                throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
+            }
+            
+            return response.bodyAsText()
+
+        } catch (e: Exception) {
+            throw PhoenixServiceException("Failed to bump onchain fees on Phoenix: ${e.message}")
+        }
+    }
 }
