@@ -9,6 +9,9 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import pos.ambrosia.services.PhoenixService
 import pos.ambrosia.models.Phoenix.CreateInvoiceRequest
+import pos.ambrosia.models.Phoenix.PayInvoiceRequest
+import pos.ambrosia.models.Phoenix.PayOfferRequest
+import pos.ambrosia.models.Phoenix.PayOnchainRequest
 
 fun Application.configureWallet() {
     val phoenixService = PhoenixService()
@@ -36,5 +39,25 @@ fun Route.wallet(phoenixService: PhoenixService) {
         val request = call.receive<CreateInvoiceRequest>()
         val invoice = phoenixService.createInvoice(request)
         call.respond(HttpStatusCode.OK, invoice)
+    }
+    post("/payinvoice"){
+        val request = call.receive<PayInvoiceRequest>()
+        val result = phoenixService.payInvoice(request)
+        call.respond(HttpStatusCode.OK, result)
+    }
+    post("/payoffer"){
+        val request = call.receive<PayOfferRequest>()
+        val result = phoenixService.payOffer(request)
+        call.respond(HttpStatusCode.OK, result)
+    }
+    post("/payonchain") {
+        val request = call.receive<PayOnchainRequest>()
+        val result = phoenixService.payOnchain(request)
+        call.respond(HttpStatusCode.OK, result)
+    }
+    post("bumpfee") {
+        val feerateSatByte = call.receive<Int>()
+        val result = phoenixService.bumpOnchainFees(feerateSatByte)
+        call.respond(HttpStatusCode.OK, result)
     }
 }
