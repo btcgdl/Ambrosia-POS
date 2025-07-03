@@ -77,4 +77,11 @@ fun Application.module() {
   configureRoles()
   configureDishes()
   configureSpaces()
+  configureTables()
+  configureIngredients()
+  configureSuppliers()
+  configureOrders()
+  configurePayments()
+  configureTickets()
+  configureShifts()
 }
