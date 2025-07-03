@@ -52,7 +52,7 @@ data class Ingredient(
 data class Supplier(
         val id: String?,
         val name: String,
-        val conact: String,
+        val contact: String,
         val phone: String,
         val email: String,
         val address: String
@@ -88,6 +88,6 @@ data class Shift(
         val user_id: String,
         val shift_date: String,
         val start_time: String,
-        val end_time: String,
+        val end_time: String?,
         val notes: String
 )
