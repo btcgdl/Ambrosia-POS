@@ -43,8 +43,8 @@ data class CreateInvoiceResponse(
 
 @Serializable
 data class PayInvoiceRequest(
-    val amountSat: Long? = null
-    val invoice: String,
+    val amountSat: Long? = null,
+    val invoice: String
     
 )
 
