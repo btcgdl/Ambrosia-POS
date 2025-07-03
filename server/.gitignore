@@ -9,3 +9,9 @@ build
 
 # Ignore IntelliJ IDEA project files
 .idea
+
+# Ignore Bin directory
+bin
+
+# Ignore database files
+*.db
