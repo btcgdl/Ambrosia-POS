@@ -11,6 +11,10 @@ import pos.ambrosia.models.Message
 import pos.ambrosia.utils.InvalidCredentialsException
 import pos.ambrosia.utils.UnauthorizedApiException
 import pos.ambrosia.utils.UserNotFoundException
+import pos.ambrosia.utils.PhoenixConnectionException
+import pos.ambrosia.utils.PhoenixNodeInfoException
+import pos.ambrosia.utils.PhoenixBalanceException
+import pos.ambrosia.utils.PhoenixServiceException
 
 private val logger = LoggerFactory.getLogger("pos.ambrosia.Handler")
 
@@ -23,8 +27,8 @@ fun Application.Handler() {
     exception<Throwable> { call, cause ->
       logger.error("Unhandled Throwable: ${cause.message}", cause)
       call.respondText(
-              text = cause.message ?: "",
-              status = defaultExceptionStatusCode(cause) ?: HttpStatusCode.InternalServerError
+        text = cause.message ?: "",
+        status = defaultExceptionStatusCode(cause) ?: HttpStatusCode.InternalServerError
       )
     }
     exception<InvalidCredentialsException> { call, cause ->
@@ -42,6 +46,22 @@ fun Application.Handler() {
     exception<UserNotFoundException> { call, cause ->
       logger.error("User not found")
       call.respond(HttpStatusCode.NotFound, cause.message.toString())
+    }
+    exception<PhoenixConnectionException> { call, cause ->
+      logger.error("Phoenix Lightning node connection error: ${cause.message}")
+      call.respond(HttpStatusCode.ServiceUnavailable, Message("Lightning node is unavailable"))
+    }
+    exception<PhoenixNodeInfoException> { call, cause ->
+      logger.error("Phoenix node info error: ${cause.message}")
+      call.respond(HttpStatusCode.ServiceUnavailable, Message("Unable to retrieve node information"))
+    }
+    exception<PhoenixBalanceException> { call, cause ->
+      logger.error("Phoenix balance error: ${cause.message}")
+      call.respond(HttpStatusCode.ServiceUnavailable, Message("Unable to retrieve balance information"))
+    }
+    exception<PhoenixServiceException> { call, cause ->
+      logger.error("Phoenix service error: ${cause.message}")
+      call.respond(HttpStatusCode.ServiceUnavailable, Message("Lightning node service error"))
     }
     status(HttpStatusCode.NotFound) { call, status ->
       logger.info("Resource not found: ${call.request}")

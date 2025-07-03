@@ -34,6 +34,10 @@ dependencies {
     implementation("io.ktor:ktor-server-swagger:3.1.2")
     implementation("io.ktor:ktor-server-openapi:3.1.2")
     implementation("org.openapitools:openapi-generator:6.6.0")
+    implementation("io.ktor:ktor-client-core:3.1.2")
+    implementation("io.ktor:ktor-client-cio:3.1.2")
+    implementation("io.ktor:ktor-client-auth:3.1.2")
+    implementation("io.ktor:ktor-client-content-negotiation:3.1.2")
     // This dependency is used by the application.
     implementation(libs.guava)
 }
