@@ -60,6 +60,7 @@
             amount: 1000,
             paymentMethod: "Efectivo",
             userName: "Angel",
+            status: "paid",
         },
     ],
 };
@@ -377,6 +378,9 @@ export const mockService = {
             reports,
         };
     },
+    getTicketByOrderId(orderId) {
+        return state.tickets.find(ticket => ticket.orderId === orderId);
+    }
 };
 
 export function useMockSocket() {

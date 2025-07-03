@@ -9,6 +9,9 @@ import {
     updateOrder,
     updateTable,
     getTables,
+    addTicket,
+    getUserById,
+    updateTicket, getTicketByOrderId,
 } from "./ordersService";
 import { validatePin } from "../auth/authService";
 
@@ -26,8 +29,11 @@ export default function EditOrder() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [undoStack, setUndoStack] = useState([]);
-    const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+    const [showCurrencyDialog, setShowCurrencyDialog] = useState(false);
+    const [showPaymentMethodDialog, setShowPaymentMethodDialog] = useState(false);
+    const [selectedCurrency, setSelectedCurrency] = useState("");
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+    const [ticketId, setTicketId] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -42,7 +48,15 @@ export default function EditOrder() {
                 setDishes(dishesResponse.data);
                 setCategories(categoriesResponse.data);
                 setSelectedCategory(categoriesResponse.data[0] || "");
+                if (orderResponse.data.estado === 'cerrado'){
+                    const ticketResponse = await getTicketByOrderId(orderResponse.data.id);
+                    console.log(ticketResponse);
+                    setTicketId(ticketResponse.data.id);
+                    setSelectedCurrency(ticketResponse.data.paymentMethod === "Efectivo" ? "Pesos" : "Bitcoin");
+                }
+
             } catch (err) {
+                console.log(err);
                 setError("Error al cargar el pedido");
             } finally {
                 setIsLoading(false);
@@ -117,15 +131,19 @@ export default function EditOrder() {
         setIsLoading(true);
         setError("");
         try {
-            const response = await updateOrder(pedidoId, { estado: newStatus });
-            setOrder(response.data);
-            if (newStatus === "pagado") {
-                const tables = await getTables();
-                const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
-                if (table) {
-                    await updateTable(table.id, { pedidoId: null, estado: "libre" });
+            if (newStatus === "cerrado") {
+                setShowCurrencyDialog(true);
+            } else {
+                const response = await updateOrder(pedidoId, { estado: newStatus });
+                setOrder(response.data);
+                if (newStatus === "pagado") {
+                    const tables = await getTables();
+                    const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
+                    if (table) {
+                        await updateTable(table.id, { pedidoId: null, estado: "libre" });
+                    }
+                    navigate("/all-orders");
                 }
-                navigate("/all-orders");
             }
         } catch (err) {
             setError("Error al cambiar el estado del pedido");
@@ -134,11 +152,84 @@ export default function EditOrder() {
         }
     };
 
-    const handlePayOrder = () => {
-        setShowPaymentDialog(true);
+    const handleConfirmCurrency = async () => {
+        if (!selectedCurrency) {
+            setError("Por favor, selecciona una moneda");
+            return;
+        }
+        setIsLoading(true);
+        setError("");
+        try {
+            const total = order.dishes?.reduce((sum, item) => sum + (item.dish?.precio || 0), 0) || 0;
+            const userResponse = await getUserById(order.userId);
+            const userName = userResponse.data?.nombre || "Desconocido";
+            const ticket = {
+                orderId: Number(pedidoId),
+                date: new Date().toISOString().split("T")[0],
+                amount: total,
+                paymentMethod: selectedCurrency === "Pesos" ? "Efectivo" : "Bitcoin",
+                userName,
+            };
+            const ticketResponse = await addTicket(ticket);
+            setTicketId(ticketResponse.id);
+
+            const response = await updateOrder(pedidoId, { estado: "cerrado" });
+            setOrder(response.data);
+
+            if (selectedCurrency === "Pesos") {
+                console.log("Imprimiendo ticket en Pesos:", ticketResponse);
+            } else {
+                console.log("Preparando ticket con QR para Bitcoin:", ticketResponse);
+                const qrCode = `bitcoin:payment?amount=${total}&orderId=${pedidoId}`;
+                console.log("QR Code:", qrCode);
+            }
+
+            setShowCurrencyDialog(false);
+            setSelectedCurrency(selectedCurrency);
+        } catch (err) {
+            setError("Error al cerrar el pedido");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const handleConfirmPayment = async () => {
+    const handlePayOrder = async () => {
+        console.log("error")
+        if (!selectedCurrency) {
+            setError("No se ha seleccionado una moneda");
+            console.log("ahora si error")
+            return;
+        }
+        if (selectedCurrency === "Pesos") {
+            setShowPaymentMethodDialog(true);
+        } else {
+            setIsLoading(true);
+            setError("");
+            try {
+                const response = await updateOrder(pedidoId, {
+                    estado: "pagado",
+                    paymentMethod: "Bitcoin",
+                });
+                setOrder(response.data);
+
+                const tables = await getTables();
+                const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
+                if (table) {
+                    await updateTable(table.id, { pedidoId: null, estado: "libre" });
+                }
+
+                setTicketId(null);
+                setSelectedCurrency("");
+                navigate("/all-orders");
+            } catch (err) {
+                setError("Error al procesar el pago");
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
+
+    const handleConfirmPaymentMethod = async () => {
         if (!selectedPaymentMethod) {
             setError("Por favor, selecciona un método de pago");
             return;
@@ -151,13 +242,19 @@ export default function EditOrder() {
                 paymentMethod: selectedPaymentMethod,
             });
             setOrder(response.data);
+
+            await updateTicket(ticketId, { paymentMethod: selectedPaymentMethod });
+
             const tables = await getTables();
             const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
             if (table) {
                 await updateTable(table.id, { pedidoId: null, estado: "libre" });
             }
-            setShowPaymentDialog(false);
+
+            setShowPaymentMethodDialog(false);
             setSelectedPaymentMethod("");
+            setTicketId(null);
+            setSelectedCurrency("");
             navigate("/all-orders");
         } catch (err) {
             setError("Error al procesar el pago");
@@ -166,8 +263,9 @@ export default function EditOrder() {
         }
     };
 
-    const handleCancelPayment = () => {
-        setShowPaymentDialog(false);
+    const handleCancelDialog = () => {
+        setShowCurrencyDialog(false);
+        setShowPaymentMethodDialog(false);
         setSelectedPaymentMethod("");
     };
 
@@ -372,7 +470,7 @@ export default function EditOrder() {
                                                 <button
                                                     className="bg-green-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-green-600"
                                                     onClick={handlePayOrder}
-                                                    disabled={isLoading}
+                                                    disabled={isLoading || !selectedCurrency}
                                                 >
                                                     Pagar
                                                 </button>
@@ -380,8 +478,51 @@ export default function EditOrder() {
                                         )}
                                     </div>
                                 </div>
-                                {/* Payment Method Dialog */}
-                                {showPaymentDialog && (
+                                {showCurrencyDialog && (
+                                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                        <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
+                                            <h3 className="text-2xl font-bold text-center">Seleccionar Moneda</h3>
+                                            <div className="flex flex-col gap-4">
+                                                <button
+                                                    className={`py-4 px-6 text-xl rounded-lg ${
+                                                        selectedCurrency === "Pesos"
+                                                            ? "bg-green-500 text-white"
+                                                            : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                                                    }`}
+                                                    onClick={() => setSelectedCurrency("Pesos")}
+                                                >
+                                                    💵 Pesos
+                                                </button>
+                                                <button
+                                                    className={`py-4 px-6 text-xl rounded-lg ${
+                                                        selectedCurrency === "Bitcoin"
+                                                            ? "bg-blue-500 text-white"
+                                                            : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                                                    }`}
+                                                    onClick={() => setSelectedCurrency("Bitcoin")}
+                                                >
+                                                    ₿ Bitcoin
+                                                </button>
+                                            </div>
+                                            <div className="flex justify-between gap-4">
+                                                <button
+                                                    className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
+                                                    onClick={handleCancelDialog}
+                                                >
+                                                    Cancelar
+                                                </button>
+                                                <button
+                                                    className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
+                                                    onClick={handleConfirmCurrency}
+                                                    disabled={!selectedCurrency || isLoading}
+                                                >
+                                                    Confirmar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                {showPaymentMethodDialog && (
                                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                                         <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
                                             <h3 className="text-2xl font-bold text-center">Seleccionar Método de Pago</h3>
@@ -410,13 +551,13 @@ export default function EditOrder() {
                                             <div className="flex justify-between gap-4">
                                                 <button
                                                     className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
-                                                    onClick={handleCancelPayment}
+                                                    onClick={handleCancelDialog}
                                                 >
                                                     Cancelar
                                                 </button>
                                                 <button
                                                     className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
-                                                    onClick={handleConfirmPayment}
+                                                    onClick={handleConfirmPaymentMethod}
                                                     disabled={!selectedPaymentMethod || isLoading}
                                                 >
                                                     Confirmar

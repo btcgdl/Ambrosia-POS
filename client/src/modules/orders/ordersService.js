@@ -238,3 +238,12 @@ export async function updateTicket(ticketId, updatedTicket) {
         return { data: updated };
     }
 }
+
+export async function getTicketByOrderId(orderId) {
+    try {
+        return await apiClient(`/get-ticket-by-order-id/${orderId}`, {});
+    } catch (error) {
+        const ticket = mockService.getTicketByOrderId(orderId);
+        return {data: ticket};
+    }
+}
