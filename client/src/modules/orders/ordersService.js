@@ -131,8 +131,10 @@ export async function createOrder(pin, tableId = null) {
             throw new Error(pinValidation.error);
         }
 
+        const orderId = Date.now();
+
         const newOrder = {
-            id: Number(`${Date.now()}`),
+            id: Number(`${orderId}`),
             userId: pinValidation.userId,
             dishes: [],
             estado: 'abierto',
@@ -146,9 +148,11 @@ export async function createOrder(pin, tableId = null) {
             const table = tables.find((t) => t.id === Number(tableId));
             if (!table) throw new Error('Mesa no encontrada');
             if (table.estado !== 'libre') throw new Error('La mesa no está libre');
-            await updateTable(Number(tableId), { pedidoId: newOrder.id, estado: 'ocupada' });
+            await updateTable(Number(tableId), { pedidoId: Number(`${orderResponse.id}`), estado: 'ocupada' });
+            console.log(orderId);
         }
 
+        console.log(orderResponse);
         return { data: orderResponse };
     } catch (error) {
         throw new Error(error.message || 'Error al crear el pedido');

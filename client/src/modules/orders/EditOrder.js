@@ -52,6 +52,7 @@ export default function EditOrder() {
                     const ticketResponse = await getTicketByOrderId(orderResponse.data.id);
                     console.log(ticketResponse);
                     setTicketId(ticketResponse.data.id);
+                    console.log(ticketResponse.data.paymentMethod);
                     setSelectedCurrency(ticketResponse.data.paymentMethod === "Efectivo" ? "Pesos" : "Bitcoin");
                 }
 
@@ -84,6 +85,7 @@ export default function EditOrder() {
     };
 
     const handleAddDish = async (dish) => {
+        if (order.estado !== "abierto") return;
         const instanceId = `${dish.id}_${Date.now()}`;
         const newDishes = [...(order.dishes || []), { instanceId, dish }];
         setUndoStack([...undoStack, order.dishes]);
@@ -163,6 +165,7 @@ export default function EditOrder() {
             const total = order.dishes?.reduce((sum, item) => sum + (item.dish?.precio || 0), 0) || 0;
             const userResponse = await getUserById(order.userId);
             const userName = userResponse.data?.nombre || "Desconocido";
+            console.log(selectedCurrency);
             const ticket = {
                 orderId: Number(pedidoId),
                 date: new Date().toISOString().split("T")[0],
@@ -194,10 +197,8 @@ export default function EditOrder() {
     };
 
     const handlePayOrder = async () => {
-        console.log("error")
         if (!selectedCurrency) {
             setError("No se ha seleccionado una moneda");
-            console.log("ahora si error")
             return;
         }
         if (selectedCurrency === "Pesos") {
@@ -441,15 +442,8 @@ export default function EditOrder() {
                                     )}
                                 </div>
                                 <div className="flex justify-between items-center mt-4">
-                                    <button
-                                        className="bg-yellow-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-yellow-600"
-                                        onClick={handleUndo}
-                                        disabled={undoStack.length === 0 || isLoading}
-                                    >
-                                        Deshacer
-                                    </button>
                                     <div className="flex gap-4">
-                                        {order?.estado === "abierto" && (
+                                        {order?.estado === "abierto" && (<>
                                             <button
                                                 className="bg-blue-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-blue-600"
                                                 onClick={() => handleChangeOrderStatus("cerrado")}
@@ -457,7 +451,14 @@ export default function EditOrder() {
                                             >
                                                 Cerrar Pedido
                                             </button>
-                                        )}
+                                            <button
+                                                    className="bg-yellow-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-yellow-600"
+                                                    onClick={handleUndo}
+                                                disabled={undoStack.length === 0 || isLoading}
+                                            >
+                                                Deshacer
+                                            </button>
+                                        </>)}
                                         {order?.estado === "cerrado" && (
                                             <>
                                                 <button

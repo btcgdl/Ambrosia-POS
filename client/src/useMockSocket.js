@@ -155,7 +155,7 @@ export const mockService = {
             ? state.orders.map((o) => (o.id === newOrder.id ? newOrder : o))
             : [...state.orders, newOrder];
 
-        if (newOrder.estado === "pagado") {
+        /*if (newOrder.estado === "pagado") {
             const user = state.users.find((u) => u.id === newOrder.userId);
             const userName = user ? user.nombre : "Desconocido";
             const amount = newOrder.dishes.reduce((sum, item) => sum + (item.dish?.precio || 0), 0);
@@ -167,7 +167,7 @@ export const mockService = {
                 userName,
             };
             state.tickets = [...state.tickets, { ...ticket, id: Date.now() }];
-        }
+        }*/
 
         return newOrder;
     },
