@@ -9,6 +9,9 @@ import {
     updateOrder,
     updateTable,
     getTables,
+    addTicket,
+    getUserById,
+    updateTicket, getTicketByOrderId,
 } from "./ordersService";
 import { validatePin } from "../auth/authService";
 
@@ -26,6 +29,11 @@ export default function EditOrder() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [undoStack, setUndoStack] = useState([]);
+    const [showCurrencyDialog, setShowCurrencyDialog] = useState(false);
+    const [showPaymentMethodDialog, setShowPaymentMethodDialog] = useState(false);
+    const [selectedCurrency, setSelectedCurrency] = useState("");
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+    const [ticketId, setTicketId] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -40,7 +48,16 @@ export default function EditOrder() {
                 setDishes(dishesResponse.data);
                 setCategories(categoriesResponse.data);
                 setSelectedCategory(categoriesResponse.data[0] || "");
+                if (orderResponse.data.estado === 'cerrado'){
+                    const ticketResponse = await getTicketByOrderId(orderResponse.data.id);
+                    console.log(ticketResponse);
+                    setTicketId(ticketResponse.data.id);
+                    console.log(ticketResponse.data.paymentMethod);
+                    setSelectedCurrency(ticketResponse.data.paymentMethod === "Efectivo" ? "Pesos" : "Bitcoin");
+                }
+
             } catch (err) {
+                console.log(err);
                 setError("Error al cargar el pedido");
             } finally {
                 setIsLoading(false);
@@ -68,6 +85,7 @@ export default function EditOrder() {
     };
 
     const handleAddDish = async (dish) => {
+        if (order.estado !== "abierto") return;
         const instanceId = `${dish.id}_${Date.now()}`;
         const newDishes = [...(order.dishes || []), { instanceId, dish }];
         setUndoStack([...undoStack, order.dishes]);
@@ -115,21 +133,141 @@ export default function EditOrder() {
         setIsLoading(true);
         setError("");
         try {
-            const response = await updateOrder(pedidoId, { estado: newStatus });
-            setOrder(response.data);
-            if (newStatus === "pagado") {
-                const tables = await getTables();
-                const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
-                if (table) {
-                    await updateTable(table.id, { pedidoId: null, estado: "libre" });
+            if (newStatus === "cerrado") {
+                setShowCurrencyDialog(true);
+            } else {
+                const response = await updateOrder(pedidoId, { estado: newStatus });
+                setOrder(response.data);
+                if (newStatus === "pagado") {
+                    const tables = await getTables();
+                    const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
+                    if (table) {
+                        await updateTable(table.id, { pedidoId: null, estado: "libre" });
+                    }
+                    navigate("/all-orders");
                 }
-                navigate("/all-orders");
             }
         } catch (err) {
             setError("Error al cambiar el estado del pedido");
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleConfirmCurrency = async () => {
+        if (!selectedCurrency) {
+            setError("Por favor, selecciona una moneda");
+            return;
+        }
+        setIsLoading(true);
+        setError("");
+        try {
+            const total = order.dishes?.reduce((sum, item) => sum + (item.dish?.precio || 0), 0) || 0;
+            const userResponse = await getUserById(order.userId);
+            const userName = userResponse.data?.nombre || "Desconocido";
+            console.log(selectedCurrency);
+            const ticket = {
+                orderId: Number(pedidoId),
+                date: new Date().toISOString().split("T")[0],
+                amount: total,
+                paymentMethod: selectedCurrency === "Pesos" ? "Efectivo" : "Bitcoin",
+                userName,
+            };
+            const ticketResponse = await addTicket(ticket);
+            setTicketId(ticketResponse.id);
+
+            const response = await updateOrder(pedidoId, { estado: "cerrado" });
+            setOrder(response.data);
+
+            if (selectedCurrency === "Pesos") {
+                console.log("Imprimiendo ticket en Pesos:", ticketResponse);
+            } else {
+                console.log("Preparando ticket con QR para Bitcoin:", ticketResponse);
+                const qrCode = `bitcoin:payment?amount=${total}&orderId=${pedidoId}`;
+                console.log("QR Code:", qrCode);
+            }
+
+            setShowCurrencyDialog(false);
+            setSelectedCurrency(selectedCurrency);
+        } catch (err) {
+            setError("Error al cerrar el pedido");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handlePayOrder = async () => {
+        if (!selectedCurrency) {
+            setError("No se ha seleccionado una moneda");
+            return;
+        }
+        if (selectedCurrency === "Pesos") {
+            setShowPaymentMethodDialog(true);
+        } else {
+            setIsLoading(true);
+            setError("");
+            try {
+                const response = await updateOrder(pedidoId, {
+                    estado: "pagado",
+                    paymentMethod: "Bitcoin",
+                });
+                setOrder(response.data);
+
+                const tables = await getTables();
+                const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
+                if (table) {
+                    await updateTable(table.id, { pedidoId: null, estado: "libre" });
+                }
+
+                setTicketId(null);
+                setSelectedCurrency("");
+                navigate("/all-orders");
+            } catch (err) {
+                setError("Error al procesar el pago");
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
+
+    const handleConfirmPaymentMethod = async () => {
+        if (!selectedPaymentMethod) {
+            setError("Por favor, selecciona un método de pago");
+            return;
+        }
+        setIsLoading(true);
+        setError("");
+        try {
+            const response = await updateOrder(pedidoId, {
+                estado: "pagado",
+                paymentMethod: selectedPaymentMethod,
+            });
+            setOrder(response.data);
+
+            await updateTicket(ticketId, { paymentMethod: selectedPaymentMethod });
+
+            const tables = await getTables();
+            const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
+            if (table) {
+                await updateTable(table.id, { pedidoId: null, estado: "libre" });
+            }
+
+            setShowPaymentMethodDialog(false);
+            setSelectedPaymentMethod("");
+            setTicketId(null);
+            setSelectedCurrency("");
+            navigate("/all-orders");
+        } catch (err) {
+            setError("Error al procesar el pago");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleCancelDialog = () => {
+        setShowCurrencyDialog(false);
+        setShowPaymentMethodDialog(false);
+        setSelectedPaymentMethod("");
     };
 
     const filteredDishes = dishes.filter((dish) => dish.categoria === selectedCategory);
@@ -304,15 +442,8 @@ export default function EditOrder() {
                                     )}
                                 </div>
                                 <div className="flex justify-between items-center mt-4">
-                                    <button
-                                        className="bg-yellow-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-yellow-600"
-                                        onClick={handleUndo}
-                                        disabled={undoStack.length === 0 || isLoading}
-                                    >
-                                        Deshacer
-                                    </button>
                                     <div className="flex gap-4">
-                                        {order?.estado === "abierto" && (
+                                        {order?.estado === "abierto" && (<>
                                             <button
                                                 className="bg-blue-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-blue-600"
                                                 onClick={() => handleChangeOrderStatus("cerrado")}
@@ -320,7 +451,14 @@ export default function EditOrder() {
                                             >
                                                 Cerrar Pedido
                                             </button>
-                                        )}
+                                            <button
+                                                    className="bg-yellow-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-yellow-600"
+                                                    onClick={handleUndo}
+                                                disabled={undoStack.length === 0 || isLoading}
+                                            >
+                                                Deshacer
+                                            </button>
+                                        </>)}
                                         {order?.estado === "cerrado" && (
                                             <>
                                                 <button
@@ -332,8 +470,8 @@ export default function EditOrder() {
                                                 </button>
                                                 <button
                                                     className="bg-green-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-green-600"
-                                                    onClick={() => handleChangeOrderStatus("pagado")}
-                                                    disabled={isLoading}
+                                                    onClick={handlePayOrder}
+                                                    disabled={isLoading || !selectedCurrency}
                                                 >
                                                     Pagar
                                                 </button>
@@ -341,6 +479,94 @@ export default function EditOrder() {
                                         )}
                                     </div>
                                 </div>
+                                {showCurrencyDialog && (
+                                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                        <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
+                                            <h3 className="text-2xl font-bold text-center">Seleccionar Moneda</h3>
+                                            <div className="flex flex-col gap-4">
+                                                <button
+                                                    className={`py-4 px-6 text-xl rounded-lg ${
+                                                        selectedCurrency === "Pesos"
+                                                            ? "bg-green-500 text-white"
+                                                            : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                                                    }`}
+                                                    onClick={() => setSelectedCurrency("Pesos")}
+                                                >
+                                                    💵 Pesos
+                                                </button>
+                                                <button
+                                                    className={`py-4 px-6 text-xl rounded-lg ${
+                                                        selectedCurrency === "Bitcoin"
+                                                            ? "bg-blue-500 text-white"
+                                                            : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                                                    }`}
+                                                    onClick={() => setSelectedCurrency("Bitcoin")}
+                                                >
+                                                    ₿ Bitcoin
+                                                </button>
+                                            </div>
+                                            <div className="flex justify-between gap-4">
+                                                <button
+                                                    className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
+                                                    onClick={handleCancelDialog}
+                                                >
+                                                    Cancelar
+                                                </button>
+                                                <button
+                                                    className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
+                                                    onClick={handleConfirmCurrency}
+                                                    disabled={!selectedCurrency || isLoading}
+                                                >
+                                                    Confirmar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                {showPaymentMethodDialog && (
+                                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                        <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
+                                            <h3 className="text-2xl font-bold text-center">Seleccionar Método de Pago</h3>
+                                            <div className="flex flex-col gap-4">
+                                                <button
+                                                    className={`py-4 px-6 text-xl rounded-lg ${
+                                                        selectedPaymentMethod === "Efectivo"
+                                                            ? "bg-green-500 text-white"
+                                                            : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                                                    }`}
+                                                    onClick={() => setSelectedPaymentMethod("Efectivo")}
+                                                >
+                                                    💵 Efectivo
+                                                </button>
+                                                <button
+                                                    className={`py-4 px-6 text-xl rounded-lg ${
+                                                        selectedPaymentMethod === "Tarjeta"
+                                                            ? "bg-blue-500 text-white"
+                                                            : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                                                    }`}
+                                                    onClick={() => setSelectedPaymentMethod("Tarjeta")}
+                                                >
+                                                    💳 Tarjeta
+                                                </button>
+                                            </div>
+                                            <div className="flex justify-between gap-4">
+                                                <button
+                                                    className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
+                                                    onClick={handleCancelDialog}
+                                                >
+                                                    Cancelar
+                                                </button>
+                                                <button
+                                                    className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
+                                                    onClick={handleConfirmPaymentMethod}
+                                                    disabled={!selectedPaymentMethod || isLoading}
+                                                >
+                                                    Confirmar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

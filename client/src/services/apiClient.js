@@ -1,11 +1,6 @@
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-const TOKEN = process.env.REACT_APP_TOKEN_HASH;
 export async function apiClient(endpoint, { method = 'GET', headers = {}, body } = {}) {
 
-    if (TOKEN) {
-        const token = btoa(`:${TOKEN}`);
-        headers['Authorization'] = `Basic ${token}`;
-    }
 
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
         method,

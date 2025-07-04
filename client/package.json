@@ -8,10 +8,13 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "date-fns": "^4.1.0",
     "react": "^19.1.0",
+    "react-calendar": "^6.0.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.5.3",
     "react-scripts": "^5.0.1",
+    "react-to-print": "^3.1.1",
     "tailwindcss": "^4.1.4",
     "web-vitals": "^2.1.4"
   },

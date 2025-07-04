@@ -12,5 +12,5 @@ addModule('orders', {
         { path: '/modify-order/:pedidoId', component: EditOrder },
     ],
     services: ordersService,
-    navItems: [{ path: '/all-orders', label: 'Órdenes' }],
+    navItems: [{ path: '/all-orders', label: 'Órdenes', icon: 'receipt' }],
 });

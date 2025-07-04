@@ -1,8 +1,9 @@
 import LoginInputField from "../../components/Login/LoginInputField";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useUserRole } from "../../contexts/UserRoleContext";
 import { useNavigate } from "react-router-dom";
 import { login } from "./authService";
+import {getHomeRoute} from "../../utils/getHomeRoute";
 
 export default function LoginPage() {
     const [role, setRole] = useState("");
@@ -19,7 +20,7 @@ export default function LoginPage() {
         try {
             const response = await login({ role, password });
             updateUserRole(response.data.role);
-            navigate("/all-orders");
+            navigate(getHomeRoute());
             setLoading(false);
         } catch (error) {
             setLoading(false);

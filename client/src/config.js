@@ -3,8 +3,8 @@
         auth: true,
         dishes: true,
         orders: true,
-        cash: false,
-        inventory: true,
+        cashier: true,
+        inventory: false,
         spaces: true,
     },
 };

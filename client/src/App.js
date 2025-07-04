@@ -11,6 +11,10 @@ import { getModules } from "./core/moduleRegistry";
 import './modules/auth';
 import './modules/dishes';
 import './modules/orders';
+import './modules/cashier';
+
+import {TurnProvider} from "./modules/cashier/useTurn";
+import {ProtectedRoute} from "./modules/cashier/ProtectedRoute";
 
 function App() {
     const [modules, setModules] = useState(getModules());
@@ -42,27 +46,36 @@ function App() {
     return (
         <div className="App">
             <MockSocketProvider>
-                <UserRoleProvider>
-                    <BrowserRouter>
-                        <Routes>
-                            {
-                            Object.entries(modules).map(([name, module]) =>
-                                console.log(`Cargando rutas del módulo: ${name}`) ||
-                                
-                                config.modules[name] &&
-                                module.routes.map((route) => (
+                <TurnProvider>
+                    <UserRoleProvider>
+                        <BrowserRouter>
+                            <Routes>
+                                {Object.entries(modules).map(([name, module]) => {
 
-                                    <Route
-                                        key={route.path}
-                                        path={route.path}
-                                        element={<route.component />}
-                                    />
-                                ))
-                            )}
-                            <Route path="*" element={<div>404 - Página no encontrada</div>} />
-                        </Routes>
-                    </BrowserRouter>
-                </UserRoleProvider>
+                                    if (!config.modules[name]) return null;
+
+                                    return module.routes.map((route) => {
+                                        const Component = route.component;
+                                        return (
+                                            <Route
+                                                key={route.path}
+                                                path={route.path}
+                                                element={
+                                                    <ProtectedRoute>
+                                                        <Component />
+                                                    </ProtectedRoute>
+                                                }
+                                            />
+                                        );
+                                    });
+                                })}
+
+                                <Route path="*" element={<div>404 - Página no encontrada</div>} />
+                            </Routes>
+
+                        </BrowserRouter>
+                    </UserRoleProvider>
+                </TurnProvider>
             </MockSocketProvider>
         </div>
     );
