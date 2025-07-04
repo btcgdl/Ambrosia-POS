@@ -47,7 +47,7 @@ chmod +x phoenixd.sh
 curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/phoenixd.sh | bash -s -- --yes
 ```
 
-El script descarga phoenixd v0.6.0, verifica la integridad del paquete usando GPG y checksums, instala en `~/.local/bin`, y opcionalmente configura un servicio systemd para inicio automático.
+El script descarga phoenixd v0.6.0, verifica la integridad del paquete usando GPG y checksums, instala en `/usr/local/bin`, y opcionalmente configura un servicio systemd para inicio automático.
 
 #### Instalación manual
 
