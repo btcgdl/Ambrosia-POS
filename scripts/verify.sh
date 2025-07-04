@@ -5,16 +5,40 @@ TAG="0.6.0"
 PHOENIXD_SIG="https://github.com/ACINQ/phoenixd/releases/download/v${TAG}/SHA256SUMS.asc"
 ACINQ_PGP_KEY="https://acinq.co/pgp/padioupm.asc"
 
-verify_package() {
+# Parse command line arguments
+AUTO_YES=false
+for arg in "$@"; do
+  case $arg in
+    --yes|-y)
+      AUTO_YES=true
+      shift
+      ;;
+    *)
+      # Unknown option
+      ;;
+  esac
+done
 
-  while true; do
-    read -r -p "Verify package signature and integrity? (Y/N): " response
-    case "$response" in
-      [Yy]) break ;;
-      [Nn]) echo "Verification skipped." ; return 0 ;;
-      *) echo "Invalid input. Please enter Y or N." ;;
-    esac
-  done
+verify_package() {
+  # Check if auto-yes mode is enabled
+  if [[ "$AUTO_YES" == true ]]; then
+    echo "Auto-verification enabled. Starting verification..."
+    # Continue to verification
+  # Check if running in non-interactive mode
+  elif [[ ! -t 0 ]]; then
+    echo "Running in non-interactive mode. Skipping verification."
+    return 0
+  else
+    # Interactive mode
+    while true; do
+      read -r -p "Verify package signature and integrity? (Y/N): " response
+      case "$response" in
+        [Yy]) break ;;
+        [Nn]) echo "Verification skipped." ; return 0 ;;
+        *) echo "Invalid input. Please enter Y or N." ;;
+      esac
+    done
+  fi
 
   echo "🔐 Starting package verification..."
   
