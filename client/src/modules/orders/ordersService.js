@@ -4,9 +4,10 @@ import { validatePin } from '../auth/authService';
 
 export async function getAllOrders() {
     try {
-        const response = await apiClient('/orders?include=users,tables');
+        const response = await apiClient('/orders');
         return response;
     } catch (error) {
+        console.log("fallback")
         const orders = mockService.getOrders();
         const users = mockService.getUsers();
         const tables = mockService.getTables();

@@ -1,17 +1,33 @@
 import { apiClient } from '../../services/apiClient';
 import { mockService } from '../../useMockSocket';
 
-export async function login({ role, password }) {
+export async function loginFromService({ name, pin }) {
     try {
         return await apiClient('/auth/login', {
             method: 'POST',
-            body: { role, password },
+            body: { name, pin },
         });
     } catch (error) {
         const roles = mockService.getRoles();
-        const foundRole = roles.find((r) => r.role === role && r.password === password);
+        const foundRole = roles.find((r) => r.role === name && r.password === pin);
         if (!foundRole) throw new Error('Credenciales inválidas');
         return { data: { role: foundRole.role } };
+    }
+}
+
+export async function RefreshToken(refreshToken) {
+    try {
+        return await apiClient('/auth/refresh-token', {})
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function logoutFromService() {
+    try{
+        return await apiClient('/auth/logout');
+    } catch (error) {
+        console.log(error)
     }
 }
 
