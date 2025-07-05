@@ -5,7 +5,6 @@ set -euo pipefail # Exit on error, unset variable, or pipe failure
 # The Diceware wordlist file. Expected to be in the same directory as the script.
 # Downloaded  from: https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt
 WORDLIST_URL="https://raw.githubusercontent.com/btcgdl/ambrosia-pos/main/scripts/eff_large_wordlist.txt"
-PHOENIXD_SCRIPT_URL="https://raw.githubusercontent.com/btcgdl/ambrosia-pos/main/scripts/phoenixd.sh"
 DB_URL="https://raw.githubusercontent.com/btcgdl/ambrosia-pos/main/db/ambrosia.db"
 readonly NUM_WORDS=6 # Number of words for the passphrase
 

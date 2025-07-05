@@ -1,6 +1,22 @@
 #!/bin/bash
 
+set -o pipefail
+
 # This script is for install phoenix on a Linux system.
+
+# Parse command line arguments
+AUTO_YES=false
+for arg in "$@"; do
+  case $arg in
+    --yes|-y)
+      AUTO_YES=true
+      shift
+      ;;
+    *)
+      # Unknown option
+      ;;
+  esac
+done
 
 TAG="0.6.0"
 PHOENIXD_URL="https://github.com/ACINQ/phoenixd/releases/download/v${TAG}"
@@ -38,7 +54,11 @@ if [[ ! -f "verify.sh" ]]; then
   chmod +x verify.sh
 fi
 
-./verify.sh
+if [[ "$AUTO_YES" == true ]]; then
+  ./verify.sh --yes
+else
+  ./verify.sh
+fi
 if [[ $? -ne 0 ]]; then
   echo "❌ Verification failed, aborting installation"
   exit 1
@@ -52,7 +72,11 @@ rm -f phoenixd-${TAG}-linux-x64.zip
 echo "✅ phoenixd installed to $INSTALL_DIR"
 
 # optionally create a systemd service to start phoenixd
-if [[ -t 0 ]]; then
+if [[ "$AUTO_YES" == true ]]; then
+  # Auto-yes mode
+  echo "Auto-installing systemd service..."
+  REPLY="y"
+elif [[ -t 0 ]]; then
   # Interactive mode
   echo "Do you want to setup a systemd service (requires sudo permission)? (y/n): "
   read -r REPLY
@@ -94,5 +118,5 @@ sudo systemctl enable phoenixd
 echo ""
 sudo systemctl start phoenixd
 
-echo "Run 'sudo systemctl start phoenixd' to start Phoenix Daemon"
+echo "Run 'sudo systemctl status phoenixd' to check the status of Phoenix Daemon"
 echo "Run 'sudo systemctl stop phoenixd' to stop Phoenix Daemon"

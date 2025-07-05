@@ -30,6 +30,29 @@ Consulta los archivos mencionados para obtener más detalles sobre el proyecto.
 - **Gradle 8.1.4**: Para construir y gestionar el backend en Kotlin.
 - **JDK 21**: Java Development Kit versión 21, requerido para compilar y ejecutar el backend.
 
+### Phoenix - Lightning Network Daemon (phoenixd)
+
+Este proyecto requiere **phoenixd** para el procesamiento de pagos mediante Lightning Network. Si aún no tienes phoenixd instalado, sigue estas instrucciones:
+
+#### Instalación automática (Recomendada)
+
+**Opción 1: Script del proyecto**
+```bash
+chmod +x phoenixd.sh
+./phoenixd.sh
+```
+
+**Opción 2: Instalación directa**
+```bash
+curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/phoenixd.sh | bash -s -- --yes
+```
+
+El script descarga phoenixd v0.6.0, verifica la integridad del paquete usando GPG y checksums, instala en `/usr/local/bin`, y opcionalmente configura un servicio systemd para inicio automático.
+
+#### Instalación manual
+
+Para instalación manual, consulta la [documentación oficial](https://phoenix.acinq.co/server) para obtener las instrucciones específicas para tu sistema operativo.
+
 ## Scripts de Desarrollo
 
 ### Cliente (Frontend - React/Electron)
@@ -37,11 +60,11 @@ Consulta los archivos mencionados para obtener más detalles sobre el proyecto.
 Para instalar las dependencias del cliente, ejecuta:
 
 ```sh
-cd front
+cd client
 npm install
 ```
 
-Antes de iniciar el entorno de desarrollo, crea un archivo `.env` dentro de la carpeta `front/` con la siguiente variable:
+Antes de iniciar el entorno de desarrollo, crea un archivo `.env` dentro de la carpeta `client/` con la siguiente variable:
 
 ```
 REACT_APP_API_BASE_URL=http://0.0.0.0:5000
