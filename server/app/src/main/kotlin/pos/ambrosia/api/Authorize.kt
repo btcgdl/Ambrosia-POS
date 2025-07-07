@@ -89,11 +89,10 @@ fun Route.auth(userService: UsersService, tokenService: TokenService) {
         throw InvalidTokenException("Unable to extract user information from refresh token")
       }
 
-      // Generar nuevo access token y refresh token
+      // Generar SOLO un nuevo access token (NO generar nuevo refresh token)
       val newAccessToken = tokenService.generateAccessToken(userInfo)
-      val newRefreshToken = tokenService.generateRefreshToken(userInfo)
 
-      // Actualizar cookies con los nuevos tokens
+      // Actualizar SOLO la cookie del access token
       call.response.cookies.append(
               Cookie(
                       name = "accessToken",
@@ -105,18 +104,9 @@ fun Route.auth(userService: UsersService, tokenService: TokenService) {
               )
       )
 
-      call.response.cookies.append(
-              Cookie(
-                      name = "refreshToken",
-                      value = newRefreshToken,
-                      maxAge = 30 * 24 * 60 * 60, // 30 días
-                      httpOnly = true,
-                      secure = false, // Cambiar a true en producción
-                      path = "/"
-              )
-      )
+      // NO actualizamos el refresh token - sigue siendo el mismo
 
-      call.respond(Message("Tokens refreshed successfully"))
+      call.respond(Message("Access token refreshed successfully"))
     } catch (e: Exception) {
       logger.error("Error refreshing token: ${e.message}")
       throw InvalidTokenException("Failed to refresh token")

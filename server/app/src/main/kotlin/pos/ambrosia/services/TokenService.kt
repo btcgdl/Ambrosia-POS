@@ -40,6 +40,7 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
                                 .withAudience(audience)
                                 .withIssuer(issuer)
                                 .withClaim("userId", user.id.toString())
+                                .withClaim("role", user.role)
                                 .withClaim("type", "refresh")
                                 .withExpiresAt(
                                         Date(
