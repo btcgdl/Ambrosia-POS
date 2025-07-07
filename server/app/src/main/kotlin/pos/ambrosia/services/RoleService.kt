@@ -3,6 +3,7 @@ package pos.ambrosia.services
 import java.sql.Connection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Role
+import pos.ambrosia.utils.SecurePinProcessor
 
 class RolesService(private val connection: Connection) {
     companion object {
@@ -25,9 +26,15 @@ class RolesService(private val connection: Connection) {
         val generatedId = java.util.UUID.randomUUID().toString()
         val statement = connection.prepareStatement(ADD_ROLE)
 
+        val encryptedPin =
+                SecurePinProcessor.hashPinForStorage(
+                        role.password?.toCharArray() ?: charArrayOf(),
+                        generatedId
+                )
+
         statement.setString(1, generatedId)
         statement.setString(2, role.role)
-        statement.setString(3, role.password)
+        statement.setString(3, SecurePinProcessor.byteArrayToBase64(encryptedPin))
 
         val rowsAffected = statement.executeUpdate()
 
