@@ -1,15 +1,12 @@
 package pos.ambrosia.services
 
 import java.sql.Connection
-import java.sql.Statement
 import pos.ambrosia.logger
 import pos.ambrosia.models.User
 import pos.ambrosia.utils.SecurePinProcessor
 
-// TODO: Verify AI generated code
 class UsersService(private val connection: Connection) {
   companion object {
-
     private const val ADD_USER =
             """
             INSERT INTO users (id, name, pin, refresh_token, role_id) VALUES (?, ?, ?, ?, ?)
@@ -45,6 +42,11 @@ class UsersService(private val connection: Connection) {
             JOIN roles r ON u.role_id = r.id
             WHERE u.name = ? AND u.is_deleted = 0
         """
+
+    private const val CHECK_ROLE_EXISTS =
+            """
+            SELECT id FROM roles WHERE id = ? AND is_deleted = 0
+        """
   }
 
   fun authenticateUser(name: String, pin: CharArray): User? {
@@ -54,18 +56,18 @@ class UsersService(private val connection: Connection) {
     if (resultSet.next()) {
       val userIdString = resultSet.getString("id")
       val storedPinHashBase64 = resultSet.getString("pin")
-      logger.info(userIdString)
+      logger.info("Authenticating user: $userIdString")
       val storedPinHash = SecurePinProcessor.base64ToByteArray(storedPinHashBase64)
 
       val isValidPin = SecurePinProcessor.verifyPin(pin, userIdString, storedPinHash)
-      pin.fill('\u0000')
+      pin.fill('\u0000') // Limpiar PIN de memoria
 
-      logger.info(isValidPin.toString())
+      logger.info("Authentication result: $isValidPin")
       if (isValidPin) {
         return User(
                 id = userIdString,
                 name = resultSet.getString("name"),
-                pin = pin.toString(),
+                pin = "****", // No devolver el PIN real
                 refreshToken = null,
                 role = resultSet.getString("role")
         )
@@ -74,26 +76,40 @@ class UsersService(private val connection: Connection) {
     return null
   }
 
+  private fun roleExists(roleId: String): Boolean {
+    val statement = connection.prepareStatement(CHECK_ROLE_EXISTS)
+    statement.setString(1, roleId)
+    val resultSet = statement.executeQuery()
+    return resultSet.next()
+  }
+
   suspend fun addUser(user: User): String? {
-    val statement = connection.prepareStatement(ADD_USER, Statement.RETURN_GENERATED_KEYS)
-    // TODO: HASH ID FOR USERS SHA256
-    val genereatedId = java.util.UUID.randomUUID().toString()
-    statement.setString(1, genereatedId)
-    logger.info(genereatedId)
+    // Verificar que el rol existe
+    if (user.role == null || !roleExists(user.role)) {
+      logger.error("Role does not exist: ${user.role}")
+      return null
+    }
+
+    val generatedId = java.util.UUID.randomUUID().toString()
+    val statement = connection.prepareStatement(ADD_USER)
+
+    statement.setString(1, generatedId)
     statement.setString(2, user.name)
-    // Encrypt the pin before storing it
-    val encryptedPin = SecurePinProcessor.hashPinForStorage(user.pin.toCharArray(), genereatedId)
+
+    // Hashear el PIN correctamente
+    val encryptedPin = SecurePinProcessor.hashPinForStorage(user.pin.toCharArray(), generatedId)
     statement.setString(3, SecurePinProcessor.byteArrayToBase64(encryptedPin))
     statement.setString(4, user.refreshToken)
-    statement.setString(5, user.role)
-    statement.executeUpdate()
+    statement.setString(5, user.role) // Asumiendo que user.role contiene el role_id
 
-    val generatedKeys = statement.generatedKeys
-    if (generatedKeys.next()) {
-      val id = generatedKeys.getString(1)
-      return id
+    val rowsAffected = statement.executeUpdate()
+
+    return if (rowsAffected > 0) {
+      logger.info("User created successfully with ID: $generatedId")
+      generatedId
     } else {
-      return null
+      logger.error("Failed to create user")
+      null
     }
   }
 
@@ -106,8 +122,8 @@ class UsersService(private val connection: Connection) {
       val name = resultSet.getString("name")
       val refreshToken = resultSet.getString("refresh_token")
       val role = resultSet.getString("role")
-      val pin = resultSet.getString("pin")
-      users.add(User(id = id, name = name, pin = pin, refreshToken = refreshToken, role = role))
+      // No devolvemos el PIN hasheado en las consultas generales
+      users.add(User(id = id, name = name, pin = "****", refreshToken = refreshToken, role = role))
     }
     return users
   }
@@ -121,22 +137,31 @@ class UsersService(private val connection: Connection) {
       val name = resultSet.getString("name")
       val refreshToken = resultSet.getString("refresh_token")
       val role = resultSet.getString("role")
-      val pin = resultSet.getString("pin")
-      return User(id = userId, name = name, pin = pin, refreshToken = refreshToken, role = role)
+      // No devolvemos el PIN hasheado
+      return User(id = userId, name = name, pin = "****", refreshToken = refreshToken, role = role)
     }
     return null
   }
 
   suspend fun updateUser(id: String?, updatedUser: User): Boolean {
     if (id == null) return false
+
+    // Verificar que el rol existe
+    if (updatedUser.role == null || !roleExists(updatedUser.role)) {
+      logger.error("Role does not exist: ${updatedUser.role}")
+      return false
+    }
+
     val statement = connection.prepareStatement(UPDATE_USER)
     statement.setString(1, updatedUser.name)
 
-    val encryptedPin = SecurePinProcessor.hashPinForStorage(id.toCharArray(), updatedUser.pin)
+    // Corregir el hash del PIN - usar el ID del usuario, no el PIN como salt
+    val encryptedPin = SecurePinProcessor.hashPinForStorage(updatedUser.pin.toCharArray(), id)
     statement.setString(2, SecurePinProcessor.byteArrayToBase64(encryptedPin))
     statement.setString(3, updatedUser.refreshToken)
     statement.setString(4, updatedUser.role)
-    statement.setString(5, updatedUser.id)
+    statement.setString(5, id) // El ID del usuario a actualizar
+
     val rowsUpdated = statement.executeUpdate()
     return rowsUpdated > 0
   }

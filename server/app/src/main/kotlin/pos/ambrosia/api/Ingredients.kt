@@ -83,8 +83,7 @@ fun Route.ingredients(ingredientService: IngredientService) {
             call.respond(HttpStatusCode.BadRequest, "Invalid or missing threshold parameter")
             return@get
         }
-        val lowStockIngredients =
-                ingredientService.getLowStockIngredients(threshold) // Example threshold
+        val lowStockIngredients = ingredientService.getLowStockIngredients() // Example threshold
         if (lowStockIngredients.isEmpty()) {
             call.respond(HttpStatusCode.NoContent, "No low stock ingredients found")
             return@get
