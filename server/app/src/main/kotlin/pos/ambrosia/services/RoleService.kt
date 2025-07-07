@@ -1,26 +1,60 @@
 package pos.ambrosia.services
 
 import java.sql.Connection
+import pos.ambrosia.logger
 import pos.ambrosia.models.Role
+import pos.ambrosia.utils.SecurePinProcessor
 
 class RolesService(private val connection: Connection) {
     companion object {
-        private const val ADD_ROLE = "INSERT INTO roles (id, role) VALUES (?, ?)"
+        private const val ADD_ROLE = "INSERT INTO roles (id, role, password) VALUES (?, ?, ?)"
         private const val GET_ROLES = "SELECT id, role, password FROM roles WHERE is_deleted = 0"
         private const val GET_ROLE_BY_ID =
                 "SELECT id, role, password FROM roles WHERE id = ? AND is_deleted = 0"
         private const val UPDATE_ROLE = "UPDATE roles SET role = ?, password = ? WHERE id = ?"
         private const val DELETE_ROLE = "UPDATE roles SET is_deleted = 1 WHERE id = ?"
+        private const val CHECK_ROLE_NAME_EXISTS =
+                "SELECT id FROM roles WHERE role = ? AND is_deleted = 0"
     }
 
-    fun addRole(role: Role): Boolean {
+    suspend fun addRole(role: Role): String? {
+        if (roleNameExists(role.role)) {
+            logger.error("Role name already exists: ${role.role}")
+            return null
+        }
+
+        val generatedId = java.util.UUID.randomUUID().toString()
         val statement = connection.prepareStatement(ADD_ROLE)
-        statement.setString(1, role.id)
+
+        val encryptedPin =
+                SecurePinProcessor.hashPinForStorage(
+                        role.password?.toCharArray() ?: charArrayOf(),
+                        generatedId
+                )
+
+        statement.setString(1, generatedId)
         statement.setString(2, role.role)
-        return statement.executeUpdate() > 0
+        statement.setString(3, SecurePinProcessor.byteArrayToBase64(encryptedPin))
+
+        val rowsAffected = statement.executeUpdate()
+
+        return if (rowsAffected > 0) {
+            logger.info("Role created successfully with ID: $generatedId")
+            generatedId
+        } else {
+            logger.error("Failed to create role")
+            null
+        }
     }
 
-    fun getRoles(): List<Role> {
+    private suspend fun roleNameExists(roleName: String): Boolean {
+        val statement = connection.prepareStatement(CHECK_ROLE_NAME_EXISTS)
+        statement.setString(1, roleName)
+        val resultSet = statement.executeQuery()
+        return resultSet.next()
+    }
+
+    suspend fun getRoles(): List<Role> {
         val statement = connection.prepareStatement(GET_ROLES)
         val resultSet = statement.executeQuery()
         val roles = mutableListOf<Role>()
@@ -29,17 +63,15 @@ class RolesService(private val connection: Connection) {
                     Role(
                             id = resultSet.getString("id"),
                             role = resultSet.getString("role"),
-                            password =
-                                    resultSet.getString(
-                                            "password"
-                                    ) // Assuming Role has a password field
+                            password = resultSet.getString("password") // Puede ser null
                     )
             roles.add(role)
         }
+        logger.info("Retrieved ${roles.size} roles")
         return roles
     }
 
-    fun getRoleById(id: String): Role? {
+    suspend fun getRoleById(id: String): Role? {
         val statement = connection.prepareStatement(GET_ROLE_BY_ID)
         statement.setString(1, id)
         val resultSet = statement.executeQuery()
@@ -50,21 +82,71 @@ class RolesService(private val connection: Connection) {
                     password = resultSet.getString("password")
             )
         } else {
+            logger.warn("Role not found with ID: $id")
             null
         }
     }
 
-    fun updateRole(role: Role): Boolean {
+    suspend fun updateRole(role: Role): Boolean {
+        // Verificar que el nombre del rol no exista ya (excluyendo el rol actual)
+        if (role.id != null && roleNameExistsExcludingId(role.role, role.id)) {
+            logger.error("Role name already exists: ${role.role}")
+            return false
+        }
+
         val statement = connection.prepareStatement(UPDATE_ROLE)
         statement.setString(1, role.role)
         statement.setString(2, role.password)
         statement.setString(3, role.id)
-        return statement.executeUpdate() > 0
+
+        val rowsUpdated = statement.executeUpdate()
+        if (rowsUpdated > 0) {
+            logger.info("Role updated successfully: ${role.id}")
+        } else {
+            logger.error("Failed to update role: ${role.id}")
+        }
+        return rowsUpdated > 0
     }
 
-    fun deleteRole(id: String): Boolean {
+    private suspend fun roleNameExistsExcludingId(roleName: String, excludeId: String): Boolean {
+        val statement =
+                connection.prepareStatement(
+                        "SELECT id FROM roles WHERE role = ? AND id != ? AND is_deleted = 0"
+                )
+        statement.setString(1, roleName)
+        statement.setString(2, excludeId)
+        val resultSet = statement.executeQuery()
+        return resultSet.next()
+    }
+
+    suspend fun deleteRole(id: String): Boolean {
+        if (roleInUse(id)) {
+            logger.error("Cannot delete role $id: it's being used by users")
+            return false
+        }
+
         val statement = connection.prepareStatement(DELETE_ROLE)
         statement.setString(1, id)
-        return statement.executeUpdate() > 0
+        val rowsDeleted = statement.executeUpdate()
+
+        if (rowsDeleted > 0) {
+            logger.info("Role soft-deleted successfully: $id")
+        } else {
+            logger.error("Failed to delete role: $id")
+        }
+        return rowsDeleted > 0
+    }
+
+    private suspend fun roleInUse(roleId: String): Boolean {
+        val statement =
+                connection.prepareStatement(
+                        "SELECT COUNT(*) as count FROM users WHERE role_id = ? AND is_deleted = 0"
+                )
+        statement.setString(1, roleId)
+        val resultSet = statement.executeQuery()
+        if (resultSet.next()) {
+            return resultSet.getInt("count") > 0
+        }
+        return false
     }
 }

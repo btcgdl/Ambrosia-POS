@@ -3,6 +3,7 @@ package pos.ambrosia
 import com.auth0.jwt.*
 import com.auth0.jwt.algorithms.*
 import io.ktor.http.*
+import io.ktor.http.auth.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -42,7 +43,19 @@ fun Application.module() {
   val myRealm = environment.config.property("jwt.realm").getString()
   install(Authentication) {
     jwt("auth-jwt") {
-      // Use a custom validation function to check credentials
+      // Configurar para leer el token desde cookies
+      authHeader { call ->
+        try {
+          val token = call.request.cookies["accessToken"]
+          if (token != null) {
+            HttpAuthHeader.Single("Bearer", token)
+          } else {
+            null
+          }
+        } catch (cause: Throwable) {
+          null
+        }
+      }
       verifier(
               JWT.require(Algorithm.HMAC256(secret))
                       .withIssuer(issuer)
@@ -51,7 +64,7 @@ fun Application.module() {
                       .build()
       )
       validate { credential ->
-        if (credential.payload.getClaim("username").asString() != "") {
+        if (credential.payload.getClaim("userId").asString() != "") {
           JWTPrincipal(credential.payload)
         } else {
           null
