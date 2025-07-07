@@ -14,115 +14,109 @@ import pos.ambrosia.models.User
 
 class TokenService(environment: ApplicationEnvironment, private val connection: Connection) {
 
-        private val config = environment.config
-        private val secret = AppConfig.getProperty("TOKEN_HASH")
-        private val issuer = config.property("jwt.issuer").getString()
-        private val audience = config.property("jwt.audience").getString()
-        private val algorithm = Algorithm.HMAC256(secret)
+  private val config = environment.config
+  private val secret = AppConfig.getProperty("TOKEN_HASH")
+  private val issuer = config.property("jwt.issuer").getString()
+  private val audience = config.property("jwt.audience").getString()
+  private val myRealm = config.property("jwt.realm").getString()
+  private val algorithm = Algorithm.HMAC256(secret)
 
-        val verifier: JWTVerifier =
-                JWT.require(algorithm).withAudience(audience).withIssuer(issuer).build()
+  val verifier: JWTVerifier =
+          JWT.require(algorithm).withAudience(audience).withIssuer(issuer).build()
 
-        fun generateAccessToken(user: User): String =
-                JWT.create()
-                        .withAudience(audience)
-                        .withIssuer(issuer)
-                        .withClaim("userId", user.id.toString())
-                        .withClaim("role", user.role)
-                        .withExpiresAt(
-                                Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(15))
-                        )
-                        .sign(algorithm)
+  fun generateAccessToken(user: User): String =
+          JWT.create()
+                  .withAudience(audience)
+                  .withIssuer(issuer)
+                  .withClaim("userId", user.id.toString())
+                  .withClaim("role", user.role)
+                  .withClaim("realm", myRealm)
+                  .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(15)))
+                  .sign(algorithm)
 
-        fun generateRefreshToken(user: User): String {
-                val refreshToken =
-                        JWT.create()
-                                .withAudience(audience)
-                                .withIssuer(issuer)
-                                .withClaim("userId", user.id.toString())
-                                .withClaim("role", user.role)
-                                .withClaim("type", "refresh")
-                                .withExpiresAt(
-                                        Date(
-                                                System.currentTimeMillis() +
-                                                        TimeUnit.DAYS.toMillis(30)
-                                        )
-                                )
-                                .sign(algorithm)
+  fun generateRefreshToken(user: User): String {
+    val refreshToken =
+            JWT.create()
+                    .withAudience(audience)
+                    .withIssuer(issuer)
+                    .withClaim("userId", user.id.toString())
+                    .withClaim("role", user.role)
+                    .withClaim("type", "refresh")
+                    .withClaim("realm", myRealm)
+                    .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)))
+                    .sign(algorithm)
 
-                // Almacenar el refresh token en la base de datos
-                user.id?.let { saveRefreshTokenToDatabase(it, refreshToken) }
-                return refreshToken
-        }
+    // Almacenar el refresh token en la base de datos
+    user.id?.let { saveRefreshTokenToDatabase(it, refreshToken) }
+    return refreshToken
+  }
 
-        fun validateRefreshToken(refreshToken: String): Boolean {
-                return try {
-                        val decodedJWT = verifier.verify(refreshToken)
-                        val tokenType = decodedJWT.getClaim("type")?.asString()
-                        val userId = decodedJWT.getClaim("userId")?.asString()
+  fun validateRefreshToken(refreshToken: String): Boolean {
+    return try {
+      val decodedJWT = verifier.verify(refreshToken)
+      val tokenType = decodedJWT.getClaim("type")?.asString()
+      val userId = decodedJWT.getClaim("userId")?.asString()
 
-                        // Verificar que el token existe en la base de datos
-                        val isStoredInDb = isRefreshTokenInDatabase(userId, refreshToken)
+      // Verificar que el token existe en la base de datos
+      val isStoredInDb = isRefreshTokenInDatabase(userId, refreshToken)
 
-                        tokenType == "refresh" &&
-                                !isTokenExpired(decodedJWT.expiresAt) &&
-                                isStoredInDb
-                } catch (e: JWTVerificationException) {
-                        false
-                }
-        }
+      tokenType == "refresh" && !isTokenExpired(decodedJWT.expiresAt) && isStoredInDb
+    } catch (e: JWTVerificationException) {
+      false
+    }
+  }
 
-        fun getUserFromRefreshToken(refreshToken: String): User? {
-                return try {
-                        val decodedJWT = verifier.verify(refreshToken)
-                        val userId = decodedJWT.getClaim("userId")?.asString()
-                        val role = decodedJWT.getClaim("role")?.asString()
+  fun getUserFromRefreshToken(refreshToken: String): User? {
+    return try {
+      val decodedJWT = verifier.verify(refreshToken)
+      val userId = decodedJWT.getClaim("userId")?.asString()
+      val role = decodedJWT.getClaim("role")?.asString()
 
-                        if (userId != null && role != null) {
-                                User(id = userId, role = role, name = "", pin = "")
-                        } else {
-                                null
-                        }
-                } catch (e: JWTVerificationException) {
-                        null
-                }
-        }
+      if (userId != null && role != null) {
+        User(id = userId, role = role, name = "", pin = "")
+      } else {
+        null
+      }
+    } catch (e: JWTVerificationException) {
+      null
+    }
+  }
 
-        fun revokeRefreshToken(userId: String) {
-                val sql = "UPDATE users SET refresh_token = NULL WHERE id = ?"
-                connection.prepareStatement(sql).use { statement ->
-                        statement.setString(1, userId)
-                        statement.executeUpdate()
-                }
-        }
+  fun revokeRefreshToken(userId: String) {
+    val sql = "UPDATE users SET refresh_token = NULL WHERE id = ?"
+    connection.prepareStatement(sql).use { statement ->
+      statement.setString(1, userId)
+      statement.executeUpdate()
+    }
+  }
 
-        fun revokeAllRefreshTokens() {
-                val sql = "UPDATE users SET refresh_token = NULL"
-                connection.prepareStatement(sql).use { statement -> statement.executeUpdate() }
-        }
+  fun revokeAllRefreshTokens() {
+    val sql = "UPDATE users SET refresh_token = NULL"
+    connection.prepareStatement(sql).use { statement -> statement.executeUpdate() }
+  }
 
-        private fun saveRefreshTokenToDatabase(userId: String, refreshToken: String) {
-                val sql = "UPDATE users SET refresh_token = ? WHERE id = ?"
-                connection.prepareStatement(sql).use { statement ->
-                        statement.setString(1, refreshToken)
-                        statement.setString(2, userId)
-                        statement.executeUpdate()
-                }
-        }
+  private fun saveRefreshTokenToDatabase(userId: String, refreshToken: String) {
+    val sql = "UPDATE users SET refresh_token = ? WHERE id = ?"
+    connection.prepareStatement(sql).use { statement ->
+      statement.setString(1, refreshToken)
+      statement.setString(2, userId)
+      statement.executeUpdate()
+    }
+  }
 
-        private fun isRefreshTokenInDatabase(userId: String?, refreshToken: String): Boolean {
-                if (userId == null) return false
+  private fun isRefreshTokenInDatabase(userId: String?, refreshToken: String): Boolean {
+    if (userId == null) return false
 
-                val sql = "SELECT refresh_token FROM users WHERE id = ? AND refresh_token = ?"
-                connection.prepareStatement(sql).use { statement ->
-                        statement.setString(1, userId)
-                        statement.setString(2, refreshToken)
-                        val resultSet = statement.executeQuery()
-                        return resultSet.next()
-                }
-        }
+    val sql = "SELECT refresh_token FROM users WHERE id = ? AND refresh_token = ?"
+    connection.prepareStatement(sql).use { statement ->
+      statement.setString(1, userId)
+      statement.setString(2, refreshToken)
+      val resultSet = statement.executeQuery()
+      return resultSet.next()
+    }
+  }
 
-        private fun isTokenExpired(expiresAt: Date): Boolean {
-                return expiresAt.before(Date())
-        }
+  private fun isTokenExpired(expiresAt: Date): Boolean {
+    return expiresAt.before(Date())
+  }
 }
