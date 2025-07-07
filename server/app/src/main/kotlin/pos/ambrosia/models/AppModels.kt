@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable data class TokenResponse(val accessToken: String, val refreshToken: String)
 
+@Serializable data class UserResponse(val id: String, val name: String, val role: String)
+
 @Serializable data class Message(val message: String)
 
 @Serializable
