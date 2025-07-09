@@ -8,16 +8,20 @@ export async function loginFromService({ name, pin }) {
             body: { name, pin },
         });
     } catch (error) {
-        const roles = mockService.getRoles();
+        /*const roles = mockService.getRoles();
         const foundRole = roles.find((r) => r.role === name && r.password === pin);
         if (!foundRole) throw new Error('Credenciales inválidas');
-        return { data: { role: foundRole.role } };
+        return { data: { role: foundRole.role } };*/
+        return error;
     }
 }
 
-export async function RefreshToken(refreshToken) {
+export async function RefreshToken() {
     try {
-        return await apiClient('/auth/refresh-token', {})
+        return await apiClient('/auth/refresh',
+            {
+                method:'POST',
+            })
     } catch (error) {
         console.log(error);
     }

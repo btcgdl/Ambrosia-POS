@@ -3,7 +3,7 @@ import { mockService } from '../../useMockSocket';
 
 export async function getRooms() {
     try {
-        return await apiClient('/rooms');
+        return await apiClient('/spaces');
     } catch (error) {
         return { data: mockService.getRooms() };
     }

@@ -14,7 +14,7 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { updateUserRole } = useUserRole();
-    const {accessToken, login, logout} = useAuth();
+    const {login, logout} = useAuth();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -22,11 +22,8 @@ export default function LoginPage() {
         setError(null);
         try {
             const response = await loginFromService({ name, pin });
-            console.log(response);
-            const tokenData = await jwtDecode(response.accessToken);
-            console.log(tokenData);
-            updateUserRole(tokenData.role);
-            //login({accessToken: response.accessToken, refreshToken: response.refreshToken});
+            updateUserRole("admin"/*response.data.role*/);
+            login();
             navigate(getHomeRoute());
             setLoading(false);
         } catch (error) {

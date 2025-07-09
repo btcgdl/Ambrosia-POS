@@ -14,7 +14,7 @@ export default function TableAdmin({ room }) {
             try {
                 setIsLoading(true);
                 const response = await getTables();
-                setTables(response.data);
+                setTables(response);
             } catch (err) {
                 setError("Error al cargar las mesas");
             } finally {
@@ -40,7 +40,7 @@ export default function TableAdmin({ room }) {
                 });
             }
             const response = await getTables();
-            setTables(response.data);
+            setTables(response);
             setEditingTable(null);
         } catch (err) {
             setError(err.message || "Error al guardar la mesa");
@@ -56,7 +56,7 @@ export default function TableAdmin({ room }) {
                 mesasIds: room.mesasIds.filter((mId) => mId !== id),
             });
             const response = await getTables();
-            setTables(response.data);
+            setTables(response);
             if (editingTable?.id === id) setEditingTable(null);
         } catch (err) {
             setError(err.message || "Error al eliminar la mesa");

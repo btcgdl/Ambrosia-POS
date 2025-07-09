@@ -1,46 +1,59 @@
-﻿import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import {logoutFromService} from "./authService";
+﻿import React, { createContext, useEffect, useRef } from 'react';
+import {RefreshToken} from "./authService";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-    const [accessToken, setAccessToken] = useState(null);
-    const [refreshToken, setRefreshToken] = useState(null);
+    const intervalRef = useRef(null);
 
-    const login = ({ accessToken, refreshToken }) => {
-        setAccessToken(accessToken);
-        setRefreshToken(refreshToken);
+    const refreshToken = async () => {
+        try {
+            const response = await RefreshToken();
+            console.log(response);
+        } catch (err) {
+            console.error('Error en la petición de refresh:', err);
+            logout();
+        }
+    };
+
+    const startTokenRefresh = () => {
+        if (intervalRef.current) {
+            console.warn('Refresh ya estaba activo');
+            return;
+        }
+
+        refreshToken();
+
+        intervalRef.current = setInterval(() => {
+            refreshToken();
+        }, 298000);
+
+        console.log('⏱️ Token refresher iniciado');
+    };
+
+    const stopTokenRefresh = () => {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+            console.log('Token refresher detenido');
+        }
+    };
+
+    const login = () => {
+        startTokenRefresh();
     };
 
     const logout = () => {
-        setAccessToken(null);
-        setRefreshToken(null);
-        logoutFromService();
+        stopTokenRefresh();
     };
 
-    const refreshAccessToken = useCallback(async () => {
-        try {
-            const response = await refreshToken();
-            const newAccessToken = response.data.accessToken;
-            setAccessToken(newAccessToken);
-            console.log('Access token refreshed');
-        } catch (error) {
-            console.error('Error refreshing token:', error);
-            logout();
-        }
-    }, [refreshToken]);
-
     useEffect(() => {
-        if (refreshToken) {
-            refreshAccessToken();
-            const interval = setInterval(refreshAccessToken, 5 * 59 * 1000);
-            return () => clearInterval(interval);
-        }
-    }, [refreshToken, refreshAccessToken]);
+        return () => {
+            stopTokenRefresh();
+        };
+    }, []);
 
     const value = {
-        accessToken,
-        refreshToken,
         login,
         logout,
     };

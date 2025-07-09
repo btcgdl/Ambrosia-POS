@@ -16,7 +16,7 @@ export default function RoomAdmin() {
             try {
                 setIsLoading(true);
                 const response = await getRooms();
-                setRooms(response.data);
+                setRooms(response);
             } catch (err) {
                 setError("Error al cargar las salas");
             } finally {
@@ -31,7 +31,7 @@ export default function RoomAdmin() {
             setError("");
             await addRoom(room);
             const response = await getRooms();
-            setRooms(response.data);
+            setRooms(response);
         } catch (err) {
             setError(err.message || "Error al agregar la sala");
         }
@@ -61,7 +61,9 @@ export default function RoomAdmin() {
         }
     };
 
-    const selectedRoom = rooms.find((r) => r.id === selectedRoomId) || null;
+    const selectedRoom = Array.isArray(rooms)
+        ? rooms.find((r) => r.id === selectedRoomId) || null
+        : [];
 
     if (isLoading) {
         return <div className="p-4 text-2xl">Cargando salas...</div>;
