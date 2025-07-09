@@ -48,9 +48,9 @@ fun Route.auth(userService: UsersService, tokenService: TokenService) {
                     name = "accessToken",
                     value = accessTokenResponse,
                     maxAge = 15 * 60, // 15 minutos en segundos
-                    httpOnly = true, // No accesible desde JavaScript
+                    httpOnly = false, // No accesible desde JavaScript
                     secure = false, // Cambiar a true en producción con HTTPS
-                    path = "/"
+                    path = "/",
             )
     )
 
@@ -61,7 +61,7 @@ fun Route.auth(userService: UsersService, tokenService: TokenService) {
                     maxAge = 30 * 24 * 60 * 60, // 30 días en segundos
                     httpOnly = true, // No accesible desde JavaScript
                     secure = false, // Cambiar a true en producción con HTTPS
-                    path = "/"
+                    path = "/",
             )
     )
 
@@ -98,7 +98,7 @@ fun Route.auth(userService: UsersService, tokenService: TokenService) {
                       name = "accessToken",
                       value = newAccessToken,
                       maxAge = 15 * 60, // 15 minutos
-                      httpOnly = true,
+                      httpOnly = false,
                       secure = false, // Cambiar a true en producción
                       path = "/"
               )
