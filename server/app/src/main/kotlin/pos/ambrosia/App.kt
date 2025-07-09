@@ -32,6 +32,7 @@ fun Application.module() {
   Handler() // Install exception handlers
   install(ContentNegotiation) { json() }
   install(CORS) {
+    allowCredentials = true;
     anyHost()
     allowHeader(HttpHeaders.ContentType)
     allowHeader(HttpHeaders.Authorization)

@@ -6,10 +6,9 @@ import { getAllOrders } from "./ordersService";
 
 export default function Orders() {
     const [orders, setOrders] = useState([]);
-    const [filter, setFilter] = useState("en-curso"); // Filtro inicial: en-curso
+    const [filter, setFilter] = useState("en-curso");
     const navigate = useNavigate();
 
-    // Cargar datos al montar el componente
     useEffect(() => {
         async function fetchData() {
             try {
@@ -22,17 +21,20 @@ export default function Orders() {
         fetchData();
     }, []);
 
-    // Manejar clic en una orden
     const handleOrderClick = (pedidoId) => {
         navigate(`/modify-order/${pedidoId}`);
     };
 
-    // Redirigir a la página de creación de pedido
     const handleCreateOrder = () => {
         navigate("/new-order");
     };
 
-    // Filtrar pedidos según el filtro seleccionado
+    if(!orders) {
+        return (<>
+            loading
+        </>)
+    }
+
     const filteredOrders = orders.filter((order) => {
         if (filter === "en-curso") {
             return order.estado === "abierto" || order.estado === "cerrado";
@@ -57,7 +59,6 @@ export default function Orders() {
                             </button>
                         </div>
 
-                        {/* Botones de filtro */}
                         <div className="flex gap-4 mb-6">
                             <button
                                 className={`py-4 px-8 text-2xl rounded-lg ${
@@ -81,7 +82,6 @@ export default function Orders() {
                             </button>
                         </div>
 
-                        {/* Lista de órdenes */}
                         {filteredOrders.length > 0 ? (
                             <div className="overflow-y-auto max-h-[70%]">
                                 <ul className="space-y-4">
