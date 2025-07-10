@@ -15,6 +15,7 @@ import './modules/cashier';
 
 import {TurnProvider} from "./modules/cashier/useTurn";
 import {ProtectedRoute} from "./modules/cashier/ProtectedRoute";
+import {AuthProvider} from "./modules/auth/AuthProvider";
 
 function App() {
     const [modules, setModules] = useState(getModules());
@@ -46,36 +47,38 @@ function App() {
     return (
         <div className="App">
             <MockSocketProvider>
-                <TurnProvider>
-                    <UserRoleProvider>
-                        <BrowserRouter>
-                            <Routes>
-                                {Object.entries(modules).map(([name, module]) => {
+                <AuthProvider>
+                    <TurnProvider>
+                        <UserRoleProvider>
+                            <BrowserRouter>
+                                <Routes>
+                                    {Object.entries(modules).map(([name, module]) => {
 
-                                    if (!config.modules[name]) return null;
+                                        if (!config.modules[name]) return null;
 
-                                    return module.routes.map((route) => {
-                                        const Component = route.component;
-                                        return (
-                                            <Route
-                                                key={route.path}
-                                                path={route.path}
-                                                element={
-                                                    <ProtectedRoute>
-                                                        <Component />
-                                                    </ProtectedRoute>
-                                                }
-                                            />
-                                        );
-                                    });
-                                })}
+                                        return module.routes.map((route) => {
+                                            const Component = route.component;
+                                            return (
+                                                <Route
+                                                    key={route.path}
+                                                    path={route.path}
+                                                    element={
+                                                        <ProtectedRoute>
+                                                            <Component />
+                                                        </ProtectedRoute>
+                                                    }
+                                                />
+                                            );
+                                        });
+                                    })}
 
-                                <Route path="*" element={<div>404 - Página no encontrada</div>} />
-                            </Routes>
+                                    <Route path="*" element={<div>404 - Página no encontrada</div>} />
+                                </Routes>
 
-                        </BrowserRouter>
-                    </UserRoleProvider>
-                </TurnProvider>
+                            </BrowserRouter>
+                        </UserRoleProvider>
+                    </TurnProvider>
+                </AuthProvider>
             </MockSocketProvider>
         </div>
     );

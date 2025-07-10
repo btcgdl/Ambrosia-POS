@@ -35,7 +35,7 @@ export default function NavBar() {
                                 item.roles.some((role) => role === userRole)
                         )
                         .map((item) => (
-                            <NavBarButton text={item.label} icon={item.icon} onClick={()=>{navigate(item.path)}} />
+                            <NavBarButton key={item.path} text={item.label} icon={item.icon} onClick={()=>{navigate(item.path)}} />
                         ))
                 )}
 

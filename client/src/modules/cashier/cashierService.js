@@ -3,7 +3,7 @@ import {mockService} from "../../useMockSocket";
 
 export async function getTurnOpen() {
     try {
-        return await apiClient('/get-turn-open');
+        return await apiClient('/get-turn-open', {credentials : "same-origin"});
     } catch (error) {
         return { data: mockService.getTurnOpen() };
     }

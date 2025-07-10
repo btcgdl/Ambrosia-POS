@@ -14,7 +14,7 @@ export default function Rooms() {
             try {
                 setIsLoading(true);
                 const response = await getRooms();
-                setRooms(response.data);
+                setRooms(response);
             } catch (err) {
                 setError("Error al cargar las salas");
             } finally {
@@ -23,6 +23,9 @@ export default function Rooms() {
         }
         fetchRooms();
     }, []);
+
+    const isEmptyObject =
+        typeof rooms === 'object' && rooms !== null && Object.keys(rooms).length === 0;
 
     if (isLoading) {
         return (
@@ -40,7 +43,7 @@ export default function Rooms() {
         );
     }
 
-    if (error && rooms.length === 0) {
+    if (error && (rooms.length === 0 || isEmptyObject)) {
         return (
             <div className="flex w-screen h-screen">
                 <NavBar />
@@ -71,7 +74,10 @@ export default function Rooms() {
                             </div>
                         ) : (
                             <div className="h-full flex items-center justify-center">
-                                <p className="text-2xl text-gray-500">No hay salas disponibles</p>
+                                <p className="text-2xl text-gray-500">
+                                    Agrega tu primer espacio desde la página{' '}
+                                    <span className="font-bold">Administrar espacios</span>
+                                </p>
                             </div>
                         )}
                     </div>

@@ -2,24 +2,28 @@ import LoginInputField from "../../components/Login/LoginInputField";
 import {useEffect, useState} from "react";
 import { useUserRole } from "../../contexts/UserRoleContext";
 import { useNavigate } from "react-router-dom";
-import { login } from "./authService";
+import { loginFromService } from "./authService";
 import {getHomeRoute} from "../../utils/getHomeRoute";
+import {useAuth} from "./useAuth";
+import {jwtDecode} from "jwt-decode";
 
 export default function LoginPage() {
-    const [role, setRole] = useState("");
-    const [password, setPassword] = useState("");
+    const [name, setName] = useState("");
+    const [pin, setPin] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { updateUserRole } = useUserRole();
+    const {login, logout} = useAuth();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
         try {
-            const response = await login({ role, password });
-            updateUserRole(response.data.role);
+            const response = await loginFromService({ name, pin });
+            updateUserRole("admin"/*response.data.role*/);
+            login();
             navigate(getHomeRoute());
             setLoading(false);
         } catch (error) {
@@ -56,14 +60,14 @@ export default function LoginPage() {
                     <LoginInputField
                         name="USUARIO"
                         placeholder="Ingrese su usuario"
-                        value={role}
-                        onChange={(e) => setRole(e.target.value)}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                     />
                     <LoginInputField
                         name="CONTRASEÑA"
                         placeholder="Ingrese su contraseña"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={pin}
+                        onChange={(e) => setPin(e.target.value)}
                         type="password"
                     />
                     <div className="flex justify-evenly">

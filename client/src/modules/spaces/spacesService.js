@@ -3,7 +3,7 @@ import { mockService } from '../../useMockSocket';
 
 export async function getRooms() {
     try {
-        return await apiClient('/rooms');
+        return await apiClient('/spaces');
     } catch (error) {
         return { data: mockService.getRooms() };
     }
@@ -11,7 +11,7 @@ export async function getRooms() {
 
 export async function addRoom(room) {
     try {
-        return await apiClient('/rooms', {
+        return await apiClient('/spaces', {
             method: 'POST',
             body: room,
         });
@@ -25,7 +25,7 @@ export async function addRoom(room) {
 
 export async function updateRoom(room) {
     try {
-        return await apiClient(`/rooms/${room.id}`, {
+        return await apiClient(`/spaces/${room.id}`, {
             method: 'PATCH',
             body: room,
         });
@@ -42,7 +42,7 @@ export async function updateRoom(room) {
 
 export async function deleteRoom(roomId) {
     try {
-        return await apiClient(`/rooms/${roomId}`, {
+        return await apiClient(`/spaces/${roomId}`, {
             method: 'DELETE',
         });
     } catch (error) {
