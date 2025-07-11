@@ -6,6 +6,7 @@ import java.util.Properties
 import org.slf4j.LoggerFactory
 
 // Object to load and hold custom configuration
+@Deprecated("Use pos.ambrosia.config.ConfigFile", ReplaceWith("pos.ambrosia.config.ConfigFile"))
 object AppConfig {
     private val logger = LoggerFactory.getLogger("pos.ambrosia.App")
     private val properties = Properties()
