@@ -9,17 +9,12 @@ import java.util.*
  * Service for generating secure seeds/passphrases similar to the install.sh script.
  * Uses Diceware methodology for generating cryptographically secure passphrases.
  */
-object ConfigGenerator {
-    private const val NUM_WORDS = 6
-    private const val CONFIG_DIR = ".Ambrosia-POS"
-    private const val CONFIG_FILE = "ambrosia.conf"
-    private const val DB_FILE = "ambrosia.db"
-
-    data class SeedResult(
-        val passphrase: String,
-        val sha256Hash: String,
-        val base64Token: String
-    )
+class ConfigGenerator (
+    val NUM_WORDS: Int = 6,
+    val CONFIG_DIR: String = ".Ambrosia-POS",
+    val CONFIG_FILE: String = "ambrosia.conf",
+    val DB_FILE: String = "ambrosia.db"
+) {
 
     /**
      * Loads the EFF large wordlist from the local file
@@ -56,79 +51,6 @@ object ConfigGenerator {
      */
     private fun getWordFromRoll(wordlist: List<String>, roll: String): String? {
         return wordlist.find { it.startsWith(roll) }?.substringAfter("\t")
-    }
-
-    /**
-     * Generates a secure passphrase using Diceware methodology
-     */
-    fun generateSeed(): SeedResult {
-        val wordlist = loadWordlist()
-        
-        // Generate passphrase
-        val words = mutableListOf<String>()
-        repeat(NUM_WORDS) {
-            val roll = generateDiceRoll()
-            // Find word that starts with the roll number
-            val word = wordlist.find { line -> 
-                line.startsWith(roll) 
-            }?.split("\t")?.getOrNull(1)
-            
-            if (word != null) {
-                words.add(word)
-            } else {
-                // Fallback: use a random word if dice roll doesn't match
-                val randomLine = wordlist.random()
-                val randomWord = randomLine.split("\t").getOrNull(1) ?: "fallback"
-                words.add(randomWord)
-            }
-        }
-        
-        val passphrase = words.joinToString(" ")
-        
-        // Generate SHA-256 hash
-        val digest = MessageDigest.getInstance("SHA-256")
-        val hashBytes = digest.digest(passphrase.toByteArray())
-        val sha256Hash = hashBytes.joinToString("") { "%02x".format(it) }
-        
-        // Generate Base64 encoding
-        val base64Token = Base64.getEncoder().encodeToString(passphrase.toByteArray())
-        
-        return SeedResult(passphrase, sha256Hash, base64Token)
-    }
-
-    /**
-     * Saves the configuration to the ambrosia.conf file
-     */
-    fun saveConfig(seedResult: SeedResult, overwrite: Boolean = false): Boolean {
-        val userHome = System.getProperty("user.home")
-        val configDir = File(userHome, CONFIG_DIR)
-        val configFile = File(configDir, CONFIG_FILE)
-
-        // Create directory if it doesn't exist
-        if (!configDir.exists()) {
-            configDir.mkdirs()
-            println("Created directory ${configDir.absolutePath}")
-        }
-
-        // Check if file exists and handle overwrite
-        if (configFile.exists() && !overwrite) {
-            println("Configuration file already exists at ${configFile.absolutePath}")
-            return false
-        }
-
-        try {
-            // Write configuration
-            configFile.writeText("""
-                TOKEN_HASH=${seedResult.sha256Hash}
-                TOKEN_BASE64=${seedResult.base64Token}
-            """.trimIndent())
-            
-            println("Configuration saved to ${configFile.absolutePath}")
-            return true
-        } catch (e: Exception) {
-            println("Error saving configuration: ${e.message}")
-            return false
-        }
     }
 
     /**
