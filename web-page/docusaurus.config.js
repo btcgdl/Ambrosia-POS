@@ -91,7 +91,7 @@ const config = {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
             position: 'left',
-            label: 'Tutorial',
+            label: 'Documentation',
           },
           { to: '/blog', label: 'Blog', position: 'left' },
           {
@@ -105,11 +105,11 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Docs',
+            title: 'Documentation',
             items: [
               {
-                label: 'Tutorial',
-                to: '/docs/intro',
+                label: 'Api',
+                to: '/docs/api/Auth',
               },
             ],
           },
@@ -147,7 +147,7 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} Ambrosia-POS, BTCGDL.`,
       },
       prism: {
-        theme: prismThemes.github,
+        theme: prismThemes.oceanicNext,
         darkTheme: prismThemes.dracula,
       },
     }),

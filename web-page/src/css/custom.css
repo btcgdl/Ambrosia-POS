@@ -4,27 +4,318 @@
  * work well for content-centric websites.
  */
 
+/* Picton Blue Color Palette */
+:root {
+  --picton-blue-50: #f0faff;
+  --picton-blue-100: #dff4ff;
+  --picton-blue-200: #b9eafe;
+  --picton-blue-300: #7bdcfe;
+  --picton-blue-400: #35cafb;
+  --picton-blue-500: #0aafe6;
+  --picton-blue-600: #0091ca;
+  --picton-blue-700: #0074a4;
+  --picton-blue-800: #056287;
+  --picton-blue-900: #0a5070;
+  --picton-blue-950: #07334a;
+}
+
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #0aafe6;
+  --ifm-color-primary-dark: #0091ca;
+  --ifm-color-primary-darker: #0074a4;
+  --ifm-color-primary-darkest: #056287;
+  --ifm-color-primary-light: #35cafb;
+  --ifm-color-primary-lighter: #7bdcfe;
+  --ifm-color-primary-lightest: #b9eafe;
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(10, 175, 230, 0.1);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #35cafb;
+  --ifm-color-primary-dark: #0aafe6;
+  --ifm-color-primary-darker: #0091ca;
+  --ifm-color-primary-darkest: #0074a4;
+  --ifm-color-primary-light: #7bdcfe;
+  --ifm-color-primary-lighter: #b9eafe;
+  --ifm-color-primary-lightest: #dff4ff;
+  --docusaurus-highlighted-code-line-bg: rgba(53, 202, 251, 0.3);
+}
+
+/* Animación para el efecto glow del CTA */
+@keyframes ctaGlow {
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Footer con el mismo degradado que CTA Section */
+.footer {
+  background: linear-gradient(
+    135deg,
+    var(--picton-blue-900) 0%,
+    var(--picton-blue-950) 100%
+  ) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efectos adicionales del CTA para el footer */
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(
+      circle at 20% 50%,
+      rgba(123, 220, 254, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(53, 202, 251, 0.1) 0%,
+      transparent 50%
+    );
+  animation: ctaGlow 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.footer .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ajustes para el texto del footer */
+.footer .footer__title,
+.footer .footer__item,
+.footer .footer__link-item {
+  color: var(--picton-blue-100) !important;
+}
+
+.footer .footer__link-item:hover {
+  color: var(--picton-blue-300) !important;
+}
+
+.footer .footer__copyright {
+  color: var(--picton-blue-200) !important;
+}
+
+/* Dark mode para el footer */
+[data-theme="dark"] .footer {
+  background: linear-gradient(135deg, var(--picton-blue-950) 0%, #000000 100%) !important;
+}
+
+[data-theme="dark"] .footer .footer__title,
+[data-theme="dark"] .footer .footer__item,
+[data-theme="dark"] .footer .footer__link-item {
+  color: var(--picton-blue-200) !important;
+}
+
+[data-theme="dark"] .footer .footer__link-item:hover {
+  color: var(--picton-blue-400) !important;
+}
+
+[data-theme="dark"] .footer .footer__copyright {
+  color: var(--picton-blue-300) !important;
+}
+
+/* Estilo para la navbar con la paleta Picton Blue */
+.navbar {
+  background-color: var(--picton-blue-50);
+  border-bottom: 1px solid var(--picton-blue-200);
+}
+
+[data-theme="dark"] .navbar {
+  background-color: var(--picton-blue-950);
+  border-bottom: 1px solid var(--picton-blue-800);
+}
+
+.navbar__title {
+  color: var(--picton-blue-800) !important;
+}
+
+[data-theme="dark"] .navbar__title {
+  color: var(--picton-blue-200) !important;
+}
+
+.navbar__link {
+  color: var(--picton-blue-700) !important;
+}
+
+.navbar__link:hover {
+  color: var(--picton-blue-600) !important;
+}
+
+[data-theme="dark"] .navbar__link {
+  color: var(--picton-blue-300) !important;
+}
+
+[data-theme="dark"] .navbar__link:hover {
+  color: var(--picton-blue-400) !important;
+}
+
+/* Estilo para los botones globales */
+.button--primary {
+  background-color: var(--picton-blue-600);
+  border-color: var(--picton-blue-600);
+}
+
+.button--primary:hover {
+  background-color: var(--picton-blue-700);
+  border-color: var(--picton-blue-700);
+}
+
+.button--secondary {
+  background-color: var(--picton-blue-200);
+  color: var(--picton-blue-800);
+  border-color: var(--picton-blue-200);
+}
+
+.button--secondary:hover {
+  background-color: var(--picton-blue-300);
+  color: var(--picton-blue-900);
+  border-color: var(--picton-blue-300);
+}
+
+/* Sidebar y documentación */
+.menu__link {
+  color: var(--picton-blue-700);
+}
+
+.menu__link:hover {
+  color: var(--picton-blue-600);
+  background-color: var(--picton-blue-50);
+}
+
+.menu__link--active {
+  color: var(--picton-blue-600);
+  background-color: var(--picton-blue-100);
+}
+
+[data-theme="dark"] .menu__link {
+  color: var(--picton-blue-300);
+}
+
+[data-theme="dark"] .menu__link:hover {
+  color: var(--picton-blue-400);
+  background-color: var(--picton-blue-950);
+}
+
+[data-theme="dark"] .menu__link--active {
+  color: var(--picton-blue-400);
+  background-color: var(--picton-blue-900);
+}
+
+/* Breadcrumb navigation */
+.breadcrumbs__link {
+  color: var(--picton-blue-600);
+}
+
+.breadcrumbs__link:hover {
+  color: var(--picton-blue-700);
+}
+
+[data-theme="dark"] .breadcrumbs__link {
+  color: var(--picton-blue-400);
+}
+
+[data-theme="dark"] .breadcrumbs__link:hover {
+  color: var(--picton-blue-300);
+}
+
+/* Cards y contenedores */
+.card {
+  border-color: var(--picton-blue-200);
+}
+
+[data-theme="dark"] .card {
+  border-color: var(--picton-blue-800);
+}
+
+/* Admonitions */
+.alert--info {
+  background-color: var(--picton-blue-50);
+  border-left-color: var(--picton-blue-600);
+  color: var(--picton-blue-800);
+}
+
+[data-theme="dark"] .alert--info {
+  background-color: var(--picton-blue-950);
+  color: var(--picton-blue-200);
+}
+
+/* Links globales */
+
+
+/* Pagination */
+.pagination-nav__link {
+  border-color: var(--picton-blue-200);
+  color: var(--picton-blue-700);
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--picton-blue-400);
+  color: var(--picton-blue-600);
+}
+
+[data-theme="dark"] .pagination-nav__link {
+  border-color: var(--picton-blue-800);
+  color: var(--picton-blue-300);
+}
+
+[data-theme="dark"] .pagination-nav__link:hover {
+  border-color: var(--picton-blue-600);
+  color: var(--picton-blue-400);
+}
+
+/* Table of contents */
+.table-of-contents__link {
+  color: var(--picton-blue-600);
+}
+
+.table-of-contents__link:hover {
+  color: var(--picton-blue-700);
+}
+
+.table-of-contents__link--active {
+  color: var(--picton-blue-800);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .table-of-contents__link {
+  color: var(--picton-blue-400);
+}
+
+[data-theme="dark"] .table-of-contents__link:hover {
+  color: var(--picton-blue-300);
+}
+
+[data-theme="dark"] .table-of-contents__link--active {
+  color: var(--picton-blue-200);
+}
+
+/* Search */
+.search-box {
+  border-color: var(--picton-blue-300);
+}
+
+.search-box:focus {
+  border-color: var(--picton-blue-600);
+  box-shadow: 0 0 0 2px rgba(10, 175, 230, 0.2);
+}
+
+[data-theme="dark"] .search-box {
+  border-color: var(--picton-blue-700);
+}
+
+[data-theme="dark"] .search-box:focus {
+  border-color: var(--picton-blue-400);
+  box-shadow: 0 0 0 2px rgba(53, 202, 251, 0.2);
 }

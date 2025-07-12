@@ -30,14 +30,14 @@
 
 @keyframes heroGradientShift {
   0%,
-  100% {
+  /* 100% {
     background: linear-gradient(
       135deg,
       var(--picton-blue-500) 0%,
       var(--picton-blue-600) 100%
     );
-  }
-  50% {
+  } */
+  20% {
     background: linear-gradient(
       135deg,
       var(--picton-blue-600) 0%,

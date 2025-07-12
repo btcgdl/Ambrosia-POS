@@ -36,7 +36,7 @@ function HomepageHeader() {
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.heroDescription}>
+        <div >
           <p>
             Sistema POS de código abierto que acepta Bitcoin y Lightning Network
           </p>
@@ -51,7 +51,7 @@ function HomepageHeader() {
           </Link>
           <Link
             className="button button--outline button--lg"
-            to="https://github.com/tu-repo/pos-btc"
+            to="https://github.com/btcgdl/Ambrosia-POS"
           >
             <Github className="margin-right--sm" />
             Ver en GitHub
@@ -150,7 +150,7 @@ function BenefitsSection() {
       <div className="container">
         <div className="row">
           <div className="col col--6">
-            <h2 className="margin-bottom--lg">Ventajas del Bitcoin POS</h2>
+            <h2 className="margin-bottom--lg">Ventajas de Ambrosia-POS</h2>
             <div className={styles.benefitsList}>
               {benefits.map((benefit, idx) => (
                 <div
@@ -268,17 +268,18 @@ function TestimonialsSection() {
 function TechStackSection() {
   const technologies = [
     {
-      name: "Bitcoin Core",
-      description: "Integración directa con nodos Bitcoin",
+      name: "Ktor",
+      description: "Framework backend para Kotlin",
     },
-    { name: "Lightning Network", description: "LND, CLN y Eclair compatibles" },
+    { name: "Lightning Network", description: "Pagos instantáneos y de bajo costo" },
     {
       name: "React/Electron",
       description: "Interfaz moderna y multiplataforma",
     },
-    { name: "Node.js", description: "Backend robusto y escalable" },
-    { name: "SQLite/PostgreSQL", description: "Base de datos local y remota" },
-    { name: "Docker", description: "Despliegue fácil y consistente" },
+    { name: "Kotlin", description: "Backend robusto y escalable" },
+    { name: "SQLite", description: "Base de datos local" },
+    { name: "REST API", description: "Integración sencilla con otros servicios" },
+    
   ];
 
   return (
@@ -362,6 +363,7 @@ export default function Home() {
         <BenefitsSection />
         <TestimonialsSection />
         <TechStackSection />
+        {/* <CTASection /> */}
       </main>
     </Layout>
   );
