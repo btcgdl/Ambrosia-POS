@@ -44,7 +44,7 @@ function HomepageHeader() {
         <div>
           <Link
             className="button button--secondary button--lg margin-right--md"
-            to="/docs/getting-started"
+            to="/blog"
           >
             <Download className="margin-right--sm" />
             Comenzar Ahora
@@ -165,7 +165,7 @@ function BenefitsSection() {
             <div className="margin-top--lg">
               <Link
                 className="button button--primary button--lg"
-                to="/docs/benefits"
+                to="/blog"
               >
                 Conocer Más Beneficios
               </Link>
