@@ -9,16 +9,14 @@ import io.ktor.server.application.ApplicationEnvironment
 import java.sql.Connection
 import java.util.*
 import java.util.concurrent.TimeUnit
-import pos.ambrosia.config.AppConfig
 import pos.ambrosia.models.User
 
 class TokenService(environment: ApplicationEnvironment, private val connection: Connection) {
 
   private val config = environment.config
-  private val secret = AppConfig.getProperty("TOKEN_HASH")
+  private val secret = config.property("secret").getString()
   private val issuer = config.property("jwt.issuer").getString()
   private val audience = config.property("jwt.audience").getString()
-  private val myRealm = config.property("jwt.realm").getString()
   private val algorithm = Algorithm.HMAC256(secret)
 
   val verifier: JWTVerifier =
@@ -30,7 +28,7 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
                   .withIssuer(issuer)
                   .withClaim("userId", user.id.toString())
                   .withClaim("role", user.role)
-                  .withClaim("realm", myRealm)
+                  .withClaim("realm", "Ambrosia-Server")
                   .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(15)))
                   .sign(algorithm)
 
@@ -42,7 +40,7 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
                     .withClaim("userId", user.id.toString())
                     .withClaim("role", user.role)
                     .withClaim("type", "refresh")
-                    .withClaim("realm", myRealm)
+                    .withClaim("realm", "Ambrosia-Server")
                     .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)))
                     .sign(algorithm)
 

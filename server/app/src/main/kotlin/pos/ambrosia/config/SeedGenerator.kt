@@ -1,4 +1,4 @@
-package pos.ambrosia.utils
+package pos.ambrosia.config
 
 import java.io.File
 import java.security.MessageDigest
@@ -9,18 +9,14 @@ import java.util.*
  * Service for generating secure seeds/passphrases similar to the install.sh script.
  * Uses Diceware methodology for generating cryptographically secure passphrases.
  */
-class SeedGenerator (
-    val NUM_WORDS: Int = 12,
-    val CONFIG_DIR: String = ".Ambrosia-POS",
-    val CONFIG_FILE: String = "ambrosia.conf"
-) {
-
+object SeedGenerator {
+    val NUM_WORDS: Int = 12
     /**
      * Loads the EFF large wordlist from the local file
      */
     private fun loadWordlist(): List<String> {
         // Try to find the wordlist file in the project scripts directory
-        val projectRoot = System.getProperty("user.dir")
+        val projectRoot = File(System.getProperty("user.dir")).parentFile.parentFile
         val wordlistFile = File(projectRoot, "scripts/eff_large_wordlist.txt")
         
         if (!wordlistFile.exists()) {
@@ -47,4 +43,30 @@ class SeedGenerator (
         return wordlist.find { it.startsWith(roll) }?.substringAfter("\t")
     }
 
+    fun generateSeed(): String {
+        val wordlist = loadWordlist()
+        val seedWords = mutableListOf<String>()
+
+        repeat(NUM_WORDS) {
+            var word: String?
+            do {
+                val roll = generateDiceRoll()
+                word = getWordFromRoll(wordlist, roll)
+            } while (word == null)
+            seedWords.add(word)
+        }
+        return seedWords.joinToString(" ")
+    }
+
+        /**
+     * Generates a secure random seed and returns its SHA-256 hash as a hex string.
+     */
+    fun generateSecureSeed(seedInput: String): String {
+
+        // Create SHA-256 hash of the seed
+        val digest = MessageDigest.getInstance("SHA-256")
+        val hashedSeed = digest.digest(seedInput.toByteArray())
+
+        return hashedSeed.joinToString("") { "%02x".format(it) }
+    }
 }

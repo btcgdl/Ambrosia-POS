@@ -18,10 +18,6 @@ class ListValueSource(
     companion object {
         fun fromFile(confFile: Path): ListValueSource {
             val values = readConfFile(confFile)
-            println("Valores cargados desde el archivo de configuración:")
-            values.forEach { (key, value) ->
-                println("$key=$value")
-            }
             return ListValueSource(values)
         }
     }

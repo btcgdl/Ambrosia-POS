@@ -13,13 +13,12 @@ class InjectDB (
         val dbFile = File(datadir, dbfile)
 
         if (dbFile.exists()) {
-            println("Database already exists at ${dbFile.absolutePath}")
             return true
         }
 
         try {
             // Try to find the database file in the project db directory
-            val projectRoot = System.getProperty("user.dir")
+            val projectRoot = File(System.getProperty("user.dir")).parentFile.parentFile
             val sourceDbFile = File(projectRoot, "db/ambrosia.db")
             
             if (!sourceDbFile.exists()) {

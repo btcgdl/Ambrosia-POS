@@ -5,13 +5,16 @@ import java.sql.DriverManager
 import java.sql.SQLException
 import java.sql.Statement
 import io.ktor.server.application.*
+import kotlinx.io.files.Path
 import org.slf4j.LoggerFactory
+import java.io.File
 
 private val logger = LoggerFactory.getLogger("pos.ambrosia.App")
 fun Application.connectToSqlite(): Connection
 {
+    val datadir =  Path(Path(System.getProperty("user.home")), ".Ambrosia-POS")
     // load the SQLite datapath from the config file
-    val DBPath = environment.config.property("ktor.database.path").getString()
+    val DBPath = Path(datadir, "ambrosia.db").toString()
     return try {
         DriverManager.getConnection("jdbc:sqlite:$DBPath")
     } catch (e: SQLException) {

@@ -21,14 +21,12 @@
 
 	public val logger = LoggerFactory.getLogger("pos.ambrosia.App")
 
-class Api(
-
-
-) {
+class Api( ) {
 
 	fun Application.module() {
 		AppConfig.loadConfig() // Load custom config
 		// Configure the application
+		val config = this.environment.config
 		Handler() // Install exception handlers
 		install(ContentNegotiation) { json() }
 		install(CORS) {
@@ -38,10 +36,6 @@ class Api(
 			allowHeader(HttpHeaders.Authorization)
 		}
 
-		val secret = AppConfig.getProperty("TOKEN_HASH")
-		val issuer = AppConfig.getProperty("JWT_ISSUER")
-		val audience = AppConfig.getProperty("JWT_AUDIENCE")
-		val myRealm = AppConfig.getProperty("JWT_REALM")
 		install(Authentication) {
 			jwt("auth-jwt") {
 			// Configurar para leer el token desde cookies
@@ -58,11 +52,17 @@ class Api(
 				}
 			}
 			verifier(
-					JWT.require(Algorithm.HMAC256(secret))
-							.withIssuer(issuer)
-							.withAudience(audience)
-							.withClaim("realm", myRealm)
-							.build()
+				JWT.require(Algorithm.HMAC256(
+						config.property("secret").getString()
+					))
+					.withIssuer(
+						config.property("jwt.issuer").getString()
+					)
+					.withAudience(
+						config.property("jwt.audience").getString()
+					)
+					.withClaim("realm", "Ambrosia-Server")
+					.build()
 			)
 			validate { credential ->
 				if (credential.payload.getClaim("userId").asString() != "") {

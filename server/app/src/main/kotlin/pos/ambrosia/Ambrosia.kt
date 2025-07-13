@@ -12,12 +12,15 @@ import com.github.ajalt.clikt.output.MordantHelpFormatter
 import com.github.ajalt.mordant.rendering.TextColors.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.config.MapApplicationConfig
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
 import pos.ambrosia.utils.InjectDB
 import pos.ambrosia.config.ListValueSource
+import pos.ambrosia.config.SeedGenerator
+import org.slf4j.LoggerFactory
 
 
 fun main(args: Array<String>) = Ambrosia()
@@ -30,7 +33,7 @@ class Ambrosia: CliktCommand() {
     init {
 
         SystemFileSystem.createDirectories(datadir)
-        // InjectDB(datadir.toString()).ensureDatabase()
+        InjectDB(datadir.toString()).ensureDatabase()
 
         context {
             valueSource = ListValueSource.fromFile(confFile)
@@ -53,6 +56,16 @@ class Ambrosia: CliktCommand() {
                     .use { it.writeString("\nhttp-bind-port=$value") }
                 value
             }
+        val secret by option("--secret", help = "Secret key for the server")
+            .defaultLazy {
+                val seed = SeedGenerator.generateSeed() // Generate a new seed
+                SystemFileSystem.sink(this@Ambrosia.confFile, append = true).buffered()
+                    .use { it.writeString("\nsecret=$seed") }
+                val hash = SeedGenerator.generateSecureSeed(seedInput = seed)
+                SystemFileSystem.sink(this@Ambrosia.confFile, append = true).buffered()
+                    .use { it.writeString("\nsecret-hash=$hash") }
+                seed
+            }
     }
     private val options by DaemonOptions()
 
@@ -61,23 +74,27 @@ class Ambrosia: CliktCommand() {
         echo("Starting Ambrosia POS Server...")
         
         try {
-            val server = embeddedServer(
-            Netty,
-            environment = applicationEnvironment {
-
-            },
-            configure = {
-                connector {
-                    port = options.httpBindPort
-                    host = options.httpBindIp
-                }
-            },
-            module = {
-                Api().run { module() }
-            }
-        )
             
-            echo("Server starting...")
+            val server = embeddedServer(
+                Netty,
+                environment = applicationEnvironment {
+                    config = MapApplicationConfig().apply {
+                        put("jwt.issuer", "ambrosia-pos")
+                        put("jwt.audience", "ambrosia-pos-users")
+                        put("secret", options.secret)
+                    }
+                    log = LoggerFactory.getLogger("AmbrosiaServer")
+                },
+                configure = {
+                    connector {
+                        port = options.httpBindPort
+                        host = options.httpBindIp
+                    }
+                },
+                module = {
+                    Api( ).run { module() }
+                }
+            )
             server.start(wait = true)
         } catch (e: Exception) {
             echo("Error starting server: ${e.message}", err = true)
