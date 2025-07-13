@@ -40,6 +40,8 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:3.1.2")
     // This dependency is used by the application.
     implementation(libs.guava)
+
+    implementation("com.github.ajalt.clikt:clikt:5.0.3")
 }
 
 tasks.named<JavaExec>("run") {
@@ -55,7 +57,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "pos.ambrosia.AppKt"
+    mainClass = "pos.ambrosia.AmbrosiaKt"
 }
 
 tasks.named<Test>("test") {

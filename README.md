@@ -91,12 +91,6 @@ npm start
 
 *Install App*
 
-Para generar el data directory y el token del API:
-
-```sh
-./install.sh 
-```
-
 Para ejecutar el servidor en modo de desarrollo:
 
 ```sh

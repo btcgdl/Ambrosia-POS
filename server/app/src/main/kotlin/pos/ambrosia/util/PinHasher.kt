@@ -10,10 +10,10 @@ import pos.ambrosia.logger
 
 object SecurePinProcessor {
   private fun getAppMasterKey(): ByteArray {
-    val keyString = AppConfig.getProperty("TOKEN_HASH")
+    val keyString = AppConfig.getProperty("secret")
     if (keyString.isNullOrBlank()) {
       throw IllegalStateException(
-              "TOKEN_HASH (App Master Key) not found in configuration or is empty. Cannot proceed securely."
+              "SECRET_HASH (App Master Key) not found in configuration or is empty. Cannot proceed securely."
       )
     }
     val keyBytes = keyString.toByteArray(Charsets.UTF_8)
