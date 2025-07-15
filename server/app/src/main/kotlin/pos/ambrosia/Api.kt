@@ -32,6 +32,8 @@ class Api( ) {
 		install(CORS) {
 			allowCredentials = true;
 			anyHost()
+			allowMethod(HttpMethod.Put)
+			allowMethod(HttpMethod.Delete)
 			allowHeader(HttpHeaders.ContentType)
 			allowHeader(HttpHeaders.Authorization)
 		}
