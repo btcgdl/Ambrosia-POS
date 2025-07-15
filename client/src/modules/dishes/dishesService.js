@@ -3,7 +3,8 @@ import { mockService } from '../../useMockSocket';
 
 export async function getDishes() {
     try {
-        return await apiClient('/dishes');
+        const dishes = await apiClient('/dishes');
+        return dishes ? dishes : [];
     } catch (error) {
         return { data: mockService.getDishes() };
     }
@@ -49,7 +50,8 @@ export async function deleteDish(dishId) {
 
 export async function getCategories() {
     try {
-        return await apiClient('/categories');
+        const categories = await apiClient('/categories');
+        return  categories ? categories : [];
     } catch (error) {
         return { data: mockService.getCategories() };
     }

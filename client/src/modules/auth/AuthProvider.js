@@ -10,7 +10,6 @@ export function AuthProvider({ children }) {
         try {
             const response = await RefreshToken();
             console.log(response);
-            console.log(document.cookie);
         } catch (err) {
             console.error('Error en la petición de refresh:', err);
             logout();
