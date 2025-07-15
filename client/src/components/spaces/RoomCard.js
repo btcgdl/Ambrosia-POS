@@ -10,7 +10,7 @@ export default function RoomCard({ roomData }) {
         >
 
             <i className="bi bi-door-open-fill text-4xl mb-2"></i>
-            <span className="text-lg font-semibold">{roomData.nombre}</span>
+            <span className="text-lg font-semibold">{roomData.name}</span>
         </button>
     );
 }

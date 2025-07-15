@@ -21,9 +21,13 @@ export default function LoginPage() {
         setLoading(true);
         setError(null);
         try {
-            const response = await loginFromService({ name, pin });
-            updateUserRole("admin"/*response.data.role*/);
-            login();
+            /*const response = await loginFromService({ name, pin });
+            const accessToken = getCookieValue('accessToken');
+            console.log("login")
+            const tokenData = await jwtDecode(accessToken);
+            console.log(tokenData.role);*/
+            updateUserRole(/*tokenData.role*/"admin");
+            /*login();*/
             navigate(getHomeRoute());
             setLoading(false);
         } catch (error) {
@@ -31,6 +35,11 @@ export default function LoginPage() {
             setError("Error de red o credenciales inválidas");
             console.log(error.message);
         }
+    };
+
+    const getCookieValue = (name) => {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
     };
 
     return (
