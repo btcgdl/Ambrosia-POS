@@ -89,12 +89,6 @@ class TableService(private val connection: Connection) {
             return null
         }
 
-        // Verificar que la orden existe (si se proporciona)
-        if (!orderExists(table.order_id)) {
-            logger.error("Order does not exist: ${table.order_id}")
-            return null
-        }
-
         val generatedId = java.util.UUID.randomUUID().toString()
         val statement = connection.prepareStatement(ADD_TABLE)
 
@@ -194,12 +188,6 @@ class TableService(private val connection: Connection) {
         val tableStatus = table.status ?: "available"
         if (!isValidStatus(tableStatus)) {
             logger.error("Invalid table status: $tableStatus")
-            return false
-        }
-
-        // Verificar que la orden existe (si se proporciona)
-        if (!orderExists(table.order_id)) {
-            logger.error("Order does not exist: ${table.order_id}")
             return false
         }
 
