@@ -30,7 +30,7 @@ data class Table(
         val name: String,
         val status: String? = null,
         val space_id: String,
-        val order_id: String
+        val order_id: String? = null
 )
 
 @Serializable
@@ -66,7 +66,7 @@ data class Supplier(
 data class Order(
         val id: String? = null,
         val user_id: String,
-        val table_id: String,
+        val table_id: String? = null,
         val waiter: String,
         val status: String,
         val total: Double,
