@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 
-export default function TableForm({ onSubmit, onCancel, initialData }) {
+export default function TableForm({ onSubmit, onCancel, initialData, roomId }) {
     const [nombre, setNombre] = useState("");
-    const [estado, setEstado] = useState("libre");
+    const [estado, setEstado] = useState("available");
     const [error, setError] = useState("");
 
     useEffect(() => {
         if (initialData) {
             setNombre(initialData.nombre || "");
-            setEstado(initialData.estado || "libre");
+            setEstado(initialData.estado || "available");
         } else {
             setNombre("");
-            setEstado("libre");
+            setEstado("available");
         }
     }, [initialData]);
 
@@ -25,12 +25,12 @@ export default function TableForm({ onSubmit, onCancel, initialData }) {
             setError("");
             await onSubmit({
                 ...initialData,
-                nombre: nombre.trim(),
-                estado,
-                pedidoId: initialData?.pedidoId || null,
+                name: nombre.trim(),
+                status: estado,
+                space_id: roomId,
             });
             setNombre("");
-            setEstado("libre");
+            setEstado("available");
         } catch (err) {
             setError(err.message || "Error al guardar la mesa");
         }
@@ -56,8 +56,8 @@ export default function TableForm({ onSubmit, onCancel, initialData }) {
                     onChange={(e) => setEstado(e.target.value)}
                     className="w-full border p-2 rounded"
                 >
-                    <option value="libre">Libre</option>
-                    <option value="ocupada">Ocupada</option>
+                    <option value="available">Libre</option>
+                    <option value="busy">Ocupada</option>
                 </select>
             </div>
             <div className="flex justify-end gap-2">

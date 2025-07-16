@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import NavBar from "../../components/navbar/NavBar";
 import Header from "../../components/header/Header";
 import TableCard from "../../components/spaces/TableCard";
-import {getRooms, getTables, getTablesByRoomId} from "./spacesService";
+import {getTablesByRoomId} from "./spacesService";
 
 export default function Tables() {
     const { roomId } = useParams();
@@ -16,7 +16,8 @@ export default function Tables() {
             try {
                 setIsLoading(true);
                 const tablesResponse = await getTablesByRoomId(roomId);
-                setTables(tablesResponse.data);
+                console.log(tablesResponse);
+                setTables(tablesResponse);
             } catch (err) {
                 setError("Error al cargar los datos");
             } finally {
@@ -67,9 +68,8 @@ export default function Tables() {
                     <div className="h-[60%] w-[80%] bg-amber-200">
                         {Array.isArray(tables) && tables.length > 0 ? (
                             <div className="h-full overflow-x-auto flex gap-4 p-4">
-                                {tables.map((tableId) => {
-                                    const table = tables.find((t) => t.id === tableId);
-                                    return table ? <TableCard key={tableId} tableData={table} /> : null;
+                                {tables.map((table) => {
+                                    return table ? <TableCard key={table.id} tableData={table} /> : null;
                                 })}
                             </div>
                         ) : (

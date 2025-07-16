@@ -42,7 +42,7 @@ export default function RoomAdmin() {
             setError("");
             await updateRoom(room);
             const response = await getRooms();
-            setRooms(response.data);
+            setRooms(response);
             setEditingRoom(null);
         } catch (err) {
             setError(err.message || "Error al actualizar la sala");
@@ -54,7 +54,7 @@ export default function RoomAdmin() {
             setError("");
             await deleteRoom(id);
             const response = await getRooms();
-            setRooms(response.data);
+            setRooms(response);
             if (selectedRoomId === id) setSelectedRoomId(null);
         } catch (err) {
             setError(err.message || "Error al eliminar la sala");
