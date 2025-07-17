@@ -1,25 +1,25 @@
-	package pos.ambrosia
+package pos.ambrosia
 
-	import com.auth0.jwt.*
-	import com.auth0.jwt.algorithms.*
-	import io.ktor.http.*
-	import io.ktor.http.auth.*
-	import io.ktor.serialization.kotlinx.json.*
-	import io.ktor.server.application.*
-	import io.ktor.server.auth.*
-	import io.ktor.server.auth.jwt.*
-	import io.ktor.server.engine.*
-	import io.ktor.server.netty.*
-	import io.ktor.server.plugins.contentnegotiation.*
-	import io.ktor.server.plugins.cors.routing.*
-	import io.ktor.server.plugins.statuspages.*
-	import io.ktor.server.response.*
-	import org.slf4j.LoggerFactory
-	import pos.ambrosia.api.*
-	import pos.ambrosia.config.AppConfig
-	import pos.ambrosia.utils.UnauthorizedApiException
+import com.auth0.jwt.*
+import com.auth0.jwt.algorithms.*
+import io.ktor.http.*
+import io.ktor.http.auth.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.response.*
+import org.slf4j.LoggerFactory
+import pos.ambrosia.api.*
+import pos.ambrosia.config.AppConfig
+import pos.ambrosia.utils.UnauthorizedApiException
 
-	public val logger = LoggerFactory.getLogger("pos.ambrosia.App")
+public val logger = LoggerFactory.getLogger("pos.ambrosia.App")
 
 class Api( ) {
 
@@ -32,6 +32,8 @@ class Api( ) {
 		install(CORS) {
 			allowCredentials = true;
 			anyHost()
+			allowMethod(HttpMethod.Put)
+			allowMethod(HttpMethod.Delete)
 			allowHeader(HttpHeaders.ContentType)
 			allowHeader(HttpHeaders.Authorization)
 		}

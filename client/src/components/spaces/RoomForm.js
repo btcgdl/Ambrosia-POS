@@ -22,8 +22,8 @@ export default function RoomForm({ onSubmit, initialData, onCancel }) {
             setError("");
             await onSubmit({
                 ...initialData,
-                nombre: nombre.trim(),
-                mesasIds: initialData?.mesasIds || [],
+                name: nombre.trim(),
+                //mesasIds: initialData?.mesasIds || [],
             });
             setNombre("");
         } catch (err) {

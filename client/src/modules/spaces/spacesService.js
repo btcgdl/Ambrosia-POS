@@ -5,7 +5,8 @@ export async function getRooms() {
     try {
         return await apiClient('/spaces');
     } catch (error) {
-        return { data: mockService.getRooms() };
+        throw error;
+        //return { data: mockService.getRooms() };
     }
 }
 
@@ -47,6 +48,14 @@ export async function deleteRoom(roomId) {
         });
     } catch (error) {
         return mockService.deleteRoom(roomId);
+    }
+}
+
+export async function getTablesByRoomId(roomId) {
+    try{
+        return await apiClient(`/tables/by-space/${roomId}`);
+    } catch (e) {
+        return [];
     }
 }
 

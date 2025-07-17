@@ -13,7 +13,7 @@ export default function Orders() {
         async function fetchData() {
             try {
                 const response = await getAllOrders();
-                setOrders(response.data);
+                setOrders(response);
             } catch (error) {
                 console.error("Error fetching orders:", error);
             }
@@ -28,12 +28,6 @@ export default function Orders() {
     const handleCreateOrder = () => {
         navigate("/new-order");
     };
-
-    if(!orders) {
-        return (<>
-            loading
-        </>)
-    }
 
     const filteredOrders = orders.filter((order) => {
         if (filter === "en-curso") {

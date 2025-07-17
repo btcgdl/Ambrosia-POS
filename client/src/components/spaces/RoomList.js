@@ -14,7 +14,7 @@ export default function RoomList({ rooms, onSelect, onEdit, onDelete, selectedRo
                             }`}
                             onClick={() => onSelect(room.id)}
                         >
-                            <span className="font-medium">{room.nombre}</span>
+                            <span className="font-medium">{room.name}</span>
                             <div className="flex gap-2">
                                 <button
                                     className="px-2 py-1 bg-blue-500 text-white rounded text-sm"

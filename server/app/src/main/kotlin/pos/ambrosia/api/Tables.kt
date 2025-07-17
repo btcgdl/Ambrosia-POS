@@ -31,6 +31,19 @@ fun Route.tables(tableService: TableService) {
         }
         call.respond(HttpStatusCode.OK, tables)
     }
+    get("/by-space/{id}") {
+        val id = call.parameters["id"]
+        if (id != null) {
+            val tables = tableService.getTablesBySpace(spaceId = id)
+            if (tables.isNotEmpty()) {
+                call.respond(HttpStatusCode.OK, tables)
+            } else {
+                call.respond(HttpStatusCode.NoContent, "No tables found for space ID: $id")
+            }
+        } else {
+            call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+        }
+    }
     get("/{id}") {
         val id = call.parameters["id"]
         if (id != null) {

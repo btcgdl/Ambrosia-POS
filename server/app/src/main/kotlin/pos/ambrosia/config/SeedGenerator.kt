@@ -4,6 +4,11 @@ import java.io.File
 import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import kotlinx.coroutines.runBlocking
 
 /**
  * Service for generating secure seeds/passphrases similar to the install.sh script.
@@ -11,21 +16,42 @@ import java.util.*
  */
 object SeedGenerator {
     val NUM_WORDS: Int = 12
+    private const val FALLBACK_WORDLIST_URL = "https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/main/scripts/eff_large_wordlist.txt"
+    
     /**
-     * Loads the EFF large wordlist from the local file
+     * Downloads the wordlist from the fallback URL
+     */
+    private suspend fun downloadWordlist(): List<String> {
+        val client = HttpClient(CIO)
+        return try {
+            val response: HttpResponse = client.get(FALLBACK_WORDLIST_URL)
+            val content = response.bodyAsText()
+            client.close()
+            content.lines().filter { it.isNotBlank() }
+        } catch (e: Exception) {
+            client.close()
+            throw IllegalStateException("Failed to download wordlist from fallback URL: ${e.message}", e)
+        }
+    }
+    
+    /**
+     * Loads the EFF large wordlist from the local file, with fallback to GitHub
      */
     private fun loadWordlist(): List<String> {
         // Try to find the wordlist file in the project scripts directory
         val projectRoot = File(System.getProperty("user.dir")).parentFile.parentFile
         val wordlistFile = File(projectRoot, "scripts/eff_large_wordlist.txt")
         
-        if (!wordlistFile.exists()) {
-            
-            throw IllegalStateException("Wordlist file not found. Expected at: ${wordlistFile.absolutePath}")
+        return if (wordlistFile.exists()) {
+            // Load from local file
+            wordlistFile.readText().lines()
+                .filter { it.isNotBlank() }
+        } else {
+            // Fallback to downloading from GitHub
+            runBlocking {
+                downloadWordlist()
+            }
         }
-        
-        return wordlistFile.readText().lines()
-            .filter { it.isNotBlank() }
     }
 
     /**
@@ -58,7 +84,7 @@ object SeedGenerator {
         return seedWords.joinToString(" ")
     }
 
-        /**
+    /**
      * Generates a secure random seed and returns its SHA-256 hash as a hex string.
      */
     fun generateSecureSeed(seedInput: String): String {

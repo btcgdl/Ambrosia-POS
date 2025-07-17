@@ -48,6 +48,26 @@ tasks.named<JavaExec>("run") {
     jvmArgs("-Dlogback.configurationFile=Ambrosia-Logs.xml")
 }
 
+// Configure the JAR task to create a fat JAR with all dependencies included.
+tasks.named<Jar>("jar") {
+    manifest {
+        attributes["Main-Class"] = "pos.ambrosia.AmbrosiaKt"
+    }
+    
+    // Incluir todas las dependencias (fat jar)
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    
+    // Asegurar que los archivos de recursos estén incluidos
+    from("src/main/resources") {
+        include("**/*")
+    }
+    
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // Cambiar el nombre del archivo resultante
+    archiveFileName.set("ambrosia.jar")
+}
+
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {

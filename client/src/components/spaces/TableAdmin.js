@@ -14,7 +14,7 @@ export default function TableAdmin({ room }) {
             try {
                 setIsLoading(true);
                 const response = await getTables();
-                setTables(response);
+                setTables(Array.isArray(response) ? response : []);
             } catch (err) {
                 setError("Error al cargar las mesas");
             } finally {
@@ -24,7 +24,9 @@ export default function TableAdmin({ room }) {
         fetchTables();
     }, []);
 
-    const roomTables = tables.filter((t) => room.mesasIds.includes(t.id));
+    const roomTables = Array.isArray(tables)
+        ? tables.filter((t) => room.mesasIds.includes(t.id))
+        : [];
 
     const handleAddOrUpdate = async (mesa) => {
         try {
@@ -40,7 +42,7 @@ export default function TableAdmin({ room }) {
                 });
             }
             const response = await getTables();
-            setTables(response);
+            setTables(Array.isArray(response) ? response : []);
             setEditingTable(null);
         } catch (err) {
             setError(err.message || "Error al guardar la mesa");
@@ -56,7 +58,7 @@ export default function TableAdmin({ room }) {
                 mesasIds: room.mesasIds.filter((mId) => mId !== id),
             });
             const response = await getTables();
-            setTables(response);
+            setTables(Array.isArray(response) ? response : []);
             if (editingTable?.id === id) setEditingTable(null);
         } catch (err) {
             setError(err.message || "Error al eliminar la mesa");
@@ -75,11 +77,17 @@ export default function TableAdmin({ room }) {
         <div className="flex gap-6">
             {error && <p className="text-red-600 text-xl absolute top-4">{error}</p>}
             <div className="w-1/2">
-                <TableList
-                    tables={roomTables}
-                    onEdit={setEditingTable}
-                    onDelete={handleDelete}
-                />
+                {roomTables.length > 0 ? (
+                    <TableList
+                        tables={roomTables}
+                        onEdit={setEditingTable}
+                        onDelete={handleDelete}
+                    />
+                ) : (
+                    <div className="text-gray-500 text-lg p-4">
+                        Agrega tu primera mesa desde el formulario de la derecha
+                    </div>
+                )}
             </div>
             <div className="w-1/2">
                 <TableForm
