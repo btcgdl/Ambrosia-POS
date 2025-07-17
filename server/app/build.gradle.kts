@@ -63,6 +63,9 @@ tasks.named<Jar>("jar") {
     }
     
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // Cambiar el nombre del archivo resultante
+    archiveFileName.set("ambrosia.jar")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

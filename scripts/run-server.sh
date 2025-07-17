@@ -27,7 +27,7 @@ if [ -f "$LOGBACK_CONFIG" ]; then
     echo "Using external logback configuration: $LOGBACK_CONFIG"
     JVM_OPTS="-Dlogback.configurationFile=file:$LOGBACK_CONFIG"
 else
-    echo "Using embedded logback configuration (logback.xml from JAR)"
+    echo "Using embedded logback configuration"
 fi
 
 java $JVM_OPTS -jar "$JAR_PATH" "$@"
