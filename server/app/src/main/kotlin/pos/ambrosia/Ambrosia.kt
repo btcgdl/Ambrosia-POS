@@ -17,7 +17,8 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
-import pos.ambrosia.utils.InjectDB
+import pos.ambrosia.config.InjectDB
+import pos.ambrosia.config.InjectLogs
 import pos.ambrosia.config.ListValueSource
 import pos.ambrosia.config.SeedGenerator
 import org.slf4j.LoggerFactory
@@ -33,7 +34,8 @@ class Ambrosia: CliktCommand() {
     init {
 
         SystemFileSystem.createDirectories(datadir)
-        InjectDB(datadir.toString()).ensureDatabase()
+        InjectDB.ensureDatabase(datadir.toString())
+        InjectLogs.ensureLogConfig(datadir.toString())
 
         context {
             valueSource = ListValueSource.fromFile(confFile)
