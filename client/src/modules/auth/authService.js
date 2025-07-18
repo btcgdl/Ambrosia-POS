@@ -37,7 +37,8 @@ export async function logoutFromService() {
 
 export async function getRoles() {
     try {
-        return await apiClient('/roles');
+        const roles = await apiClient('/roles');
+        return roles ? roles : [];
     } catch (error) {
         return { data: mockService.getRoles() };
     }
@@ -57,7 +58,7 @@ export async function addRole(role) {
 export async function updateRole(role) {
     try {
         return await apiClient(`/roles/${role.id}`, {
-            method: 'PATCH',
+            method: 'PUT',
             body: role,
         });
     } catch (error) {
@@ -83,7 +84,8 @@ export async function deleteRole(roleId) {
 
 export async function getUsers() {
     try {
-        return await apiClient('/users');
+        const users = await apiClient('/users');
+        return users ? users : [];
     } catch (error) {
         return { data: mockService.getUsers() };
     }
@@ -107,7 +109,7 @@ export async function addUser(user) {
 export async function updateUser(user) {
     try {
         return await apiClient(`/users/${user.id}`, {
-            method: 'PATCH',
+            method: 'PUT',
             body: { ...user, pin: parseInt(user.pin, 10) },
         });
     } catch (error) {
@@ -132,6 +134,19 @@ export async function deleteUser(userId) {
         const userExists = users.find((u) => u.id === userId);
         if (!userExists) throw new Error('Usuario no encontrado');
         return mockService.deleteUser(userId);
+    }
+}
+
+export async function logInWithPIN(pin){
+    try{
+        return await apiClient('/login-with-pin', {
+            method: 'POST',
+            body: {
+                pin: pin,
+            }
+        })
+    } catch (error) {
+        throw new Error(error);
     }
 }
 

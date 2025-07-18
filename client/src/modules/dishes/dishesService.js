@@ -83,15 +83,15 @@ export async function deleteCategory(category) {
     }
 }
 
-export async function updateCategory(oldName, newName) {
+export async function updateCategory(id, name) {
     try {
-        return await apiClient(`/categories/${oldName}`, {
+        return await apiClient(`/categories/${id}`, {
             method: 'PATCH',
-            body: { newName },
+            body: { newName: name },
         });
     } catch (error) {
         const categories = mockService.getCategories();
-        if (!categories.includes(oldName)) throw new Error('Categoría no encontrada');
-        return mockService.updateCategory(oldName, newName);
+        if (!categories.includes(id)) throw new Error('Categoría no encontrada');
+        return mockService.updateCategory(id, name);
     }
 }

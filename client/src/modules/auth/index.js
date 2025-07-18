@@ -3,12 +3,14 @@ import Roles from './Roles';
 import Users from './Users';
 import * as authService from './authService';
 import { addModule } from '../../core/moduleRegistry';
+import PinLogin from "./PinLogin";
 
 addModule('auth', {
     routes: [
-        { path: '/', component: LoginPage },
+        { path: '/', component: PinLogin },
         { path: '/roles', component: Roles },
         { path: '/users', component: Users },
+        { path: '/login', component: LoginPage },
     ],
     services: authService,
     navItems: [

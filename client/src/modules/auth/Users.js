@@ -1,29 +1,42 @@
 import { useState, useEffect } from "react";
 import NavBar from "../../components/navbar/NavBar";
 import Header from "../../components/header/Header";
-import { getUsers, addUser, updateUser, deleteUser } from "./authService";
+import {getUsers, addUser, updateUser, deleteUser, getRoles} from "./authService";
 
 export default function Users() {
     const [users, setUsers] = useState([]);
     const [editing, setEditing] = useState(null);
-    const [form, setForm] = useState({ nombre: "", pin: "" });
+    const [form, setForm] = useState({ name: "", pin: "", role: "" });
     const [showPin, setShowPin] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
+    const [roles, setRoles] = useState([]) ;
 
     useEffect(() => {
         async function fetchUsers() {
             try {
                 setIsLoading(true);
                 const response = await getUsers();
-                setUsers(response.data);
+                setUsers(response);
             } catch (err) {
                 setError("Error al cargar los usuarios");
+                setIsLoading(false);
+            }
+        }
+
+        async function fetchRoles(){
+            try {
+                setIsLoading(true);
+                const response = await getRoles();
+                setRoles(response);
+                console.log(response);
+            } catch (err) {
+                setError("Error al cargar los roles");
             } finally {
                 setIsLoading(false);
             }
         }
-        fetchUsers();
+        fetchUsers().then(r => fetchRoles());
     }, []);
 
     const handleChange = (e) => {
@@ -47,8 +60,8 @@ export default function Users() {
                 await addUser(userData);
             }
             const response = await getUsers();
-            setUsers(response.data);
-            setForm({ nombre: "", pin: "" });
+            setUsers(response);
+            setForm({ name: "", pin: "", role:"" });
             setEditing(null);
             setShowPin(false);
         } catch (err) {
@@ -59,7 +72,7 @@ export default function Users() {
     };
 
     const startEdit = (user) => {
-        setForm({ nombre: user.nombre, pin: user.pin.toString() });
+        setForm({ name: user.name, pin: user.pin.toString(), role: user.role });
         setEditing(user.id);
         setShowPin(false);
     };
@@ -70,7 +83,7 @@ export default function Users() {
         try {
             await deleteUser(userId);
             const response = await getUsers();
-            setUsers(response.data);
+            setUsers(response);
         } catch (err) {
             setError(err.message || "Error al eliminar el usuario");
         } finally {
@@ -127,14 +140,29 @@ export default function Users() {
 
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-xl">
                             <input
-                                name="nombre"
-                                value={form.nombre}
+                                name="name"
+                                value={form.name}
                                 onChange={handleChange}
                                 placeholder="Nombre"
                                 className="text-2xl p-3 rounded-lg"
                                 required
                                 disabled={isLoading}
                             />
+                            <select
+                                name="role"
+                                value={form.role}
+                                onChange={handleChange}
+                                className="text-2xl p-3 rounded-lg"
+                                required
+                                disabled={isLoading || roles.length === 0}
+                            >
+                                <option value="">Selecciona un rol</option>
+                                {roles.map((r) => (
+                                    <option key={r.id} value={r.id}>
+                                        {r.role}
+                                    </option>
+                                ))}
+                            </select>
                             <div className="relative">
                                 <input
                                     name="pin"
@@ -173,7 +201,7 @@ export default function Users() {
                                     className="bg-white p-4 rounded-xl flex justify-between items-center text-2xl shadow-md"
                                 >
                                     <div>
-                                        <strong>{user.nombre}</strong> – PIN: ****
+                                        <strong>{user.name}</strong> – PIN: ****
                                     </div>
                                     <div className="flex gap-4">
                                         <button

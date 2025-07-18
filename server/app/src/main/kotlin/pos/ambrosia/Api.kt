@@ -101,5 +101,6 @@ class Api( ) {
 	configureTickets()
 	configureShifts()
 	configureWallet()
+	configureDishCategories()
 	}
 }

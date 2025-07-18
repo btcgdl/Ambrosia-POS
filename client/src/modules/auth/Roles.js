@@ -16,7 +16,7 @@ export default function Roles() {
             try {
                 setIsLoading(true);
                 const response = await getRoles();
-                setRoles(response.data);
+                setRoles(response);
             } catch (err) {
                 setError("Error al cargar los roles");
             } finally {
@@ -42,7 +42,7 @@ export default function Roles() {
                 await addRole(form);
             }
             const response = await getRoles();
-            setRoles(response.data);
+            setRoles(response);
             setForm({ role: "", password: "" });
             setEditing(null);
             setShowPassword(false);
@@ -65,7 +65,7 @@ export default function Roles() {
         try {
             await deleteRole(roleId);
             const response = await getRoles();
-            setRoles(response.data);
+            setRoles(response);
         } catch (err) {
             setError(err.message || "Error al eliminar el rol");
         } finally {

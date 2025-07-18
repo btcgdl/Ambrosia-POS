@@ -46,8 +46,9 @@ fun Route.orders(orderService: OrderService) {
     }
     post("") {
         val order = call.receive<Order>()
-        orderService.addOrder(order)
-        call.respond(HttpStatusCode.Created, "Order added successfully")
+        val generatedOrder = orderService.addOrder(order)
+        logger.info(generatedOrder)
+        call.respond(HttpStatusCode.Created, mapOf("orderId" to generatedOrder))
     }
     put("/{id}") {
         val id = call.parameters["id"]

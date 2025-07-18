@@ -3,17 +3,44 @@ import {mockService} from "../../useMockSocket";
 
 export async function getTurnOpen() {
     try {
-        return await apiClient('/get-turn-open', {credentials : "same-origin"});
+        const shifts = await apiClient('/shifts');
+        if (!shifts) return;
+        const openShift = shifts.find(shift => shift.end_time === null);
+        return openShift ? openShift.id : null;
     } catch (error) {
         return { data: mockService.getTurnOpen() };
     }
 }
 
-export async function setTurnOpen(open){
+export async function openTurn(){
     try {
-        return await apiClient('/set-turn-open');
+        return await apiClient('/shifts', {
+            method: 'POST',
+            body: {
+                user_id: localStorage.getItem('userId'),
+                shift_date: Date.now(),
+                start_time: Date.now(),
+                notes: ""
+            }
+        });
     } catch (error) {
-        return { data: mockService.setTurnOpen(open) };
+        console.error(error);
+        console.error(error.message);
+        throw error;
+    }
+}
+
+export async function closeTurn(openTurn){
+    try {
+        const currentShift = await apiClient(`/shifts/${openTurn}`);
+        if (!currentShift) throw new Error("Turn not found");
+        currentShift.end_time = Date.now();
+        return await apiClient(`/shifts/${openTurn}`, {
+            method: 'PUT',
+            body: currentShift
+        })
+    } catch (error) {
+        throw error;
     }
 }
 
