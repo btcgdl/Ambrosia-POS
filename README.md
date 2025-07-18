@@ -36,15 +36,15 @@ Este proyecto requiere **phoenixd** para el procesamiento de pagos mediante Ligh
 
 #### Instalación automática (Recomendada)
 
-**Opción 1: Script del proyecto**
+**Opción 1: Instalación directa**
+```bash
+curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/phoenixd.sh | bash -s -- --yes
+```
+
+**Opción 2: Script del proyecto**
 ```bash
 chmod +x phoenixd.sh
 ./phoenixd.sh
-```
-
-**Opción 2: Instalación directa**
-```bash
-curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/phoenixd.sh | bash -s -- --yes
 ```
 
 El script descarga phoenixd v0.6.0, verifica la integridad del paquete usando GPG y checksums, instala en `/usr/local/bin`, y opcionalmente configura un servicio systemd para inicio automático.
@@ -100,5 +100,5 @@ Para ejecutar el servidor en modo de desarrollo:
 Para construir el proyecto del servidor:
 
 ```sh
-./gradlew build
+./gradlew jar
 ```
