@@ -38,7 +38,7 @@ Este proyecto requiere **phoenixd** para el procesamiento de pagos mediante Ligh
 
 **Opción 1: Instalación directa**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/phoenixd.sh | bash -s -- --yes
+curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/phoenixd.sh | bash -s -- --yes
 ```
 
 **Opción 2: Script del proyecto**
