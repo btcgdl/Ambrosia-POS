@@ -41,6 +41,8 @@ data class Dish(
         val category_id: String
 )
 
+@Serializable data class DishCategory(val id: String? = null, val name: String)
+
 @Serializable
 data class Ingredient(
         val id: String? = null,
@@ -51,6 +53,8 @@ data class Ingredient(
         val low_stock_threshold: Double,
         val cost_per_unit: Double
 )
+
+@Serializable data class IngredientCategory(val id: String? = null, val name: String)
 
 @Serializable
 data class Supplier(
