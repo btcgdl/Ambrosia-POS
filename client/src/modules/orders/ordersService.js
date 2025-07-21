@@ -109,22 +109,6 @@ export async function getOrderById(orderId) {
     }
 }
 
-export async function getDishes() {
-    try {
-        return await apiClient('/dishes');
-    } catch (error) {
-        return { data: mockService.getDishes() };
-    }
-}
-
-export async function getCategories() {
-    try {
-        return await apiClient('/dishes/categories');
-    } catch (error) {
-        return { data: mockService.getCategories() };
-    }
-}
-
 export async function createOrder() {
     try{
         //localStorage.setItem('userId', "");

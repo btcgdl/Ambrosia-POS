@@ -24,7 +24,7 @@ export async function addDish(dish) {
 export async function updateDish(dish) {
     try {
         return await apiClient(`/dishes/${dish.id}`, {
-            method: 'PATCH',
+            method: 'PUT',
             body: dish,
         });
     } catch (error) {
@@ -50,7 +50,7 @@ export async function deleteDish(dishId) {
 
 export async function getCategories() {
     try {
-        const categories = await apiClient('/categories');
+        const categories = await apiClient('/dish-categories');
         return  categories ? categories : [];
     } catch (error) {
         return { data: mockService.getCategories() };
@@ -59,9 +59,9 @@ export async function getCategories() {
 
 export async function addCategory(category) {
     try {
-        return await apiClient('/categories', {
+        return await apiClient('/dish-categories', {
             method: 'POST',
-            body: { category },
+            body: { name: category },
         });
     } catch (error) {
         if (mockService.getCategories().includes(category)) {
@@ -73,7 +73,7 @@ export async function addCategory(category) {
 
 export async function deleteCategory(category) {
     try {
-        return await apiClient(`/categories/${category}`, {
+        return await apiClient(`/dish-categories/${category}`, {
             method: 'DELETE',
         });
     } catch (error) {
@@ -85,9 +85,9 @@ export async function deleteCategory(category) {
 
 export async function updateCategory(id, name) {
     try {
-        return await apiClient(`/categories/${id}`, {
-            method: 'PATCH',
-            body: { newName: name },
+        return await apiClient(`/dish-categories/${id}`, {
+            method: 'PUT',
+            body: { name: name },
         });
     } catch (error) {
         const categories = mockService.getCategories();

@@ -51,13 +51,13 @@ export default function PinLogin() {
         setIsLoading(true);
         setError("");
         try {
-            /*const response = await loginFromService({name:selectedUser, pin});
+            const response = await loginFromService({name:selectedUser, pin});
             const accessToken = getCookieValue('accessToken');
             const tokenData = await jwtDecode(accessToken);
-            console.log(tokenData);*/
-            updateUserRole(/*tokenData.role*/"admin");
-            /*localStorage.setItem('userId', tokenData.userId);
-            login();*/
+            console.log(tokenData);
+            updateUserRole(tokenData.role);
+            localStorage.setItem('userId', tokenData.userId);
+            login();
             navigate(getHomeRoute());
         } catch (error) {
             setError(error.message || "Error al ingresar");

@@ -38,9 +38,9 @@ export default function Orders() {
 
     const filteredOrders = orders.filter((order) => {
         if (filter === "en-curso") {
-            return order.estado === "abierto" || order.estado === "cerrado";
+            return order.status === "open" || order.status === "close";
         }
-        return order.estado === "pagado";
+        return order.status === "paid";
     });
 
     return (
