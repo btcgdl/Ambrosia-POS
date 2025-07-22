@@ -18,6 +18,7 @@ CREATE TABLE roles (
     id BLOB PRIMARY KEY,
     role TEXT NOT NULL UNIQUE,
     password TEXT,
+    isAdmin BOOLEAN NOT NULL DEFAULT 0,
     is_deleted BOOLEAN NOT NULL DEFAULT 0
 );
 
