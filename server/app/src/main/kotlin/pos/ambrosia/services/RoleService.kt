@@ -7,11 +7,11 @@ import pos.ambrosia.utils.SecurePinProcessor
 
 class RolesService(private val connection: Connection) {
     companion object {
-        private const val ADD_ROLE = "INSERT INTO roles (id, role, password) VALUES (?, ?, ?)"
-        private const val GET_ROLES = "SELECT id, role, password FROM roles WHERE is_deleted = 0"
+        private const val ADD_ROLE = "INSERT INTO roles (id, role, password, isAdmin) VALUES (?, ?, ?, ?)"
+        private const val GET_ROLES = "SELECT id, role, password, isAdmin FROM roles WHERE is_deleted = 0"
         private const val GET_ROLE_BY_ID =
-                "SELECT id, role, password FROM roles WHERE id = ? AND is_deleted = 0"
-        private const val UPDATE_ROLE = "UPDATE roles SET role = ?, password = ? WHERE id = ?"
+                "SELECT id, role, password, isAdmin FROM roles WHERE id = ? AND is_deleted = 0"
+        private const val UPDATE_ROLE = "UPDATE roles SET role = ?, password = ?, isAdmin = ? WHERE id = ?"
         private const val DELETE_ROLE = "UPDATE roles SET is_deleted = 1 WHERE id = ?"
         private const val CHECK_ROLE_NAME_EXISTS =
                 "SELECT id FROM roles WHERE role = ? AND is_deleted = 0"
@@ -35,6 +35,7 @@ class RolesService(private val connection: Connection) {
         statement.setString(1, generatedId)
         statement.setString(2, role.role)
         statement.setString(3, SecurePinProcessor.byteArrayToBase64(encryptedPin))
+        statement.setBoolean(4, role.isAdmin ?: false)
 
         val rowsAffected = statement.executeUpdate()
 
@@ -63,7 +64,8 @@ class RolesService(private val connection: Connection) {
                     Role(
                             id = resultSet.getString("id"),
                             role = resultSet.getString("role"),
-                            password = resultSet.getString("password") // Puede ser null
+                            password = resultSet.getString("password"),
+                            isAdmin = resultSet.getBoolean("isAdmin")
                     )
             roles.add(role)
         }
@@ -79,7 +81,8 @@ class RolesService(private val connection: Connection) {
             Role(
                     id = resultSet.getString("id"),
                     role = resultSet.getString("role"),
-                    password = resultSet.getString("password")
+                    password = resultSet.getString("password"),
+                    isAdmin = resultSet.getBoolean("isAdmin")
             )
         } else {
             logger.warn("Role not found with ID: $id")
@@ -97,7 +100,8 @@ class RolesService(private val connection: Connection) {
         val statement = connection.prepareStatement(UPDATE_ROLE)
         statement.setString(1, role.role)
         statement.setString(2, role.password)
-        statement.setString(3, role.id)
+        statement.setBoolean(3, role.isAdmin ?: false)
+        statement.setString(4, role.id)
 
         val rowsUpdated = statement.executeUpdate()
         if (rowsUpdated > 0) {

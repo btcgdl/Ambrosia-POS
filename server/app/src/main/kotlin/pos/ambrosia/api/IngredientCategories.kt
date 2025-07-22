@@ -7,21 +7,21 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
 import pos.ambrosia.db.connectToSqlite
-import pos.ambrosia.models.DishCategory
-import pos.ambrosia.services.DishCategoryService
+import pos.ambrosia.models.IngredientCategory
+import pos.ambrosia.services.IngredientCategoryService
 import pos.ambrosia.utils.UserNotFoundException
 
-fun Application.configureDishCategories() {
+fun Application.configureIngredientCategories() {
     val connection: Connection = connectToSqlite()
-    val dishCategoryService = DishCategoryService(connection)
-    routing { route("/dish-categories") { dishCategories(dishCategoryService) } }
+    val ingredientCategoryService = IngredientCategoryService(connection)
+    routing { route("/ingredient-categories") { ingredientCategories(ingredientCategoryService) } }
 }
 
-fun Route.dishCategories(dishCategoryService: DishCategoryService) {
+fun Route.ingredientCategories(ingredientCategoryService: IngredientCategoryService) {
     get("") {
-        val categories = dishCategoryService.getDishCategories()
+        val categories = ingredientCategoryService.getIngredientCategories()
         if (categories.isEmpty()) {
-            call.respond(HttpStatusCode.NoContent, "No dish categories found")
+            call.respond(HttpStatusCode.NoContent, "No ingredient categories found")
             return@get
         }
         call.respond(HttpStatusCode.OK, categories)
@@ -30,7 +30,7 @@ fun Route.dishCategories(dishCategoryService: DishCategoryService) {
     get("/{id}") {
         val id = call.parameters["id"]
         if (id != null) {
-            val category = dishCategoryService.getDishCategoryById(id)
+            val category = ingredientCategoryService.getIngredientCategoryById(id)
             if (category != null) {
                 call.respond(HttpStatusCode.OK, category)
             } else {
@@ -42,29 +42,32 @@ fun Route.dishCategories(dishCategoryService: DishCategoryService) {
     }
 
     post("") {
-        val category = call.receive<DishCategory>()
-        val createdId = dishCategoryService.addDishCategory(category)
+        val category = call.receive<IngredientCategory>()
+        val createdId = ingredientCategoryService.addIngredientCategory(category)
         if (createdId != null) {
             call.respond(
                     HttpStatusCode.Created,
-                    mapOf("id" to createdId, "message" to "Dish category added successfully")
+                    mapOf("id" to createdId, "message" to "Ingredient category added successfully")
             )
         } else {
-            call.respond(HttpStatusCode.BadRequest, "Failed to create dish category")
+            call.respond(HttpStatusCode.BadRequest, "Failed to create ingredient category")
         }
     }
 
     put("/{id}") {
         val id = call.parameters["id"]
         if (id != null) {
-            val updatedCategory = call.receive<DishCategory>()
+            val updatedCategory = call.receive<IngredientCategory>()
             val categoryWithId = updatedCategory.copy(id = id)
-            val isUpdated = dishCategoryService.updateDishCategory(categoryWithId)
+            val isUpdated = ingredientCategoryService.updateIngredientCategory(categoryWithId)
 
             if (isUpdated) {
-                call.respond(HttpStatusCode.OK, "Dish category updated successfully")
+                call.respond(HttpStatusCode.OK, "Ingredient category updated successfully")
             } else {
-                call.respond(HttpStatusCode.NotFound, "Dish category not found or update failed")
+                call.respond(
+                        HttpStatusCode.NotFound,
+                        "Ingredient category not found or update failed"
+                )
             }
         } else {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
@@ -74,13 +77,13 @@ fun Route.dishCategories(dishCategoryService: DishCategoryService) {
     delete("/{id}") {
         val id = call.parameters["id"]
         if (id != null) {
-            val isDeleted = dishCategoryService.deleteDishCategory(id)
+            val isDeleted = ingredientCategoryService.deleteIngredientCategory(id)
             if (isDeleted) {
-                call.respond(HttpStatusCode.NoContent, "Dish category deleted successfully")
+                call.respond(HttpStatusCode.NoContent, "Ingredient category deleted successfully")
             } else {
                 call.respond(
                         HttpStatusCode.BadRequest,
-                        "Cannot delete dish category - it may be in use or not found"
+                        "Cannot delete ingredient category - it may be in use or not found"
                 )
             }
         } else {

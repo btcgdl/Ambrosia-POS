@@ -3,6 +3,7 @@ package pos.ambrosia.services
 import java.sql.Connection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Order
+import pos.ambrosia.models.OrderDish
 
 class OrderService(private val connection: Connection) {
         companion object {
@@ -32,6 +33,7 @@ class OrderService(private val connection: Connection) {
         }
 
         private val validStatuses = setOf("open", "closed", "paid")
+        private val orderDishService = OrderDishService(connection)
 
         private fun userExists(userId: String): Boolean {
                 val statement = connection.prepareStatement(CHECK_USER_EXISTS)
@@ -252,5 +254,47 @@ class OrderService(private val connection: Connection) {
 
                 logger.info("Total sales for $date: $total")
                 return total
+        }
+
+        // New methods for handling order dishes
+        suspend fun addDishesToOrder(orderId: String, dishes: List<OrderDish>): Boolean {
+            var allAdded = true
+            for (dish in dishes) {
+                val dishWithOrderId = dish.copy(order_id = orderId)
+                val result = orderDishService.addOrderDish(dishWithOrderId)
+                if (result == null) {
+                    allAdded = false
+                    logger.error("Failed to add dish ${dish.dish_id} to order $orderId")
+                }
+            }
+            return allAdded
+        }
+
+        suspend fun getOrderDishes(orderId: String): List<OrderDish> {
+            return orderDishService.getOrderDishesByOrderId(orderId)
+        }
+
+        suspend fun updateOrderDish(orderDish: OrderDish): Boolean {
+            return orderDishService.updateOrderDish(orderDish)
+        }
+
+        suspend fun removeOrderDish(orderDishId: String): Boolean {
+            return orderDishService.deleteOrderDish(orderDishId)
+        }
+
+        suspend fun removeAllOrderDishes(orderId: String): Boolean {
+            return orderDishService.deleteOrderDishesByOrderId(orderId)
+        }
+
+        suspend fun calculateOrderTotal(orderId: String): Double {
+            val dishes = orderDishService.getOrderDishesByOrderId(orderId)
+            return dishes.sumOf { it.price_at_order * it.quantity }
+        }
+
+        suspend fun updateOrderTotal(orderId: String): Boolean {
+            val newTotal = calculateOrderTotal(orderId)
+            val order = getOrderById(orderId) ?: return false
+            val updatedOrder = order.copy(total = newTotal)
+            return updateOrder(updatedOrder)
         }
 }

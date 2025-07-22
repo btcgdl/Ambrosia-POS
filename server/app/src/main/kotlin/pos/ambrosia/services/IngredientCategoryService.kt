@@ -2,21 +2,23 @@ package pos.ambrosia.services
 
 import java.sql.Connection
 import pos.ambrosia.logger
-import pos.ambrosia.models.DishCategory
+import pos.ambrosia.models.IngredientCategory
 
-class DishCategoryService(private val connection: Connection) {
+class IngredientCategoryService(private val connection: Connection) {
     companion object {
-        private const val ADD_CATEGORY = "INSERT INTO dish_categories (id, name) VALUES (?, ?)"
+        private const val ADD_CATEGORY =
+                "INSERT INTO ingredient_categories (id, name) VALUES (?, ?)"
         private const val GET_CATEGORIES =
-                "SELECT id, name FROM dish_categories WHERE is_deleted = 0"
+                "SELECT id, name FROM ingredient_categories WHERE is_deleted = 0"
         private const val GET_CATEGORY_BY_ID =
-                "SELECT id, name FROM dish_categories WHERE id = ? AND is_deleted = 0"
-        private const val UPDATE_CATEGORY = "UPDATE dish_categories SET name = ? WHERE id = ?"
-        private const val DELETE_CATEGORY = "UPDATE dish_categories SET is_deleted = 1 WHERE id = ?"
+                "SELECT id, name FROM ingredient_categories WHERE id = ? AND is_deleted = 0"
+        private const val UPDATE_CATEGORY = "UPDATE ingredient_categories SET name = ? WHERE id = ?"
+        private const val DELETE_CATEGORY =
+                "UPDATE ingredient_categories SET is_deleted = 1 WHERE id = ?"
         private const val CHECK_CATEGORY_IN_USE =
-                "SELECT COUNT(*) as count FROM dishes WHERE category_id = ? AND is_deleted = 0"
+                "SELECT COUNT(*) as count FROM ingredients WHERE category_id = ? AND is_deleted = 0"
         private const val CHECK_NAME_EXISTS =
-                "SELECT id FROM dish_categories WHERE name = ? AND is_deleted = 0 AND id != ?"
+                "SELECT id FROM ingredient_categories WHERE name = ? AND is_deleted = 0 AND id != ?"
     }
 
     private fun categoryInUse(categoryId: String): Boolean {
@@ -37,11 +39,16 @@ class DishCategoryService(private val connection: Connection) {
         return resultSet.next()
     }
 
-    private fun mapResultSetToDishCategory(resultSet: java.sql.ResultSet): DishCategory {
-        return DishCategory(id = resultSet.getString("id"), name = resultSet.getString("name"))
+    private fun mapResultSetToIngredientCategory(
+            resultSet: java.sql.ResultSet
+    ): IngredientCategory {
+        return IngredientCategory(
+                id = resultSet.getString("id"),
+                name = resultSet.getString("name")
+        )
     }
 
-    suspend fun addDishCategory(category: DishCategory): String? {
+    suspend fun addIngredientCategory(category: IngredientCategory): String? {
         // Validar datos
         if (category.name.isBlank()) {
             logger.error("Category name cannot be blank")
@@ -63,40 +70,40 @@ class DishCategoryService(private val connection: Connection) {
         val rowsAffected = statement.executeUpdate()
 
         return if (rowsAffected > 0) {
-            logger.info("Dish category created successfully with ID: $generatedId")
+            logger.info("Ingredient category created successfully with ID: $generatedId")
             generatedId
         } else {
-            logger.error("Failed to create dish category")
+            logger.error("Failed to create ingredient category")
             null
         }
     }
 
-    suspend fun getDishCategories(): List<DishCategory> {
+    suspend fun getIngredientCategories(): List<IngredientCategory> {
         val statement = connection.prepareStatement(GET_CATEGORIES)
         val resultSet = statement.executeQuery()
-        val categories = mutableListOf<DishCategory>()
+        val categories = mutableListOf<IngredientCategory>()
         while (resultSet.next()) {
-            categories.add(mapResultSetToDishCategory(resultSet))
+            categories.add(mapResultSetToIngredientCategory(resultSet))
         }
-        logger.info("Retrieved ${categories.size} dish categories")
+        logger.info("Retrieved ${categories.size} ingredient categories")
         return categories
     }
 
-    suspend fun getDishCategoryById(id: String): DishCategory? {
+    suspend fun getIngredientCategoryById(id: String): IngredientCategory? {
         val statement = connection.prepareStatement(GET_CATEGORY_BY_ID)
         statement.setString(1, id)
         val resultSet = statement.executeQuery()
         return if (resultSet.next()) {
-            mapResultSetToDishCategory(resultSet)
+            mapResultSetToIngredientCategory(resultSet)
         } else {
-            logger.warn("Dish category not found with ID: $id")
+            logger.warn("Ingredient category not found with ID: $id")
             null
         }
     }
 
-    suspend fun updateDishCategory(category: DishCategory): Boolean {
+    suspend fun updateIngredientCategory(category: IngredientCategory): Boolean {
         if (category.id == null) {
-            logger.error("Cannot update dish category: ID is null")
+            logger.error("Cannot update ingredient category: ID is null")
             return false
         }
 
@@ -118,17 +125,17 @@ class DishCategoryService(private val connection: Connection) {
 
         val rowsUpdated = statement.executeUpdate()
         if (rowsUpdated > 0) {
-            logger.info("Dish category updated successfully: ${category.id}")
+            logger.info("Ingredient category updated successfully: ${category.id}")
         } else {
-            logger.error("Failed to update dish category: ${category.id}")
+            logger.error("Failed to update ingredient category: ${category.id}")
         }
         return rowsUpdated > 0
     }
 
-    suspend fun deleteDishCategory(id: String): Boolean {
-        // Verificar que la categoría no esté siendo usada en platos
+    suspend fun deleteIngredientCategory(id: String): Boolean {
+        // Verificar que la categoría no esté siendo usada en ingredientes
         if (categoryInUse(id)) {
-            logger.error("Cannot delete dish category $id: it's being used by dishes")
+            logger.error("Cannot delete ingredient category $id: it's being used by ingredients")
             return false
         }
 
@@ -137,9 +144,9 @@ class DishCategoryService(private val connection: Connection) {
         val rowsDeleted = statement.executeUpdate()
 
         if (rowsDeleted > 0) {
-            logger.info("Dish category soft-deleted successfully: $id")
+            logger.info("Ingredient category soft-deleted successfully: $id")
         } else {
-            logger.error("Failed to delete dish category: $id")
+            logger.error("Failed to delete ingredient category: $id")
         }
         return rowsDeleted > 0
     }
