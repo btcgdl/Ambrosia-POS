@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar/NavBar";
 import Header from "../../components/header/Header";
-import { getAllOrders } from "./ordersService";
+import {createOrder, getAllOrders, getUserById} from "./ordersService";
 
 export default function Orders() {
     const [orders, setOrders] = useState([]);
@@ -25,15 +25,22 @@ export default function Orders() {
         navigate(`/modify-order/${pedidoId}`);
     };
 
-    const handleCreateOrder = () => {
-        navigate("/new-order");
+    const handleCreateOrder = async () => {
+        try{
+            const createdOrderId = await createOrder();
+            navigate(`/modify-order/${createdOrderId.orderId}`);
+        } catch (error) {
+
+        } finally {
+
+        }
     };
 
     const filteredOrders = orders.filter((order) => {
         if (filter === "en-curso") {
-            return order.estado === "abierto" || order.estado === "cerrado";
+            return order.status === "open" || order.status === "close";
         }
-        return order.estado === "pagado";
+        return order.status === "paid";
     });
 
     return (

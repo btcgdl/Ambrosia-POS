@@ -1,8 +1,9 @@
 ﻿import { useState } from "react";
 import NavBar from "../../components/navbar/NavBar";
 import Header from "../../components/header/Header";
-import {setTurnOpen} from "./cashierService";
+import {closeTurn} from "./cashierService";
 import {useNavigate} from "react-router-dom";
+import {useTurn} from "./useTurn";
 
 export default function CloseTurn() {
     const [finalAmount, setFinalAmount] = useState("");
@@ -10,6 +11,7 @@ export default function CloseTurn() {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const [success, setSuccess] = useState(false);
+    const { openTurn, updateTurn } = useTurn();
 
     const handleAmountChange = (e) => {
         const value = e.target.value;
@@ -37,7 +39,8 @@ export default function CloseTurn() {
 
         setIsLoading(true);
         try {
-            await setTurnOpen(false);
+            await closeTurn(openTurn);
+            updateTurn(null);
             setSuccess(true);
             await new Promise(resolve => setTimeout(resolve, 3000));
             navigate("/");

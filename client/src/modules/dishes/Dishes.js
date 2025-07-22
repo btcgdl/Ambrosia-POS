@@ -19,8 +19,8 @@ export default function Dishes() {
                     getDishes(),
                     getCategories(),
                 ]);
-                setDishes(dishesResponse.data);
-                setCategories(categoriesResponse.data);
+                setDishes(dishesResponse);
+                setCategories(categoriesResponse);
             } catch (err) {
                 setError("Error al cargar los datos");
             } finally {
@@ -35,7 +35,7 @@ export default function Dishes() {
             setError("");
             await addCategory(category);
             const response = await getCategories();
-            setCategories(response.data);
+            setCategories(response);
         } catch (err) {
             setError(err.message || "Error al agregar la categoría");
         }
@@ -49,23 +49,23 @@ export default function Dishes() {
                 getDishes(),
                 getCategories(),
             ]);
-            setDishes(dishesResponse.data);
-            setCategories(categoriesResponse.data);
+            setDishes(dishesResponse);
+            setCategories(categoriesResponse);
         } catch (err) {
             setError(err.message || "Error al eliminar la categoría");
         }
     };
 
-    const handleUpdateCategory = async (oldName, newName) => {
+    const handleUpdateCategory = async (id, newName) => {
         try {
             setError("");
-            await updateCategory(oldName, newName);
+            await updateCategory(id, newName);
             const [dishesResponse, categoriesResponse] = await Promise.all([
                 getDishes(),
                 getCategories(),
             ]);
-            setDishes(dishesResponse.data);
-            setCategories(categoriesResponse.data);
+            setDishes(dishesResponse);
+            setCategories(categoriesResponse);
         } catch (err) {
             setError(err.message || "Error al actualizar la categoría");
         }
@@ -76,7 +76,7 @@ export default function Dishes() {
             setError("");
             await addDish(dish);
             const response = await getDishes();
-            setDishes(response.data);
+            setDishes(response);
         } catch (err) {
             setError(err.message || "Error al agregar el platillo");
         }
@@ -87,7 +87,7 @@ export default function Dishes() {
             setError("");
             await updateDish(dish);
             const response = await getDishes();
-            setDishes(response.data);
+            setDishes(response);
         } catch (err) {
             setError(err.message || "Error al actualizar el platillo");
         }
@@ -98,7 +98,7 @@ export default function Dishes() {
             setError("");
             await deleteDish(dishId);
             const response = await getDishes();
-            setDishes(response.data);
+            setDishes(response);
         } catch (err) {
             setError(err.message || "Error al eliminar el platillo");
         }
@@ -149,8 +149,6 @@ export default function Dishes() {
                             addCategory={handleAddCategory}
                             deleteCategory={handleDeleteCategory}
                             updateCategory={handleUpdateCategory}
-                            dishes={dishes}
-                            updateDish={handleUpdateDish}
                         />
                         <DishManager
                             dishes={dishes}

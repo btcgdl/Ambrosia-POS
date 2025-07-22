@@ -70,7 +70,7 @@ fun Route.orders(orderService: OrderService) {
         val order = call.receive<Order>()
         val orderId = orderService.addOrder(order)
         if (orderId != null) {
-            call.respond(HttpStatusCode.Created, mapOf("message" to "Order added successfully", "id" to orderId))
+            call.respond(HttpStatusCode.Created, mapOf("message" to "Order added successfully", "orderId" to orderId))
         } else {
             call.respond(HttpStatusCode.BadRequest, "Failed to create order")
         }

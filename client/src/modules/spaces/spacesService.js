@@ -27,7 +27,7 @@ export async function addRoom(room) {
 export async function updateRoom(room) {
     try {
         return await apiClient(`/spaces/${room.id}`, {
-            method: 'PATCH',
+            method: 'PUT',
             body: room,
         });
     } catch (error) {
@@ -53,9 +53,10 @@ export async function deleteRoom(roomId) {
 
 export async function getTablesByRoomId(roomId) {
     try{
-        return await apiClient(`/tables/by-space/${roomId}`);
+        const tables = await apiClient(`/tables/by-space/${roomId}`);
+        return tables ? tables : [];
     } catch (e) {
-        return [];
+        throw e;
     }
 }
 
@@ -81,7 +82,7 @@ export async function addTable(table) {
 export async function updateTable(table) {
     try {
         return await apiClient(`/tables/${table.id}`, {
-            method: 'PATCH',
+            method: 'PUT',
             body: table,
         });
     } catch (error) {

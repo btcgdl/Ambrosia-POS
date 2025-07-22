@@ -4,8 +4,6 @@ import NavBar from "../../components/navbar/NavBar";
 import Header from "../../components/header/Header";
 import {
     getOrderById,
-    getDishes,
-    getCategories,
     updateOrder,
     updateTable,
     getTables,
@@ -13,7 +11,7 @@ import {
     getUserById,
     updateTicket, getTicketByOrderId,
 } from "./ordersService";
-import { validatePin } from "../auth/authService";
+import {getCategories, getDishes} from "../dishes/dishesService";
 
 export default function EditOrder() {
     const { pedidoId } = useParams();
@@ -24,8 +22,6 @@ export default function EditOrder() {
     const [dishes, setDishes] = useState([]);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("");
-    const [pin, setPin] = useState("");
-    const [isAuthorized, setIsAuthorized] = useState(isNew);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [undoStack, setUndoStack] = useState([]);
@@ -44,17 +40,17 @@ export default function EditOrder() {
                     getDishes(),
                     getCategories(),
                 ]);
-                setOrder(orderResponse.data);
-                setDishes(dishesResponse.data);
-                setCategories(categoriesResponse.data);
-                setSelectedCategory(categoriesResponse.data[0] || "");
-                if (orderResponse.data.estado === 'cerrado'){
+                setOrder(orderResponse);
+                setDishes(dishesResponse);
+                setCategories(categoriesResponse);
+                setSelectedCategory(categoriesResponse[0] || "");
+                /*if (orderResponse.estado === 'cerrado'){
                     const ticketResponse = await getTicketByOrderId(orderResponse.data.id);
                     console.log(ticketResponse);
                     setTicketId(ticketResponse.data.id);
                     console.log(ticketResponse.data.paymentMethod);
                     setSelectedCurrency(ticketResponse.data.paymentMethod === "Efectivo" ? "Pesos" : "Bitcoin");
-                }
+                }*/
 
             } catch (err) {
                 console.log(err);
@@ -66,26 +62,10 @@ export default function EditOrder() {
         fetchData();
     }, [pedidoId]);
 
-    const handlePinSubmit = async () => {
-        setError("");
-        setIsLoading(true);
-        try {
-            const response = await validatePin(pin, pedidoId);
-            if (response.authorized) {
-                setIsAuthorized(true);
-            } else {
-                setError(response.error || "PIN inválido");
-            }
-        } catch (err) {
-            setError("Error al validar el PIN");
-        } finally {
-            setIsLoading(false);
-            setPin("");
-        }
-    };
 
     const handleAddDish = async (dish) => {
-        if (order.estado !== "abierto") return;
+        console.log("addDish", dish)
+        if (order.status !== "open") return;
         const instanceId = `${dish.id}_${Date.now()}`;
         const newDishes = [...(order.dishes || []), { instanceId, dish }];
         setUndoStack([...undoStack, order.dishes]);
@@ -164,7 +144,7 @@ export default function EditOrder() {
         try {
             const total = order.dishes?.reduce((sum, item) => sum + (item.dish?.precio || 0), 0) || 0;
             const userResponse = await getUserById(order.userId);
-            const userName = userResponse.data?.nombre || "Desconocido";
+            const userName = userResponse.data?.name || "Desconocido";
             console.log(selectedCurrency);
             const ticket = {
                 orderId: Number(pedidoId),
@@ -270,7 +250,7 @@ export default function EditOrder() {
         setSelectedPaymentMethod("");
     };
 
-    const filteredDishes = dishes.filter((dish) => dish.categoria === selectedCategory);
+    const filteredDishes = dishes.filter((dish) => dish.category_id === selectedCategory.id);
 
     if (isLoading && !order) {
         return (
@@ -304,65 +284,6 @@ export default function EditOrder() {
         );
     }
 
-    if (!isAuthorized) {
-        return (
-            <div className="flex w-screen h-screen">
-                <NavBar />
-                <div className="w-[75%] h-full">
-                    <Header />
-                    <main className="h-[90%] w-full flex items-center justify-center">
-                        <div className="h-[80%] w-[80%] bg-amber-200 rounded-xl p-6 flex flex-col items-center justify-center gap-6">
-                            <h2 className="text-3xl font-bold">Ingresar PIN</h2>
-                            <div className="text-3xl font-bold mb-4">
-                                <p>PIN Ingresado:</p>
-                                <div>
-                                    <span>{"*".repeat(pin.length)}</span>
-                                </div>
-                            </div>
-                            {error && <p className="text-red-600 text-xl">{error}</p>}
-                            <div className="grid grid-cols-3 gap-4">
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                                    <button
-                                        key={num}
-                                        className="bg-gray-800 text-white py-6 px-8 text-3xl rounded-lg hover:bg-gray-700"
-                                        onClick={() => setPin((prev) => prev + num)}
-                                        disabled={isLoading}
-                                    >
-                                        {num}
-                                    </button>
-                                ))}
-                                <div className="col-span-3 flex justify-center">
-                                    <button
-                                        className="bg-gray-800 text-white py-6 px-8 text-3xl rounded-lg hover:bg-gray-700"
-                                        onClick={() => setPin((prev) => prev + "0")}
-                                        disabled={isLoading}
-                                    >
-                                        0
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="flex gap-6 mt-6">
-                                <button
-                                    className="bg-red-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-red-600"
-                                    onClick={() => setPin("")}
-                                    disabled={isLoading}
-                                >
-                                    Borrar
-                                </button>
-                                <button
-                                    onClick={handlePinSubmit}
-                                    className="bg-green-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-green-600"
-                                    disabled={isLoading || pin.length < 4}
-                                >
-                                    Validar PIN
-                                </button>
-                            </div>
-                        </div>
-                    </main>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="flex w-screen h-screen">
@@ -373,7 +294,7 @@ export default function EditOrder() {
                     <div className="h-full w-full bg-amber-100 rounded-lg flex flex-col p-6 gap-6">
                         <div className="flex justify-between items-center">
                             <h2 className="text-4xl font-bold">
-                                Pedido #{pedidoId} - {order?.mozo || "Desconocido"}
+                                Pedido #{pedidoId} - {order?.waiter || "Desconocido"}
                             </h2>
                             <span className="text-2xl font-bold">
                                 Total: ${order?.total ? order.total.toFixed(2) : "0.00"}
@@ -386,7 +307,7 @@ export default function EditOrder() {
                                 <div className="grid grid-cols-2 gap-4">
                                     {categories.map((category) => (
                                         <button
-                                            key={category}
+                                            key={category.id}
                                             className={`py-6 px-8 text-2xl rounded-lg ${
                                                 selectedCategory === category
                                                     ? "bg-blue-500 text-white"
@@ -395,7 +316,7 @@ export default function EditOrder() {
                                             onClick={() => setSelectedCategory(category)}
                                             disabled={isLoading}
                                         >
-                                            {category}
+                                            {category.name}
                                         </button>
                                     ))}
                                 </div>
@@ -408,8 +329,8 @@ export default function EditOrder() {
                                             onClick={() => handleAddDish(dish)}
                                             disabled={isLoading}
                                         >
-                                            <span className="font-bold">{dish.nombre}</span>
-                                            <span>${dish.precio.toFixed(2)}</span>
+                                            <span className="font-bold">{dish.name}</span>
+                                            <span>${dish.price.toFixed(2)}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -425,7 +346,7 @@ export default function EditOrder() {
                                                     className="flex justify-between items-center bg-gray-100 p-4 rounded-lg"
                                                 >
                                                     <span className="text-xl">
-                                                        {item.dish.nombre} - ${item.dish.precio.toFixed(2)}
+                                                        {item.dish.name} - ${item.dish.price.toFixed(2)}
                                                     </span>
                                                     <button
                                                         className="bg-red-500 text-white py-2 px-4 text-lg rounded-lg hover:bg-red-600"

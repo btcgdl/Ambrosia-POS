@@ -8,7 +8,8 @@ export function TurnProvider({children}) {
 
     useEffect(() => {
         const handleOpenTurn = async () => {
-            const { data } = await getTurnOpen();
+            const data = await getTurnOpen();
+            console.log(data);
             setOpenTurn(data);
         }
         handleOpenTurn();

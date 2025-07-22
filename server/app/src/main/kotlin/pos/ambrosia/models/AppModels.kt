@@ -120,3 +120,9 @@ data class Shift(
         val end_time: String? = null,
         val notes: String
 )
+
+@Serializable
+data class DishCategory(
+    val id: String? = null,
+    val name: String,
+)

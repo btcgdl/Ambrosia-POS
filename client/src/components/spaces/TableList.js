@@ -7,8 +7,8 @@ export default function TableList({ tables, onEdit, onDelete }) {
                 tables.map((mesa) => (
                     <div key={mesa.id} className="bg-white p-3 rounded shadow flex justify-between items-center">
                         <div>
-                            <p className="font-semibold">{mesa.nombre}</p>
-                            <p className="text-sm text-gray-600">Estado: {mesa.estado}</p>
+                            <p className="font-semibold">{mesa.name}</p>
+                            <p className="text-sm text-gray-600">Estado: {mesa.status}</p>
                         </div>
                         <div className="space-x-2">
                             <button
