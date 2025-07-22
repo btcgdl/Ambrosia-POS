@@ -77,6 +77,27 @@ data class Order(
         val created_at: String
 )
 
+@Serializable
+data class OrderDish(
+    val id: String? = null,
+    val order_id: String,
+    val dish_id: String,
+    val instance_id: String,
+    val quantity: Int = 1,
+    val price_at_order: Double,
+    val notes: String? = null
+)
+
+data class CompleteOrder(
+    val order: Order,
+    val dishes: List<OrderDish>
+)
+
+data class OrderWithDishesRequest(
+    val order: Order,
+    val dishes: List<OrderDish>
+)
+
 @Serializable data class Payment(val id: String? = null, val currency: String, val name: String)
 
 @Serializable
