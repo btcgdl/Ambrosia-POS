@@ -20,7 +20,7 @@ data class User(
 )
 
 @Serializable
-data class Role(val id: String? = null, val role: String, val password: String? = null)
+data class Role(val id: String? = null, val role: String, val password: String? = null, val isAdmin: Boolean? = false)
 
 @Serializable data class Space(val id: String? = null, val name: String)
 
