@@ -41,8 +41,6 @@ data class Dish(
         val category_id: String
 )
 
-@Serializable data class DishCategory(val id: String? = null, val name: String)
-
 @Serializable
 data class Ingredient(
         val id: String? = null,
