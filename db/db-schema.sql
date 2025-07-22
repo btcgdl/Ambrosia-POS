@@ -115,7 +115,7 @@ CREATE TABLE orders (
     id BLOB PRIMARY KEY,
     user_id BLOB NOT NULL,
     table_id BLOB,
-    username TEXT,
+    waiter TEXT,
     status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed', 'paid')),
     total REAL NOT NULL DEFAULT 0.00,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
