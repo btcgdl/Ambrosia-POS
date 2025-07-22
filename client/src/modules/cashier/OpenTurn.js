@@ -1,13 +1,13 @@
 ﻿import { useState } from "react";
 import NavBar from "../../components/navbar/NavBar";
 import Header from "../../components/header/Header";
-import {setTurnOpen} from "./cashierService";
+import {openTurn} from "./cashierService";
 import {useNavigate} from "react-router-dom";
 import {useTurn} from "./useTurn";
 import {getHomeRoute} from "../../utils/getHomeRoute";
 
 export default function OpenTurn() {
-    const [initialAmount, setInitialAmount] = useState("");
+    const [initialAmount, setInitialAmount] = useState("1");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -43,10 +43,9 @@ export default function OpenTurn() {
         setIsLoading(true);
         try {
             console.log("Abriendo turno con cantidad inicial:", amount);
-
-
-            await setTurnOpen(true);
-            updateTurn(true);
+            const response = await openTurn();
+            console.log(response.shiftId);
+            updateTurn(response.shiftId);
             navigate(getHomeRoute());
 
         } catch (err) {

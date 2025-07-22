@@ -14,7 +14,7 @@ class UsersService(private val connection: Connection) {
 
     private const val GET_USERS =
             """
-            SELECT u.id, u.name, u.refresh_token, u.pin, r.role 
+            SELECT u.id, u.name, u.refresh_token, u.pin, u.role_id
             FROM users u
             JOIN roles r ON u.role_id = r.id
             WHERE u.is_deleted = 0
@@ -121,7 +121,7 @@ class UsersService(private val connection: Connection) {
       val id = resultSet.getString("id")
       val name = resultSet.getString("name")
       val refreshToken = resultSet.getString("refresh_token")
-      val role = resultSet.getString("role")
+      val role = resultSet.getString("role_id")
       // No devolvemos el PIN hasheado en las consultas generales
       users.add(User(id = id, name = name, pin = "****", refreshToken = refreshToken, role = role))
     }

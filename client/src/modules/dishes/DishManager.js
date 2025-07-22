@@ -1,14 +1,14 @@
 import { useState } from "react";
 
 export default function DishManager({ dishes, categories, addDish, updateDish, deleteDish }) {
-    const [newDish, setNewDish] = useState({ nombre: "", categoria: "", precio: "" });
+    const [newDish, setNewDish] = useState({ name: "", price: "", category_id: "" });
     const [editingDish, setEditingDish] = useState(null);
     const [error, setError] = useState("");
 
     const validateDish = (dish) => {
-        if (!dish.nombre.trim()) return "El nombre es requerido";
-        if (!dish.categoria) return "La categoría es requerida";
-        if (!dish.precio || isNaN(dish.precio) || parseFloat(dish.precio) <= 0) return "El precio debe ser un número mayor a 0";
+        if (!dish.name.trim()) return "El nombre es requerido";
+        if (!dish.category_id) return "La categoría es requerida";
+        if (!dish.price || isNaN(dish.price) || parseFloat(dish.price) <= 0) return "El precio debe ser un número mayor a 0";
         return "";
     };
 
@@ -20,7 +20,7 @@ export default function DishManager({ dishes, categories, addDish, updateDish, d
         }
         try {
             setError("");
-            await addDish({ ...newDish, precio: parseFloat(newDish.precio), ingredients: [] });
+            await addDish({ ...newDish, price: parseFloat(newDish.price)});
             setNewDish({ nombre: "", categoria: "", precio: "" });
         } catch (err) {
             setError(err.message || "Error al agregar el platillo");
@@ -35,7 +35,7 @@ export default function DishManager({ dishes, categories, addDish, updateDish, d
         }
         try {
             setError("");
-            await updateDish({ ...editingDish, precio: parseFloat(editingDish.precio), ingredients: editingDish.ingredients || [] });
+            await updateDish({ ...editingDish, price: parseFloat(editingDish.price)});
             setEditingDish(null);
         } catch (err) {
             setError(err.message || "Error al actualizar el platillo");
@@ -48,14 +48,14 @@ export default function DishManager({ dishes, categories, addDish, updateDish, d
             {error && <p className="text-red-600 text-xl">{error}</p>}
             <div className="flex gap-2">
                 <input
-                    value={newDish.nombre}
-                    onChange={(e) => setNewDish({ ...newDish, nombre: e.target.value })}
+                    value={newDish.name}
+                    onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
                     placeholder="Nombre"
                     className="p-4 rounded text-xl flex-1"
                 />
                 <input
-                    value={newDish.precio}
-                    onChange={(e) => setNewDish({ ...newDish, precio: e.target.value })}
+                    value={newDish.price}
+                    onChange={(e) => setNewDish({ ...newDish, price: e.target.value })}
                     placeholder="Precio"
                     className="p-4 rounded text-xl w-[120px]"
                     type="number"
@@ -63,13 +63,13 @@ export default function DishManager({ dishes, categories, addDish, updateDish, d
                     step="0.01"
                 />
                 <select
-                    value={newDish.categoria}
-                    onChange={(e) => setNewDish({ ...newDish, categoria: e.target.value })}
+                    value={newDish.category_id}
+                    onChange={(e) => setNewDish({ ...newDish, category_id: e.target.value })}
                     className="p-4 rounded text-xl"
                 >
                     <option value="">Categoría</option>
                     {categories.map((cat) => (
-                        <option key={cat} value={cat}>{cat}</option>
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
                 </select>
                 <button onClick={handleSaveDish} className="bg-green-600 text-white px-6 py-4 rounded text-xl">Agregar</button>
@@ -80,25 +80,25 @@ export default function DishManager({ dishes, categories, addDish, updateDish, d
                         {editingDish?.id === dish.id ? (
                             <>
                                 <input
-                                    value={editingDish.nombre}
-                                    onChange={(e) => setEditingDish({ ...editingDish, nombre: e.target.value })}
+                                    value={editingDish.name}
+                                    onChange={(e) => setEditingDish({ ...editingDish, name: e.target.value })}
                                     className="p-2 rounded mr-2"
                                 />
                                 <input
-                                    value={editingDish.precio}
-                                    onChange={(e) => setEditingDish({ ...editingDish, precio: e.target.value })}
+                                    value={editingDish.price}
+                                    onChange={(e) => setEditingDish({ ...editingDish, price: e.target.value })}
                                     className="p-2 rounded mr-2 w-[100px]"
                                     type="number"
                                     min="0"
                                     step="0.01"
                                 />
                                 <select
-                                    value={editingDish.categoria}
-                                    onChange={(e) => setEditingDish({ ...editingDish, categoria: e.target.value })}
+                                    value={editingDish.category_id}
+                                    onChange={(e) => setEditingDish({ ...editingDish, category_id: e.target.value })}
                                     className="p-2 rounded mr-2"
                                 >
                                     {categories.map((cat) => (
-                                        <option key={cat} value={cat}>{cat}</option>
+                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
                                     ))}
                                 </select>
                                 <button onClick={handleUpdateDish} className="bg-green-500 text-white px-4 py-2 rounded text-lg mr-2">✔</button>
@@ -106,7 +106,10 @@ export default function DishManager({ dishes, categories, addDish, updateDish, d
                             </>
                         ) : (
                             <>
-                                <span className="flex-1">{dish.nombre} - ${dish.precio} ({dish.categoria || 'Sin categoría'})</span>
+                                <span className="flex-1">
+                                    {dish.name} - ${dish.price}
+                                    ({categories.find(c => c.id === dish.category_id)?.name || 'Sin categoría'})
+                                </span>
                                 <div className="flex gap-2">
                                     <button onClick={() => setEditingDish(dish)} className="bg-blue-500 text-white px-4 py-2 rounded text-lg">Editar</button>
                                     <button onClick={() => deleteDish(dish.id)} className="bg-red-500 text-white px-4 py-2 rounded text-lg">Eliminar</button>

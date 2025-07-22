@@ -1,19 +1,19 @@
 import { useState } from "react";
 
-export default function CategoryManager({ categories, addCategory, deleteCategory, updateCategory, dishes, updateDish }) {
+export default function CategoryManager({ categories, addCategory, deleteCategory, updateCategory}) {
     const [newCategory, setNewCategory] = useState("");
     const [editingCategory, setEditingCategory] = useState(null);
     const [categoryEditValue, setCategoryEditValue] = useState("");
     const [error, setError] = useState("");
 
     const handleAddCategory = async () => {
-        if (!newCategory.trim()) {
+        if (!newCategory) {
             setError("La categoría no puede estar vacía");
             return;
         }
         try {
             setError("");
-            await addCategory(newCategory.trim());
+            await addCategory(newCategory);
             setNewCategory("");
         } catch (err) {
             setError(err.message || "Error al agregar la categoría");
@@ -21,13 +21,13 @@ export default function CategoryManager({ categories, addCategory, deleteCategor
     };
 
     const handleUpdateCategory = async () => {
-        if (!categoryEditValue.trim()) {
+        if (!categoryEditValue) {
             setError("La categoría no puede estar vacía");
             return;
         }
         try {
             setError("");
-            await updateCategory(editingCategory, categoryEditValue.trim());
+            await updateCategory(editingCategory.id, categoryEditValue);
             setEditingCategory(null);
             setCategoryEditValue("");
         } catch (err) {
@@ -55,8 +55,8 @@ export default function CategoryManager({ categories, addCategory, deleteCategor
             </div>
             <ul className="flex flex-col gap-3 overflow-y-auto">
                 {categories.map((cat) => (
-                    <li key={cat} className="bg-white rounded-xl p-4 flex justify-between items-center text-xl">
-                        {editingCategory === cat ? (
+                    <li key={cat.id} className="bg-white rounded-xl p-4 flex justify-between items-center text-xl">
+                        {editingCategory?.id === cat.id ? (
                             <>
                                 <input
                                     value={categoryEditValue}
@@ -68,10 +68,10 @@ export default function CategoryManager({ categories, addCategory, deleteCategor
                             </>
                         ) : (
                             <>
-                                <span>{cat}</span>
+                                <span>{cat.name}</span>
                                 <div className="flex gap-2">
-                                    <button onClick={() => { setEditingCategory(cat); setCategoryEditValue(cat); }} className="bg-blue-500 text-white px-4 py-2 rounded text-lg">Editar</button>
-                                    <button onClick={() => deleteCategory(cat)} className="bg-red-500 text-white px-4 py-2 rounded text-lg">Eliminar</button>
+                                    <button onClick={() => { setEditingCategory(cat); setCategoryEditValue(cat.name); }} className="bg-blue-500 text-white px-4 py-2 rounded text-lg">Editar</button>
+                                    <button onClick={() => deleteCategory(cat.id)} className="bg-red-500 text-white px-4 py-2 rounded text-lg">Eliminar</button>
                                 </div>
                             </>
                         )}

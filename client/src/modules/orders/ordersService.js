@@ -1,6 +1,6 @@
-﻿import { apiClient } from '../../services/apiClient';
-import { mockService } from '../../useMockSocket';
-import { validatePin } from '../auth/authService';
+﻿import {apiClient} from '../../services/apiClient';
+import {mockService} from '../../useMockSocket';
+
 
 export async function getAllOrders() {
     try {
@@ -109,23 +109,37 @@ export async function getOrderById(orderId) {
     }
 }
 
-export async function getDishes() {
-    try {
-        return await apiClient('/dishes');
+export async function createOrder() {
+    try{
+        //localStorage.setItem('userId', "");
+        if (!localStorage.getItem('userId')) {
+            throw new Error('No hay usuario logeado');
+        }
+        //const response = await getUserById(localStorage.getItem('userId'));
+        const response = {id: localStorage.getItem('userId'), name: "JordyArreglaLaDBConnection"};
+        if (response){
+            return await apiClient('/orders', {
+                method: 'POST',
+                body: {
+                    user_id: response.id,
+                    waiter: response.name,
+                    status: "open",
+                    total: 0,
+                    created_at: Date.now(),
+                }
+            });
+        }
+        else{
+
+        }
     } catch (error) {
-        return { data: mockService.getDishes() };
+        throw new error;
+    } finally {
+
     }
 }
 
-export async function getCategories() {
-    try {
-        return await apiClient('/dishes/categories');
-    } catch (error) {
-        return { data: mockService.getCategories() };
-    }
-}
-
-export async function createOrder(pin, tableId = null) {
+/*export async function createOrder(pin, tableId = null) {
     try {
         const pinValidation = await validatePin(pin);
         if (!pinValidation.authorized) {
@@ -158,7 +172,7 @@ export async function createOrder(pin, tableId = null) {
     } catch (error) {
         throw new Error(error.message || 'Error al crear el pedido');
     }
-}
+}*/
 
 export async function updateOrder(orderId, updatedOrder) {
     try {
