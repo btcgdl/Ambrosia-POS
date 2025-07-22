@@ -53,3 +53,24 @@ export async function getReport(startDate, endDate) {
         };
     }
 }
+
+export async function getInfo(){
+    return await apiClient('/wallet/getinfo');
+}
+
+export async function createInvoice(invoiceAmount, invoiceDesc){
+    return await apiClient("/wallet/createinvoice", {
+        method: "POST",
+        body: {
+            description: invoiceDesc,
+            amountSat: parseInt(invoiceAmount),
+        }
+    });
+}
+
+export async function payInvoiceFromService(invoice){
+    return await apiClient("/wallet/payinvoice", {
+        method: "POST",
+        body: { invoice: invoice.trim() }
+    });
+}
