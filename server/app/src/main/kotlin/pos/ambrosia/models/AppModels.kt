@@ -20,7 +20,7 @@ data class User(
 )
 
 @Serializable
-data class Role(val id: String? = null, val role: String, val password: String? = null)
+data class Role(val id: String? = null, val role: String, val password: String? = null, val isAdmin: Boolean? = false)
 
 @Serializable data class Space(val id: String? = null, val name: String)
 
@@ -41,6 +41,8 @@ data class Dish(
         val category_id: String
 )
 
+@Serializable data class DishCategory(val id: String? = null, val name: String)
+
 @Serializable
 data class Ingredient(
         val id: String? = null,
@@ -51,6 +53,8 @@ data class Ingredient(
         val low_stock_threshold: Double,
         val cost_per_unit: Double
 )
+
+@Serializable data class IngredientCategory(val id: String? = null, val name: String)
 
 @Serializable
 data class Supplier(
@@ -71,6 +75,27 @@ data class Order(
         val status: String,
         val total: Double,
         val created_at: String
+)
+
+@Serializable
+data class OrderDish(
+    val id: String? = null,
+    val order_id: String,
+    val dish_id: String,
+    val instance_id: String,
+    val quantity: Int = 1,
+    val price_at_order: Double,
+    val notes: String? = null
+)
+
+data class CompleteOrder(
+    val order: Order,
+    val dishes: List<OrderDish>
+)
+
+data class OrderWithDishesRequest(
+    val order: Order,
+    val dishes: List<OrderDish>
 )
 
 @Serializable data class Payment(val id: String? = null, val currency: String, val name: String)
