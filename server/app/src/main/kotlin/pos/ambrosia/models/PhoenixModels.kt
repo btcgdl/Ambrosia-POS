@@ -69,6 +69,23 @@ data class IncomingPayment(
     val isPaid: Boolean,
     val receivedSat: Long,
     val fees: Long,
+    val payerKey: String? = null,
+    val completedAt: Long? = null,
+    val createdAt: Long
+)
+
+@Serializable
+data class OutgoingPayment(
+    val type: String,
+    val subType: String,
+    val paymentId: String,
+    val paymentHash: String? = null,
+    val txId: String? = null,
+    val preimage: String? = null,
+    val isPaid: Boolean,
+    val sent: Long,
+    val fees: Long,
+    val invoice: String? = null,
     val completedAt: Long? = null,
     val createdAt: Long
 )

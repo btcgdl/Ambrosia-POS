@@ -217,4 +217,115 @@ class PhoenixService(
             throw PhoenixServiceException("Failed to bump onchain fees on Phoenix: ${e.message}")
         }
     }
+
+    /**
+     * List incoming payments from Phoenix
+     */
+    suspend fun listIncomingPayments(
+        from: Long = 0,
+        to: Long? = null,
+        limit: Int = 20,
+        offset: Int = 0,
+        all: Boolean = false,
+        externalId: String? = null
+    ): List<IncomingPayment> {
+        try {
+            val response: HttpResponse = httpClient.get("$phoenixUrl/payments/incoming") {
+                parameter("from", from)
+                to?.let { parameter("to", it) }
+                parameter("limit", limit)
+                parameter("offset", offset)
+                if (all) parameter("all", "true")
+                externalId?.let { parameter("externalId", it) }
+            }
+            if (response.status.value != 200) {
+                throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
+            }
+            
+            val responseText = response.bodyAsText()
+            return Json.decodeFromString<List<IncomingPayment>>(responseText)
+        } catch (e: Exception) {
+            throw PhoenixServiceException("Failed to list incoming payments on Phoenix: ${e.message}")
+        }
+    }
+
+    /**
+     * Get a specific incoming payment by payment hash
+     */
+    suspend fun getIncomingPayment(paymentHash: String): IncomingPayment {
+        try {
+            val response: HttpResponse = httpClient.get("$phoenixUrl/payments/incoming/$paymentHash")
+            if (response.status.value != 200) {
+                throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
+            }
+            
+            val responseText = response.bodyAsText()
+            return Json.decodeFromString<IncomingPayment>(responseText)
+        } catch (e: Exception) {
+            throw PhoenixServiceException("Failed to get incoming payment on Phoenix: ${e.message}")
+        }
+    }
+
+    /**
+     * List outgoing payments from Phoenix
+     */
+    suspend fun listOutgoingPayments(
+        from: Long = 0,
+        to: Long? = null,
+        limit: Int = 20,
+        offset: Int = 0,
+        all: Boolean = false
+    ): List<OutgoingPayment> {
+        try {
+            val response: HttpResponse = httpClient.get("$phoenixUrl/payments/outgoing") {
+                parameter("from", from)
+                to?.let { parameter("to", it) }
+                parameter("limit", limit)
+                parameter("offset", offset)
+                if (all) parameter("all", "true")
+            }
+            if (response.status.value != 200) {
+                throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
+            }
+            
+            val responseText = response.bodyAsText()
+            return Json.decodeFromString<List<OutgoingPayment>>(responseText)
+        } catch (e: Exception) {
+            throw PhoenixServiceException("Failed to list outgoing payments on Phoenix: ${e.message}")
+        }
+    }
+
+    /**
+     * Get a specific outgoing payment by payment ID
+     */
+    suspend fun getOutgoingPayment(paymentId: String): OutgoingPayment {
+        try {
+            val response: HttpResponse = httpClient.get("$phoenixUrl/payments/outgoing/$paymentId")
+            if (response.status.value != 200) {
+                throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
+            }
+            
+            val responseText = response.bodyAsText()
+            return Json.decodeFromString<OutgoingPayment>(responseText)
+        } catch (e: Exception) {
+            throw PhoenixServiceException("Failed to get outgoing payment on Phoenix: ${e.message}")
+        }
+    }
+
+    /**
+     * Get a specific outgoing payment by payment hash
+     */
+    suspend fun getOutgoingPaymentByHash(paymentHash: String): OutgoingPayment {
+        try {
+            val response: HttpResponse = httpClient.get("$phoenixUrl/payments/outgoingbyhash/$paymentHash")
+            if (response.status.value != 200) {
+                throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
+            }
+            
+            val responseText = response.bodyAsText()
+            return Json.decodeFromString<OutgoingPayment>(responseText)
+        } catch (e: Exception) {
+            throw PhoenixServiceException("Failed to get outgoing payment by hash on Phoenix: ${e.message}")
+        }
+    }
 }

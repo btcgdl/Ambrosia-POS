@@ -60,4 +60,53 @@ fun Route.wallet(phoenixService: PhoenixService) {
         val result = phoenixService.bumpOnchainFees(feerateSatByte)
         call.respond(HttpStatusCode.OK, result)
     }
+    
+    // Payments endpoints
+    route("/payments") {
+        // List incoming payments
+        get("/incoming") {
+            val from = call.request.queryParameters["from"]?.toLongOrNull() ?: 0L
+            val to = call.request.queryParameters["to"]?.toLongOrNull()
+            val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 20
+            val offset = call.request.queryParameters["offset"]?.toIntOrNull() ?: 0
+            val all = call.request.queryParameters["all"]?.toBoolean() ?: false
+            val externalId = call.request.queryParameters["externalId"]
+            
+            val payments = phoenixService.listIncomingPayments(from, to, limit, offset, all, externalId)
+            call.respond(HttpStatusCode.OK, payments)
+        }
+        
+        // Get specific incoming payment
+        get("/incoming/{paymentHash}") {
+            val paymentHash = call.parameters["paymentHash"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing paymentHash")
+            val payment = phoenixService.getIncomingPayment(paymentHash)
+            call.respond(HttpStatusCode.OK, payment)
+        }
+        
+        // List outgoing payments
+        get("/outgoing") {
+            val from = call.request.queryParameters["from"]?.toLongOrNull() ?: 0L
+            val to = call.request.queryParameters["to"]?.toLongOrNull()
+            val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 20
+            val offset = call.request.queryParameters["offset"]?.toIntOrNull() ?: 0
+            val all = call.request.queryParameters["all"]?.toBoolean() ?: false
+            
+            val payments = phoenixService.listOutgoingPayments(from, to, limit, offset, all)
+            call.respond(HttpStatusCode.OK, payments)
+        }
+        
+        // Get specific outgoing payment by ID
+        get("/outgoing/{paymentId}") {
+            val paymentId = call.parameters["paymentId"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing paymentId")
+            val payment = phoenixService.getOutgoingPayment(paymentId)
+            call.respond(HttpStatusCode.OK, payment)
+        }
+        
+        // Get specific outgoing payment by hash
+        get("/outgoingbyhash/{paymentHash}") {
+            val paymentHash = call.parameters["paymentHash"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing paymentHash")
+            val payment = phoenixService.getOutgoingPaymentByHash(paymentHash)
+            call.respond(HttpStatusCode.OK, payment)
+        }
+    }
 }
