@@ -1,5 +1,11 @@
 ﻿import { useEffect, useState } from "react";
-import {createInvoice, getInfo, payInvoiceFromService} from "./cashierService";
+import {
+    createInvoice,
+    getIncomingTransactions,
+    getInfo,
+    getOutgoingTransactions,
+    payInvoiceFromService
+} from "./cashierService";
 
 export default function Wallet() {
     const [info, setInfo] = useState(null);
@@ -11,27 +17,51 @@ export default function Wallet() {
     const [transactions, setTransactions] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [filter, setFilter] = useState("all"); // 'incoming' | 'outgoing' | 'all'
 
-    const dummyTransactions = [
-        { id: "tx1", type: "received", amount: 25000, timestamp: "2025-07-21T15:30:00Z" },
-        { id: "tx2", type: "sent", amount: 12000, fee: 10, timestamp: "2025-07-20T11:15:00Z" },
-        { id: "tx3", type: "received", amount: 50000, timestamp: "2025-07-19T09:00:00Z" }
-    ];
 
     useEffect(() => {
         fetchInfo();
-        setTransactions(dummyTransactions);
     }, []);
+
+    useEffect(() => {
+        fetchTransactions();
+    }, [filter]);
+
 
     const fetchInfo = async () => {
         try {
             const res = await getInfo();
-            //if (!res.ok) throw new Error("Error al obtener la información");
             setInfo(res);
             setError("");
         } catch (err) {
             console.error(err);
             setError("Error al obtener la información de la wallet");
+        }
+    };
+
+    const fetchTransactions = async () => {
+        try {
+            setLoading(true);
+            let incoming = [];
+            let outgoing = [];
+
+            if (filter === "incoming" || filter === "all") {
+                incoming = await getIncomingTransactions();
+            }
+            if (filter === "outgoing" || filter === "all") {
+                outgoing = await getOutgoingTransactions();
+            }
+
+            const allTx = [...incoming, ...outgoing].sort(
+                (a, b) => b.completedAt - a.completedAt
+            );
+            setTransactions(allTx);
+        } catch (err) {
+            console.error("Error al obtener transacciones:", err);
+            setError("Error al cargar historial");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -253,16 +283,45 @@ export default function Wallet() {
 
             <div className="bg-gray-100 rounded p-4">
                 <h2 className="text-2xl mb-2">Historial</h2>
+                <div className="flex gap-2 mb-4">
+                    <button
+                        className={`px-4 py-1 rounded ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+                        onClick={() => setFilter("all")}
+                    >
+                        Todos
+                    </button>
+                    <button
+                        className={`px-4 py-1 rounded ${filter === 'incoming' ? 'bg-green-500 text-white' : 'bg-gray-300'}`}
+                        onClick={() => setFilter("incoming")}
+                    >
+                        Recibidos
+                    </button>
+                    <button
+                        className={`px-4 py-1 rounded ${filter === 'outgoing' ? 'bg-red-500 text-white' : 'bg-gray-300'}`}
+                        onClick={() => setFilter("outgoing")}
+                    >
+                        Enviados
+                    </button>
+                </div>
                 {transactions.length === 0 ? (
                     <p>No hay transacciones aún</p>
                 ) : (
                     <ul className="divide-y">
-                        {transactions.map((tx) => (
-                            <li key={tx.id} className="py-2 flex justify-between">
-                                <span>
-                                    {tx.type === "received" ? "✅ Recibido" : "📤 Enviado"} - {tx.amount} sats
-                                </span>
-                                <span className="text-gray-500">{new Date(tx.timestamp).toLocaleString()}</span>
+                        {transactions.map((tx, i) => (
+                            <li key={tx.paymentId || tx.txId || i} className="py-2">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        {tx.type === "outgoing_payment" ? (
+                                            <span>📤 Enviado - {tx.sent} sats</span>
+                                        ) : (
+                                            <span>✅ Recibido - {tx.amount || 0} sats</span>
+                                        )}
+                                    </div>
+                                    <div className="text-gray-500 text-sm">
+                                        {new Date(tx.completedAt).toLocaleString()}
+                                    </div>
+                                </div>
+                                {tx.fees && <p className="text-sm text-gray-500">Fee: {tx.fees} sats</p>}
                             </li>
                         ))}
                     </ul>

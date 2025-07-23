@@ -81,7 +81,7 @@ export async function getTables() {
 
 export async function getOrderById(orderId) {
     try {
-        const response = await apiClient(`/orders/${orderId}?include=users,tables`);
+        const response = await apiClient(`/orders/${orderId}`);
         return response;
     } catch (error) {
         const order = mockService.getOrders().find((o) => o.id === Number(orderId));
@@ -115,8 +115,8 @@ export async function createOrder() {
         if (!localStorage.getItem('userId')) {
             throw new Error('No hay usuario logeado');
         }
-        //const response = await getUserById(localStorage.getItem('userId'));
-        const response = {id: localStorage.getItem('userId'), name: "JordyArreglaLaDBConnection"};
+        const response = await getUserById(localStorage.getItem('userId'));
+        //const response = {id: localStorage.getItem('userId'), name: "JordyArreglaLaDBConnection"};
         if (response){
             return await apiClient('/orders', {
                 method: 'POST',
@@ -137,6 +137,28 @@ export async function createOrder() {
     } finally {
 
     }
+}
+
+export async function addDishToOrder(pedidoId, dish) {
+    return await apiClient(`/orders/${pedidoId}/dishes`, {
+        method: 'POST',
+        body: [{
+            dish_id: dish.id,
+            price_at_order: dish.price,
+            notes: "none"
+        }]
+    });
+}
+
+export async function removeDishToOrder(pedidoId, dish) {
+    return await apiClient(`/orders/${pedidoId}/dishes/${dish}`, {
+        method: 'DELETE',
+    })
+}
+
+export async function getDishesByOrder(orderId) {
+    const dishes = await apiClient(`/orders/${orderId}/dishes`);
+    return dishes ? dishes : [];
 }
 
 /*export async function createOrder(pin, tableId = null) {

@@ -5,6 +5,7 @@ import Header from "../../components/header/Header";
 import { createOrder } from "./ordersService";
 
 export default function CreateOrder() {
+    //deprecated unused
     const { tableId } = useParams();
     const navigate = useNavigate();
     const [pin, setPin] = useState("");

@@ -9,9 +9,9 @@ import {
     getTables,
     addTicket,
     getUserById,
-    updateTicket, getTicketByOrderId,
+    updateTicket, getTicketByOrderId, addDishToOrder, getDishesByOrder, removeDishToOrder,
 } from "./ordersService";
-import {getCategories, getDishes} from "../dishes/dishesService";
+import {addDish, getCategories, getDishes} from "../dishes/dishesService";
 
 export default function EditOrder() {
     const { pedidoId } = useParams();
@@ -30,20 +30,24 @@ export default function EditOrder() {
     const [selectedCurrency, setSelectedCurrency] = useState("");
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
     const [ticketId, setTicketId] = useState(null);
+    const [orderDishes, setOrderDishes] = useState([]);
 
     useEffect(() => {
         async function fetchData() {
             try {
                 setIsLoading(true);
-                const [orderResponse, dishesResponse, categoriesResponse] = await Promise.all([
+                const [orderResponse, dishesResponse, categoriesResponse, orderDishesResponse] = await Promise.all([
                     getOrderById(pedidoId),
                     getDishes(),
                     getCategories(),
+                    getDishesByOrder(pedidoId),
                 ]);
                 setOrder(orderResponse);
                 setDishes(dishesResponse);
                 setCategories(categoriesResponse);
                 setSelectedCategory(categoriesResponse[0] || "");
+                setOrderDishes(orderDishesResponse || []);
+                console.log(orderDishesResponse);
                 /*if (orderResponse.estado === 'cerrado'){
                     const ticketResponse = await getTicketByOrderId(orderResponse.data.id);
                     console.log(ticketResponse);
@@ -60,19 +64,37 @@ export default function EditOrder() {
             }
         }
         fetchData();
+        fetchOrderDishes()
     }, [pedidoId]);
+
+    useEffect(() => {
+        if (order) fetchOrderDishes();
+    }, [order]);
+
+    async function fetchOrderDishes() {
+        try{
+            const response = await getDishesByOrder(pedidoId);
+        }
+        catch (err) {
+            console.error(err);
+        }
+        finally {
+
+        }
+    }
 
 
     const handleAddDish = async (dish) => {
         console.log("addDish", dish)
         if (order.status !== "open") return;
-        const instanceId = `${dish.id}_${Date.now()}`;
-        const newDishes = [...(order.dishes || []), { instanceId, dish }];
-        setUndoStack([...undoStack, order.dishes]);
         setIsLoading(true);
         try {
-            const response = await updateOrder(pedidoId, { dishes: newDishes });
-            setOrder(response.data);
+            const response = await addDishToOrder(pedidoId, dish);
+            //const response = await updateOrder(pedidoId, { dishes: newDishes });
+            const orderResponse = await getOrderById(order.id);
+            const dishesResponse = await getDishesByOrder(pedidoId);
+            setOrderDishes(dishesResponse);
+            setOrder(orderResponse);
         } catch (err) {
             setError("Error al agregar el platillo");
         } finally {
@@ -82,11 +104,13 @@ export default function EditOrder() {
 
     const handleRemoveDish = async (instanceId) => {
         const newDishes = (order.dishes || []).filter((item) => item.instanceId !== instanceId);
-        setUndoStack([...undoStack, order.dishes]);
         setIsLoading(true);
         try {
-            const response = await updateOrder(pedidoId, { dishes: newDishes });
-            setOrder(response.data);
+            const response = await removeDishToOrder(pedidoId, instanceId);
+            const  orderResponse = await getOrderById(pedidoId);
+            const orderDishesResponse = await getDishesByOrder(pedidoId);
+            setOrderDishes(orderDishesResponse);
+            setOrder(orderResponse);
         } catch (err) {
             setError("Error al eliminar el platillo");
         } finally {
@@ -338,19 +362,19 @@ export default function EditOrder() {
                             <div className="w-1/2 flex flex-col gap-4">
                                 <h3 className="text-2xl font-semibold">Platillos Seleccionados</h3>
                                 <div className="flex-1 bg-white rounded-lg p-4 overflow-y-auto max-h-[400px]">
-                                    {order?.dishes?.length > 0 ? (
+                                    {orderDishes.length > 0 ? (
                                         <ul className="space-y-2">
-                                            {order.dishes.map((item) => (
+                                            {orderDishes.map((item) => (
                                                 <li
-                                                    key={item.instanceId}
+                                                    key={item.id}
                                                     className="flex justify-between items-center bg-gray-100 p-4 rounded-lg"
                                                 >
                                                     <span className="text-xl">
-                                                        {item.dish.name} - ${item.dish.price.toFixed(2)}
+                                                        {dishes.find(dish => dish.id === item.dish_id).name} - ${dishes.find(dish => dish.id === item.dish_id).price.toFixed(2)}
                                                     </span>
                                                     <button
                                                         className="bg-red-500 text-white py-2 px-4 text-lg rounded-lg hover:bg-red-600"
-                                                        onClick={() => handleRemoveDish(item.instanceId)}
+                                                        onClick={() => handleRemoveDish(item.id)}
                                                         disabled={isLoading}
                                                     >
                                                         Eliminar
