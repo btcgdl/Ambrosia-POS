@@ -129,8 +129,6 @@ CREATE TABLE orders_dishes (
     id BLOB PRIMARY KEY,
     order_id BLOB NOT NULL,
     dish_id BLOB NOT NULL,
-    instance_id TEXT NOT NULL,
-    quantity INTEGER NOT NULL DEFAULT 1,
     price_at_order REAL NOT NULL,
     notes TEXT,
     FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
