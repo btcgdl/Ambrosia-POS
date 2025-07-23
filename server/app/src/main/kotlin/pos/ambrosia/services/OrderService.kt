@@ -1,6 +1,7 @@
 package pos.ambrosia.services
 
 import java.sql.Connection
+import java.util.UUID
 import pos.ambrosia.logger
 import pos.ambrosia.models.Order
 import pos.ambrosia.models.OrderDish
@@ -86,7 +87,7 @@ class OrderService(private val connection: Connection) {
                         return null
                 }
 
-                val generatedId = java.util.UUID.randomUUID().toString()
+                val generatedId = UUID.randomUUID().toString()
                 val statement = connection.prepareStatement(ADD_ORDER)
 
                 statement.setString(1, generatedId)
@@ -258,43 +259,44 @@ class OrderService(private val connection: Connection) {
 
         // New methods for handling order dishes
         suspend fun addDishesToOrder(orderId: String, dishes: List<OrderDish>): Boolean {
-            var allAdded = true
-            for (dish in dishes) {
-                val dishWithOrderId = dish.copy(order_id = orderId)
-                val result = orderDishService.addOrderDish(dishWithOrderId)
-                if (result == null) {
-                    allAdded = false
-                    logger.error("Failed to add dish ${dish.dish_id} to order $orderId")
+                var allAdded = true
+                for (dish in dishes) {
+                        val dishWithOrderId = dish.copy(order_id = orderId)
+                        val result = orderDishService.addOrderDish(dishWithOrderId)
+                        if (result == null) {
+                                allAdded = false
+                                logger.error("Failed to add dish ${dish.dish_id} to order $orderId")
+                        }
                 }
-            }
-            return allAdded
+                return allAdded
         }
 
         suspend fun getOrderDishes(orderId: String): List<OrderDish> {
-            return orderDishService.getOrderDishesByOrderId(orderId)
+                return orderDishService.getOrderDishesByOrderId(orderId)
         }
 
         suspend fun updateOrderDish(orderDish: OrderDish): Boolean {
-            return orderDishService.updateOrderDish(orderDish)
+                return orderDishService.updateOrderDish(orderDish)
         }
 
         suspend fun removeOrderDish(orderDishId: String): Boolean {
-            return orderDishService.deleteOrderDish(orderDishId)
+                return orderDishService.deleteOrderDish(orderDishId)
         }
 
         suspend fun removeAllOrderDishes(orderId: String): Boolean {
-            return orderDishService.deleteOrderDishesByOrderId(orderId)
+                return orderDishService.deleteOrderDishesByOrderId(orderId)
         }
 
         suspend fun calculateOrderTotal(orderId: String): Double {
-            val dishes = orderDishService.getOrderDishesByOrderId(orderId)
-            return dishes.sumOf { it.price_at_order * it.quantity }
+                val dishes = orderDishService.getOrderDishesByOrderId(orderId)
+                // Como ya no hay quantity, sumamos directamente los precios
+                return dishes.sumOf { it.price_at_order }
         }
 
         suspend fun updateOrderTotal(orderId: String): Boolean {
-            val newTotal = calculateOrderTotal(orderId)
-            val order = getOrderById(orderId) ?: return false
-            val updatedOrder = order.copy(total = newTotal)
-            return updateOrder(updatedOrder)
+                val newTotal = calculateOrderTotal(orderId)
+                val order = getOrderById(orderId) ?: return false
+                val updatedOrder = order.copy(total = newTotal)
+                return updateOrder(updatedOrder)
         }
 }
