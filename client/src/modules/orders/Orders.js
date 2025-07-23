@@ -40,7 +40,7 @@ export default function Orders() {
 
     const filteredOrders = orders.filter((order) => {
         if (filter === "en-curso") {
-            return order.status === "open" || order.status === "close";
+            return order.status === "open" || order.status === "closed";
         }
         return order.status === "paid";
     });

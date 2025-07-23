@@ -10,7 +10,7 @@ export default function TableCard({ tableData }) {
         if (tableData.estado === "available") {
             setBgColor("bg-green-500");
             setNavigateUri(`/new-order/${tableData.id}`);
-        } else if (tableData.estado === "ocupada") {
+        } else if (tableData.estado === "busy") {
             setBgColor("bg-red-500");
             setNavigateUri(`/modify-order/${tableData.pedidoId}`);
         }

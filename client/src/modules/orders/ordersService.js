@@ -73,7 +73,8 @@ export async function getUserById(userId) {
 
 export async function getTables() {
     try {
-        return await apiClient('/spaces/tables');
+        const response = await apiClient('/tables');
+        return response  ? response : [];
     } catch (error) {
         return { data: mockService.getTables() };
     }
@@ -196,14 +197,14 @@ export async function getDishesByOrder(orderId) {
     }
 }*/
 
-export async function updateOrder(orderId, updatedOrder) {
+export async function updateOrder(order) {
     try {
-        return await apiClient(`/orders/${orderId}`, {
-            method: 'PATCH',
-            body: updatedOrder,
+        return await apiClient(`/orders/${order.id}`, {
+            method: 'PUT',
+            body: order,
         });
     } catch (error) {
-        const orders = mockService.getOrders();
+        /*const orders = mockService.getOrders();
         const orderIndex = orders.findIndex((o) => o.id === Number(orderId));
         if (orderIndex === -1) throw new Error('Pedido no encontrado');
 
@@ -230,18 +231,19 @@ export async function updateOrder(orderId, updatedOrder) {
                 mozo,
                 table: tableName,
             },
-        };
+        };*/
     }
 }
 
-export async function updateTable(tableId, updatedTable) {
+export async function updateTable(table) {
     try {
-        return await apiClient(`/spaces/tables/${tableId}`, {
-            method: 'PATCH',
-            body: updatedTable,
+        table.status = "available"
+        return await apiClient(`/spaces/tables/${table}`, {
+            method: 'PUT',
+            body: table,
         });
     } catch (error) {
-        const tables = mockService.getTables();
+        /*const tables = mockService.getTables();
         const tableIndex = tables.findIndex((t) => t.id === Number(tableId));
         if (tableIndex === -1) throw new Error('Mesa no encontrada');
 
@@ -249,7 +251,7 @@ export async function updateTable(tableId, updatedTable) {
         newTables[tableIndex] = { ...newTables[tableIndex], ...updatedTable };
         mockService.addTable(newTables[tableIndex]);
         return { data: newTables[tableIndex] };
-    }
+    */}
 }
 
 export async function addTicket(ticket) {

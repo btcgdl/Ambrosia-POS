@@ -47,8 +47,7 @@ export default function EditOrder() {
                 setCategories(categoriesResponse);
                 setSelectedCategory(categoriesResponse[0] || "");
                 setOrderDishes(orderDishesResponse || []);
-                console.log(orderDishesResponse);
-                /*if (orderResponse.estado === 'cerrado'){
+                /*if (orderResponse.status === 'closed'){
                     const ticketResponse = await getTicketByOrderId(orderResponse.data.id);
                     console.log(ticketResponse);
                     setTicketId(ticketResponse.data.id);
@@ -137,20 +136,24 @@ export default function EditOrder() {
         setIsLoading(true);
         setError("");
         try {
-            if (newStatus === "cerrado") {
+            /*if (newStatus === "closed") {
                 setShowCurrencyDialog(true);
-            } else {
-                const response = await updateOrder(pedidoId, { estado: newStatus });
-                setOrder(response.data);
-                if (newStatus === "pagado") {
+            } else {*/
+            console.log(newStatus);
+                const edittingOrder = order;
+                edittingOrder.status = newStatus;
+                await updateOrder(order);
+                const response = await getOrderById(pedidoId);
+                setOrder(response);
+                if (newStatus === "paid") {
                     const tables = await getTables();
-                    const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
+                    const table = tables.find((t) => t.order_id === pedidoId);
                     if (table) {
-                        await updateTable(table.id, { pedidoId: null, estado: "libre" });
+                        await updateTable(table);
                     }
                     navigate("/all-orders");
                 }
-            }
+            //}
         } catch (err) {
             setError("Error al cambiar el estado del pedido");
         } finally {
@@ -166,13 +169,14 @@ export default function EditOrder() {
         setIsLoading(true);
         setError("");
         try {
-            const total = order.dishes?.reduce((sum, item) => sum + (item.dish?.precio || 0), 0) || 0;
+            const total = order.total;
             const userResponse = await getUserById(order.userId);
             const userName = userResponse.data?.name || "Desconocido";
             console.log(selectedCurrency);
             const ticket = {
-                orderId: Number(pedidoId),
-                date: new Date().toISOString().split("T")[0],
+                order_id: pedidoId,
+                user_id: order.user_id,
+                ticket_date: Date.now(),
                 amount: total,
                 paymentMethod: selectedCurrency === "Pesos" ? "Efectivo" : "Bitcoin",
                 userName,
@@ -180,7 +184,7 @@ export default function EditOrder() {
             const ticketResponse = await addTicket(ticket);
             setTicketId(ticketResponse.id);
 
-            const response = await updateOrder(pedidoId, { estado: "cerrado" });
+            const response = await updateOrder(pedidoId, { status: "closed" });
             setOrder(response.data);
 
             if (selectedCurrency === "Pesos") {
@@ -212,7 +216,7 @@ export default function EditOrder() {
             setError("");
             try {
                 const response = await updateOrder(pedidoId, {
-                    estado: "pagado",
+                    status: "paid",
                     paymentMethod: "Bitcoin",
                 });
                 setOrder(response.data);
@@ -220,7 +224,7 @@ export default function EditOrder() {
                 const tables = await getTables();
                 const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
                 if (table) {
-                    await updateTable(table.id, { pedidoId: null, estado: "libre" });
+                    await updateTable(table.id, { pedidoId: null, status: "libre" });
                 }
 
                 setTicketId(null);
@@ -243,7 +247,7 @@ export default function EditOrder() {
         setError("");
         try {
             const response = await updateOrder(pedidoId, {
-                estado: "pagado",
+                status: "paid",
                 paymentMethod: selectedPaymentMethod,
             });
             setOrder(response.data);
@@ -253,7 +257,7 @@ export default function EditOrder() {
             const tables = await getTables();
             const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
             if (table) {
-                await updateTable(table.id, { pedidoId: null, estado: "libre" });
+                await updateTable(table.id, { pedidoId: null, status: "libre" });
             }
 
             setShowPaymentMethodDialog(false);
@@ -388,35 +392,36 @@ export default function EditOrder() {
                                 </div>
                                 <div className="flex justify-between items-center mt-4">
                                     <div className="flex gap-4">
-                                        {order?.estado === "abierto" && (<>
+                                        {order?.status === "open" && (<>
                                             <button
                                                 className="bg-blue-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-blue-600"
-                                                onClick={() => handleChangeOrderStatus("cerrado")}
+                                                onClick={() => handleChangeOrderStatus("closed")}
                                                 disabled={isLoading}
                                             >
                                                 Cerrar Pedido
                                             </button>
-                                            <button
+                                            {/*ToDo*/}
+                                            {/*<button
                                                     className="bg-yellow-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-yellow-600"
                                                     onClick={handleUndo}
                                                 disabled={undoStack.length === 0 || isLoading}
                                             >
                                                 Deshacer
-                                            </button>
+                                            </button>*/}
                                         </>)}
-                                        {order?.estado === "cerrado" && (
+                                        {order?.status === "closed" && (
                                             <>
                                                 <button
                                                     className="bg-blue-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-blue-600"
-                                                    onClick={() => handleChangeOrderStatus("abierto")}
+                                                    onClick={() => handleChangeOrderStatus("open")}
                                                     disabled={isLoading}
                                                 >
                                                     Reabrir Pedido
                                                 </button>
                                                 <button
                                                     className="bg-green-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-green-600"
-                                                    onClick={handlePayOrder}
-                                                    disabled={isLoading || !selectedCurrency}
+                                                    onClick={/*handlePayOrder*/()=> handleChangeOrderStatus("paid")}
+                                                    disabled={isLoading}
                                                 >
                                                     Pagar
                                                 </button>
