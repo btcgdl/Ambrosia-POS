@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar/NavBar";
 import Header from "../../components/header/Header";
 import { createOrder, getAllOrders, getUserById } from "./ordersService";
+import PaginatedTable from "../../components/PaginatedTable";
+import formatDate from "../../utils/formatDate";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -13,6 +15,7 @@ export default function Orders() {
     async function fetchData() {
       try {
         const response = await getAllOrders();
+        console.log(response);
         setOrders(response);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -43,8 +46,75 @@ export default function Orders() {
     return order.status === "paid";
   });
 
+  const columns = [
+    {
+      key: "id",
+      title: "ID",
+      width: "120px",
+      className: "font-mono text-sm text-gray-900",
+      render: (value) => value.substring(0, 4),
+    },
+    {
+      key: "waiter",
+      title: "Mesero",
+      className: "text-gray-900 font-medium",
+    },
+    {
+      key: "table_id",
+      title: "Mesa",
+      width: "120px",
+      className: "text-gray-500",
+      render: (value) =>
+        value ? (
+          value.substring(0, 4)
+        ) : (
+          <span className="text-gray-400 italic">Sin mesa</span>
+        ),
+    },
+    {
+      key: "status",
+      title: "Estado",
+      width: "100px",
+      render: (value) => (
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+            value === "open"
+              ? "bg-green-100 text-green-800"
+              : value === "closed"
+                ? "bg-red-100 text-red-800"
+                : "bg-yellow-100 text-yellow-800"
+          }`}
+        >
+          {value === "open"
+            ? "Abierta"
+            : value === "closed"
+              ? "Cerrada"
+              : value.charAt(0).toUpperCase() + value.slice(1)}
+        </span>
+      ),
+    },
+    {
+      key: "total",
+      title: "Total",
+      width: "100px",
+      className: "text-gray-900 font-semibold",
+      render: (value) => (
+        <span className={value > 0 ? "text-green-600" : "text-gray-400"}>
+          ${value.toFixed(2)}
+        </span>
+      ),
+    },
+    {
+      key: "created_at",
+      title: "Fecha Creación",
+      width: "140px",
+      className: "text-gray-500 text-sm",
+      render: (value) => formatDate(value),
+    },
+  ];
+
   return (
-    <main className="h-[90%] w-full flex items-center justify-center">
+    <main className="h-[90%] w-full flex items-center justify-center overflow-y-auto">
       <div className="h-[80%] w-[80%] bg-amber-200 rounded-lg p-6 flex flex-col">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold">Lista de Órdenes</h2>
@@ -79,32 +149,15 @@ export default function Orders() {
           </button>
         </div>
 
-        {filteredOrders.length > 0 ? (
-          <div className="overflow-y-auto max-h-[70%]">
-            <ul className="space-y-4">
-              {filteredOrders.map((order) => (
-                <li key={order.id}>
-                  <button
-                    className="w-full bg-white text-gray-800 py-4 px-6 rounded-lg hover:bg-gray-100 flex justify-between items-center text-xl"
-                    onClick={() => handleOrderClick(order.id)}
-                  >
-                    <span>Orden #{order.id.substring(0, 4)}</span>
-                    <span>Estado: {order.status}</span>
-                    <span>Total: ${order.total.toFixed(2)}</span>
-                    <span>Mozo: {order.waiter}</span>
-                    <span>Mesa: {order.table}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <p className="text-xl text-gray-500 text-center">
-            {filter === "en-curso"
-              ? "No hay pedidos en curso."
-              : "No hay pedidos pagados."}
-          </p>
-        )}
+        <PaginatedTable
+          data={filteredOrders}
+          columns={columns}
+          initialItemsPerPage={5}
+          itemsPerPageOptions={[5, 10, 15, 20]}
+          rowClickable
+          emptyMessage="No hay ordenes disponibles"
+          onRowClick={(orderData) => handleOrderClick(orderData.id)}
+        />
       </div>
     </main>
   );
