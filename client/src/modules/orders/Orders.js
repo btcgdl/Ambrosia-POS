@@ -28,7 +28,7 @@ export default function Orders() {
     const handleCreateOrder = async () => {
         try{
             const createdOrderId = await createOrder();
-            navigate(`/modify-order/${createdOrderId.orderId}`);
+            navigate(`/modify-order/${createdOrderId.id}`);
         } catch (error) {
 
         } finally {
@@ -36,9 +36,11 @@ export default function Orders() {
         }
     };
 
+    console.log(orders);
+
     const filteredOrders = orders.filter((order) => {
         if (filter === "en-curso") {
-            return order.status === "open" || order.status === "close";
+            return order.status === "open" || order.status === "closed";
         }
         return order.status === "paid";
     });
@@ -92,10 +94,10 @@ export default function Orders() {
                                                 className="w-full bg-white text-gray-800 py-4 px-6 rounded-lg hover:bg-gray-100 flex justify-between items-center text-xl"
                                                 onClick={() => handleOrderClick(order.id)}
                                             >
-                                                <span>Orden #{order.id}</span>
-                                                <span>Estado: {order.estado}</span>
+                                                <span>Orden #{order.id.substring(0, 4)}</span>
+                                                <span>Estado: {order.status}</span>
                                                 <span>Total: ${order.total.toFixed(2)}</span>
-                                                <span>Mozo: {order.mozo}</span>
+                                                <span>Mozo: {order.waiter}</span>
                                                 <span>Mesa: {order.table}</span>
                                             </button>
                                         </li>

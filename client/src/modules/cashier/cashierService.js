@@ -74,3 +74,12 @@ export async function payInvoiceFromService(invoice){
         body: { invoice: invoice.trim() }
     });
 }
+
+export async function getIncomingTransactions() {
+    const transactions = await apiClient("/wallet/payments/incoming");
+    return transactions ? transactions : [];
+}
+export async function getOutgoingTransactions() {
+    const transactions = await apiClient("/wallet/payments/outgoing");
+    return transactions ? transactions : [];
+}
