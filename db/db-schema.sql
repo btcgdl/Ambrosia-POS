@@ -25,7 +25,7 @@ CREATE TABLE roles (
 -- Spaces table (NUEVA)
 CREATE TABLE spaces (
     id BLOB PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
+    name TEXT,
     is_deleted BOOLEAN NOT NULL DEFAULT 0
 );
 
