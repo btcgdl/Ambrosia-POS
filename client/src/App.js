@@ -65,8 +65,8 @@ function App() {
                           path={route.path}
                           element={
                             <ProtectedRoute>
-                              <Header />
                               <NavBar>
+                                <Header />
                                 <Component />
                               </NavBar>
                             </ProtectedRoute>
