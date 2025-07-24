@@ -1,108 +1,55 @@
 ﻿import { apiClient } from '../../services/apiClient';
-import { mockService } from '../../useMockSocket';
 
 export async function getRooms() {
-    try {
-        return await apiClient('/spaces');
-    } catch (error) {
-        throw error;
-        //return { data: mockService.getRooms() };
-    }
+    return await apiClient('/spaces');
 }
 
 export async function addRoom(room) {
-    try {
-        return await apiClient('/spaces', {
-            method: 'POST',
-            body: room,
-        });
-    } catch (error) {
-        if (mockService.getRooms().some((r) => r.nombre === room.nombre)) {
-            throw new Error('La sala ya existe');
-        }
-        return mockService.addRoom({ ...room, mesasIds: [] });
-    }
+    return await apiClient('/spaces', {
+        method: 'POST',
+        body: room,
+    });
 }
 
 export async function updateRoom(room) {
-    try {
-        return await apiClient(`/spaces/${room.id}`, {
-            method: 'PUT',
-            body: room,
-        });
-    } catch (error) {
-        const rooms = mockService.getRooms();
-        const roomExists = rooms.find((r) => r.id === room.id);
-        if (!roomExists) throw new Error('Sala no encontrada');
-        if (rooms.some((r) => r.nombre === room.nombre && r.id !== room.id)) {
-            throw new Error('La sala ya existe');
-        }
-        return mockService.updateRoom(room);
-    }
+    return await apiClient(`/spaces/${room.id}`, {
+        method: 'PUT',
+        body: room,
+    });
+
 }
 
 export async function deleteRoom(roomId) {
-    try {
-        return await apiClient(`/spaces/${roomId}`, {
-            method: 'DELETE',
-        });
-    } catch (error) {
-        return mockService.deleteRoom(roomId);
-    }
+    return await apiClient(`/spaces/${roomId}`, {
+        method: 'DELETE',
+    });
 }
 
 export async function getTablesByRoomId(roomId) {
-    try{
-        const tables = await apiClient(`/tables/by-space/${roomId}`);
-        return tables ? tables : [];
-    } catch (e) {
-        throw e;
-    }
+    const tables = await apiClient(`/tables/by-space/${roomId}`);
+    return tables ? tables : [];
 }
 
 export async function getTables() {
-    try {
-        return await apiClient('/tables');
-    } catch (error) {
-        return { data: mockService.getTables() };
-    }
+    return await apiClient('/tables');
 }
 
 export async function addTable(table) {
-    try {
-        return await apiClient('/tables', {
-            method: 'POST',
-            body: table,
-        });
-    } catch (error) {
-        return mockService.addTable(table);
-    }
+    return await apiClient('/tables', {
+        method: 'POST',
+        body: table,
+    });
 }
 
 export async function updateTable(table) {
-    try {
-        return await apiClient(`/tables/${table.id}`, {
-            method: 'PUT',
-            body: table,
-        });
-    } catch (error) {
-        const tables = mockService.getTables();
-        const tableExists = tables.find((t) => t.id === table.id);
-        if (!tableExists) throw new Error('Mesa no encontrada');
-        return mockService.updateTable(table);
-    }
+    return await apiClient(`/tables/${table.id}`, {
+        method: 'PUT',
+        body: table,
+    });
 }
 
 export async function deleteTable(tableId) {
-    try {
-        return await apiClient(`/tables/${tableId}`, {
-            method: 'DELETE',
-        });
-    } catch (error) {
-        const tables = mockService.getTables();
-        const table = tables.find((t) => t.id === tableId);
-        if (!table) throw new Error('Mesa no encontrada');
-        if (table.pedidoId) throw new Error('No se puede eliminar una mesa con un pedido activo');
-        return mockService.deleteTable(tableId);
-    }
+    return await apiClient(`/tables/${tableId}`, {
+        method: 'DELETE',
+    });
 }
