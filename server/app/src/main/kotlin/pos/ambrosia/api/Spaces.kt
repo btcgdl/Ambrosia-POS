@@ -71,7 +71,7 @@ fun Route.spaces(spaceService: SpaceService) {
             if (isDeleted) {
                 call.respond(HttpStatusCode.OK, "Space deleted successfully")
             } else {
-                call.respond(HttpStatusCode.NotFound, "Space not found")
+                call.respond(HttpStatusCode.BadRequest, "Space not found")
             }
         } else {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
