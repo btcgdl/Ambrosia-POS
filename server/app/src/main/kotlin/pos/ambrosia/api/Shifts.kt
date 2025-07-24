@@ -10,14 +10,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
-import pos.ambrosia.db.connectToSqlite
 import pos.ambrosia.logger
 import pos.ambrosia.models.Shift
 import pos.ambrosia.services.ShiftService
 import pos.ambrosia.utils.UserNotFoundException
+import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureShifts() {
-    val connection: Connection = connectToSqlite()
+    val connection: Connection = DatabaseConnection.getConnection()
     val shiftService = ShiftService(connection)
     routing { route("/shifts") { shifts(shiftService) } }
 }

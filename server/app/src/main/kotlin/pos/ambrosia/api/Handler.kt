@@ -65,11 +65,11 @@ fun Application.Handler() {
     }
     status(HttpStatusCode.NotFound) { call, status ->
       logger.info("Resource not found: ${call.request}")
-      call.respondText(text = "Unknown endpoint (check api doc)", status = status)
+      call.respondText(status.description, status = status)
     }
     status(HttpStatusCode.BadRequest) { call, status ->
       logger.warn("Bad request: ${call.request}")
-      call.respondText(text = "Bad request (check api doc)", status = status)
+      call.respondText(status.description, status = status)
     }
   }
 }

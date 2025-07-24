@@ -1,4 +1,4 @@
-﻿import { useUserRole } from "../../contexts/UserRoleContext";
+import { useUserRole } from "../../contexts/UserRoleContext";
 import NavBarButton from "./NavBarButton";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, Children } from "react";
@@ -21,7 +21,6 @@ export default function NavBar({ children }) {
           ></i>
           <p className="text-white text-[15px]">{userRole?.toUpperCase()}</p>
         </div>
-
         <div className="h-[80%] overflow-y-auto flex flex-col gap-7 py-4 scrollbar-hide">
           {Object.values(getModules()).flatMap((module) =>
             (module.navItems || [])
@@ -42,19 +41,6 @@ export default function NavBar({ children }) {
                 />
               )),
           )}
-
-          {/*{userRole === "admin" && (<>
-                    <NavBarButton text="Platos" icon="egg-fried" onClick={()=>{navigate("/dishes")}}/>
-                    <NavBarButton text="Espacios" icon="layout-text-window" onClick={()=>{navigate("/spaces")}}/>
-                </>)}
-                <NavBarButton text="Pedidos" icon="receipt" onClick={()=>{navigate("/all-orders")}}/>
-                {userRole === "admin" && (<>
-                    <NavBarButton text="Conf" icon="gear-fill" onClick={()=>{}}/>
-                    <NavBarButton text="Usuarios" icon="people-fill" onClick={()=>{navigate("/users")}}/>
-                    <NavBarButton text="Roles" icon="people-fill" onClick={()=>{navigate("/roles")}}/>
-                    <NavBarButton text="Inventario" icon="people-fill" onClick={()=>{navigate("/inventory/ingredients")}}/>
-                    <NavBarButton text="Reportes y caja" icon="people-fill" onClick={()=>{navigate("/reports")}}/>
-                </>)}*/}
           <NavBarButton
             text="Salir"
             icon="box-arrow-right"
@@ -64,7 +50,8 @@ export default function NavBar({ children }) {
           />
         </div>
       </aside>
-      <div className="w-[75%] h-full">{children}</div>
+      {/* 👇 El cambio está en esta línea */}
+      <div className="w-[75%] h-full overflow-y-auto">{children}</div>
     </div>
   );
 }
