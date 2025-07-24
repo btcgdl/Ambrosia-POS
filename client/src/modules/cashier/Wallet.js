@@ -179,6 +179,7 @@ export default function Wallet() {
                         value={invoiceAmount}
                         onChange={(e) => setInvoiceAmount(e.target.value)}
                         className="p-2 rounded flex-1"
+                        required={true}
                     />
                     <input
                         type="text"
@@ -186,6 +187,7 @@ export default function Wallet() {
                         value={invoiceDesc}
                         onChange={(e) => setInvoiceDesc(e.target.value)}
                         className="p-2 rounded flex-1"
+                        required={true}
                     />
                     <button
                         onClick={handleCreateInvoice}
@@ -314,14 +316,14 @@ export default function Wallet() {
                                         {tx.type === "outgoing_payment" ? (
                                             <span>📤 Enviado - {tx.sent} sats</span>
                                         ) : (
-                                            <span>✅ Recibido - {tx.amount || 0} sats</span>
+                                            <span>✅ Recibido - {tx.receivedSat} sats</span>
                                         )}
                                     </div>
                                     <div className="text-gray-500 text-sm">
                                         {new Date(tx.completedAt).toLocaleString()}
                                     </div>
                                 </div>
-                                {tx.fees && <p className="text-sm text-gray-500">Fee: {tx.fees} sats</p>}
+                                {<p className="text-sm text-gray-500">Fee: {Number(tx.fees)/1000} sats</p>}
                             </li>
                         ))}
                     </ul>

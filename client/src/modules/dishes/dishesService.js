@@ -1,97 +1,51 @@
 ﻿import { apiClient } from '../../services/apiClient';
-import { mockService } from '../../useMockSocket';
 
 export async function getDishes() {
-    try {
-        const dishes = await apiClient('/dishes');
-        return dishes ? dishes : [];
-    } catch (error) {
-        return { data: mockService.getDishes() };
-    }
+    const dishes = await apiClient('/dishes');
+    return dishes ? dishes : [];
 }
 
 export async function addDish(dish) {
-    try {
-        return await apiClient('/dishes', {
-            method: 'POST',
-            body: dish,
-        });
-    } catch (error) {
-        return mockService.addDish(dish);
-    }
+    return await apiClient('/dishes', {
+        method: 'POST',
+        body: dish,
+    });
 }
 
 export async function updateDish(dish) {
-    try {
-        return await apiClient(`/dishes/${dish.id}`, {
-            method: 'PUT',
-            body: dish,
-        });
-    } catch (error) {
-        const dishes = mockService.getDishes();
-        const dishExists = dishes.find((d) => d.id === dish.id);
-        if (!dishExists) throw new Error('Platillo no encontrado');
-        return mockService.updateDish(dish);
-    }
+    return await apiClient(`/dishes/${dish.id}`, {
+        method: 'PUT',
+        body: dish,
+    });
 }
 
 export async function deleteDish(dishId) {
-    try {
-        return await apiClient(`/dishes/${dishId}`, {
-            method: 'DELETE',
-        });
-    } catch (error) {
-        const dishes = mockService.getDishes();
-        const dishExists = dishes.find((d) => d.id === dishId);
-        if (!dishExists) throw new Error('Platillo no encontrado');
-        return mockService.deleteDish(dishId);
-    }
+    return await apiClient(`/dishes/${dishId}`, {
+        method: 'DELETE',
+    });
 }
 
 export async function getCategories() {
-    try {
-        const categories = await apiClient('/dish-categories');
-        return  categories ? categories : [];
-    } catch (error) {
-        return { data: mockService.getCategories() };
-    }
+    const categories = await apiClient('/dish-categories');
+    return  categories ? categories : [];
 }
 
 export async function addCategory(category) {
-    try {
-        return await apiClient('/dish-categories', {
-            method: 'POST',
-            body: { name: category },
-        });
-    } catch (error) {
-        if (mockService.getCategories().includes(category)) {
-            throw new Error('La categoría ya existe');
-        }
-        return mockService.addCategory(category);
-    }
+    return await apiClient('/dish-categories', {
+        method: 'POST',
+        body: { name: category },
+    });
 }
 
 export async function deleteCategory(category) {
-    try {
-        return await apiClient(`/dish-categories/${category}`, {
-            method: 'DELETE',
-        });
-    } catch (error) {
-        const categories = mockService.getCategories();
-        if (!categories.includes(category)) throw new Error('Categoría no encontrada');
-        return mockService.deleteCategory(category);
-    }
+    return await apiClient(`/dish-categories/${category}`, {
+        method: 'DELETE',
+    });
 }
 
 export async function updateCategory(id, name) {
-    try {
-        return await apiClient(`/dish-categories/${id}`, {
-            method: 'PUT',
-            body: { name: name },
-        });
-    } catch (error) {
-        const categories = mockService.getCategories();
-        if (!categories.includes(id)) throw new Error('Categoría no encontrada');
-        return mockService.updateCategory(id, name);
-    }
+    return await apiClient(`/dish-categories/${id}`, {
+        method: 'PUT',
+        body: { name: name },
+    });
 }
