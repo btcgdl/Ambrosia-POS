@@ -114,7 +114,7 @@ const PaginatedTable = ({
   return (
     <div className={`w-full max-w-6xl mx-auto p-6 ${className}`}>
       {/* Tabla completa con header integrado */}
-      <div className="overflow-hidden shadow rounded-lg">
+      <div className="overflow-x-auto shadow rounded-lg">
         <table
           className={`min-w-full divide-y divide-gray-300 ${tableClassName}`}
         >

@@ -139,7 +139,7 @@ export default function Wallet() {
     {
       label: "Recibir Pago",
       content: (
-        <div className="bg-green-100 rounded p-4">
+        <div className="bg-green-100 rounded p-4 overflow-y-auto">
           <h2 className="text-2xl mb-2">Recibir Pago</h2>
           <div className="flex gap-2">
             <input
@@ -336,61 +336,63 @@ export default function Wallet() {
   ];
 
   return (
-    <div className="p-8 flex flex-col gap-6">
-      <h1 className="text-3xl font-bold">Wallet Lightning ⚡</h1>
+    <main className="h-[90%] w-[90%] mt-4 mx-auto my-auto overflow-y-auto">
+      <div className="bg-amber-100 rounded-xl p-8 flex flex-col gap-6">
+        <h1 className="text-3xl font-bold">Wallet Lightning ⚡</h1>
 
-      {error && <p className="text-red-600">{error}</p>}
+        {error && <p className="text-red-600">{error}</p>}
 
-      <div className="bg-gray-100 rounded p-4">
-        <h2 className="text-2xl mb-2">Información</h2>
-        {info ? (
-          <div className="flex flex-col gap-1">
-            <p>
-              <b>Node ID:</b> {info.nodeId}
-            </p>
-            <p>
-              <b>Versión:</b> {info.version}
-            </p>
-            <p>
-              <b>Red:</b> {info.chain}
-            </p>
-            <p>
-              <b>Altura de bloque:</b> {info.blockHeight}
-            </p>
+        <div className="bg-white rounded p-4">
+          <h2 className="text-2xl mb-2">Información</h2>
+          {info ? (
+            <div className="flex flex-col gap-1 overflow-x-auto">
+              <p>
+                <b>Node ID:</b> {info.nodeId}
+              </p>
+              <p>
+                <b>Versión:</b> {info.version}
+              </p>
+              <p>
+                <b>Red:</b> {info.chain}
+              </p>
+              <p>
+                <b>Altura de bloque:</b> {info.blockHeight}
+              </p>
 
-            <p>
-              <b>Balance local:</b>{" "}
-              {info.channels.reduce((total, ch) => total + ch.balanceSat, 0)}{" "}
-              sats
-            </p>
+              <p>
+                <b>Balance local:</b>{" "}
+                {info.channels.reduce((total, ch) => total + ch.balanceSat, 0)}{" "}
+                sats
+              </p>
 
-            <h3 className="mt-2 text-lg font-semibold">Canales abiertos:</h3>
-            {info.channels.map((ch, index) => (
-              <div key={ch.channelId} className="border rounded p-2 mt-1">
-                <p>
-                  <b>Canal #{index + 1}</b>
-                </p>
-                <p>
-                  <b>Estado:</b> {ch.state}
-                </p>
-                <p>
-                  <b>Balance:</b> {ch.balanceSat} sats
-                </p>
-                <p>
-                  <b>Inbound Liquidity:</b> {ch.inboundLiquiditySat} sats
-                </p>
-                <p>
-                  <b>Capacidad total:</b> {ch.capacitySat} sats
-                </p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p>Cargando información...</p>
-        )}
+              <h3 className="mt-2 text-lg font-semibold">Canales abiertos:</h3>
+              {info.channels.map((ch, index) => (
+                <div key={ch.channelId} className="border rounded p-2 mt-1">
+                  <p>
+                    <b>Canal #{index + 1}</b>
+                  </p>
+                  <p>
+                    <b>Estado:</b> {ch.state}
+                  </p>
+                  <p>
+                    <b>Balance:</b> {ch.balanceSat} sats
+                  </p>
+                  <p>
+                    <b>Inbound Liquidity:</b> {ch.inboundLiquiditySat} sats
+                  </p>
+                  <p>
+                    <b>Capacidad total:</b> {ch.capacitySat} sats
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>Cargando información...</p>
+          )}
+        </div>
+
+        <Tabs tabs={tabsData} />
       </div>
-
-      <Tabs tabs={tabsData} />
-    </div>
+    </main>
   );
 }
