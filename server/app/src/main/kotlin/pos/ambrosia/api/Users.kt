@@ -10,14 +10,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
-import pos.ambrosia.db.connectToSqlite
 import pos.ambrosia.logger
 import pos.ambrosia.models.User
 import pos.ambrosia.services.UsersService
 import pos.ambrosia.utils.UserNotFoundException
+import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureUsers() {
-  val connection: Connection = connectToSqlite()
+  val connection: Connection = DatabaseConnection.getConnection()
   val userService = UsersService(connection)
   routing { route("/users") { users(userService) } }
 }

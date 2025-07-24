@@ -46,11 +46,3 @@ object DatabaseConnection {
         }
     }
 }
-
-// Extension function for backward compatibility
-@Deprecated(
-    message = "Use DatabaseConnection.getConnection() instead for better resource management",
-    replaceWith = ReplaceWith("DatabaseConnection.getConnection()"),
-    level = DeprecationLevel.WARNING
-)
-fun Application.connectToSqlite(): Connection = DatabaseConnection.getConnection()

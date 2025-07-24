@@ -10,14 +10,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
-import pos.ambrosia.db.connectToSqlite
 import pos.ambrosia.logger
 import pos.ambrosia.models.Supplier
 import pos.ambrosia.services.SupplierService
 import pos.ambrosia.utils.UserNotFoundException
+import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureSuppliers() {
-    val connection: Connection = connectToSqlite()
+    val connection: Connection = DatabaseConnection.getConnection()
     val supplierService = SupplierService(connection)
     routing { route("/suppliers") { suppliers(supplierService) } }
 }
