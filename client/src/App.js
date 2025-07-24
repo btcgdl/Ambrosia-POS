@@ -18,6 +18,7 @@ import { ProtectedRoute } from "./modules/cashier/ProtectedRoute";
 import { AuthProvider } from "./modules/auth/AuthProvider";
 import NavBar from "./components/navbar/NavBar";
 import Header from "./components/header/Header";
+import {LoggerProvider} from "./contexts/LoggerContext";
 
 function App() {
   const [modules, setModules] = useState(getModules());
@@ -49,42 +50,44 @@ function App() {
   return (
     <div className="App">
       <MockSocketProvider>
-        <AuthProvider>
-          <TurnProvider>
-            <UserRoleProvider>
-              <BrowserRouter>
-                <Routes>
-                  {Object.entries(modules).map(([name, module]) => {
-                    if (!config.modules[name]) return null;
+        <LoggerProvider>
+          <AuthProvider>
+            <TurnProvider>
+              <UserRoleProvider>
+                <BrowserRouter>
+                  <Routes>
+                    {Object.entries(modules).map(([name, module]) => {
+                      if (!config.modules[name]) return null;
 
-                    return module.routes.map((route) => {
-                      const Component = route.component;
-                      return (
-                        <Route
-                          key={route.path}
-                          path={route.path}
-                          element={
-                            <ProtectedRoute>
-                              <NavBar>
-                                <Header />
-                                <Component />
-                              </NavBar>
-                            </ProtectedRoute>
-                          }
-                        />
-                      );
-                    });
-                  })}
+                      return module.routes.map((route) => {
+                        const Component = route.component;
+                        return (
+                          <Route
+                            key={route.path}
+                            path={route.path}
+                            element={
+                              <ProtectedRoute>
+                                <NavBar>
+                                  <Header />
+                                  <Component />
+                                </NavBar>
+                              </ProtectedRoute>
+                            }
+                          />
+                        );
+                      });
+                    })}
 
-                  <Route
-                    path="*"
-                    element={<div>404 - Página no encontrada</div>}
-                  />
-                </Routes>
-              </BrowserRouter>
-            </UserRoleProvider>
-          </TurnProvider>
-        </AuthProvider>
+                    <Route
+                      path="*"
+                      element={<div>404 - Página no encontrada</div>}
+                    />
+                  </Routes>
+                </BrowserRouter>
+              </UserRoleProvider>
+            </TurnProvider>
+          </AuthProvider>
+        </LoggerProvider>
       </MockSocketProvider>
     </div>
   );

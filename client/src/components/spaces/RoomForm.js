@@ -6,7 +6,7 @@ export default function RoomForm({ onSubmit, initialData, onCancel }) {
 
     useEffect(() => {
         if (initialData) {
-            setNombre(initialData.nombre);
+            setNombre(initialData.name);
         } else {
             setNombre("");
         }
@@ -23,7 +23,6 @@ export default function RoomForm({ onSubmit, initialData, onCancel }) {
             await onSubmit({
                 ...initialData,
                 name: nombre.trim(),
-                //mesasIds: initialData?.mesasIds || [],
             });
             setNombre("");
         } catch (err) {
@@ -52,18 +51,16 @@ export default function RoomForm({ onSubmit, initialData, onCancel }) {
                     >
                         {initialData ? "Guardar cambios" : "Agregar sala"}
                     </button>
-                    {initialData && (
-                        <button
-                            type="button"
-                            onClick={() => {
-                                onCancel();
-                                setError("");
-                            }}
-                            className="px-4 py-2 bg-gray-400 text-white rounded"
-                        >
-                            Cancelar
-                        </button>
-                    )}
+                    <button
+                        type="button"
+                        onClick={() => {
+                            onCancel();
+                            setError("");
+                        }}
+                        className="px-4 py-2 bg-gray-400 text-white rounded"
+                    >
+                        Cancelar
+                    </button>
                 </div>
             </form>
         </div>

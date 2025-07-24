@@ -136,7 +136,7 @@ export default function Wallet() {
     };
 
     return (
-        <div className="p-8 flex flex-col gap-6">
+        <div className="p-8 flex flex-col gap-6 h-[100%]                  ">
             <h1 className="text-3xl font-bold">Wallet Lightning ⚡</h1>
 
             {error && <p className="text-red-600">{error}</p>}

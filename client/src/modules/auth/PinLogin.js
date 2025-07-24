@@ -7,6 +7,7 @@ import { getHomeRoute } from "../../utils/getHomeRoute";
 import { jwtDecode } from "jwt-decode";
 import { useUserRole } from "../../contexts/UserRoleContext";
 import { useAuth } from "./useAuth";
+import {getLogger} from "../../utils/loggerStore";
 
 export default function PinLogin() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function PinLogin() {
   const [isLoading, setIsLoading] = useState(true);
   const { login, logout } = useAuth();
   const { updateUserRole } = useUserRole();
+  const showLog = getLogger();
 
   useEffect(() => {
     async function getUsersFromService() {
@@ -24,7 +26,6 @@ export default function PinLogin() {
         const users = await getUsers();
         setUsers(users);
       } catch (error) {
-        setError(error.message);
       } finally {
         setIsLoading(false);
       }
@@ -43,8 +44,12 @@ export default function PinLogin() {
   };
 
   const handleLogInWithPin = async () => {
-    if (!selectedUser || pin.length < 4) {
-      setError("Seleccione usuario e ingrese su pin");
+    if (!selectedUser) {
+      if (showLog) showLog("error", "Seleccione un usuario");
+      return;
+    }
+    if (pin.length < 4) {
+      if (showLog) showLog("error", "El pin debe ser de 4 digitos");
       return;
     }
     setIsLoading(true);
@@ -59,7 +64,6 @@ export default function PinLogin() {
       login();
       navigate(getHomeRoute());
     } catch (error) {
-      setError(error.message || "Error al ingresar");
     } finally {
       setIsLoading(false);
     }
@@ -146,7 +150,6 @@ export default function PinLogin() {
           <button
             onClick={handleLogInWithPin}
             className="bg-green-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-green-600"
-            disabled={isLoading || pin.length < 4}
           >
             Ingresar
           </button>

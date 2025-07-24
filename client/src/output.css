@@ -277,6 +277,9 @@
   .mt-6 {
     margin-top: calc(var(--spacing) * 6);
   }
+  .mt-\[40px\] {
+    margin-top: 40px;
+  }
   .mr-2 {
     margin-right: calc(var(--spacing) * 2);
   }
@@ -342,6 +345,9 @@
   }
   .h-\[95\%\] {
     height: 95%;
+  }
+  .h-\[100\%\] {
+    height: 100%;
   }
   .h-\[350px\] {
     height: 350px;
@@ -674,6 +680,9 @@
   }
   .bg-green-100 {
     background-color: var(--color-green-100);
+  }
+  .bg-green-400 {
+    background-color: var(--color-green-400);
   }
   .bg-green-500 {
     background-color: var(--color-green-500);
