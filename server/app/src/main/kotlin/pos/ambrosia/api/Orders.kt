@@ -10,7 +10,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
-import pos.ambrosia.db.connectToSqlite
 import pos.ambrosia.logger
 import pos.ambrosia.models.AddOrderDishRequest
 import pos.ambrosia.models.CompleteOrder
@@ -18,9 +17,10 @@ import pos.ambrosia.models.Order
 import pos.ambrosia.models.OrderDish
 import pos.ambrosia.models.OrderWithDishesRequest
 import pos.ambrosia.services.OrderService
+import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureOrders() {
-    val connection: Connection = connectToSqlite()
+    val connection: Connection = DatabaseConnection.getConnection()
     val orderService = OrderService(connection)
     routing { route("/orders") { orders(orderService) } }
 }
