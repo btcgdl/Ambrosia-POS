@@ -92,11 +92,7 @@ export default function PinLogin() {
           className="text-xl p-2 rounded-lg w-full max-w-md bg-white border border-gray-300 shadow focus:outline-none focus:ring-2 focus:ring-blue-400 hover:bg-gray-50 transition-colors"
           disabled={isLoading}
         >
-          {users.length !== 0 && (
-            <option key="" disabled>
-              Selecciona un usuario
-            </option>
-          )}
+          {users.length !== 0 && <option key="">Selecciona un usuario</option>}
           {users.length !== 0 ? (
             users.map((user) => (
               <option key={user.id} value={user.name}>
