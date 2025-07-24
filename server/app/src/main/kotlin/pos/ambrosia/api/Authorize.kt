@@ -13,16 +13,16 @@ import io.ktor.server.routing.*
 import io.ktor.util.date.*
 import java.sql.Connection
 import java.util.*
-import pos.ambrosia.db.connectToSqlite
 import pos.ambrosia.logger
 import pos.ambrosia.models.AuthRequest
 import pos.ambrosia.models.Message
 import pos.ambrosia.services.TokenService
 import pos.ambrosia.services.UsersService
 import pos.ambrosia.utils.*
+import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureAuth() {
-  val connection: Connection = connectToSqlite()
+  val connection: Connection = DatabaseConnection.getConnection()
   val userService = UsersService(connection)
   val tokenService = TokenService(environment, connection)
   routing { route("/auth") { auth(userService, tokenService) } }
