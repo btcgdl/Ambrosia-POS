@@ -7,7 +7,8 @@ export async function getAllOrders() {
 }
 
 export async function getOrders() {
-    return await apiClient('/orders');
+    const orders = await apiClient('/orders');
+    return orders ? orders : [];
 }
 
 export async function addOrder(order) {
@@ -155,4 +156,52 @@ export async function updateTicket(ticketId, updatedTicket) {
 
 export async function getTicketByOrderId(orderId) {
     return await apiClient(`/get-ticket-by-order-id/${orderId}`, {});
+}
+
+export async function createTicket(ticket) {
+    return await apiClient('/tickets', {
+        method: 'POST',
+        body: ticket,
+    })
+}
+
+export async function createPayment(payment){
+    return await apiClient('/payments', {
+        method: 'POST',
+        body: payment,
+    })
+}
+
+export async function addPaymentToTicket(ticketId, paymentId){
+    return await apiClient('/payments/ticket-payments', {
+        method: 'POST',
+        body:{
+            payment_id: paymentId,
+            ticket_id: ticketId,
+        }
+    })
+}
+
+export async function getPaymentMethods(){
+    const paymentMethods = await apiClient('/payments/methods');
+    return paymentMethods ? paymentMethods : [];
+}
+
+export async function getPaymentCurrencies(){
+    const paymentCurrencies = await apiClient('/payments/currencies');
+    return paymentCurrencies ? paymentCurrencies : [];
+}
+
+export async function getTickets(){
+    const tickets = await apiClient('/tickets');
+    return tickets ? tickets : [];
+}
+
+export async function getPayments(){
+    const payments = await apiClient('/payments');
+    return payments ? payments : [];
+}
+
+export async function getPaymentByTicketId(id){
+    return await apiClient(`/payments/ticket-payments/by-ticket/${id}`);
 }

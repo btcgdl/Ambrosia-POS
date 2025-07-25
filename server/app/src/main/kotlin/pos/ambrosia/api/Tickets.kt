@@ -46,8 +46,8 @@ fun Route.tickets(ticketService: TicketService) {
     }
     post("") {
         val ticket = call.receive<Ticket>()
-        ticketService.addTicket(ticket)
-        call.respond(HttpStatusCode.Created, "Ticket added successfully")
+        val generatedId = ticketService.addTicket(ticket)
+        call.respond(HttpStatusCode.Created, mapOf("id" to generatedId))
     }
     put("/{id}") {
         val id = call.parameters["id"]

@@ -1,32 +1,9 @@
-﻿// pages/Reports.jsx
-import { useEffect, useState } from "react";
-import Calendar from "react-calendar";
+﻿import { useEffect, useState } from "react";
 import "react-calendar/dist/Calendar.css";
-import NavBar from "../../components/navbar/NavBar";
-import Header from "../../components/header/Header";
 
-import { getReport } from "./cashierService";
-import { useNavigate } from "react-router-dom"; // Adjust the path as needed
-
-const getReportData = async (startDate, endDate) => {
-  try {
-    const response = await getReport(startDate, endDate);
-    if (response.data) {
-      return response.data;
-    } else {
-      console.warn("Using mock data for reports");
-      return {
-        startDate,
-        endDate,
-        totalBalance: 0,
-        reports: [],
-      };
-    }
-  } catch (error) {
-    console.error("Error fetching report data:", error);
-    throw new Error("Error al obtener los datos del reporte");
-  }
-};
+import { useNavigate } from "react-router-dom";
+import {getOrders, getPaymentMethods, getPayments, getTickets} from "../orders/ordersService";
+import {generateReportFromData} from "./cashierService";
 
 export default function Reports() {
   const [startDate, setStartDate] = useState(
@@ -38,17 +15,25 @@ export default function Reports() {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [tickets, setTickets] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [payments, setPayments] = useState([]);
 
   const navigate = useNavigate();
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
+    const [year, month, day] = dateString.split("-");
+    const date = new Date(Date.UTC(year, month - 1, day));
     return date.toLocaleDateString("es-ES", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
+      timeZone: "UTC",
     });
   };
+
+
 
   const handleGenerateReport = async () => {
     setLoading(true);
@@ -67,14 +52,20 @@ export default function Reports() {
     }
 
     try {
-      const data = await getReportData(startDate, endDate);
-      setReportData(data);
+      const report = await generateReportFromData(startDate, endDate, {
+        tickets,
+        orders,
+        payments,
+        paymentMethods,
+      });
+      setReportData(report);
     } catch (err) {
       setError("Error al generar el reporte");
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleCloseTurn = () => {
     navigate("/close-turn");
@@ -90,8 +81,50 @@ export default function Reports() {
   };
 
   useEffect(() => {
-    handleGenerateReport();
+    const fetchData = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const [ticketsResponse, ordersResponse, paymentsResponse, paymentMethodsResponse] = await Promise.all([
+          getTickets(),
+          getOrders(),
+          getPayments(),
+          getPaymentMethods(),
+        ]);
+
+        setTickets(ticketsResponse);
+        setOrders(ordersResponse);
+        setPaymentMethods(paymentMethodsResponse);
+        setPayments(paymentsResponse);
+
+        const report = await generateReportFromData(startDate, endDate, {
+          tickets: ticketsResponse,
+          orders: ordersResponse,
+          payments: paymentsResponse,
+          paymentMethods: paymentMethodsResponse,
+        });
+
+        setReportData(report);
+      } catch (err) {
+        console.error(err);
+        setError("Error al generar el reporte");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
+
+  function getPaymentIcon(method) {
+    const m = method?.toLowerCase();
+    if (m === "efectivo") return "💵";
+    if (m === "btc" || m === "bitcoin") return "₿";
+    if (m === "tarjeta de débito" || m === "debito") return "🏧";
+    if (m === "tarjeta de crédito" || m === "credito") return "💳";
+    return "❓";
+  }
 
   return (
     <main className="h-[90%] w-full flex items-center justify-center">
@@ -180,7 +213,7 @@ export default function Reports() {
                 <h3 className="text-3xl font-bold mb-4">Resumen General</h3>
                 <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-6 mb-4">
                   <p className="text-xl mb-2">
-                    📅 Período:{" "}
+                    📅 Periodo:{" "}
                     <strong>{formatDate(reportData.startDate)}</strong> -{" "}
                     <strong>{formatDate(reportData.endDate)}</strong>
                   </p>
@@ -201,7 +234,7 @@ export default function Reports() {
                   >
                     <div className="flex justify-between items-center mb-6">
                       <h4 className="text-2xl font-bold">
-                        📆 {formatDate(report.date)}
+                        📆 {report.date}
                       </h4>
                       <div className="bg-green-100 px-4 py-2 rounded-xl">
                         <p className="text-2xl font-bold text-green-700">
@@ -235,10 +268,7 @@ export default function Reports() {
                                   : "bg-blue-100 text-blue-800"
                               }`}
                             >
-                              {ticket.paymentMethod === "Efectivo"
-                                ? "💵"
-                                : "💳"}{" "}
-                              {ticket.paymentMethod}
+                              {getPaymentIcon(ticket.paymentMethod)} {ticket.paymentMethod}
                             </span>
                           </div>
                         </div>

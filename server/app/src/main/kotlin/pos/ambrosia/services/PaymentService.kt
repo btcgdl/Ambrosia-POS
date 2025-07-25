@@ -119,8 +119,7 @@ class PaymentService(private val connection: Connection) {
     suspend fun addPayment(payment: Payment): String? {
         // Validar que los campos requeridos no estén vacíos
         if (payment.method_id.isBlank() ||
-                        payment.currency_id.isBlank() ||
-                        payment.transaction_id.isBlank()
+                        payment.currency_id.isBlank()
         ) {
             logger.error("Method ID, currency ID and transaction ID are required fields")
             return null
@@ -203,8 +202,7 @@ class PaymentService(private val connection: Connection) {
 
         // Validar que los campos requeridos no estén vacíos
         if (payment.method_id.isBlank() ||
-                        payment.currency_id.isBlank() ||
-                        payment.transaction_id.isBlank()
+                        payment.currency_id.isBlank()
         ) {
             logger.error("Method ID, currency ID and transaction ID are required fields")
             return false

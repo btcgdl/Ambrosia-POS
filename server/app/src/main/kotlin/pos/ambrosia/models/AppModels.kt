@@ -106,7 +106,7 @@ data class Payment(
         val id: String? = null,
         val method_id: String,
         val currency_id: String,
-        val transaction_id: String,
+        val transaction_id: String? = null,
         val amount: Double,
 )
 

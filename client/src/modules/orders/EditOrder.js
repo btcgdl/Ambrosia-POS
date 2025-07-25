@@ -1,21 +1,18 @@
-import { useEffect, useState } from "react";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import NavBar from "../../components/navbar/NavBar";
-import Header from "../../components/header/Header";
+import {use, useEffect, useState} from "react";
+import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import {
-  getOrderById,
+  addDishToOrder, addPaymentToTicket,
+  addTicket, createPayment, createTicket,
+  getDishesByOrder,
+  getOrderById, getPaymentCurrencies, getPaymentMethods,
+  getTables,
+  getUserById,
+  removeDishToOrder,
   updateOrder,
   updateTable,
-  getTables,
-  addTicket,
-  getUserById,
   updateTicket,
-  getTicketByOrderId,
-  addDishToOrder,
-  getDishesByOrder,
-  removeDishToOrder,
 } from "./ordersService";
-import { addDish, getCategories, getDishes } from "../dishes/dishesService";
+import {getCategories, getDishes} from "../dishes/dishesService";
 
 export default function EditOrder() {
   const { pedidoId } = useParams();
@@ -31,10 +28,23 @@ export default function EditOrder() {
   const [undoStack, setUndoStack] = useState([]);
   const [showCurrencyDialog, setShowCurrencyDialog] = useState(false);
   const [showPaymentMethodDialog, setShowPaymentMethodDialog] = useState(false);
+  const [showGenerateInvoiceDialog, setShowGenerateInvoiceDialog] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const [ticketId, setTicketId] = useState(null);
   const [orderDishes, setOrderDishes] = useState([]);
+  //const [generateInvoice, setGenerateInvoice] = useState(false);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [paymentCurrencies, setPaymentCurrencies] = useState([]);
+
+  const getPaymentIcon = (name) => {
+    if (name.toLowerCase().includes("efectivo")) return "💵";
+    if (name.toLowerCase().includes("crédito")) return "💳";
+    if (name.toLowerCase().includes("débito")) return "🏧";
+    if (name.toLowerCase().includes("btc")) return "₿";
+    return "💰";
+  };
+
 
   useEffect(() => {
     async function fetchData() {
@@ -45,17 +55,23 @@ export default function EditOrder() {
           dishesResponse,
           categoriesResponse,
           orderDishesResponse,
+          paymentMethodsResponse,
+          paymentCurrenciesResponse,
         ] = await Promise.all([
           getOrderById(pedidoId),
           getDishes(),
           getCategories(),
           getDishesByOrder(pedidoId),
+          getPaymentMethods(),
+          getPaymentCurrencies(),
         ]);
         setOrder(orderResponse);
         setDishes(dishesResponse);
         setCategories(categoriesResponse);
         setSelectedCategory(categoriesResponse[0] || "");
         setOrderDishes(orderDishesResponse || []);
+        setPaymentMethods(paymentMethodsResponse)
+        setPaymentCurrencies(paymentCurrenciesResponse)
         /*if (orderResponse.status === 'closed'){
                     const ticketResponse = await getTicketByOrderId(orderResponse.data.id);
                     console.log(ticketResponse);
@@ -140,11 +156,7 @@ export default function EditOrder() {
     setIsLoading(true);
     setError("");
     try {
-      /*if (newStatus === "closed") {
-                setShowCurrencyDialog(true);
-            } else {*/
-      const edittingOrder = order;
-      edittingOrder.status = newStatus;
+      order.status = newStatus;
       await updateOrder(order);
       const response = await getOrderById(pedidoId);
       setOrder(response);
@@ -156,116 +168,53 @@ export default function EditOrder() {
         }
         navigate("/all-orders");
       }
-      //}
-    } catch (err) {
+      } catch (err) {
       setError("Error al cambiar el estado del pedido");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleConfirmCurrency = async () => {
-    if (!selectedCurrency) {
-      setError("Por favor, selecciona una moneda");
+  const handleConfirmPaymentMethod = async () => {
+    if (!selectedPaymentMethod || !selectedCurrency) {
+      setError("Por favor, selecciona un método de pago y una moneda");
       return;
     }
     setIsLoading(true);
     setError("");
     try {
       const total = order.total;
-      const userResponse = await getUserById(order.userId);
-      const userName = userResponse.data?.name || "Desconocido";
       const ticket = {
-        order_id: pedidoId,
+        order_id: order.id,
         user_id: order.user_id,
-        ticket_date: Date.now(),
-        amount: total,
-        paymentMethod: selectedCurrency === "Pesos" ? "Efectivo" : "Bitcoin",
-        userName,
+        ticket_date: Date.now().toString(),
+        status: 1,
+        total_amount: total,
+        notes: "Sin Notas",
       };
-      const ticketResponse = await addTicket(ticket);
+      const ticketResponse = await createTicket(ticket);
       setTicketId(ticketResponse.id);
+      const payment = {
+        method_id: selectedPaymentMethod,
+        currency_id: selectedCurrency,
+        transaction_id: "",
+        amount: total
+      }
+      const paymentResponse = await createPayment(payment);
+      const paymentTicketResponse = await addPaymentToTicket(ticketResponse.id, paymentResponse.id);
+      await handleChangeOrderStatus("paid")
 
-      const response = await updateOrder(pedidoId, { status: "closed" });
-      setOrder(response.data);
+      setShowPaymentMethodDialog(false);
 
+      //ToDo
       if (selectedCurrency === "Pesos") {
       } else {
         const qrCode = `bitcoin:payment?amount=${total}&orderId=${pedidoId}`;
       }
 
-      setShowCurrencyDialog(false);
-      setSelectedCurrency(selectedCurrency);
+      //setShowCurrencyDialog(false);
     } catch (err) {
       setError("Error al cerrar el pedido");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handlePayOrder = async () => {
-    if (!selectedCurrency) {
-      setError("No se ha seleccionado una moneda");
-      return;
-    }
-    if (selectedCurrency === "Pesos") {
-      setShowPaymentMethodDialog(true);
-    } else {
-      setIsLoading(true);
-      setError("");
-      try {
-        const response = await updateOrder(pedidoId, {
-          status: "paid",
-          paymentMethod: "Bitcoin",
-        });
-        setOrder(response.data);
-
-        const tables = await getTables();
-        const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
-        if (table) {
-          await updateTable(table.id, { pedidoId: null, status: "libre" });
-        }
-
-        setTicketId(null);
-        setSelectedCurrency("");
-        navigate("/all-orders");
-      } catch (err) {
-        setError("Error al procesar el pago");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
-  const handleConfirmPaymentMethod = async () => {
-    if (!selectedPaymentMethod) {
-      setError("Por favor, selecciona un método de pago");
-      return;
-    }
-    setIsLoading(true);
-    setError("");
-    try {
-      const response = await updateOrder(pedidoId, {
-        status: "paid",
-        paymentMethod: selectedPaymentMethod,
-      });
-      setOrder(response.data);
-
-      await updateTicket(ticketId, { paymentMethod: selectedPaymentMethod });
-
-      const tables = await getTables();
-      const table = tables.data.find((t) => t.pedidoId === Number(pedidoId));
-      if (table) {
-        await updateTable(table.id, { pedidoId: null, status: "libre" });
-      }
-
-      setShowPaymentMethodDialog(false);
-      setSelectedPaymentMethod("");
-      setTicketId(null);
-      setSelectedCurrency("");
-      navigate("/all-orders");
-    } catch (err) {
-      setError("Error al procesar el pago");
     } finally {
       setIsLoading(false);
     }
@@ -366,13 +315,15 @@ export default function EditOrder() {
                           .find((dish) => dish.id === item.dish_id)
                           .price.toFixed(2)}
                       </span>
-                      <button
-                        className="bg-red-500 text-white py-2 px-4 text-lg rounded-lg hover:bg-red-600"
-                        onClick={() => handleRemoveDish(item.id)}
-                        disabled={isLoading}
-                      >
-                        Eliminar
-                      </button>
+                      {(order && order.status === 'open') && (<>
+                        <button
+                            className="bg-red-500 text-white py-2 px-4 text-lg rounded-lg hover:bg-red-600"
+                            onClick={() => handleRemoveDish(item.id)}
+                            disabled={isLoading}
+                        >
+                          Eliminar
+                        </button>
+                      </>)}
                     </li>
                   ))}
                 </ul>
@@ -388,7 +339,7 @@ export default function EditOrder() {
                   <>
                     <button
                       className="bg-blue-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-blue-600"
-                      onClick={() => handleChangeOrderStatus("closed")}
+                      onClick={() => setShowGenerateInvoiceDialog(true)}
                       disabled={isLoading}
                     >
                       Cerrar Pedido
@@ -415,7 +366,7 @@ export default function EditOrder() {
                     <button
                       className="bg-green-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-green-600"
                       onClick={
-                        /*handlePayOrder*/ () => handleChangeOrderStatus("paid")
+                        () => setShowCurrencyDialog(true)
                       }
                       disabled={isLoading}
                     >
@@ -425,97 +376,123 @@ export default function EditOrder() {
                 )}
               </div>
             </div>
-            {showCurrencyDialog && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
-                  <h3 className="text-2xl font-bold text-center">
-                    Seleccionar Moneda
-                  </h3>
-                  <div className="flex flex-col gap-4">
-                    <button
-                      className={`py-4 px-6 text-xl rounded-lg ${
-                        selectedCurrency === "Pesos"
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                      }`}
-                      onClick={() => setSelectedCurrency("Pesos")}
-                    >
-                      💵 Pesos
-                    </button>
-                    <button
-                      className={`py-4 px-6 text-xl rounded-lg ${
-                        selectedCurrency === "Bitcoin"
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                      }`}
-                      onClick={() => setSelectedCurrency("Bitcoin")}
-                    >
-                      ₿ Bitcoin
-                    </button>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <button
-                      className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
-                      onClick={handleCancelDialog}
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
-                      onClick={handleConfirmCurrency}
-                      disabled={!selectedCurrency || isLoading}
-                    >
-                      Confirmar
-                    </button>
+            {showGenerateInvoiceDialog && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
+                    <h3 className="text-2xl font-bold text-center">
+                      ¿Deseas generar un ticket con factura Lightning?
+                    </h3>
+                    <div className="flex justify-between gap-4">
+                      <button
+                          className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
+                          onClick={() => {
+                            //setGenerateInvoice(false);
+                            setShowGenerateInvoiceDialog(false);
+                            handleChangeOrderStatus("closed");
+                          }}
+                      >
+                        No
+                      </button>
+                      <button
+                          className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
+                          onClick={() => {
+                            //setGenerateInvoice(true);
+                            //ToDo Generate Invoice and print ticket
+                            setShowGenerateInvoiceDialog(false);
+                            handleChangeOrderStatus("closed");
+                          }}
+                      >
+                        Sí
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
+            )}
+
+            {showCurrencyDialog && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
+                    <h3 className="text-2xl font-bold text-center">
+                      Seleccionar Moneda
+                    </h3>
+                    <div className="flex flex-col gap-4">
+                      {paymentCurrencies.map((currency) => (
+                          <button
+                              key={currency.id}
+                              className={`py-4 px-6 text-xl rounded-lg ${
+                                  selectedCurrency === currency.id
+                                      ? "bg-green-500 text-white"
+                                      : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                              }`}
+                              onClick={() => setSelectedCurrency(currency.id)}
+                          >
+                            {currency.acronym === "MXN" && "💵 "}
+                            {currency.acronym === "USD" && "💲 "}
+                            {currency.acronym === "BTC" && "₿ "}
+                            {currency.acronym}
+                          </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <button
+                          className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
+                          onClick={handleCancelDialog}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                          className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
+                          onClick={()=> {
+                            setShowCurrencyDialog(false);
+                            setShowPaymentMethodDialog(true)
+                          }}
+                          disabled={!selectedCurrency || isLoading}
+                      >
+                        Confirmar
+                      </button>
+                    </div>
+                  </div>
+                </div>
             )}
             {showPaymentMethodDialog && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
-                  <h3 className="text-2xl font-bold text-center">
-                    Seleccionar Método de Pago
-                  </h3>
-                  <div className="flex flex-col gap-4">
-                    <button
-                      className={`py-4 px-6 text-xl rounded-lg ${
-                        selectedPaymentMethod === "Efectivo"
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                      }`}
-                      onClick={() => setSelectedPaymentMethod("Efectivo")}
-                    >
-                      💵 Efectivo
-                    </button>
-                    <button
-                      className={`py-4 px-6 text-xl rounded-lg ${
-                        selectedPaymentMethod === "Tarjeta"
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                      }`}
-                      onClick={() => setSelectedPaymentMethod("Tarjeta")}
-                    >
-                      💳 Tarjeta
-                    </button>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <button
-                      className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
-                      onClick={handleCancelDialog}
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
-                      onClick={handleConfirmPaymentMethod}
-                      disabled={!selectedPaymentMethod || isLoading}
-                    >
-                      Confirmar
-                    </button>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
+                    <h3 className="text-2xl font-bold text-center">
+                      Seleccionar Método de Pago
+                    </h3>
+                    <div className="flex flex-col gap-4">
+                      {paymentMethods.map((method) => (
+                          <button
+                              key={method.id}
+                              className={`py-4 px-6 text-xl rounded-lg flex items-center justify-center gap-2 ${
+                                  selectedPaymentMethod === method.id
+                                      ? "bg-green-500 text-white"
+                                      : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                              }`}
+                              onClick={() => setSelectedPaymentMethod(method.id)}
+                          >
+                            <span>{getPaymentIcon(method.name)}</span>
+                            <span>{method.name}</span>
+                          </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <button
+                          className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
+                          onClick={handleCancelDialog}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                          className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
+                          onClick={handleConfirmPaymentMethod}
+                          disabled={!selectedPaymentMethod || isLoading}
+                      >
+                        Confirmar
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
             )}
           </div>
         </div>
