@@ -138,8 +138,16 @@ CREATE TABLE orders_dishes (
 -- Payments table (currency corregido a TEXT)
 CREATE TABLE payments (
     id BLOB PRIMARY KEY,
+    method_id BLOB NOT NULL,
     currency TEXT NOT NULL,
-    name TEXT NOT NULL
+    name TEXT NOT NULL,
+    FOREIGN KEY (method_id) REFERENCES payment_methods (id) ON DELETE RESTRICT
+);
+
+-- Payment Methods table (NUEVA)
+CREATE TABLE payment_methods (
+    id BLOB PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
 );
 
 -- Tickets table (ahora vinculada a orders)
@@ -191,22 +199,9 @@ CREATE TABLE shifts (
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
--- Create indexes for better performance
-CREATE INDEX idx_users_pin ON users (pin);
-CREATE INDEX idx_tables_space ON tables (space_id);
-CREATE INDEX idx_tables_order ON tables (order_id);
-CREATE INDEX idx_dishes_category ON dishes (category_id);
-CREATE INDEX idx_ingredients_category ON ingredients (category_id);
-CREATE INDEX idx_orders_user ON orders (user_id);
-CREATE INDEX idx_orders_table ON orders (table_id);
-CREATE INDEX idx_orders_status ON orders (status);
-CREATE INDEX idx_orders_dishes_order ON orders_dishes (order_id);
-CREATE INDEX idx_tickets_order ON tickets (order_id);
-CREATE INDEX idx_tickets_user ON tickets (user_id);
-CREATE INDEX idx_tickets_date ON tickets (ticket_date);
-CREATE INDEX idx_tickets_status ON tickets (status);
-CREATE INDEX idx_tickets_dish_order ON tickets_dish (id_ticket);
-CREATE INDEX idx_payments_tickets_order ON payments_tickets (ticket_id);
-CREATE INDEX idx_ingredient_suppliers_date ON ingredient_suppliers (date);
-CREATE INDEX idx_ingredient_suppliers_supplier ON ingredient_suppliers (id_supplier);
-CREATE INDEX idx_ingredient_suppliers_ingredient ON ingredient_suppliers (id_ingredient);
+INSERT INTO payment_methods (id, name) VALUES
+    ('32332081-7a2b-4e67-a198-fddf2451f426', 'Efectivo'),
+    ('6440df5d-c76c-4074-9256-dd2dccf8a50b', 'Tarjeta de Crédito'),
+    ('0b571243-2143-4afc-a728-f6e5c4e8a9e1', 'Tarjeta de Débito'),
+    ('3ae8f71e-954a-4795-8531-368354c67ede', 'BTC');
+

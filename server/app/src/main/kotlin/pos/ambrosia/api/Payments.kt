@@ -77,4 +77,25 @@ fun Route.payments(paymentService: PaymentService) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
         }
     }
+    get("/methods") {
+        val paymentMethods = paymentService.getPaymentMethods()
+        if (paymentMethods.isEmpty()) {
+            call.respond(HttpStatusCode.NoContent, "No payment methods found")
+            return@get
+        }
+        call.respond(HttpStatusCode.OK, paymentMethods)
+    }
+    get("/methods/{id}") {
+        val id = call.parameters["id"]
+        if (id != null) {
+            val paymentMethod = paymentService.getPaymentMethodById(id)
+            if (paymentMethod != null) {
+                call.respond(HttpStatusCode.OK, paymentMethod)
+            } else {
+                throw UserNotFoundException()
+            }
+        } else {
+            call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+        }
+    }
 }
