@@ -1,30 +1,44 @@
+import {getLogger} from "../utils/loggerStore";
+
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 export async function apiClient(
-  endpoint,
-  { method = "GET", headers = {}, body, credentials = "include" } = {},
+    endpoint,
+    {
+      method = "GET",
+      headers = {},
+      body,
+      credentials = "include",
+    } = {}
 ) {
-  if (!API_BASE_URL) {
-    throw new Error("Not enviroments variables found");
+
+  const showLog = getLogger();
+  if (showLog) showLog("loading", "Cargando...");
+
+  try {
+    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method,
+      credentials,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers,
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+
+    const contentType = res.headers.get("content-type");
+    const data = contentType?.includes("application/json") ? await res.json() : await res.text();
+
+    if (!res.ok) {
+      const errorMsg = typeof data === "string" ? data : data?.data || "Error desconocido";
+      if (showLog) showLog("error", errorMsg);
+      throw new Error(errorMsg);
+    }
+
+    //if (showLog) showLog("success", "Operación exitosa");
+    if (showLog) showLog("endLoading", "")
+    return data;
+  } catch (err) {
+    if (showLog && err instanceof Error) showLog("error", err.message);
+    throw err;
   }
-  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-    method,
-    credentials: credentials,
-    headers: {
-      "Content-Type": "application/json",
-      ...headers,
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-
-  const contentType = res.headers.get("content-type");
-
-  if (!res.ok) {
-    const error = contentType?.includes("application/json")
-      ? await res.json()
-      : await res.text();
-    console.log(error.data);
-    throw new Error(error.data);
-  }
-
-  return contentType?.includes("application/json") ? res.json() : res.text();
 }

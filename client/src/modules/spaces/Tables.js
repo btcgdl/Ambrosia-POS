@@ -16,7 +16,6 @@ export default function Tables() {
       try {
         setIsLoading(true);
         const tablesResponse = await getTablesByRoomId(roomId);
-        console.log(tablesResponse);
         setTables(tablesResponse);
       } catch (err) {
         setError("Error al cargar los datos");

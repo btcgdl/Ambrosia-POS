@@ -10,6 +10,7 @@ export default function RoomAdmin() {
     const [editingRoom, setEditingRoom] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
+    const [showingSpaceForm, setShowingSpaceForm] = useState(false);
 
     useEffect(() => {
         async function fetchRooms() {
@@ -81,22 +82,44 @@ export default function RoomAdmin() {
                     <RoomList
                         rooms={rooms}
                         onSelect={setSelectedRoomId}
-                        onEdit={setEditingRoom}
+                        onEdit={(room)=> {
+                            setEditingRoom(room);
+                            setShowingSpaceForm(true);
+                        }}
                         onDelete={handleDeleteRoom}
                         selectedRoomId={selectedRoomId}
                     />
                 </div>
                 <div className="w-1/2">
-                    <RoomForm
-                        onSubmit={editingRoom ? handleUpdateRoom : handleAddRoom}
-                        initialData={editingRoom}
-                        onCancel={() => setEditingRoom(null)}
-                    />
+                    {showingSpaceForm ? (<>
+                        <RoomForm
+                            onSubmit={editingRoom ? handleUpdateRoom : handleAddRoom}
+                            initialData={editingRoom}
+                            onCancel={() => {
+                                setEditingRoom(null);
+                                setShowingSpaceForm(false);
+                            }}
+                        />
+                    </>) : (<>
+                        {/*<h2 className="text-xl font-bold mb-2">
+
+                        </h2>*/}
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setShowingSpaceForm(true)
+                            }}
+                            className="px-4 py-2 bg-green-400 text-white rounded mt-[40px] cursor-pointer"
+                        >
+                            Añadir Sala
+                        </button>
+                    </>)}
+
                 </div>
             </div>
             {selectedRoom && (
                 <div>
-                    <h2 className="text-xl font-bold mb-2">Mesas en: {selectedRoom.nombre}</h2>
+                    <h2 className="text-xl font-bold mb-2">Mesas en: {selectedRoom.name}</h2>
                     <TableAdmin room={selectedRoom} />
                 </div>
             )}

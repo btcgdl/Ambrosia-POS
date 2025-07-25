@@ -12,6 +12,7 @@ import {
 export default function TableAdmin({ room }) {
     const [tables, setTables] = useState([]);
     const [editingTable, setEditingTable] = useState(null);
+    const [showingTableForm, setShowingTableForm] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -70,7 +71,10 @@ export default function TableAdmin({ room }) {
                 {tables.length > 0 ? (
                     <TableList
                         tables={tables}
-                        onEdit={setEditingTable}
+                        onEdit={(table)=>{
+                            setEditingTable(table);
+                            setShowingTableForm(true);
+                        }}
                         onDelete={handleDelete}
                     />
                 ) : (
@@ -80,12 +84,28 @@ export default function TableAdmin({ room }) {
                 )}
             </div>
             <div className="w-1/2">
-                <TableForm
-                    onSubmit={handleAddOrUpdate}
-                    onCancel={() => setEditingTable(null)}
-                    initialData={editingTable}
-                    roomId={room.id}
-                />
+                {showingTableForm ? (<>
+                    <TableForm
+                        onSubmit={handleAddOrUpdate}
+                        onCancel={() => {
+                            setEditingTable(null);
+                            setShowingTableForm(false);
+                        }}
+                        initialData={editingTable}
+                        roomId={room.id}
+                    />
+                </>) : (<>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setShowingTableForm(true)
+                        }}
+                        className="px-4 py-2 bg-green-400 text-white rounded cursor-pointer"
+                    >
+                        Añadir Una Mesa
+                    </button>
+                </>)}
+
             </div>
         </div>
     );

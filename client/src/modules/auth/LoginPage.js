@@ -33,7 +33,6 @@ export default function LoginPage() {
         } catch (error) {
             setLoading(false);
             setError("Error de red o credenciales inválidas");
-            console.log(error.message);
         }
     };
 

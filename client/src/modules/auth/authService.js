@@ -11,7 +11,7 @@ export async function RefreshToken() {
     return await apiClient('/auth/refresh',
         {
             method:'POST',
-        })
+    })
 }
 
 export async function logoutFromService() {
@@ -38,9 +38,9 @@ export async function updateRole(role) {
 }
 
 export async function deleteRole(roleId) {
-        return await apiClient(`/roles/${roleId}`, {
-            method: 'DELETE',
-        });
+    return await apiClient(`/roles/${roleId}`, {
+        method: 'DELETE',
+    });
 }
 
 export async function getUsers() {
