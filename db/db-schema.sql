@@ -29,7 +29,7 @@ CREATE TABLE spaces (
     is_deleted BOOLEAN NOT NULL DEFAULT 0
 );
 
--- Tables table (NUEVA)  
+-- Tables table (NUEVA)
 CREATE TABLE tables (
     id BLOB PRIMARY KEY,
     name TEXT NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE tables (
 
 -- Dish Categories table
 CREATE TABLE dish_categories (
-    id BLOB PRIMARY KEY, 
+    id BLOB PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     is_deleted BOOLEAN NOT NULL DEFAULT 0
 );
@@ -59,7 +59,7 @@ CREATE TABLE dishes (
 
 -- Ingredient Categories table
 CREATE TABLE ingredient_categories (
-    id BLOB PRIMARY KEY, 
+    id BLOB PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     is_deleted BOOLEAN NOT NULL DEFAULT 0
 );
@@ -135,21 +135,6 @@ CREATE TABLE orders_dishes (
     FOREIGN KEY (dish_id) REFERENCES dishes (id) ON DELETE CASCADE
 );
 
--- Payments table (currency corregido a TEXT)
-CREATE TABLE payments (
-    id BLOB PRIMARY KEY,
-    method_id BLOB NOT NULL,
-    currency TEXT NOT NULL,
-    name TEXT NOT NULL,
-    FOREIGN KEY (method_id) REFERENCES payment_methods (id) ON DELETE RESTRICT
-);
-
--- Payment Methods table (NUEVA)
-CREATE TABLE payment_methods (
-    id BLOB PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE
-);
-
 -- Tickets table (ahora vinculada a orders)
 CREATE TABLE tickets (
     id BLOB PRIMARY KEY,
@@ -175,16 +160,34 @@ CREATE TABLE tickets_dish (
     FOREIGN KEY (id_dish) REFERENCES dishes (id) ON DELETE CASCADE
 );
 
--- Payments_Tickets table (con ID propio)
-CREATE TABLE payments_tickets (
+-- Payments
+CREATE TABLE payments (
     id BLOB PRIMARY KEY,
-    ticket_id BLOB NOT NULL,
-    payment_date TEXT NOT NULL DEFAULT (datetime('now')),
+    method_id BLOB NOT NULL,
+    currency_id BLOB NOT NULL,
+    transaction_id BLOB NOT NULL,
     amount REAL NOT NULL,
-    payment_method BLOB NOT NULL,
-    transaction_id TEXT,
+    date TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (method_id) REFERENCES payment_methods (id) ON DELETE RESTRICT
+);
+
+-- Tickets_payments
+CREATE TABLE ticket_payments (
+    payment_id BLOB NOT NULL,
+    ticket_id BLOB NOT NULL,
     FOREIGN KEY (ticket_id) REFERENCES tickets (id) ON DELETE CASCADE,
-    FOREIGN KEY (payment_method) REFERENCES payments (id) ON DELETE CASCADE
+    FOREIGN KEY (payment_id) REFERENCES payments (id) ON DELETE CASCADE
+);
+
+CREATE TABLE currency (
+    id BLOB PRIMARY KEY,
+    acronym TEXT(3) NOT NULL
+);
+
+
+CREATE TABLE payment_methods (
+    id BLOB PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
 );
 
 -- Shifts table (referencia corregida)
@@ -205,3 +208,7 @@ INSERT INTO payment_methods (id, name) VALUES
     ('0b571243-2143-4afc-a728-f6e5c4e8a9e1', 'Tarjeta de Débito'),
     ('3ae8f71e-954a-4795-8531-368354c67ede', 'BTC');
 
+INSERT INTO currency (id, acronym) VALUES
+    ('1', 'MXN'),
+    ('2', 'USD'),
+    ('3', 'BTC');
