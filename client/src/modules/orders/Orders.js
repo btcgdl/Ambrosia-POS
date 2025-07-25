@@ -15,7 +15,6 @@ export default function Orders() {
     async function fetchData() {
       try {
         const response = await getAllOrders();
-        console.log(response);
         setOrders(response);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -36,8 +35,6 @@ export default function Orders() {
     } finally {
     }
   };
-
-  console.log(orders);
 
   const filteredOrders = orders.filter((order) => {
     if (filter === "en-curso") {

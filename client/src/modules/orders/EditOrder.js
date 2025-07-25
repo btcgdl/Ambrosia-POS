@@ -64,7 +64,6 @@ export default function EditOrder() {
                     setSelectedCurrency(ticketResponse.data.paymentMethod === "Efectivo" ? "Pesos" : "Bitcoin");
                 }*/
       } catch (err) {
-        console.log(err);
         setError("Error al cargar el pedido");
       } finally {
         setIsLoading(false);
@@ -88,7 +87,6 @@ export default function EditOrder() {
   }
 
   const handleAddDish = async (dish) => {
-    console.log("addDish", dish);
     if (order.status !== "open") return;
     setIsLoading(true);
     try {
@@ -145,7 +143,6 @@ export default function EditOrder() {
       /*if (newStatus === "closed") {
                 setShowCurrencyDialog(true);
             } else {*/
-      console.log(newStatus);
       const edittingOrder = order;
       edittingOrder.status = newStatus;
       await updateOrder(order);
@@ -178,7 +175,6 @@ export default function EditOrder() {
       const total = order.total;
       const userResponse = await getUserById(order.userId);
       const userName = userResponse.data?.name || "Desconocido";
-      console.log(selectedCurrency);
       const ticket = {
         order_id: pedidoId,
         user_id: order.user_id,
@@ -194,11 +190,8 @@ export default function EditOrder() {
       setOrder(response.data);
 
       if (selectedCurrency === "Pesos") {
-        console.log("Imprimiendo ticket en Pesos:", ticketResponse);
       } else {
-        console.log("Preparando ticket con QR para Bitcoin:", ticketResponse);
         const qrCode = `bitcoin:payment?amount=${total}&orderId=${pedidoId}`;
-        console.log("QR Code:", qrCode);
       }
 
       setShowCurrencyDialog(false);

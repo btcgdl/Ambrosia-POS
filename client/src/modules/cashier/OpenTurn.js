@@ -42,9 +42,7 @@ export default function OpenTurn() {
 
     setIsLoading(true);
     try {
-      console.log("Abriendo turno con cantidad inicial:", amount);
       const response = await openTurn();
-      console.log(response.shiftId);
       updateTurn(response.shiftId);
       navigate(getHomeRoute());
     } catch (err) {

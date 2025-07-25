@@ -17,9 +17,7 @@ export default function TableCard({ tableData }) {
 
   async function tableClicked() {
     if (tableData.status === "available") {
-      console.log(tableData.id);
       const orderResponse = await createOrder(tableData.id);
-      console.log(orderResponse.id);
       if (orderResponse.id) {
         tableData.order_id = orderResponse.id;
         tableData.status = "occupied";

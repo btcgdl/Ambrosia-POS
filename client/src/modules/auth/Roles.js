@@ -6,7 +6,7 @@ import { getRoles, addRole, updateRole, deleteRole } from "./authService";
 export default function Roles() {
   const [roles, setRoles] = useState([]);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ role: "", password: "" });
+  const [form, setForm] = useState({ role: "", password: "", isAdmin: false });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -43,7 +43,7 @@ export default function Roles() {
       }
       const response = await getRoles();
       setRoles(response);
-      setForm({ role: "", password: "" });
+      setForm({ role: "", password: "", isAdmin: false });
       setEditing(null);
       setShowPassword(false);
     } catch (err) {
@@ -54,7 +54,7 @@ export default function Roles() {
   };
 
   const startEdit = (role) => {
-    setForm({ role: role.role, password: role.password });
+    setForm({ role: role.role, password: role.password, isAdmin: role.isAdmin });
     setEditing(role.id);
     setShowPassword(false);
   };
@@ -137,6 +137,17 @@ export default function Roles() {
               {showPassword ? "👁️‍🗨️" : "👁️"}
             </button>
           </div>
+          <label className="flex items-center gap-2 text-xl">
+            <input
+                type="checkbox"
+                checked={form.isAdmin}
+                onChange={(e) =>
+                    setForm((prev) => ({ ...prev, isAdmin: e.target.checked }))
+                }
+                disabled={isLoading}
+            />
+            Es administrador
+          </label>
           <button
             type="submit"
             className="bg-green-500 text-white text-2xl py-3 rounded-lg hover:bg-green-600"
@@ -154,6 +165,7 @@ export default function Roles() {
             >
               <div>
                 <strong>{role.role}</strong> – Contraseña: ****
+                {role.isAdmin && <span className="ml-2 text-sm text-green-700">(admin)</span>}
               </div>
               <div className="flex gap-4">
                 <button
