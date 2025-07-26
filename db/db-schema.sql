@@ -202,6 +202,12 @@ CREATE TABLE shifts (
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+CREATE TABLE base_currency (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    currency_id BLOB NOT NULL,
+    FOREIGN KEY (currency_id) REFERENCES currency (id) ON DELETE RESTRICT
+);
+
 INSERT INTO payment_methods (id, name) VALUES
     ('32332081-7a2b-4e67-a198-fddf2451f426', 'Efectivo'),
     ('6440df5d-c76c-4074-9256-dd2dccf8a50b', 'Tarjeta de Crédito'),
@@ -209,6 +215,9 @@ INSERT INTO payment_methods (id, name) VALUES
     ('3ae8f71e-954a-4795-8531-368354c67ede', 'BTC');
 
 INSERT INTO currency (id, acronym) VALUES
-    ('1', 'MXN'),
-    ('2', 'USD'),
-    ('3', 'BTC');
+    ('beb95c15-cdcb-47c3-beba-5a47f360b999', 'MXN'),
+    ('bccfc932-d89b-477a-b65b-04f97cae4aae', 'USD'),
+    ('5562cbb7-3e26-4811-ac57-21e6edc53265', 'BTC');
+
+INSERT INTO base_currency (id, currency_id) VALUES
+    (1, 'beb95c15-cdcb-47c3-beba-5a47f360b999');

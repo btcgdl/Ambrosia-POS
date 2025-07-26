@@ -13,7 +13,6 @@ import java.sql.Connection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Space
 import pos.ambrosia.services.SpaceService
-import pos.ambrosia.utils.UserNotFoundException
 import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureSpaces() {
@@ -33,16 +32,18 @@ fun Route.spaces(spaceService: SpaceService) {
     }
     get("/{id}") {
         val id = call.parameters["id"]
-        if (id != null) {
-            val space = spaceService.getSpaceById(id)
-            if (space != null) {
-                call.respond(HttpStatusCode.OK, space)
-            } else {
-                throw UserNotFoundException()
-            }
-        } else {
+        if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@get
         }
+        
+        val space = spaceService.getSpaceById(id)
+        if (space == null) {
+            call.respond(HttpStatusCode.NotFound, "Space not found")
+            return@get
+        }
+        
+        call.respond(HttpStatusCode.OK, space)
     }
     post("") {
         val space = call.receive<Space>()
@@ -51,30 +52,35 @@ fun Route.spaces(spaceService: SpaceService) {
     }
     put("/{id}") {
         val id = call.parameters["id"]
-        if (id != null) {
-            val updatedSpace = call.receive<Space>()
-            val isUpdated = spaceService.updateSpace(updatedSpace)
-            logger.info(isUpdated.toString())
-            if (isUpdated) {
-                call.respond(HttpStatusCode.OK, "Space updated successfully")
-            } else {
-                call.respond(HttpStatusCode.NotFound, "Space not found")
-            }
-        } else {
+        if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@put
         }
+        
+        val updatedSpace = call.receive<Space>()
+        val isUpdated = spaceService.updateSpace(updatedSpace)
+        logger.info(isUpdated.toString())
+        
+        if (!isUpdated) {
+            call.respond(HttpStatusCode.NotFound, "Space not found")
+            return@put
+        }
+        
+        call.respond(HttpStatusCode.OK, "Space updated successfully")
     }
     delete("/{id}") {
         val id = call.parameters["id"]
-        if (id != null) {
-            val isDeleted = spaceService.deleteSpace(id)
-            if (isDeleted) {
-                call.respond(HttpStatusCode.OK, "Space deleted successfully")
-            } else {
-                call.respond(HttpStatusCode.BadRequest, "Space not found")
-            }
-        } else {
+        if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@delete
         }
+        
+        val isDeleted = spaceService.deleteSpace(id)
+        if (!isDeleted) {
+            call.respond(HttpStatusCode.BadRequest, "Space not found")
+            return@delete
+        }
+        
+        call.respond(HttpStatusCode.OK, "Space deleted successfully")
     }
 }

@@ -10,71 +10,81 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
+import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.User
 import pos.ambrosia.services.UsersService
-import pos.ambrosia.utils.UserNotFoundException
-import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureUsers() {
-  val connection: Connection = DatabaseConnection.getConnection()
-  val userService = UsersService(connection)
-  routing { route("/users") { users(userService) } }
+    val connection: Connection = DatabaseConnection.getConnection()
+    val userService = UsersService(connection)
+    routing { route("/users") { users(userService) } }
 }
 
 fun Route.users(userService: UsersService) {
-  get("") {
-    val users = userService.getUsers()
-    if (users.isEmpty()) {
-      call.respond(HttpStatusCode.NoContent, "No users found")
-      return@get
+    get("") {
+        val users = userService.getUsers()
+        if (users.isEmpty()) {
+            call.respond(HttpStatusCode.NoContent, "No users found")
+            return@get
+        }
+        call.respond(HttpStatusCode.OK, users)
     }
-    call.respond(HttpStatusCode.OK, users)
-  }
-  get("/{id}") {
-    val id = call.parameters["id"]
-    if (id != null) {
-      val user = userService.getUserById(id)
-      if (user != null) {
+    get("/{id}") {
+        val id = call.parameters["id"]
+        if (id == null) {
+            call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@get
+        }
+
+        val user = userService.getUserById(id)
+        if (user == null) {
+            call.respond(HttpStatusCode.NotFound, "User not found")
+            return@get
+        }
+
         call.respond(HttpStatusCode.OK, user)
-      } else {
-        throw UserNotFoundException()
-      }
-    } else {
-      call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
     }
-  }
-  post("") {
-    val user = call.receive<User>()
-    userService.addUser(user)
-    call.respond(HttpStatusCode.Created, "User added successfully")
-  }
-  put("/{id}") {
-    val id = call.parameters["id"]
-    if (id != null) {
-      val updatedUser = call.receive<User>()
-      val isUpdated = userService.updateUser(id, updatedUser)
-      logger.info(isUpdated.toString())
-      if (isUpdated) {
+    post("") {
+        val user = call.receive<User>()
+        val result = userService.addUser(user)
+        if (result == null) {
+            call.respond(HttpStatusCode.BadRequest, "Failed to add user")
+            return@post
+        }
+        call.respond(HttpStatusCode.Created, "User added successfully")
+    }
+    put("/{id}") {
+        val id = call.parameters["id"]
+        if (id == null) {
+            call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@put
+        }
+
+        val updatedUser = call.receive<User>()
+        val isUpdated = userService.updateUser(id, updatedUser)
+        logger.info(isUpdated.toString())
+
+        if (!isUpdated) {
+            call.respond(HttpStatusCode.NotFound, "User with ID: $id not found")
+            return@put
+        }
+
         call.respond(HttpStatusCode.OK, "User updated successfully")
-      } else {
-        call.respond(HttpStatusCode.NotFound, "User with ID: $id not found")
-      }
-    } else {
-      call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
     }
-  }
-  delete("/{id}") {
-    val id = call.parameters["id"]
-    if (id != null) {
-      val isDeleted = userService.deleteUser(id)
-      if (isDeleted) {
+    delete("/{id}") {
+        val id = call.parameters["id"]
+        if (id == null) {
+            call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@delete
+        }
+
+        val isDeleted = userService.deleteUser(id)
+        if (!isDeleted) {
+            call.respond(HttpStatusCode.NotFound, "User with ID: $id not found")
+            return@delete
+        }
+
         call.respond(HttpStatusCode.NoContent, "User deleted successfully")
-      } else {
-        call.respond(HttpStatusCode.NotFound, "User with ID: $id not found")
-      }
-    } else {
-      call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
     }
-  }
 }
