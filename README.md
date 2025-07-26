@@ -50,6 +50,8 @@ chmod +x phoenixd.sh
 
 El script descarga phoenixd v0.6.0, verifica la integridad del paquete usando GPG y checksums, instala en `/usr/local/bin`, y opcionalmente configura un servicio systemd para inicio automático.
 
+Check [Mastering Phoenixd](https://btcgdl.github.io/Mastering-phoenixd/) for more details.
+
 #### Instalación manual
 
 Para instalación manual, consulta la [documentación oficial](https://phoenix.acinq.co/server) para obtener las instrucciones específicas para tu sistema operativo.
@@ -86,7 +88,7 @@ HOST="127.0.0.1" npm start
 
 ### Servidor (Backend - Kotlin/Gradle)
 
-*Install App*
+**Desarrollo**
 
 Para ejecutar el servidor en modo de desarrollo:
 
@@ -94,8 +96,26 @@ Para ejecutar el servidor en modo de desarrollo:
 ./gradlew run
 ```
 
-Para construir el proyecto del servidor:
+**Producción**
+
+Para desplegar en producción, primero construye el JAR:
 
 ```sh
 ./gradlew jar
 ```
+
+Esto generará `ambrosia.jar` en `server/app/build/libs/`. Copia este archivo junto con el script `scripts/run-server.sh` a tu servidor de producción.
+
+Para ejecutar en producción:
+
+```sh
+chmod +x run-server.sh
+./run-server.sh
+```
+
+El script automáticamente:
+- Busca el archivo `ambrosia.jar` en el directorio actual
+- Configura el logging usando `$HOME/.Ambrosia-POS/Ambrosia-Logs.xml` si existe
+- Ejecuta la aplicación con las opciones JVM apropiadas
+
+Para configuración adicional o servicios systemd, consulta la documentación de deployment del proyecto.
