@@ -43,6 +43,7 @@ curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/
 
 **Opción 2: Script del proyecto**
 ```bash
+cd scripts
 chmod +x phoenixd.sh
 ./phoenixd.sh
 ```
@@ -80,12 +81,8 @@ REACT_APP_API_BASE_URL=http://172.18.223.141:5000
 Luego, inicia el entorno de desarrollo del cliente con:
 
 ```sh
-npm start
+HOST="127.0.0.1" npm start
 ```
-
-> 🔧 **Nota sobre el backend en desarrollo:** Actualmente el servidor backend no cuenta con endpoints funcionales, por lo que cualquier llamada a la API generará errores. El cliente cuenta con un sistema de fallback que usa una base de datos simulada directamente en el frontend para permitir la navegación y prueba de funcionalidades durante esta etapa.
->
-> ⚠️ Este comportamiento es **temporal**. Una vez que el backend esté completo, será necesario actualizar el manejo de errores del frontend para desactivar el uso de datos simulados y responder correctamente a las respuestas reales del servidor.
 
 ### Servidor (Backend - Kotlin/Gradle)
 
