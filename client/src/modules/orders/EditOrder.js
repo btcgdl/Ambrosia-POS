@@ -1,10 +1,15 @@
-import {use, useEffect, useState} from "react";
-import {useNavigate, useParams, useSearchParams} from "react-router-dom";
+import { use, useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
-  addDishToOrder, addPaymentToTicket,
-  addTicket, createPayment, createTicket,
+  addDishToOrder,
+  addPaymentToTicket,
+  addTicket,
+  createPayment,
+  createTicket,
   getDishesByOrder,
-  getOrderById, getPaymentCurrencies, getPaymentMethods,
+  getOrderById,
+  getPaymentCurrencies,
+  getPaymentMethods,
   getTables,
   getUserById,
   removeDishToOrder,
@@ -12,7 +17,12 @@ import {
   updateTable,
   updateTicket,
 } from "./ordersService";
-import {getCategories, getDishes} from "../dishes/dishesService";
+import { getCategories, getDishes } from "../dishes/dishesService";
+import ConfirmationPopup from "../../components/ConfirmationPopup";
+import BitcoinPriceService from "../../services/bitcoinPriceService";
+import { apiClient } from "../../services/apiClient";
+
+const priceService = new BitcoinPriceService();
 
 export default function EditOrder() {
   const { pedidoId } = useParams();
@@ -28,7 +38,8 @@ export default function EditOrder() {
   const [undoStack, setUndoStack] = useState([]);
   const [showCurrencyDialog, setShowCurrencyDialog] = useState(false);
   const [showPaymentMethodDialog, setShowPaymentMethodDialog] = useState(false);
-  const [showGenerateInvoiceDialog, setShowGenerateInvoiceDialog] = useState(false);
+  const [showGenerateInvoiceDialog, setShowGenerateInvoiceDialog] =
+    useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const [ticketId, setTicketId] = useState(null);
@@ -44,7 +55,6 @@ export default function EditOrder() {
     if (name.toLowerCase().includes("btc")) return "₿";
     return "💰";
   };
-
 
   useEffect(() => {
     async function fetchData() {
@@ -70,8 +80,8 @@ export default function EditOrder() {
         setCategories(categoriesResponse);
         setSelectedCategory(categoriesResponse[0] || "");
         setOrderDishes(orderDishesResponse || []);
-        setPaymentMethods(paymentMethodsResponse)
-        setPaymentCurrencies(paymentCurrenciesResponse)
+        setPaymentMethods(paymentMethodsResponse);
+        setPaymentCurrencies(paymentCurrenciesResponse);
         /*if (orderResponse.status === 'closed'){
                     const ticketResponse = await getTicketByOrderId(orderResponse.data.id);
                     console.log(ticketResponse);
@@ -168,7 +178,7 @@ export default function EditOrder() {
         }
         navigate("/all-orders");
       }
-      } catch (err) {
+    } catch (err) {
       setError("Error al cambiar el estado del pedido");
     } finally {
       setIsLoading(false);
@@ -180,10 +190,14 @@ export default function EditOrder() {
       setError("Por favor, selecciona un método de pago y una moneda");
       return;
     }
+
     setIsLoading(true);
     setError("");
+
     try {
       const total = order.total;
+
+      // Crear ticket
       const ticket = {
         order_id: order.id,
         user_id: order.user_id,
@@ -192,29 +206,48 @@ export default function EditOrder() {
         total_amount: total,
         notes: "Sin Notas",
       };
+
       const ticketResponse = await createTicket(ticket);
       setTicketId(ticketResponse.id);
+
+      // Crear payment
       const payment = {
         method_id: selectedPaymentMethod,
         currency_id: selectedCurrency,
         transaction_id: "",
-        amount: total
-      }
-      const paymentResponse = await createPayment(payment);
-      const paymentTicketResponse = await addPaymentToTicket(ticketResponse.id, paymentResponse.id);
-      await handleChangeOrderStatus("paid")
+        amount: total,
+      };
 
+      const paymentResponse = await createPayment(payment);
+      const paymentTicketResponse = await addPaymentToTicket(
+        ticketResponse.id,
+        paymentResponse.id,
+      );
+
+      await handleChangeOrderStatus("paid");
       setShowPaymentMethodDialog(false);
 
-      //ToDo
-      if (selectedCurrency === "Pesos") {
-      } else {
-        const qrCode = `bitcoin:payment?amount=${total}&orderId=${pedidoId}`;
-      }
+      // OBTENER DATOS DE LA MONEDA
+      console.log("Selected Currency ID:", selectedCurrency);
+      const currencyData = await apiClient(
+        `/payments/currencies/${selectedCurrency}`,
+      );
+      console.log("Currency Data:", currencyData);
 
-      //setShowCurrencyDialog(false);
+      // CONVERTIR A SATOSHIS
+      const currencyAcronym = currencyData.acronym.toLowerCase(); // ej: 'mxn', 'usd'
+      console.log("Currency Acronym:", currencyAcronym);
+
+      const priceConverted = await priceService.fiatToSatoshis(
+        total,
+        currencyAcronym,
+      );
+
+      console.log("Price in Satoshis:", priceConverted);
+      console.log("Formatted:", priceService.formatSatoshis(priceConverted));
     } catch (err) {
-      setError("Error al cerrar el pedido");
+      console.error("Error en handleConfirmPaymentMethod:", err);
+      setError("Error al cerrar el pedido: " + err.message);
     } finally {
       setIsLoading(false);
     }
@@ -250,22 +283,33 @@ export default function EditOrder() {
     );
   }
 
+  const handleCurrencySelect = (currencyId) => {
+    setSelectedCurrency(currencyId);
+    setShowCurrencyDialog(false);
+    setShowPaymentMethodDialog(true);
+  };
+
+  const handlePaymentMethodSelect = (methodId) => {
+    setSelectedPaymentMethod(methodId);
+  };
+
   return (
     <main className="h-[90%] w-full flex items-center justify-center p-6">
       <div className="h-full w-full bg-amber-100 rounded-lg flex flex-col p-6 gap-6">
         <div className="flex justify-between items-center">
           <h2 className="text-4xl font-bold">
-            Pedido #{pedidoId} - {order?.waiter || "Desconocido"}
+            Pedido #{pedidoId.substring(0, 4)} -{" "}
+            {order?.waiter || "Desconocido"}
           </h2>
           <span className="text-2xl font-bold">
             Total: ${order?.total ? order.total.toFixed(2) : "0.00"}
           </span>
         </div>
         {error && <p className="text-red-600 text-xl">{error}</p>}
-        <div className="flex flex-1 gap-6">
+        <div className="flex flex-1 gap-6 overflow-y-auto">
           <div className="w-1/2 flex flex-col gap-4">
             <h3 className="text-2xl font-semibold">Categorías</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2  gap-4 overflow-y-auto touch-pan-y">
               {categories.map((category) => (
                 <button
                   key={category.id}
@@ -315,15 +359,17 @@ export default function EditOrder() {
                           .find((dish) => dish.id === item.dish_id)
                           .price.toFixed(2)}
                       </span>
-                      {(order && order.status === 'open') && (<>
-                        <button
+                      {order && order.status === "open" && (
+                        <>
+                          <button
                             className="bg-red-500 text-white py-2 px-4 text-lg rounded-lg hover:bg-red-600"
                             onClick={() => handleRemoveDish(item.id)}
                             disabled={isLoading}
-                        >
-                          Eliminar
-                        </button>
-                      </>)}
+                          >
+                            Eliminar
+                          </button>
+                        </>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -339,19 +385,11 @@ export default function EditOrder() {
                   <>
                     <button
                       className="bg-blue-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-blue-600"
-                      onClick={() => setShowGenerateInvoiceDialog(true)}
+                      onClick={() => setShowCurrencyDialog(true)}
                       disabled={isLoading}
                     >
                       Cerrar Pedido
                     </button>
-                    {/*ToDo*/}
-                    {/*<button
-                                                    className="bg-yellow-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-yellow-600"
-                                                    onClick={handleUndo}
-                                                disabled={undoStack.length === 0 || isLoading}
-                                            >
-                                                Deshacer
-                                            </button>*/}
                   </>
                 )}
                 {order?.status === "closed" && (
@@ -365,9 +403,7 @@ export default function EditOrder() {
                     </button>
                     <button
                       className="bg-green-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-green-600"
-                      onClick={
-                        () => setShowCurrencyDialog(true)
-                      }
+                      onClick={() => setShowCurrencyDialog(true)}
                       disabled={isLoading}
                     >
                       Pagar
@@ -376,124 +412,86 @@ export default function EditOrder() {
                 )}
               </div>
             </div>
-            {showGenerateInvoiceDialog && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
-                    <h3 className="text-2xl font-bold text-center">
-                      ¿Deseas generar un ticket con factura Lightning?
-                    </h3>
-                    <div className="flex justify-between gap-4">
-                      <button
-                          className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
-                          onClick={() => {
-                            //setGenerateInvoice(false);
-                            setShowGenerateInvoiceDialog(false);
-                            handleChangeOrderStatus("closed");
-                          }}
-                      >
-                        No
-                      </button>
-                      <button
-                          className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
-                          onClick={() => {
-                            //setGenerateInvoice(true);
-                            //ToDo Generate Invoice and print ticket
-                            setShowGenerateInvoiceDialog(false);
-                            handleChangeOrderStatus("closed");
-                          }}
-                      >
-                        Sí
-                      </button>
-                    </div>
-                  </div>
-                </div>
-            )}
 
-            {showCurrencyDialog && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
-                    <h3 className="text-2xl font-bold text-center">
-                      Seleccionar Moneda
-                    </h3>
-                    <div className="flex flex-col gap-4">
-                      {paymentCurrencies.map((currency) => (
-                          <button
-                              key={currency.id}
-                              className={`py-4 px-6 text-xl rounded-lg ${
-                                  selectedCurrency === currency.id
-                                      ? "bg-green-500 text-white"
-                                      : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                              }`}
-                              onClick={() => setSelectedCurrency(currency.id)}
-                          >
-                            {currency.acronym === "MXN" && "💵 "}
-                            {currency.acronym === "USD" && "💲 "}
-                            {currency.acronym === "BTC" && "₿ "}
-                            {currency.acronym}
-                          </button>
-                      ))}
-                    </div>
-                    <div className="flex justify-between gap-4">
+            <ConfirmationPopup
+              isOpen={showCurrencyDialog}
+              title="Seleccionar Moneda"
+              hideDefaultButtons={false}
+              customBody={
+                <div>
+                  <div className="flex flex-col gap-4">
+                    {paymentCurrencies.map((currency) => (
                       <button
-                          className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
-                          onClick={handleCancelDialog}
+                        key={currency.id}
+                        className={`py-4 px-6 text-xl rounded-lg transition-colors touch-manipulation ${
+                          selectedCurrency === currency.id
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400"
+                        }`}
+                        onClick={() => handleCurrencySelect(currency.id)}
                       >
-                        Cancelar
+                        {currency.acronym === "MXN" && "💵 "}
+                        {currency.acronym === "USD" && "💲 "}
+                        {currency.acronym === "BTC" && "₿ "}
+                        {currency.acronym}
                       </button>
-                      <button
-                          className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
-                          onClick={()=> {
-                            setShowCurrencyDialog(false);
-                            setShowPaymentMethodDialog(true)
-                          }}
-                          disabled={!selectedCurrency || isLoading}
-                      >
-                        Confirmar
-                      </button>
-                    </div>
+                    ))}
                   </div>
                 </div>
-            )}
-            {showPaymentMethodDialog && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="bg-white rounded-xl p-6 w-[400px] flex flex-col gap-6">
-                    <h3 className="text-2xl font-bold text-center">
-                      Seleccionar Método de Pago
-                    </h3>
-                    <div className="flex flex-col gap-4">
-                      {paymentMethods.map((method) => (
-                          <button
-                              key={method.id}
-                              className={`py-4 px-6 text-xl rounded-lg flex items-center justify-center gap-2 ${
-                                  selectedPaymentMethod === method.id
-                                      ? "bg-green-500 text-white"
-                                      : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                              }`}
-                              onClick={() => setSelectedPaymentMethod(method.id)}
-                          >
-                            <span>{getPaymentIcon(method.name)}</span>
-                            <span>{method.name}</span>
-                          </button>
-                      ))}
-                    </div>
-                    <div className="flex justify-between gap-4">
+              }
+              onClose={handleCancelDialog}
+            />
+
+            <ConfirmationPopup
+              isOpen={showPaymentMethodDialog}
+              title="Seleccionar Método de Pago"
+              hideDefaultButtons={true}
+              customBody={
+                <div>
+                  <div className="flex flex-col gap-4">
+                    {paymentMethods.map((method) => (
                       <button
-                          className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600"
-                          onClick={handleCancelDialog}
+                        key={method.id}
+                        className={`py-4 px-6 text-xl rounded-lg flex items-center justify-center gap-2 transition-colors touch-manipulation ${
+                          selectedPaymentMethod === method.id
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400"
+                        }`}
+                        onClick={() => handlePaymentMethodSelect(method.id)}
                       >
-                        Cancelar
+                        <span>{getPaymentIcon(method.name)}</span>
+                        <span>{method.name}</span>
                       </button>
-                      <button
-                          className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600"
-                          onClick={handleConfirmPaymentMethod}
-                          disabled={!selectedPaymentMethod || isLoading}
-                      >
-                        Confirmar
-                      </button>
-                    </div>
+                    ))}
+                  </div>
+
+                  {/* Botones personalizados */}
+                  <div className="flex justify-between gap-4 mt-6 pt-4 border-t">
+                    <button
+                      className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600 active:bg-red-700 transition-colors touch-manipulation disabled:opacity-50"
+                      onClick={handleCancelDialog}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600 active:bg-green-700 transition-colors touch-manipulation disabled:opacity-50"
+                      onClick={handleConfirmPaymentMethod}
+                      disabled={!selectedPaymentMethod || isLoading}
+                    >
+                      {isLoading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Cargando...</span>
+                        </div>
+                      ) : (
+                        "Confirmar"
+                      )}
+                    </button>
                   </div>
                 </div>
-            )}
+              }
+              onClose={handleCancelDialog}
+            />
           </div>
         </div>
       </div>
