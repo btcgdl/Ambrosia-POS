@@ -18,7 +18,7 @@ import { ProtectedRoute } from "./modules/cashier/ProtectedRoute";
 import { AuthProvider } from "./modules/auth/AuthProvider";
 import NavBar from "./components/navbar/NavBar";
 import Header from "./components/header/Header";
-import {LoggerProvider} from "./contexts/LoggerContext";
+import { LoggerProvider } from "./contexts/LoggerContext";
 
 function App() {
   const [modules, setModules] = useState(getModules());

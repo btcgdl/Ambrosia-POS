@@ -53,10 +53,10 @@ export default function Tables() {
   }
 
   return (
-    <main className="h-[90%] w-full flex items-center justify-center">
-      <div className="h-[60%] w-[80%] bg-amber-200">
+    <main className="h-[90%] w-full flex items-center justify-center bg-amber-50">
+      <div className="h-[60%] w-[80%] shadow-2xl  bg-amber-200 rounded-xl">
         {Array.isArray(tables) && tables.length > 0 ? (
-          <div className="h-full overflow-x-auto flex gap-4 p-4">
+          <div className="h-full overflow-x-auto flex gap-4 p-5">
             {tables.map((table) => {
               return table ? (
                 <TableCard key={table.id} tableData={table} />
