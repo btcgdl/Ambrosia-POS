@@ -6,13 +6,13 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
-import pos.ambrosia.db.connectToSqlite
 import pos.ambrosia.models.IngredientCategory
 import pos.ambrosia.services.IngredientCategoryService
 import pos.ambrosia.utils.UserNotFoundException
+import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureIngredientCategories() {
-    val connection: Connection = connectToSqlite()
+    val connection: Connection = DatabaseConnection.getConnection()
     val ingredientCategoryService = IngredientCategoryService(connection)
     routing { route("/ingredient-categories") { ingredientCategories(ingredientCategoryService) } }
 }

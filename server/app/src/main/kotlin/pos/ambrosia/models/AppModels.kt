@@ -101,7 +101,16 @@ data class CompleteOrder(val order: Order, val dishes: List<OrderDish>)
 
 data class OrderWithDishesRequest(val order: Order, val dishes: List<OrderDish>)
 
-@Serializable data class Payment(val id: String? = null, val currency: String, val name: String)
+@Serializable
+data class Payment(
+        val id: String? = null,
+        val method_id: String,
+        val currency_id: String,
+        val transaction_id: String? = null,
+        val amount: Double,
+)
+
+@Serializable data class PaymentMethod(val id: String? = null, val name: String)
 
 @Serializable
 data class Ticket(
@@ -113,6 +122,10 @@ data class Ticket(
         val total_amount: Double,
         val notes: String
 )
+
+@Serializable data class Currency(val id: String? = null, val acronym: String)
+
+@Serializable data class TicketPayment(val payment_id: String, val ticket_id: String)
 
 @Serializable
 data class Shift(

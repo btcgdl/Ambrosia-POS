@@ -10,14 +10,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
-import pos.ambrosia.db.connectToSqlite
 import pos.ambrosia.logger
 import pos.ambrosia.models.Ticket
 import pos.ambrosia.services.TicketService
 import pos.ambrosia.utils.UserNotFoundException
+import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureTickets() {
-    val connection: Connection = connectToSqlite()
+    val connection: Connection = DatabaseConnection.getConnection()
     val ticketService = TicketService(connection)
     routing { route("/tickets") { tickets(ticketService) } }
 }
@@ -46,8 +46,8 @@ fun Route.tickets(ticketService: TicketService) {
     }
     post("") {
         val ticket = call.receive<Ticket>()
-        ticketService.addTicket(ticket)
-        call.respond(HttpStatusCode.Created, "Ticket added successfully")
+        val generatedId = ticketService.addTicket(ticket)
+        call.respond(HttpStatusCode.Created, mapOf("id" to generatedId))
     }
     put("/{id}") {
         val id = call.parameters["id"]

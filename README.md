@@ -43,11 +43,14 @@ curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/
 
 **Opción 2: Script del proyecto**
 ```bash
+cd scripts
 chmod +x phoenixd.sh
 ./phoenixd.sh
 ```
 
 El script descarga phoenixd v0.6.0, verifica la integridad del paquete usando GPG y checksums, instala en `/usr/local/bin`, y opcionalmente configura un servicio systemd para inicio automático.
+
+Check [Mastering Phoenixd](https://btcgdl.github.io/Mastering-phoenixd/) for more details.
 
 #### Instalación manual
 
@@ -80,16 +83,12 @@ REACT_APP_API_BASE_URL=http://172.18.223.141:5000
 Luego, inicia el entorno de desarrollo del cliente con:
 
 ```sh
-npm start
+HOST="127.0.0.1" npm start
 ```
-
-> 🔧 **Nota sobre el backend en desarrollo:** Actualmente el servidor backend no cuenta con endpoints funcionales, por lo que cualquier llamada a la API generará errores. El cliente cuenta con un sistema de fallback que usa una base de datos simulada directamente en el frontend para permitir la navegación y prueba de funcionalidades durante esta etapa.
->
-> ⚠️ Este comportamiento es **temporal**. Una vez que el backend esté completo, será necesario actualizar el manejo de errores del frontend para desactivar el uso de datos simulados y responder correctamente a las respuestas reales del servidor.
 
 ### Servidor (Backend - Kotlin/Gradle)
 
-*Install App*
+**Desarrollo**
 
 Para ejecutar el servidor en modo de desarrollo:
 
@@ -97,8 +96,26 @@ Para ejecutar el servidor en modo de desarrollo:
 ./gradlew run
 ```
 
-Para construir el proyecto del servidor:
+**Producción**
+
+Para desplegar en producción, primero construye el JAR:
 
 ```sh
 ./gradlew jar
 ```
+
+Esto generará `ambrosia.jar` en `server/app/build/libs/`. Copia este archivo junto con el script `scripts/run-server.sh` a tu servidor de producción.
+
+Para ejecutar en producción:
+
+```sh
+chmod +x run-server.sh
+./run-server.sh
+```
+
+El script automáticamente:
+- Busca el archivo `ambrosia.jar` en el directorio actual
+- Configura el logging usando `$HOME/.Ambrosia-POS/Ambrosia-Logs.xml` si existe
+- Ejecuta la aplicación con las opciones JVM apropiadas
+
+Para configuración adicional o servicios systemd, consulta la documentación de deployment del proyecto.

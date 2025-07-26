@@ -1,142 +1,92 @@
 ﻿import {apiClient} from '../../services/apiClient';
-import {mockService} from '../../useMockSocket';
 
 
 export async function getAllOrders() {
-    try {
-        const response = await apiClient('/orders');
-        return response ? response : [];
-    } catch (error) {
-        console.log("fallback")
-        const orders = mockService.getOrders();
-        const users = mockService.getUsers();
-        const tables = mockService.getTables();
-
-        const combinedOrders = orders.map((order) => {
-            const user = users.find((u) => u.id === order.userId);
-            const mozo = user ? user.nombre : 'Desconocido';
-            const table = tables.find((t) => t.pedidoId === order.id);
-            const tableName = table ? table.nombre : 'Sin mesa';
-            const total = order.dishes?.reduce((sum, item) => sum + (item.dish?.precio || 0), 0) || 0;
-
-            return {
-                id: order.id,
-                estado: order.estado,
-                dishes: order.dishes,
-                total,
-                mozo,
-                table: tableName,
-            };
-        });
-
-        return { data: combinedOrders };
-    }
+    const response = await apiClient('/orders');
+    return response ? response : [];
 }
 
 export async function getOrders() {
-    try {
-        return await apiClient('/orders');
-    } catch (error) {
-        return { data: mockService.getOrders() };
-    }
+    const orders = await apiClient('/orders');
+    return orders ? orders : [];
 }
 
 export async function addOrder(order) {
-    try {
-        return await apiClient('/orders', {
-            method: 'POST',
-            body: order,
-        });
-    } catch (error) {
-        return mockService.addOrder(order);
-    }
+    return await apiClient('/orders', {
+        method: 'POST',
+        body: order,
+    });
 }
 
 export async function getUsers() {
-    try {
-        return await apiClient('/users');
-    } catch (error) {
-        return { data: mockService.getUsers() };
-    }
+    return await apiClient('/users');
 }
 
 export async function getUserById(userId) {
-    try {
-        const response = await apiClient(`/users/${userId}`);
-        return response;
-    } catch (error) {
-        const user = mockService.getUsers().find((u) => u.id === Number(userId));
-        if (!user) throw new Error('Usuario no encontrado');
-        return { data: user };
-    }
+    const response = await apiClient(`/users/${userId}`);
+    return response;
 }
 
 export async function getTables() {
-    try {
-        return await apiClient('/spaces/tables');
-    } catch (error) {
-        return { data: mockService.getTables() };
-    }
+    const response = await apiClient('/tables');
+    return response  ? response : [];
+}
+
+export async function createOrderInTable(tableId) {
+    return await createOrder()
 }
 
 export async function getOrderById(orderId) {
-    try {
-        const response = await apiClient(`/orders/${orderId}?include=users,tables`);
-        return response;
-    } catch (error) {
-        const order = mockService.getOrders().find((o) => o.id === Number(orderId));
-        if (!order) throw new Error('Pedido no encontrado');
-        const users = mockService.getUsers();
-        const tables = mockService.getTables();
+    const response = await apiClient(`/orders/${orderId}`);
+    return response;
+}
 
-        const user = users.find((u) => u.id === order.userId);
-        const mozo = user ? user.nombre : 'Desconocido';
-        const table = tables.find((t) => t.pedidoId === order.id);
-        const tableName = table ? table.nombre : 'Sin mesa';
-        const total = order.dishes?.reduce((sum, item) => sum + (item.dish?.precio || 0), 0) || 0;
+export async function createOrder(tableId = null) {
+    //localStorage.setItem('userId', "");
+    if (!localStorage.getItem('userId')) {
+        throw new Error('No hay usuario logeado');
+    }
+    const response = await getUserById(localStorage.getItem('userId'));
+    //const response = {id: localStorage.getItem('userId'), name: "JordyArreglaLaDBConnection"};
+    if (response){
+        const body = {
+            user_id: response.id,
+            waiter: response.name,
+            status: "open",
+            total: 0,
+            created_at: Date.now(),
+        }
+        if (tableId) body.table_id = tableId;
+        return await apiClient('/orders', {
+            method: 'POST',
+            body: body,
+        });
+    }
+    else{
 
-        return {
-            data: {
-                id: order.id,
-                userId: order.userId,
-                estado: order.estado,
-                dishes: order.dishes || [],
-                total,
-                mozo,
-                table: tableName,
-            },
-        };
     }
 }
 
-export async function createOrder() {
-    try{
-        //localStorage.setItem('userId', "");
-        if (!localStorage.getItem('userId')) {
-            throw new Error('No hay usuario logeado');
-        }
-        //const response = await getUserById(localStorage.getItem('userId'));
-        const response = {id: localStorage.getItem('userId'), name: "JordyArreglaLaDBConnection"};
-        if (response){
-            return await apiClient('/orders', {
-                method: 'POST',
-                body: {
-                    user_id: response.id,
-                    waiter: response.name,
-                    status: "open",
-                    total: 0,
-                    created_at: Date.now(),
-                }
-            });
-        }
-        else{
+export async function addDishToOrder(pedidoId, dish) {
+    return await apiClient(`/orders/${pedidoId}/dishes`, {
+        method: 'POST',
+        body: [{
+            dish_id: dish.id,
+            price_at_order: dish.price,
+            notes: "none"
+        }]
+    });
+}
 
-        }
-    } catch (error) {
-        throw new error;
-    } finally {
+export async function removeDishToOrder(pedidoId, dish) {
+    return await apiClient(`/orders/${pedidoId}/dishes/${dish}`, {
+        method: 'DELETE',
+    })
+}
 
-    }
+export async function getDishesByOrder(orderId) {
+    const dishes = await apiClient(`/orders/${orderId}/dishes`);
+    return dishes ? dishes : [];
 }
 
 /*export async function createOrder(pin, tableId = null) {
@@ -174,95 +124,84 @@ export async function createOrder() {
     }
 }*/
 
-export async function updateOrder(orderId, updatedOrder) {
-    try {
-        return await apiClient(`/orders/${orderId}`, {
-            method: 'PATCH',
-            body: updatedOrder,
-        });
-    } catch (error) {
-        const orders = mockService.getOrders();
-        const orderIndex = orders.findIndex((o) => o.id === Number(orderId));
-        if (orderIndex === -1) throw new Error('Pedido no encontrado');
-
-        const newOrders = [...orders];
-        newOrders[orderIndex] = { ...newOrders[orderIndex], ...updatedOrder };
-        mockService.addOrder(newOrders[orderIndex]);
-
-        const users = mockService.getUsers();
-        const tables = mockService.getTables();
-        const updated = newOrders[orderIndex];
-        const user = users.find((u) => u.id === updated.userId);
-        const mozo = user ? user.nombre : 'Desconocido';
-        const table = tables.find((t) => t.pedidoId === updated.id);
-        const tableName = table ? table.nombre : 'Sin mesa';
-        const total = updated.dishes?.reduce((sum, item) => sum + (item.dish?.precio || 0), 0) || 0;
-
-        return {
-            data: {
-                id: updated.id,
-                userId: updated.userId,
-                estado: updated.estado,
-                dishes: updated.dishes || [],
-                total,
-                mozo,
-                table: tableName,
-            },
-        };
-    }
+export async function updateOrder(order) {
+    return await apiClient(`/orders/${order.id}`, {
+        method: 'PUT',
+        body: order,
+    });
 }
 
-export async function updateTable(tableId, updatedTable) {
-    try {
-        return await apiClient(`/spaces/tables/${tableId}`, {
-            method: 'PATCH',
-            body: updatedTable,
-        });
-    } catch (error) {
-        const tables = mockService.getTables();
-        const tableIndex = tables.findIndex((t) => t.id === Number(tableId));
-        if (tableIndex === -1) throw new Error('Mesa no encontrada');
-
-        const newTables = [...tables];
-        newTables[tableIndex] = { ...newTables[tableIndex], ...updatedTable };
-        mockService.addTable(newTables[tableIndex]);
-        return { data: newTables[tableIndex] };
-    }
+export async function updateTable(table) {
+    table.status = "available"
+    table.order_id = null
+    return await apiClient(`/tables/${table.id}`, {
+        method: 'PUT',
+        body: table,
+    });
 }
 
 export async function addTicket(ticket) {
-    try {
-        return await apiClient('/tickets', {
-            method: 'POST',
-            body: ticket,
-        });
-    } catch (error) {
-        return mockService.addTicket(ticket);
-    }
+    return await apiClient('/tickets', {
+        method: 'POST',
+        body: ticket,
+    });
 }
 
 export async function updateTicket(ticketId, updatedTicket) {
-    try {
-        return await apiClient(`/tickets/${ticketId}`, {
-            method: 'PATCH',
-            body: updatedTicket,
-        });
-    } catch (error) {
-        const tickets = mockService.getTickets();
-        const ticketIndex = tickets.findIndex((t) => t.id === Number(ticketId));
-        if (ticketIndex === -1) throw new Error('Ticket no encontrado');
-
-        const updated = { ...tickets[ticketIndex], ...updatedTicket };
-        mockService.addTicket(updated);
-        return { data: updated };
-    }
+    return await apiClient(`/tickets/${ticketId}`, {
+        method: 'PATCH',
+        body: updatedTicket,
+    });
 }
 
 export async function getTicketByOrderId(orderId) {
-    try {
-        return await apiClient(`/get-ticket-by-order-id/${orderId}`, {});
-    } catch (error) {
-        const ticket = mockService.getTicketByOrderId(orderId);
-        return {data: ticket};
-    }
+    return await apiClient(`/get-ticket-by-order-id/${orderId}`, {});
+}
+
+export async function createTicket(ticket) {
+    return await apiClient('/tickets', {
+        method: 'POST',
+        body: ticket,
+    })
+}
+
+export async function createPayment(payment){
+    return await apiClient('/payments', {
+        method: 'POST',
+        body: payment,
+    })
+}
+
+export async function addPaymentToTicket(ticketId, paymentId){
+    return await apiClient('/payments/ticket-payments', {
+        method: 'POST',
+        body:{
+            payment_id: paymentId,
+            ticket_id: ticketId,
+        }
+    })
+}
+
+export async function getPaymentMethods(){
+    const paymentMethods = await apiClient('/payments/methods');
+    return paymentMethods ? paymentMethods : [];
+}
+
+export async function getPaymentCurrencies(){
+    const paymentCurrencies = await apiClient('/payments/currencies');
+    return paymentCurrencies ? paymentCurrencies : [];
+}
+
+export async function getTickets(){
+    const tickets = await apiClient('/tickets');
+    return tickets ? tickets : [];
+}
+
+export async function getPayments(){
+    const payments = await apiClient('/payments');
+    return payments ? payments : [];
+}
+
+export async function getPaymentByTicketId(id){
+    return await apiClient(`/payments/ticket-payments/by-ticket/${id}`);
 }

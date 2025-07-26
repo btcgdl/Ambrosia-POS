@@ -7,8 +7,8 @@ export default function TableForm({ onSubmit, onCancel, initialData, roomId }) {
 
     useEffect(() => {
         if (initialData) {
-            setNombre(initialData.nombre || "");
-            setEstado(initialData.estado || "available");
+            setNombre(initialData.name || "");
+            setEstado(initialData.status || "available");
         } else {
             setNombre("");
             setEstado("available");
@@ -49,7 +49,7 @@ export default function TableForm({ onSubmit, onCancel, initialData, roomId }) {
                     required
                 />
             </div>
-            <div>
+            {/*<div>
                 <label className="block text-sm font-medium">Estado</label>
                 <select
                     value={estado}
@@ -59,7 +59,7 @@ export default function TableForm({ onSubmit, onCancel, initialData, roomId }) {
                     <option value="available">Libre</option>
                     <option value="busy">Ocupada</option>
                 </select>
-            </div>
+            </div>*/}
             <div className="flex justify-end gap-2">
                 <button
                     type="button"

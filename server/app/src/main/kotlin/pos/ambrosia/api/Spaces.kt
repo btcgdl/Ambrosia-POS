@@ -10,14 +10,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
-import pos.ambrosia.db.connectToSqlite
 import pos.ambrosia.logger
 import pos.ambrosia.models.Space
 import pos.ambrosia.services.SpaceService
 import pos.ambrosia.utils.UserNotFoundException
+import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureSpaces() {
-    val connection: Connection = connectToSqlite()
+    val connection: Connection = DatabaseConnection.getConnection()
     val spaceService = SpaceService(connection)
     routing { route("/spaces") { spaces(spaceService) } }
 }
@@ -71,7 +71,7 @@ fun Route.spaces(spaceService: SpaceService) {
             if (isDeleted) {
                 call.respond(HttpStatusCode.OK, "Space deleted successfully")
             } else {
-                call.respond(HttpStatusCode.NotFound, "Space not found")
+                call.respond(HttpStatusCode.BadRequest, "Space not found")
             }
         } else {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
