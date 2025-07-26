@@ -21,6 +21,8 @@ import { getCategories, getDishes } from "../dishes/dishesService";
 import ConfirmationPopup from "../../components/ConfirmationPopup";
 import BitcoinPriceService from "../../services/bitcoinPriceService";
 import { apiClient } from "../../services/apiClient";
+import { createInvoice } from "../cashier/cashierService";
+import QRCode from "react-qr-code";
 
 const priceService = new BitcoinPriceService();
 
@@ -36,6 +38,7 @@ export default function EditOrder() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [undoStack, setUndoStack] = useState([]);
+  const [createdInvoice, setCreatedInvoice] = useState(null);
   const [showCurrencyDialog, setShowCurrencyDialog] = useState(false);
   const [showPaymentMethodDialog, setShowPaymentMethodDialog] = useState(false);
   const [showGenerateInvoiceDialog, setShowGenerateInvoiceDialog] =
@@ -186,8 +189,8 @@ export default function EditOrder() {
   };
 
   const handleConfirmPaymentMethod = async () => {
-    if (!selectedPaymentMethod || !selectedCurrency) {
-      setError("Por favor, selecciona un método de pago y una moneda");
+    if (!selectedPaymentMethod) {
+      setError("Por favor, selecciona un método de pago ");
       return;
     }
 
@@ -196,6 +199,8 @@ export default function EditOrder() {
 
     try {
       const total = order.total;
+      const currencyBase = await apiClient(`/base-currency`);
+      console.log("Selected Currency ID:", currencyBase.currency_id);
 
       // Crear ticket
       const ticket = {
@@ -213,7 +218,7 @@ export default function EditOrder() {
       // Crear payment
       const payment = {
         method_id: selectedPaymentMethod,
-        currency_id: selectedCurrency,
+        currency_id: currencyBase.currency_id,
         transaction_id: "",
         amount: total,
       };
@@ -224,33 +229,63 @@ export default function EditOrder() {
         paymentResponse.id,
       );
 
+      const paymentMethodData = await apiClient(
+        `/payments/methods/${selectedPaymentMethod}`,
+      );
+      console.log("Currency Data:", paymentMethodData);
+
+      if (paymentMethodData.name === "BTC") {
+        const currencyBaseData = await apiClient(
+          `/payments/currencies/${currencyBase.currency_id}`,
+        );
+        console.log("Currency Data:", currencyBaseData);
+
+        // CONVERTIR A SATOSHIS
+        const currencyAcronym = currencyBaseData.acronym.toLowerCase(); // ej: 'mxn', 'usd'
+        console.log("Currency Acronym:", currencyAcronym);
+
+        const priceConverted = await priceService.fiatToSatoshis(
+          total,
+          currencyAcronym,
+        );
+
+        console.log("Price in Satoshis:", priceConverted);
+
+        const invoice = await createInvoice(priceConverted, order.id);
+
+        console.log(invoice);
+        setCreatedInvoice(invoice);
+
+        console.log("Formatted:", priceService.formatSatoshis(priceConverted));
+        setShowPaymentMethodDialog(false);
+        return;
+      }
+
       await handleChangeOrderStatus("paid");
       setShowPaymentMethodDialog(false);
 
       // OBTENER DATOS DE LA MONEDA
-      console.log("Selected Currency ID:", selectedCurrency);
-      const currencyData = await apiClient(
-        `/payments/currencies/${selectedCurrency}`,
-      );
-      console.log("Currency Data:", currencyData);
-
-      // CONVERTIR A SATOSHIS
-      const currencyAcronym = currencyData.acronym.toLowerCase(); // ej: 'mxn', 'usd'
-      console.log("Currency Acronym:", currencyAcronym);
-
-      const priceConverted = await priceService.fiatToSatoshis(
-        total,
-        currencyAcronym,
-      );
-
-      console.log("Price in Satoshis:", priceConverted);
-      console.log("Formatted:", priceService.formatSatoshis(priceConverted));
     } catch (err) {
       console.error("Error en handleConfirmPaymentMethod:", err);
       setError("Error al cerrar el pedido: " + err.message);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePaymentConfirm = async () => {
+    // Lógica cuando el cliente pagó
+    console.log("Cliente confirmó el pago");
+    await handleChangeOrderStatus("paid");
+    // Tu lógica aquí...
+    setCreatedInvoice(null); // o lo que necesites hacer
+  };
+
+  const handlePaymentCancel = () => {
+    // Lógica cuando el cliente no pagó
+    console.log("Cliente no pagó");
+    // Tu lógica aquí...
+    setCreatedInvoice(null); // o lo que necesites hacer
   };
 
   const handleCancelDialog = () => {
@@ -385,7 +420,7 @@ export default function EditOrder() {
                   <>
                     <button
                       className="bg-blue-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-blue-600"
-                      onClick={() => setShowCurrencyDialog(true)}
+                      onClick={() => setShowPaymentMethodDialog(true)}
                       disabled={isLoading}
                     >
                       Cerrar Pedido
@@ -403,7 +438,7 @@ export default function EditOrder() {
                     </button>
                     <button
                       className="bg-green-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-green-600"
-                      onClick={() => setShowCurrencyDialog(true)}
+                      onClick={() => setShowPaymentMethodDialog(true)}
                       disabled={isLoading}
                     >
                       Pagar
@@ -412,35 +447,6 @@ export default function EditOrder() {
                 )}
               </div>
             </div>
-
-            <ConfirmationPopup
-              isOpen={showCurrencyDialog}
-              title="Seleccionar Moneda"
-              hideDefaultButtons={false}
-              customBody={
-                <div>
-                  <div className="flex flex-col gap-4">
-                    {paymentCurrencies.map((currency) => (
-                      <button
-                        key={currency.id}
-                        className={`py-4 px-6 text-xl rounded-lg transition-colors touch-manipulation ${
-                          selectedCurrency === currency.id
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400"
-                        }`}
-                        onClick={() => handleCurrencySelect(currency.id)}
-                      >
-                        {currency.acronym === "MXN" && "💵 "}
-                        {currency.acronym === "USD" && "💲 "}
-                        {currency.acronym === "BTC" && "₿ "}
-                        {currency.acronym}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              }
-              onClose={handleCancelDialog}
-            />
 
             <ConfirmationPopup
               isOpen={showPaymentMethodDialog}
@@ -492,6 +498,44 @@ export default function EditOrder() {
               }
               onClose={handleCancelDialog}
             />
+
+            {createdInvoice && (
+              <ConfirmationPopup
+                isOpen={!!createdInvoice} // Corregido: debe ser boolean
+                title="Por favor pide al cliente que realice la transacción"
+                hideDefaultButtons={true} // Agregado para usar botones personalizados
+                customBody={
+                  <div className="flex flex-col items-center gap-6">
+                    {/* QR Code */}
+                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                      <QRCode value={createdInvoice?.serialized} size={200} />
+                    </div>
+
+                    {/* Información adicional */}
+                    <p className="text-center text-gray-600">
+                      Escanea el código QR para realizar el pago
+                    </p>
+
+                    {/* Botones personalizados */}
+                    <div className="flex flex-col gap-3 w-full sm:flex-row">
+                      <button
+                        className="flex-1 px-6 py-4 bg-red-500 text-white rounded-lg hover:bg-red-600 active:bg-red-700 transition-colors font-medium text-base min-h-12 touch-manipulation"
+                        onClick={handlePaymentCancel}
+                      >
+                        No Pagó
+                      </button>
+                      <button
+                        className="flex-1 px-6 py-4 bg-green-500 text-white rounded-lg hover:bg-green-600 active:bg-green-700 transition-colors font-medium text-base min-h-12 touch-manipulation"
+                        onClick={handlePaymentConfirm}
+                      >
+                        Pagado
+                      </button>
+                    </div>
+                  </div>
+                }
+                onClose={handleCancelDialog}
+              />
+            )}
           </div>
         </div>
       </div>
