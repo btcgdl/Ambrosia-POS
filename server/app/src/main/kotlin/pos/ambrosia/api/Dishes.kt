@@ -13,7 +13,6 @@ import java.sql.Connection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Dish
 import pos.ambrosia.services.DishService
-import pos.ambrosia.utils.UserNotFoundException
 import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureDishes() {
@@ -33,16 +32,18 @@ fun Route.dishes(dishService: DishService) {
     }
     get("/{id}") {
         val id = call.parameters["id"]
-        if (id != null) {
-            val dish = dishService.getDishById(id)
-            if (dish != null) {
-                call.respond(HttpStatusCode.OK, dish)
-            } else {
-                throw UserNotFoundException()
-            }
-        } else {
+        if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@get
         }
+        
+        val dish = dishService.getDishById(id)
+        if (dish == null) {
+            call.respond(HttpStatusCode.NotFound, "Dish not found")
+            return@get
+        }
+        
+        call.respond(HttpStatusCode.OK, dish)
     }
     post("") {
         val dish = call.receive<Dish>()
@@ -51,26 +52,30 @@ fun Route.dishes(dishService: DishService) {
     }
     put("/{id}") {
         val id = call.parameters["id"]
-        if (id != null) {
-            val updatedDish = call.receive<Dish>()
-            val isUpdated = dishService.updateDish(updatedDish)
-            logger.info(isUpdated.toString())
-            if (isUpdated) {
-                call.respond(HttpStatusCode.OK, "Dish updated successfully")
-            } else {
-                call.respond(HttpStatusCode.NotFound, "Dish not found")
-            }
-        } else {
+        if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@put
         }
+        
+        val updatedDish = call.receive<Dish>()
+        val isUpdated = dishService.updateDish(updatedDish)
+        logger.info(isUpdated.toString())
+        
+        if (!isUpdated) {
+            call.respond(HttpStatusCode.NotFound, "Dish not found")
+            return@put
+        }
+        
+        call.respond(HttpStatusCode.OK, "Dish updated successfully")
     }
     delete("/{id}") {
         val id = call.parameters["id"]
-        if (id != null) {
-            dishService.deleteDish(id)
-            call.respond(HttpStatusCode.NoContent, "Dish deleted successfully")
-        } else {
+        if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@delete
         }
+        
+        dishService.deleteDish(id)
+        call.respond(HttpStatusCode.NoContent, "Dish deleted successfully")
     }
 }

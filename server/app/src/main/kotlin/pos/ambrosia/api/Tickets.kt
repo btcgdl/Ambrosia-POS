@@ -13,7 +13,6 @@ import java.sql.Connection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Ticket
 import pos.ambrosia.services.TicketService
-import pos.ambrosia.utils.UserNotFoundException
 import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureTickets() {
@@ -33,16 +32,18 @@ fun Route.tickets(ticketService: TicketService) {
     }
     get("/{id}") {
         val id = call.parameters["id"]
-        if (id != null) {
-            val ticket = ticketService.getTicketById(id)
-            if (ticket != null) {
-                call.respond(HttpStatusCode.OK, ticket)
-            } else {
-                throw UserNotFoundException()
-            }
-        } else {
+        if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@get
         }
+        
+        val ticket = ticketService.getTicketById(id)
+        if (ticket == null) {
+            call.respond(HttpStatusCode.NotFound, "Ticket not found")
+            return@get
+        }
+        
+        call.respond(HttpStatusCode.OK, ticket)
     }
     post("") {
         val ticket = call.receive<Ticket>()
@@ -51,30 +52,35 @@ fun Route.tickets(ticketService: TicketService) {
     }
     put("/{id}") {
         val id = call.parameters["id"]
-        if (id != null) {
-            val updatedTicket = call.receive<Ticket>()
-            val isUpdated = ticketService.updateTicket(updatedTicket)
-            logger.info(isUpdated.toString())
-            if (isUpdated) {
-                call.respond(HttpStatusCode.OK, "Ticket updated successfully")
-            } else {
-                call.respond(HttpStatusCode.NotFound, "Ticket not found")
-            }
-        } else {
+        if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@put
         }
+        
+        val updatedTicket = call.receive<Ticket>()
+        val isUpdated = ticketService.updateTicket(updatedTicket)
+        logger.info(isUpdated.toString())
+        
+        if (!isUpdated) {
+            call.respond(HttpStatusCode.NotFound, "Ticket not found")
+            return@put
+        }
+        
+        call.respond(HttpStatusCode.OK, "Ticket updated successfully")
     }
     delete("/{id}") {
         val id = call.parameters["id"]
-        if (id != null) {
-            val isDeleted = ticketService.deleteTicket(id)
-            if (isDeleted) {
-                call.respond(HttpStatusCode.OK, "Ticket deleted successfully")
-            } else {
-                call.respond(HttpStatusCode.NotFound, "Ticket not found")
-            }
-        } else {
+        if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@delete
         }
+        
+        val isDeleted = ticketService.deleteTicket(id)
+        if (!isDeleted) {
+            call.respond(HttpStatusCode.NotFound, "Ticket not found")
+            return@delete
+        }
+        
+        call.respond(HttpStatusCode.OK, "Ticket deleted successfully")
     }
 }

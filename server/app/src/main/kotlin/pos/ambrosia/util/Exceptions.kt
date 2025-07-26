@@ -7,8 +7,6 @@ class InvalidCredentialsException(message: String = "Invalid credentials") :
 class UnauthorizedApiException(message: String = "Unauthorized API access") :
         SecurityException(message)
 
-class UserNotFoundException(message: String = "User not found") : IllegalArgumentException(message)
-
 // Phoenix Lightning node exceptions
 class PhoenixConnectionException(message: String = "Unable to connect to Phoenix Lightning node") :
         RuntimeException(message)

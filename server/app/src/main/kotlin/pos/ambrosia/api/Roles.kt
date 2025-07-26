@@ -13,7 +13,6 @@ import java.sql.Connection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Role
 import pos.ambrosia.services.RolesService
-import pos.ambrosia.utils.UserNotFoundException
 import pos.ambrosia.db.DatabaseConnection
 
 fun Application.configureRoles() {
@@ -33,16 +32,18 @@ fun Route.roles(roleService: RolesService) {
     }
     get("/{id}") {
         val id = call.parameters["id"]
-        if (id != null) {
-            val role = roleService.getRoleById(id)
-            if (role != null) {
-                call.respond(HttpStatusCode.OK, role)
-            } else {
-                throw UserNotFoundException()
-            }
-        } else {
+        if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@get
         }
+        
+        val role = roleService.getRoleById(id)
+        if (role == null) {
+            call.respond(HttpStatusCode.NotFound, "Role not found")
+            return@get
+        }
+        
+        call.respond(HttpStatusCode.OK, role)
     }
     post("") {
         val user = call.receive<Role>()
@@ -51,30 +52,35 @@ fun Route.roles(roleService: RolesService) {
     }
     put("/{id}") {
         val id = call.parameters["id"]
-        if (id != null) {
-            val updatedRole = call.receive<Role>()
-            val isUpdated = roleService.updateRole(updatedRole)
-            logger.info(isUpdated.toString())
-            if (isUpdated) {
-                call.respond(HttpStatusCode.OK, "Role updated successfully")
-            } else {
-                call.respond(HttpStatusCode.NotFound, "Role with ID: $id not found")
-            }
-        } else {
+        if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@put
         }
+        
+        val updatedRole = call.receive<Role>()
+        val isUpdated = roleService.updateRole(updatedRole)
+        logger.info(isUpdated.toString())
+        
+        if (!isUpdated) {
+            call.respond(HttpStatusCode.NotFound, "Role with ID: $id not found")
+            return@put
+        }
+        
+        call.respond(HttpStatusCode.OK, "Role updated successfully")
     }
     delete("/{id}") {
         val id = call.parameters["id"]
-        if (id != null) {
-            val isDeleted = roleService.deleteRole(id)
-            if (isDeleted) {
-                call.respond(HttpStatusCode.NoContent, "Role deleted successfully")
-            } else {
-                call.respond(HttpStatusCode.NotFound, "Role with ID: $id not found")
-            }
-        } else {
+        if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+            return@delete
         }
+        
+        val isDeleted = roleService.deleteRole(id)
+        if (!isDeleted) {
+            call.respond(HttpStatusCode.NotFound, "Role with ID: $id not found")
+            return@delete
+        }
+        
+        call.respond(HttpStatusCode.NoContent, "Role deleted successfully")
     }
 }
