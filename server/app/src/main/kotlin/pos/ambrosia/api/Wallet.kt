@@ -1,5 +1,6 @@
 package pos.ambrosia.api
 
+import io.ktor.http.*
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.auth.*
@@ -11,6 +12,7 @@ import pos.ambrosia.models.Phoenix.PayInvoiceRequest
 import pos.ambrosia.models.Phoenix.PayOfferRequest
 import pos.ambrosia.models.Phoenix.PayOnchainRequest
 import pos.ambrosia.services.PhoenixService
+import pos.ambrosia.utils.authenticateAdmin
 
 fun Application.configureWallet() {
   val phoenixService = PhoenixService()
@@ -20,6 +22,13 @@ fun Application.configureWallet() {
 
 fun Route.wallet(phoenixService: PhoenixService) {
   authenticate("auth-jwt") {
+    post("/createinvoice") {
+      val request = call.receive<CreateInvoiceRequest>()
+      val invoice = phoenixService.createInvoice(request)
+      call.respond(HttpStatusCode.OK, invoice)
+    }
+  }
+  authenticateAdmin {
 
     // Get wallet/node info
     get("/getinfo") {
@@ -30,11 +39,6 @@ fun Route.wallet(phoenixService: PhoenixService) {
     get("/getbalance") {
       val balance = phoenixService.getBalance()
       call.respond(HttpStatusCode.OK, balance)
-    }
-    post("/createinvoice") {
-      val request = call.receive<CreateInvoiceRequest>()
-      val invoice = phoenixService.createInvoice(request)
-      call.respond(HttpStatusCode.OK, invoice)
     }
     post("/payinvoice") {
       val request = call.receive<PayInvoiceRequest>()

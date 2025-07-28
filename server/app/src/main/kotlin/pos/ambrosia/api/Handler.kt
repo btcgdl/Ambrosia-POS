@@ -8,6 +8,7 @@ import io.ktor.server.response.*
 import java.sql.SQLException
 import org.slf4j.LoggerFactory
 import pos.ambrosia.models.Message
+import pos.ambrosia.utils.AdminOnlyException
 import pos.ambrosia.utils.InvalidCredentialsException
 import pos.ambrosia.utils.PhoenixBalanceException
 import pos.ambrosia.utils.PhoenixConnectionException
@@ -41,6 +42,10 @@ fun Application.Handler() {
     exception<UnauthorizedApiException> { call, _ ->
       logger.warn("Unauthorized API access attempt")
       call.respond(HttpStatusCode.Forbidden, Message("Unauthorized API access"))
+    }
+    exception<AdminOnlyException> { call, _ ->
+      logger.warn("Non-admin user attempted to access admin-only endpoint")
+      call.respond(HttpStatusCode.Forbidden, Message("Admin privileges required"))
     }
     exception<PhoenixConnectionException> { call, cause ->
       logger.error("Phoenix Lightning node connection error: ${cause.message}")

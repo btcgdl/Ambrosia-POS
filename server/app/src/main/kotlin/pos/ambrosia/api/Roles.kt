@@ -14,6 +14,7 @@ import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Role
 import pos.ambrosia.services.RolesService
+import pos.ambrosia.utils.authenticateAdmin
 
 fun Application.configureRoles() {
   val connection: Connection = DatabaseConnection.getConnection()
@@ -23,14 +24,6 @@ fun Application.configureRoles() {
 
 fun Route.roles(roleService: RolesService) {
   authenticate("auth-jwt") {
-    get("") {
-      val roles = roleService.getRoles()
-      if (roles.isEmpty()) {
-        call.respond(HttpStatusCode.NoContent, "No roles found")
-        return@get
-      }
-      call.respond(HttpStatusCode.OK, roles)
-    }
     get("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {
@@ -45,6 +38,16 @@ fun Route.roles(roleService: RolesService) {
       }
 
       call.respond(HttpStatusCode.OK, role)
+    }
+  }
+  authenticateAdmin() {
+    get("") {
+      val roles = roleService.getRoles()
+      if (roles.isEmpty()) {
+        call.respond(HttpStatusCode.NoContent, "No roles found")
+        return@get
+      }
+      call.respond(HttpStatusCode.OK, roles)
     }
     post("") {
       val user = call.receive<Role>()

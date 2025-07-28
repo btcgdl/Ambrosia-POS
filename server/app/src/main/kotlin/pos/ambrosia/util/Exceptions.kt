@@ -4,6 +4,9 @@ package pos.ambrosia.utils
 class InvalidCredentialsException(message: String = "Invalid credentials") :
         IllegalArgumentException(message)
 
+class AdminOnlyException(message: String = "Admin privileges required") :
+        SecurityException(message)
+
 class UnauthorizedApiException(message: String = "Unauthorized API access") :
         SecurityException(message)
 
