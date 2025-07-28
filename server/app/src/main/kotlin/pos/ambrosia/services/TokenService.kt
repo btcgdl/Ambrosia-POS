@@ -9,7 +9,7 @@ import io.ktor.server.application.ApplicationEnvironment
 import java.sql.Connection
 import java.util.*
 import java.util.concurrent.TimeUnit
-import pos.ambrosia.models.User
+import pos.ambrosia.models.AuthResponse
 
 class TokenService(environment: ApplicationEnvironment, private val connection: Connection) {
 
@@ -22,23 +22,25 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
   val verifier: JWTVerifier =
           JWT.require(algorithm).withAudience(audience).withIssuer(issuer).build()
 
-  fun generateAccessToken(user: User): String =
+  fun generateAccessToken(user: AuthResponse): String =
           JWT.create()
                   .withAudience(audience)
                   .withIssuer(issuer)
                   .withClaim("userId", user.id.toString())
                   .withClaim("role", user.role)
+                  .withClaim("isAdmin", user.isAdmin)
                   .withClaim("realm", "Ambrosia-Server")
                   .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(15)))
                   .sign(algorithm)
 
-  fun generateRefreshToken(user: User): String {
+  fun generateRefreshToken(user: AuthResponse): String {
     val refreshToken =
             JWT.create()
                     .withAudience(audience)
                     .withIssuer(issuer)
                     .withClaim("userId", user.id.toString())
                     .withClaim("role", user.role)
+                    .withClaim("isAdmin", user.isAdmin)
                     .withClaim("type", "refresh")
                     .withClaim("realm", "Ambrosia-Server")
                     .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)))
@@ -64,14 +66,16 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
     }
   }
 
-  fun getUserFromRefreshToken(refreshToken: String): User? {
+  fun getUserFromRefreshToken(refreshToken: String): AuthResponse? {
     return try {
       val decodedJWT = verifier.verify(refreshToken)
       val userId = decodedJWT.getClaim("userId")?.asString()
       val role = decodedJWT.getClaim("role")?.asString()
+      val name = decodedJWT.getClaim("name")?.asString()
+      val isAdmin = decodedJWT.getClaim("isAdmin")?.asBoolean() ?: false
 
       if (userId != null && role != null) {
-        User(id = userId, role = role, name = "", pin = "")
+        AuthResponse(id = userId, role = role, name = name ?: "", isAdmin = isAdmin)
       } else {
         null
       }

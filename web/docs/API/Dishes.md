@@ -1,0 +1,156 @@
+### 4. Gestión de Platos
+
+Los endpoints de platos permiten gestionar el menú del restaurante con todos los platos disponibles.
+
+- `GET /dishes`: Obtiene todos los platos del sistema.
+  - **Authorization:** Requiere autenticación básica
+  - **cURL Example:**
+  ```bash
+  curl -X GET "http://localhost:8080/dishes" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Content-Type: application/json"
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  [
+    {
+      "id": "76ee1086-b945-4170-b2e6-9fbeb95ae0be",
+      "name": "Pizza Margherita",
+      "price": 15.99,
+      "category_id": "262006ea-8782-4b08-ac3b-b3f13270fec3"
+    },
+    {
+      "id": "262006ea-8782-4b08-ac3b-b3f13270fec3",
+      "name": "Ensalada César",
+      "price": 12.50,
+      "category_id": "76ee1086-b945-4170-b2e6-9fbeb95ae0be"
+    }
+  ]
+  ```
+  - **Response Body (Sin contenido - 204 No Content):**
+  ```json
+  "No dishes found"
+  ```
+
+- `GET /dishes/{id}`: Obtiene un plato específico por su ID.
+  - **Authorization:** Requiere autenticación básica
+  - **Path Parameters:**
+    - `id` (string): ID del plato a obtener
+  - **cURL Example:**
+  ```bash
+  curl -X GET "http://localhost:8080/dishes/76ee1086-b945-4170-b2e6-9fbeb95ae0be" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Content-Type: application/json"
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  {
+    "id": "76ee1086-b945-4170-b2e6-9fbeb95ae0be",
+    "name": "Pizza Margherita",
+    "price": 15.99,
+    "category_id": "262006ea-8782-4b08-ac3b-b3f13270fec3"
+  }
+  ```
+  - **Response Body (Error - 400 Bad Request):**
+  ```json
+  "Missing or malformed ID"
+  ```
+  - **Response Body (Error - 404 Not Found):**
+  ```json
+  "Dish not found"
+  ```
+
+- `POST /dishes`: Crea un nuevo plato en el sistema.
+  - **Authorization:** Requiere autenticación básica
+  - **Request Body:**
+  ```json
+  {
+    "name": "string",
+    "price": 0.0,
+    "category_id": "string"
+  }
+  ```
+  - **cURL Example:**
+  ```bash
+  curl -X POST "http://localhost:8080/dishes" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "Pasta Carbonara",
+      "price": 18.75,
+      "category_id": "262006ea-8782-4b08-ac3b-b3f13270fec3"
+    }'
+  ```
+  - **Response Body (Éxito - 201 Created):**
+  ```json
+  "Dish added successfully"
+  ```
+
+- `PUT /dishes/{id}`: Actualiza un plato existente.
+  - **Authorization:** Requiere autenticación básica
+  - **Path Parameters:**
+    - `id` (string): ID del plato a actualizar
+  - **Request Body:**
+  ```json
+  {
+    "name": "string",
+    "price": 0.0,
+    "category_id": "string"
+  }
+  ```
+  - **cURL Example:**
+  ```bash
+  curl -X PUT "http://127.0.0.1:9154/dishes/76ee1086-b945-4170-b2e6-9fbeb95ae0be" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H 'Cookie: refreshToken=your_refresh_token_here'
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "Pizza Margherita Premium",
+      "price": 17.99,
+      "category_id": "262006ea-8782-4b08-ac3b-b3f13270fec3"
+    }'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  "Dish updated successfully"
+  ```
+  - **Response Body (Error - 400 Bad Request):**
+  ```json
+  "Missing or malformed ID"
+  ```
+  - **Response Body (Error - 404 Not Found):**
+  ```json
+  "Dish not found"
+  ```
+
+- `DELETE /dishes/{id}`: Elimina un plato del sistema.
+  - **Authorization:** Requiere autenticación básica
+  - **Path Parameters:**
+    - `id` (string): ID del plato a eliminar
+  - **cURL Example:**
+  ```bash
+  curl -X DELETE "http://127.0.0.1:9154/dishes/76ee1086-b945-4170-b2e6-9fbeb95ae0be" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H 'Cookie: refreshToken=your_refresh_token_here'
+    -H "Content-Type: application/json"
+  ```
+  - **Response Body (Éxito - 204 No Content):**
+  ```json
+  "Dish deleted successfully"
+  ```
+  - **Response Body (Error - 400 Bad Request):**
+  ```json
+  "Missing or malformed ID"
+  ```
+
+### Notas importantes:
+- Todos los endpoints de platos requieren autenticación básica
+- Los IDs de platos son UUID generados automáticamente
+- El campo `category_id` debe referenciar una categoría de plato existente
+- Los precios deben ser valores numéricos positivos
+- Los campos `name`, `price` y `category_id` son requeridos
+- Para codificar credenciales básicas: `echo -n "username:password" | base64`
+- El servidor corre por defecto en `http://localhost:8080`

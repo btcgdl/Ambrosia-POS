@@ -1,0 +1,139 @@
+### 3. Gestión de Categorías de Platos
+
+Los endpoints de categorías de platos permiten gestionar las categorías para organizar los platos del menú.
+
+- `GET /dish-categories`: Obtiene todas las categorías de platos del sistema.
+  - **Authorization:** Requiere autenticación básica
+  - **cURL Example:**
+  ```bash
+  curl -X GET "http://127.0.0.1:9154/dish-categories" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H 'Cookie: refreshToken=your_refresh_token_here'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  [
+    {
+      "id": "76ee1086-b945-4170-b2e6-9fbeb95ae0be",
+      "name": "Entradas"
+    },
+    {
+      "id": "262006ea-8782-4b08-ac3b-b3f13270fec3",
+      "name": "Platos Principales"
+    }
+  ]
+  ```
+  - **Response Body (Sin contenido - 204 No Content):**
+  ```json
+  "No dish categories found"
+  ```
+
+- `GET /dish-categories/{id}`: Obtiene una categoría de plato específica por su ID.
+  - **Authorization:** Requiere autenticación básica
+  - **Path Parameters:**
+    - `id` (string): ID de la categoría a obtener
+  - **cURL Example:**
+  ```bash
+  curl -X GET "http://127.0.0.1:9154/dish-categories/76ee1086-b945-4170-b2e6-9fbeb95ae0be" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H 'Cookie: refreshToken=your_refresh_token_here'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  {
+    "id": "76ee1086-b945-4170-b2e6-9fbeb95ae0be",
+    "name": "Entradas"
+  }
+  ```
+  - **Response Body (Error - 400 Bad Request):**
+  ```json
+  "Missing or malformed ID"
+  ```
+  - **Response Body (Error - 404 Not Found):**
+  ```json
+  "Dish category not found"
+  ```
+
+- `POST /dish-categories`: Crea una nueva categoría de plato en el sistema.
+  - **Authorization:** Requiere autenticación básica
+  - **Request Body:**
+  ```json
+  {
+    "name": "string"
+  }
+  ```
+  - **cURL Example:**
+  ```bash
+  curl -X POST "http://127.0.0.1:9154/dish-categories" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H 'Cookie: refreshToken=your_refresh_token_here'
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "Postres"
+    }'
+  ```
+  - **Response Body (Éxito - 201 Created):**
+  ```json
+  {
+    "message": "Dish category added successfully"
+  }
+  ```
+
+- `PUT /dish-categories/{id}`: Actualiza una categoría de plato existente.
+  - **Authorization:** Requiere autenticación básica
+  - **Path Parameters:**
+    - `id` (string): ID de la categoría a actualizar
+  - **Request Body:**
+  ```json
+  {
+    "name": "string"
+  }
+  ```
+  - **cURL Example:**
+  ```bash
+  curl -X PUT "http://127.0.0.1:9154/dish-categories/76ee1086-b945-4170-b2e6-9fbeb95ae0be" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "Entradas Gourmet"
+    }'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  "Dish category updated successfully"
+  ```
+  - **Response Body (Error - 400 Bad Request):**
+  ```json
+  "Missing or malformed ID"
+  ```
+  - **Response Body (Error - 404 Not Found):**
+  ```json
+  "Dish category not found or update failed"
+  ```
+
+- `DELETE /dish-categories/{id}`: Elimina una categoría de plato del sistema.
+  - **Authorization:** Requiere autenticación básica
+  - **Path Parameters:**
+    - `id` (string): ID de la categoría a eliminar
+  - **cURL Example:**
+  ```bash
+  curl -X DELETE "http://127.0.0.1:9154/dish-categories/76ee1086-b945-4170-b2e6-9fbeb95ae0be" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Content-Type: application/json"
+  ```
+  - **Response Body (Éxito - 204 No Content):**
+  ```json
+  "Dish category deleted successfully"
+  ```
+  - **Response Body (Error - 400 Bad Request):**
+  ```json
+  "Cannot delete dish category - it may be in use or not found"
+  ```
+
+### Notas importantes:
+- Todos los endpoints de categorías de platos requieren autenticación básica
+- Los IDs de categorías son UUID generados automáticamente
+- No se puede eliminar una categoría si está siendo utilizada por platos existentes
+- El campo `name` es requerido para crear/actualizar categorías

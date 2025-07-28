@@ -3,11 +3,18 @@ import NavBarButton from "./NavBarButton";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, Children } from "react";
 import { getHomeRoute } from "../../utils/getHomeRoute";
-import { getModules } from "../../core/moduleRegistry";
+import { getModules, removeModules } from "../../core/moduleRegistry";
+import {
+  getCookieValue,
+  logoutFromService,
+  updateRole,
+} from "../../modules/auth/authService";
+import { getLogger } from "../../utils/loggerStore";
 
 export default function NavBar({ children }) {
   const { userRole } = useUserRole();
   const navigate = useNavigate();
+  const showLogger = getLogger();
 
   useEffect(() => {}, []);
 
@@ -45,7 +52,15 @@ export default function NavBar({ children }) {
             text="Salir"
             icon="box-arrow-right"
             onClick={() => {
-              navigate("/");
+              if (getCookieValue("accessToken") === null) {
+                showLogger("error", "No tiene una sesión activa");
+                return;
+              }
+              if (logoutFromService()) {
+                window.location.reload();
+              } else {
+                showLogger("error", "Error logging out");
+              }
             }}
           />
         </div>
