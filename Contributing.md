@@ -1,15 +1,14 @@
-# Contributing to Ambrosia-POS
+## **¿Cómo puedes contribuir?**
 
-Thank you for considering contributing!
+¡Nos encanta la colaboración de la comunidad! Si quieres ser parte del futuro de los pagos con Bitcoin, puedes:
 
-## How Can I Contribute?
+- 🔍 **Revisar nuestro código** en [GitHub](https://github.com/btcgdl/Ambrosia-POS)
+- 🐛 **Reportar bugs** o sugerir mejoras
+- 💡 **Contribuir con ideas** para nuevas funcionalidades
+- 🧪 **Probar la beta** cuando esté disponible
 
-### Reporting Bugs
-- Check existing [Issues](https://github.com/btcgdl/Ambrosia-POS/issues) before creating a new one.
-- Provide a clear title, description, and steps to reproduce.
+---
 
-### Pull Requests
-- Fork the repo and create your branch from `main`.
-- Add tests for new code.
-- Ensure tests pass and code lints.
-- Submit your pull request!
+**¡Mantente conectado para más actualizaciones!**
+
+Síguenos en nuestras redes sociales y únete a la comunidad de desarrolladores y empresarios que están construyendo el futuro de los pagos con Bitcoin.
