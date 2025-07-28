@@ -33,7 +33,7 @@
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
+[data-theme="dark"] {
   --ifm-color-primary: #35cafb;
   --ifm-color-primary-dark: #0aafe6;
   --ifm-color-primary-darker: #0091ca;
@@ -73,7 +73,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: radial-gradient(
+  background-image:
+    radial-gradient(
       circle at 20% 50%,
       rgba(123, 220, 254, 0.1) 0%,
       transparent 50%
@@ -109,7 +110,11 @@
 
 /* Dark mode para el footer */
 [data-theme="dark"] .footer {
-  background: linear-gradient(135deg, var(--picton-blue-950) 0%, #000000 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--picton-blue-950) 0%,
+    #000000 100%
+  ) !important;
 }
 
 [data-theme="dark"] .footer .footer__title,
@@ -253,7 +258,6 @@
 
 /* Links globales */
 
-
 /* Pagination */
 .pagination-nav__link {
   border-color: var(--picton-blue-200);
@@ -318,4 +322,42 @@
 [data-theme="dark"] .search-box:focus {
   border-color: var(--picton-blue-400);
   box-shadow: 0 0 0 2px rgba(53, 202, 251, 0.2);
+}
+
+/* Controlar el tamaño del font en el blog */
+.blog-wrapper .markdown {
+  font-size: 16px; /* Tamaño normal */
+  line-height: 1.6;
+}
+
+.blog-wrapper .markdown h1 {
+  font-size: 1rem; /* Títulos H1 */
+}
+
+.blog-wrapper .markdown h2 {
+  font-size: 1.5rem; /* Títulos H2 */
+}
+
+.blog-wrapper .markdown h3 {
+  font-size: 1.25rem; /* Títulos H3 */
+}
+
+.blog-wrapper .markdown p {
+  font-size: 1rem; /* Párrafos normales */
+}
+
+/* Busca reglas como estas que podrían estar aumentando el font-size */
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  font-size: ...; /* Si está muy grande, reduce aquí */
+}
+
+.markdown p {
+  font-size: ...; /* Controla el tamaño del texto normal */
+}
+
+/* O reglas globales como */
+html {
+  font-size: ...; /* Si está en más de 16px, podría ser el problema */
 }
