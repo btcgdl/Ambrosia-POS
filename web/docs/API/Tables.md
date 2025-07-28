@@ -1,0 +1,184 @@
+### Gestión de Mesas
+
+Los endpoints de mesas permiten administrar las mesas dentro de cada espacio.
+
+- `GET /tables`: Obtiene todas las mesas del sistema.
+  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **cURL Example:**
+  ```bash
+  curl -X GET "http://197.0.0.1:9154/tables" \
+    -H 'Cookie: accessToken=your_access_token_here'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  [
+    {
+      "id": "31c4a18d-a760-4d1f-a3ca-80b184c2d56c",
+      "name": "Mesa 1",
+      "status": "available",
+      "space_id": "7743646d-946a-4401-96ca-f970b617485c",
+      "order_id": null
+    },
+    {
+      "id": "605850d7-1c91-45dc-aabc-2e3055d8feae",
+      "name": "Mesa 2",
+      "status": "occupied",
+      "space_id": "ee5078dc-8829-4c91-af1d-2096089d4608",
+      "order_id": "b9f9c8c7-180c-49e5-8a45-0cfca41d2dfa"
+    }
+  ]
+  ```
+  - **Response Body (Sin contenido - 204 No Content):**
+  ```json
+  "No tables found"
+  ```
+
+- `GET /tables/by-space/{id}`: Obtiene todas las mesas de un espacio específico.
+  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Path Parameters:**
+    - `id` (string): ID del espacio
+  - **cURL Example:**
+  ```bash
+  curl -X GET "http://127.0.0.1:9154/tables/by-space/9c9064f5-f389-4e32-b037-805a86827777" \
+    -H 'Cookie: accessToken=your_access_token_here'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  [
+    {
+      "id": "9c9064f5-f389-4e32-b037-805a86827777",
+      "name": "Mesa 1",
+      "status": "available",
+      "space_id": "da787870-0cff-44a7-9179-ceeb49739292",
+      "order_id": null
+    }
+  ]
+  ```
+  - **Response Body (Sin contenido - 204 No Content):**
+  ```json
+  "No tables found for space ID: {id}"
+  ```
+
+- `GET /tables/{id}`: Obtiene una mesa específica por su ID.
+  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Path Parameters:**
+    - `id` (string): ID de la mesa a obtener
+  - **cURL Example:**
+  ```bash
+  curl -X GET "http://127.0.0.1:9154/tables/8dacb80d-0694-4a11-bab0-01a877fea66d" \
+    -H 'Cookie: accessToken=your_access_token_here'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  {
+    "id": "2056766b-dcd7-4bb7-a3c7-40d953592195",
+    "name": "Mesa 1",
+    "status": "available",
+    "space_id": "ded606ff-2d0b-4f89-8352-9d34355043be",
+    "order_id": null
+  }
+  ```
+  - **Response Body (Error - 400 Bad Request):**
+  ```json
+  "Missing or malformed ID"
+  ```
+  - **Response Body (Error - 404 Not Found):**
+  ```json
+  "Table not found"
+  ```
+
+- `POST /tables`: Crea una nueva mesa.
+  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Request Body:**
+  ```json
+  {
+    "name": "string",
+    "status": "available",
+    "space_id": "string",
+    "order_id": "string"
+  }
+  ```
+  - **cURL Example:**
+  ```bash
+  curl -X POST "http://127.0.0.1:9154/tables" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "Mesa 5",
+      "status": "available",
+      "space_id": "1a1a67c9-15bf-4f18-aadd-896308ff51c2",
+      "order_id": null
+    }'
+  ```
+  - **Response Body (Éxito - 201 Created):**
+  ```json
+  "Table added successfully"
+  ```
+
+- `PUT /tables/{id}`: Actualiza una mesa existente.
+  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Path Parameters:**
+    - `id` (string): ID de la mesa a actualizar
+  - **Request Body:**
+  ```json
+  {
+    "name": "string",
+    "status": "available|occupied|reserved",
+    "space_id": "string",
+    "order_id": "string"
+  }
+  ```
+  - **cURL Example:**
+  ```bash
+  curl -X PUT "http://127.0.0.1:9154/tables/table-uuid-1" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "Mesa 1 VIP",
+      "status": "occupied",
+      "space_id": "c5a51221-851d-4b7e-b534-1847091fcc09",
+      "order_id": "d7c7a43c-7884-48b1-82c4-a18e48aafef8"
+    }'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  "Table updated successfully"
+  ```
+  - **Response Body (Error - 400 Bad Request):**
+  ```json
+  "Missing or malformed ID"
+  ```
+  - **Response Body (Error - 404 Not Found):**
+  ```json
+  "Table not found"
+  ```
+
+- `DELETE /tables/{id}`: Elimina una mesa del sistema.
+  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Path Parameters:**
+    - `id` (string): ID de la mesa a eliminar
+  - **cURL Example:**
+  ```bash
+  curl -X DELETE "http://192.0.0.1:9154/tables/fc5566ef-6e4c-465f-a1ad-d9ff5dfbb92a" \
+    -H 'Cookie: accessToken=your_access_token_here'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  "Table deleted successfully"
+  ```
+  - **Response Body (Error - 400 Bad Request):**
+  ```json
+  "Missing or malformed ID"
+  ```
+  - **Response Body (Error - 404 Not Found):**
+  ```json
+  "Table not found"
+  ```
+
+### Notas importantes:
+- Todos los endpoints de mesas requieren autenticación 
+- Los IDs de mesas son UUID generados automáticamente
+- Una mesa debe estar asociada a un espacio válido (`space_id`)
+- Los estados válidos de mesa son: `available`, `occupied`, `reserved`
+- El campo `order_id` se establece cuando hay una orden activa en la mesa
+- No se puede eliminar una mesa que tenga una orden activa

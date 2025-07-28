@@ -1,0 +1,87 @@
+### 1. Autenticación
+
+- `POST /auth/login`: Autentica a un usuario específico y establece cookies de sesión con tokens JWT (access token y refresh token).
+ - **Request Body:**
+  ``` JSON
+  {
+    "name": "string",
+    "pin": "string"
+  }
+  ``` 
+  - **cURL Example:**
+  
+  ```Bash
+  curl -v -X POST http://127.0.0.1:9154/auth/login \
+    -H 'Content-Type: application/json' \
+    -d '{
+      "name": "admin",
+      "pin": "1234"
+    }'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```JSON
+  {
+    "message": "Login successful"
+  }
+  ```
+  - **Response Headers:** Se establecen cookies `accessToken` (15 min) y `refreshToken` (30 días)
+  
+  - **Response Body (Error - 401 Unauthorized):**
+  ```JSON
+  {
+    "message": "Invalid credentials"
+  }
+  ```
+
+- `POST /auth/refresh`: Renueva el access token usando el refresh token almacenado en cookies.
+ - **Request:** El refresh token debe estar presente en las cookies
+ - **cURL Example:**
+  ```Bash
+  curl -v -X POST http://127.0.0.1:9154/auth/refresh \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H 'Cookie: refreshToken=your_refresh_token_here'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```JSON
+  {
+    "message": "Access token refreshed successfully"
+  }
+  ```
+  - **Response Headers:** Se actualiza la cookie `accessToken`
+  
+  - **Response Body (Error - 401 Unauthorized):**
+  ```JSON
+  {
+    "message": "Invalid refresh token"
+  }
+  ```
+
+- `POST /auth/logout`: Cierra la sesión del usuario, revoca el refresh token y elimina las cookies de autenticación.
+ - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+ - **cURL Example:** 
+  ```Bash
+  curl -X POST http://127.0.0.1:9154/auth/logout \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H 'Cookie: refreshToken=your_refresh_token_here'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```JSON
+  {
+    "message": "Logout successful"
+  }
+  ```
+  - **Response Headers:** Se eliminan las cookies `accessToken` y `refreshToken`
+  
+  - **Response Body (Error - 401 Unauthorized):**
+  ```JSON
+  {
+    "message": "Unauthorized"
+  }
+  ```
+
+### Notas importantes:
+- La autenticación se maneja mediante cookies HTTP con tokens JWT
+- El `accessToken` tiene una duración de 15 minutos
+- El `refreshToken` tiene una duración de 30 días
+- Para endpoints protegidos, el access token se envía automáticamente via cookies
+- Cuando el access token expira, usar `/auth/refresh` para obtener uno nuevo

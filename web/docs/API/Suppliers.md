@@ -1,0 +1,165 @@
+### Gestión de Proveedores
+
+Los endpoints de proveedores permiten administrar la información de contacto de los proveedores del restaurante.
+
+- `GET /suppliers`: Obtiene todos los proveedores del sistema.
+  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **cURL Example:**
+  ```bash
+  curl -X GET "http://127.0.0.1:9154/suppliers" \
+    -H 'Cookie: accessToken=your_access_token_here'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  [
+    {
+      "id": "1c322996-8696-4dcb-b14e-8c7abd8a4880",
+      "name": "Distribuidora Central",
+      "contact": "María García",
+      "phone": "+34 666 123 456",
+      "email": "maria@distribuidora.com",
+      "address": "Calle Mayor 123, Madrid"
+    },
+    {
+      "id": "c46c6b1b-480c-4a83-86fc-327f6dbf9718",
+      "name": "Carnicería El Toro",
+      "contact": "Juan Pérez",
+      "phone": "+34 677 234 567",
+      "email": "juan@carniceriaeltoro.com",
+      "address": "Avenida de la Paz 45, Valencia"
+    }
+  ]
+  ```
+  - **Response Body (Sin contenido - 204 No Content):**
+  ```json
+  "No suppliers found"
+  ```
+
+- `GET /suppliers/{id}`: Obtiene un proveedor específico por su ID.
+  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Path Parameters:**
+    - `id` (string): ID del proveedor a obtener
+  - **cURL Example:**
+  ```bash
+  curl -X GET "http://127.0.0.1:9154/suppliers/5f7037ea-a0cc-4820-9df4-90a80960d897" \
+    -H 'Cookie: accessToken=your_access_token_here'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  {
+    "id": "5f7037ea-a0cc-4820-9df4-90a80960d897",
+    "name": "Distribuidora Central",
+    "contact": "María García",
+    "phone": "+34 666 123 456",
+    "email": "maria@distribuidora.com",
+    "address": "Calle Mayor 123, Madrid"
+  }
+  ```
+  - **Response Body (Error - 400 Bad Request):**
+  ```json
+  "Missing or malformed ID"
+  ```
+  - **Response Body (Error - 404 Not Found):**
+  ```json
+  "Supplier not found"
+  ```
+
+- `POST /suppliers`: Crea un nuevo proveedor.
+  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Request Body:**
+  ```json
+  {
+    "name": "string",
+    "contact": "string",
+    "phone": "string",
+    "email": "string",
+    "address": "string"
+  }
+  ```
+  - **cURL Example:**
+  ```bash
+  curl -X POST "http://127.0.0.1:9154/suppliers" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "Frutas y Verduras Frescas",
+      "contact": "Ana López",
+      "phone": "+34 688 345 678",
+      "email": "ana@frutasfrescas.com",
+      "address": "Mercado Central, Puesto 15, Sevilla"
+    }'
+  ```
+  - **Response Body (Éxito - 201 Created):**
+  ```json
+  "Supplier added successfully"
+  ```
+
+- `PUT /suppliers/{id}`: Actualiza un proveedor existente.
+  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Path Parameters:**
+    - `id` (string): ID del proveedor a actualizar
+  - **Request Body:**
+  ```json
+  {
+    "name": "string",
+    "contact": "string",
+    "phone": "string",
+    "email": "string",
+    "address": "string"
+  }
+  ```
+  - **cURL Example:**
+  ```bash
+  curl -X PUT "http://127.0.0.1:9154/suppliers/a1bbc895-297f-42d8-bc92-e7dc61b81d6f" \
+    -H 'Cookie: accessToken=your_access_token_here' \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "Distribuidora Central S.L.",
+      "contact": "María García Rodríguez",
+      "phone": "+34 666 123 456",
+      "email": "maria.garcia@distribuidora.com",
+      "address": "Calle Mayor 123, 28001 Madrid"
+    }'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  "Supplier updated successfully"
+  ```
+  - **Response Body (Error - 400 Bad Request):**
+  ```json
+  "Missing or malformed ID"
+  ```
+  - **Response Body (Error - 404 Not Found):**
+  ```json
+  "Supplier not found"
+  ```
+
+- `DELETE /suppliers/{id}`: Elimina un proveedor del sistema.
+  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Path Parameters:**
+    - `id` (string): ID del proveedor a eliminar
+  - **cURL Example:**
+  ```bash
+  curl -X DELETE "http://127.0.0.1:9154/suppliers/supplier-uuid-1" \
+    -H 'Cookie: accessToken=your_access_token_here'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  "Supplier deleted successfully"
+  ```
+  - **Response Body (Error - 400 Bad Request):**
+  ```json
+  "Missing or malformed ID"
+  ```
+  - **Response Body (Error - 404 Not Found):**
+  ```json
+  "Supplier not found"
+  ```
+
+### Notas importantes:
+- Todos los endpoints de proveedores requieren autenticación 
+- Los IDs de proveedores son UUID generados automáticamente
+- Todos los campos (name, contact, phone, email, address) son requeridos
+- El email debe tener un formato válido
+- Los proveedores pueden estar asociados a ingredientes para el control de inventario
+- Se recomienda mantener actualizada la información de contacto para facilitar pedidos
