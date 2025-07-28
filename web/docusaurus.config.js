@@ -110,7 +110,7 @@ const config = {
             type: "docSidebar",
             sidebarId: "tutorialSidebar",
             position: "left",
-            label: "REST API",
+            label: "REST-API",
           },
           { to: "/blog", label: "Blog", position: "left" },
           { to: "/team", label: "Equipo", position: "left" },
@@ -129,7 +129,7 @@ const config = {
             items: [
               {
                 label: "Api",
-                to: "/doc/API/Auth",
+                to: "/docs/API/Auth",
               },
             ],
           },
