@@ -36,7 +36,7 @@ function HomepageHeader() {
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div >
+        <div>
           <p>
             Sistema POS de código abierto que acepta Bitcoin y Lightning Network
           </p>
@@ -118,7 +118,7 @@ function FeaturesSection() {
               <div
                 className={clsx(
                   "card shadow--md padding--lg text--center",
-                  styles.featureCard
+                  styles.featureCard,
                 )}
               >
                 <div className="margin-bottom--md">{feature.icon}</div>
@@ -163,10 +163,7 @@ function BenefitsSection() {
               ))}
             </div>
             <div className="margin-top--lg">
-              <Link
-                className="button button--primary button--lg"
-                to="/blog"
-              >
+              <Link className="button button--primary button--lg" to="/blog">
                 Conocer Más Beneficios
               </Link>
             </div>
@@ -237,7 +234,7 @@ function TestimonialsSection() {
               <div
                 className={clsx(
                   "card padding--lg shadow--md",
-                  styles.testimonialCard
+                  styles.testimonialCard,
                 )}
               >
                 <div className="margin-bottom--sm">
@@ -271,15 +268,20 @@ function TechStackSection() {
       name: "Ktor",
       description: "Framework backend para Kotlin",
     },
-    { name: "Lightning Network", description: "Pagos instantáneos y de bajo costo" },
+    {
+      name: "Lightning Network",
+      description: "Pagos instantáneos y de bajo costo",
+    },
     {
       name: "React/Electron",
       description: "Interfaz moderna y multiplataforma",
     },
     { name: "Kotlin", description: "Backend robusto y escalable" },
     { name: "SQLite", description: "Base de datos local" },
-    { name: "REST API", description: "Integración sencilla con otros servicios" },
-    
+    {
+      name: "REST API",
+      description: "Integración sencilla con otros servicios",
+    },
   ];
 
   return (
@@ -361,7 +363,7 @@ export default function Home() {
       <main>
         <FeaturesSection />
         <BenefitsSection />
-        <TestimonialsSection />
+        {/* <TestimonialsSection /> */}
         <TechStackSection />
         {/* <CTASection /> */}
       </main>

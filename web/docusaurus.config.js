@@ -4,15 +4,15 @@
 // There are various equivalent ways to declare your Docusaurus config.
 // See: https://docusaurus.io/docs/api/docusaurus-config
 
-import { themes as prismThemes } from 'prism-react-renderer';
+import { themes as prismThemes } from "prism-react-renderer";
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Ambrosia-POS',
-  tagline: 'The best experience POS with BTC',
-  favicon: 'img/favicon.ico',
+  title: "Ambrosia-POS",
+  tagline: "The best experience POS with BTC",
+  favicon: "img/favicon.ico",
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -20,58 +20,77 @@ const config = {
   },
 
   // Set the production url of your site here
-  url: 'https://btcgdl.github.io',
+  url: "https://btcgdl.github.io",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/Ambrosia-POS/',
+  baseUrl: "/Ambrosia-POS/",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'btcgdl', // Usually your GitHub org/user name.
-  projectName: 'Ambrosia-POS', // Usually your repo name.
+  organizationName: "btcgdl", // Usually your GitHub org/user name.
+  projectName: "Ambrosia-POS", // Usually your repo name.
 
-  onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "warn",
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: "en",
+    locales: ["en"],
   },
 
   presets: [
     [
-      'classic',
+      "classic",
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          sidebarPath: './sidebars.js',
+          sidebarPath: "./sidebars.js",
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/btcgdl/Ambrosia-POS/tree/main/docs/api",
+          editUrl: "https://github.com/btcgdl/Ambrosia-POS/tree/main/docs/api",
         },
         blog: {
           showReadingTime: true,
           feedOptions: {
-            type: ['rss', 'atom'],
+            type: ["rss", "atom"],
             xslt: true,
           },
+          blogSidebarTitle: "Entradas Recientes",
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
           // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
+          onInlineTags: "warn",
+          onInlineAuthors: "warn",
+          onUntruncatedBlogPosts: "warn",
         },
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: "./src/css/custom.css",
         },
       }),
+    ],
+  ],
+
+  plugins: [
+    [
+      "@docusaurus/plugin-content-blog",
+      {
+        id: "team",
+        routeBasePath: "team",
+        path: "./team",
+        blogTitle: "Nuestro Equipo",
+        blogDescription: "Conoce a nuestro increíble equipo",
+        blogSidebarCount: 0,
+        postsPerPage: "ALL",
+        showReadingTime: false,
+        feedOptions: {
+          type: null,
+        },
+      },
     ],
   ],
 
@@ -79,67 +98,68 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      image: "img/docusaurus-social-card.jpg",
       navbar: {
-        title: 'Ambrosia-POS',
+        title: "Ambrosia-POS",
         logo: {
-          alt: 'Ambrosia-POS-Logo',
-          src: 'img/logo.svg',
+          alt: "Ambrosia-POS-Logo",
+          src: "img/logo.svg",
         },
         items: [
           {
-            type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
-            position: 'left',
-            label: 'Documentation',
+            type: "docSidebar",
+            sidebarId: "tutorialSidebar",
+            position: "left",
+            label: "REST API",
           },
-          { to: '/blog', label: 'Blog', position: 'left' },
+          { to: "/blog", label: "Blog", position: "left" },
+          { to: "/team", label: "Equipo", position: "left" },
           {
-            href: 'https://github.com/btcgdl/Ambrosia-POS',
-            label: 'GitHub',
-            position: 'right',
+            href: "https://github.com/btcgdl/Ambrosia-POS",
+            label: "GitHub",
+            position: "right",
           },
         ],
       },
       footer: {
-        style: 'dark',
+        style: "dark",
         links: [
           {
-            title: 'Documentation',
+            title: "Documentacion",
             items: [
               {
-                label: 'Api',
-                to: '/doc/API/Auth',
+                label: "Api",
+                to: "/doc/API/Auth",
               },
             ],
           },
           {
-            title: 'Community',
+            title: "Comunidad",
             items: [
               {
-                label: 'BTCGDL',
-                href: 'https://btcgdl.com/',
+                label: "BTCGDL",
+                href: "https://btcgdl.com/",
               },
               {
-                label: 'Instagram',
-                href: 'https://www.instagram.com/btc.gdl/',
+                label: "Instagram",
+                href: "https://www.instagram.com/btc.gdl/",
               },
               {
-                label: 'X',
-                href: 'https://x.com/btc_ln_gdl',
+                label: "X",
+                href: "https://x.com/btc_ln_gdl",
               },
             ],
           },
           {
-            title: 'More',
+            title: "Mas sobre nosotros",
             items: [
               {
-                label: 'Blog',
-                to: '/blog',
+                label: "Blog",
+                to: "/blog",
               },
               {
-                label: 'GitHub',
-                href: 'https://github.com/btcgdl',
+                label: "GitHub",
+                href: "https://github.com/btcgdl",
               },
             ],
           },
