@@ -2,6 +2,7 @@ package pos.ambrosia.services
 
 import java.sql.Connection
 import pos.ambrosia.logger
+import pos.ambrosia.models.AuthResponse
 import pos.ambrosia.models.User
 import pos.ambrosia.utils.SecurePinProcessor
 
@@ -37,7 +38,7 @@ class UsersService(private val connection: Connection) {
 
     private const val GET_USER_FOR_AUTH =
             """
-            SELECT u.id, u.name, u.pin, r.role
+            SELECT u.id, u.name, u.pin, u.role_id as role_id, r.role, r.isAdmin as isAdmin
             FROM users u
             JOIN roles r ON u.role_id = r.id
             WHERE u.name = ? AND u.is_deleted = 0
@@ -49,7 +50,7 @@ class UsersService(private val connection: Connection) {
         """
   }
 
-  fun authenticateUser(name: String, pin: CharArray): User? {
+  fun authenticateUser(name: String, pin: CharArray): AuthResponse? {
     val statement = connection.prepareStatement(GET_USER_FOR_AUTH)
     statement.setString(1, name)
     val resultSet = statement.executeQuery()
@@ -64,12 +65,11 @@ class UsersService(private val connection: Connection) {
 
       logger.info("Authentication result: $isValidPin")
       if (isValidPin) {
-        return User(
+        return AuthResponse(
                 id = userIdString,
                 name = resultSet.getString("name"),
-                pin = "****", // No devolver el PIN real
-                refreshToken = null,
-                role = resultSet.getString("role")
+                role = resultSet.getString("role_id"),
+                isAdmin = resultSet.getBoolean("isAdmin")
         )
       }
     }

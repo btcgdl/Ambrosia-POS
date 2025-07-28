@@ -1,13 +1,16 @@
 ﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import NavBar from "../../components/navbar/NavBar";
-import Header from "../../components/header/Header";
-import { getUsers, loginFromService } from "./authService";
+import {
+  getCookieValue,
+  getRoleName,
+  getUsers,
+  loginFromService,
+} from "./authService";
 import { getHomeRoute } from "../../utils/getHomeRoute";
 import { jwtDecode } from "jwt-decode";
 import { useUserRole } from "../../contexts/UserRoleContext";
 import { useAuth } from "./useAuth";
-import {getLogger} from "../../utils/loggerStore";
+import { getLogger } from "../../utils/loggerStore";
 
 export default function PinLogin() {
   const navigate = useNavigate();
@@ -58,22 +61,17 @@ export default function PinLogin() {
       const response = await loginFromService({ name: selectedUser, pin });
       const accessToken = getCookieValue("accessToken");
       const tokenData = await jwtDecode(accessToken);
+      const roleName = await getRoleName(tokenData.role);
       console.log(tokenData);
-      updateUserRole(tokenData.role);
+      updateUserRole(tokenData.isAdmin === true ? "admin" : roleName);
       localStorage.setItem("userId", tokenData.userId);
+      localStorage.setItem("role", roleName);
       login();
       navigate(getHomeRoute());
     } catch (error) {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const getCookieValue = (name) => {
-    const match = document.cookie.match(
-      new RegExp("(^| )" + name + "=([^;]+)"),
-    );
-    return match ? match[2] : null;
   };
 
   if (isLoading) {

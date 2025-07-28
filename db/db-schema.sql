@@ -5,7 +5,7 @@ PRAGMA foreign_keys = ON;
 -- Users table (PIN corregido a 4 dígitos)
 CREATE TABLE users (
     id BLOB PRIMARY KEY,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE,
     pin TEXT NOT NULL UNIQUE,
     refresh_token TEXT,
     is_deleted BOOLEAN NOT NULL DEFAULT 0,
