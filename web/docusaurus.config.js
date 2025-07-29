@@ -5,7 +5,6 @@
 // See: https://docusaurus.io/docs/api/docusaurus-config
 
 import { themes as prismThemes } from "prism-react-renderer";
-
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 /** @type {import('@docusaurus/types').Config} */
@@ -123,6 +122,10 @@ const config = {
       },
       footer: {
         style: "dark",
+        logo: {
+          alt: "Apóyanos",
+          src: "img/sponsorqr.svg",
+        },
         links: [
           {
             title: "Documentacion",
@@ -164,7 +167,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Ambrosia-POS, BTCGDL.`,
+        copyright: `Apóyanos`,
       },
       prism: {
         theme: prismThemes.oceanicNext,

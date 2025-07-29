@@ -41,7 +41,7 @@ function HomepageHeader() {
             Sistema POS de código abierto que acepta Bitcoin y Lightning Network
           </p>
         </div>
-        <div>
+        {/* <div>
           <Link
             className="button button--secondary button--lg margin-right--md"
             to="/blog"
@@ -56,7 +56,7 @@ function HomepageHeader() {
             <Github className="margin-right--sm" />
             Ver en GitHub
           </Link>
-        </div>
+        </div> */}
       </div>
     </header>
   );
@@ -161,11 +161,6 @@ function BenefitsSection() {
                   <span>{benefit}</span>
                 </div>
               ))}
-            </div>
-            <div className="margin-top--lg">
-              <Link className="button button--primary button--lg" to="/blog">
-                Conocer Más Beneficios
-              </Link>
             </div>
           </div>
           <div className="col col--6">

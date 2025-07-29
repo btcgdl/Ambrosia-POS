@@ -54,7 +54,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: radial-gradient(
+  background-image:
+    radial-gradient(
       circle at 20% 20%,
       rgba(255, 255, 255, 0.1) 1px,
       transparent 1px
@@ -69,7 +70,10 @@
       rgba(255, 255, 255, 0.05) 2px,
       transparent 2px
     );
-  background-size: 100px 100px, 150px 150px, 200px 200px;
+  background-size:
+    100px 100px,
+    150px 150px,
+    200px 200px;
   animation: floatingParticles 20s linear infinite;
 }
 
@@ -654,7 +658,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: radial-gradient(
+  background-image:
+    radial-gradient(
       circle at 20% 50%,
       rgba(59, 202, 251, 0.1) 0%,
       transparent 50%
