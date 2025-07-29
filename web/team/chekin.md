@@ -20,7 +20,7 @@ Soy un desarrollador de software con enfoque en aplicaciones modernas multiplata
 | **Teléfono** | `33 3790 2133` |
 | **Email** | `albertanimations@gmail.com` |
 | **Ubicación** | Zapopan, Jalisco, México |
-| **Perfiles** | [GitHub](https://github.com/tuusuario) · [LinkedIn](https://linkedin.com/in/tuusuario) |
+| **Perfiles** | [GitHub](https://github.com/vidarte-alberto) |
 
 ---
 
