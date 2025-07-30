@@ -234,5 +234,3 @@ Los endpoints de wallet permiten gestionar la billetera Bitcoin Lightning integr
 - Los pagos on-chain requieren confirmaciones en la blockchain
 - Phoenix Wallet debe estar configurado y sincronizado
 - Para production, asegurar conexión segura con el nodo Phoenix
-- Para codificar credenciales básicas: `echo -n "username:password" | base64`
-- El servidor corre por defecto en `http://localhost:8080`
