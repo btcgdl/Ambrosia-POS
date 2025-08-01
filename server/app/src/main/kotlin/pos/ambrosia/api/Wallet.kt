@@ -55,7 +55,7 @@ fun Route.wallet(phoenixService: PhoenixService) {
       val result = phoenixService.payOnchain(request)
       call.respond(HttpStatusCode.OK, result)
     }
-    post("bumpfee") {
+    post("/bumpfee") {
       val feerateSatByte = call.receive<Int>()
       val result = phoenixService.bumpOnchainFees(feerateSatByte)
       call.respond(HttpStatusCode.OK, result)
