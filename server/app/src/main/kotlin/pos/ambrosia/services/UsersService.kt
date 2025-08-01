@@ -120,10 +120,9 @@ class UsersService(private val connection: Connection) {
     while (resultSet.next()) {
       val id = resultSet.getString("id")
       val name = resultSet.getString("name")
-      val refreshToken = resultSet.getString("refresh_token")
       val role = resultSet.getString("role_id")
       // No devolvemos el PIN hasheado en las consultas generales
-      users.add(User(id = id, name = name, pin = "****", refreshToken = refreshToken, role = role))
+      users.add(User(id = id, name = name, pin = "****", refreshToken = "****", role = role))
     }
     return users
   }
