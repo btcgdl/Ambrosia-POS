@@ -86,16 +86,5 @@ class Api() {
     configureTickets()
     configureShifts()
     configureWallet()
-    configureRoles()
-    configureDishes()
-    configureSpaces()
-    configureTables()
-    configureIngredients()
-    configureSuppliers()
-    configureOrders()
-    configurePayments()
-    configureTickets()
-    configureShifts()
-    configureWallet()
   }
 }
