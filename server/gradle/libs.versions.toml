@@ -1,8 +1,6 @@
 
 [versions]
 kotlin-version = "2.1.20"
-guava = "33.4.5-jre"
-junit-jupiter = "5.12.1"
 ktor-version = "3.1.2"
 logback-version = "1.4.14"
 
@@ -13,8 +11,6 @@ ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "kto
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor-version" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback-version" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor-version" }
-guava = { module = "com.google.guava:guava", version.ref = "guava" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 
 [plugins]
 ktor = { id = "io.ktor.plugin", version.ref = "ktor-version" }

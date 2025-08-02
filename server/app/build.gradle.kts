@@ -13,10 +13,9 @@ repositories {
 }
 
 dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation(libs.junit.jupiter)
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+    // Test dependencies
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$2.1.20")
     // ktor dependencies
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.serialization.kotlinx.json)
@@ -26,21 +25,24 @@ dependencies {
 
     // logging
     implementation(libs.logback.classic)
-    implementation("io.ktor:ktor-server-cors:3.1.2")
-    implementation("io.ktor:ktor-server-status-pages:3.1.2")
-    implementation("io.ktor:ktor-server-auth:3.1.2")
-    implementation("io.ktor:ktor-server-auth-jwt:3.1.2")
-    implementation("org.xerial:sqlite-jdbc:3.49.1.0")
-    implementation("io.ktor:ktor-server-swagger:3.1.2")
-    implementation("io.ktor:ktor-server-openapi:3.1.2")
-    implementation("org.openapitools:openapi-generator:6.6.0")
-    implementation("io.ktor:ktor-client-core:3.1.2")
-    implementation("io.ktor:ktor-client-cio:3.1.2")
-    implementation("io.ktor:ktor-client-auth:3.1.2")
-    implementation("io.ktor:ktor-client-content-negotiation:3.1.2")
-    // This dependency is used by the application.
-    implementation(libs.guava)
 
+    // Ktor services
+    implementation("io.ktor:ktor-server-cors:$ktor-version")
+    implementation("io.ktor:ktor-server-status-pages:$ktor-version")
+    implementation("io.ktor:ktor-server-auth:$ktor-version")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktor-version")
+    implementation("io.ktor:ktor-server-swagger:$ktor-version")
+    implementation("io.ktor:ktor-server-openapi:$ktor-version")
+    implementation("org.openapitools:openapi-generator:6.6.0")
+    implementation("io.ktor:ktor-client-core:$ktor-version")
+    implementation("io.ktor:ktor-client-cio:$ktor-version")
+    implementation("io.ktor:ktor-client-auth:$ktor-version")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor-version")
+
+    // Database dependencies
+    implementation("org.xerial:sqlite-jdbc:3.49.1.0")
+
+    // Console helper
     implementation("com.github.ajalt.clikt:clikt:5.0.3")
 }
 

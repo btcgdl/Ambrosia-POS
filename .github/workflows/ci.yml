@@ -1,0 +1,45 @@
+# .github/workflows/ci.yml
+name: CI for Server
+
+on:
+  push:
+    branches: ["main"]
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write # Needed for publishing test results
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+        
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./server/gradlew
+
+      - name: Run tests with Gradle
+        working-directory: server
+        run: ./gradlew test
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: server/app/build/test-results/test/
+          
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v4
+        if: always() # Ensures the report is published even if tests fail
+        with:
+          report_paths: 'server/app/build/test-results/test/*.xml'
