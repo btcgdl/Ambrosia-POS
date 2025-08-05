@@ -31,11 +31,20 @@ fun ApplicationCall.getCurrentUser(): UserInfo? {
 /**
  * Función de extensión para crear rutas que requieren autenticación y privilegios de administrador
  */
+val AdminOnlyPlugin = createRouteScopedPlugin("AdminOnlyPlugin") {
+    onCall { call ->
+        // La lógica que antes estaba en el interceptor ahora vive aquí.
+        call.requireAdmin()
+    }
+}
+
+/** Función de extensión para crear rutas que requieren autenticación y privilegios de administrador */
 fun Route.authenticateAdmin(name: String = "auth-jwt", build: Route.() -> Unit): Route {
-  return authenticate(name) {
-    intercept(ApplicationCallPipeline.Call) { call.requireAdmin() }
-    build()
-  }
+    return authenticate(name) {
+        // 2. Instalamos el plugin en el bloque de la ruta autenticada.
+        install(AdminOnlyPlugin)
+        build()
+    }
 }
 
 /** Data class para representar información básica del usuario */
