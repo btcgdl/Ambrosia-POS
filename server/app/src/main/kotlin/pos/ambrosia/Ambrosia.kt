@@ -10,7 +10,7 @@ import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.mordant.rendering.TextColors.*
 import io.ktor.server.config.MapApplicationConfig
 import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.server.cio.*
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -77,7 +77,7 @@ class Ambrosia : CliktCommand() {
 
       val server =
               embeddedServer(
-                      Netty,
+                      CIO,
                       environment =
                               applicationEnvironment {
                                 config =
