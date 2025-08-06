@@ -6,7 +6,7 @@
 > [!WARNING]
 > Advertencia de Seguridad: El sistema utiliza Bitcoin en local. El usuario y contraseña por defecto son:
 >
-> - Usuario: `admin`
+> - Usuario: `cooluser1`
 > - Pin: `0000`
 >
 > ¡No dejes estas credenciales por defecto en producción! Cambia el usuario y la contraseña inmediatamente después de la instalación para proteger tus fondos.
