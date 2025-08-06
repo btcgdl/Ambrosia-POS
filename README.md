@@ -70,7 +70,7 @@ npm install
 Antes de iniciar el entorno de desarrollo, crea un archivo `.env` dentro de la carpeta `client/` con la siguiente variable:
 
 ```
-REACT_APP_API_BASE_URL=http://0.0.0.0:5000
+REACT_APP_API_BASE_URL=http://127.0.0.1:9154
 ```
 
 - Si estás trabajando directamente en Linux, usa `http://127.0.0.1:9154`.
