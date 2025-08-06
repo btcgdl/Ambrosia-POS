@@ -73,7 +73,7 @@ Antes de iniciar el entorno de desarrollo, crea un archivo `.env` dentro de la c
 REACT_APP_API_BASE_URL=http://0.0.0.0:5000
 ```
 
-- Si estás trabajando directamente en Linux, usa `http://0.0.0.0:5000`.
+- Si estás trabajando directamente en Linux, usa `http://127.0.0.1:9154`.
 - Si estás usando WSL, coloca la IP correspondiente a tu entorno de WSL (puedes obtenerla con `ip addr`, suele ser una IP tipo `172.x.x.x`). Ejemplo:
 
 ```
@@ -90,7 +90,7 @@ HOST="127.0.0.1" npm start
 
 **Desarrollo**
 
-Para ejecutar el servidor en modo de desarrollo:
+Para ejecutar el servidor en modo de desarrollo dirígete a `server/` y ejecuta:
 
 ```sh
 ./gradlew run
