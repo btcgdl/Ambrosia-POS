@@ -18,13 +18,23 @@ import org.slf4j.LoggerFactory
 import pos.ambrosia.api.*
 import pos.ambrosia.config.AppConfig
 import pos.ambrosia.utils.UnauthorizedApiException
+// TODO move to utilities folder instead of service folder
+import pos.ambrosia.services.DefaultCredentialsService
+import pos.ambrosia.db.DatabaseConnection
+import kotlinx.coroutines.*
 
 public val logger = LoggerFactory.getLogger("pos.ambrosia.App")
 
 class Api() {
 
+  fun blockingAddUser() = runBlocking {
+    launch { DefaultCredentialsService(DatabaseConnection.getConnection()).addUser()}
+  }
+
   fun Application.module() {
+
     AppConfig.loadConfig() // Load custom config
+    blockingAddUser() // Add default user if there are no users
     // Configure the application
     val config = this.environment.config
     Handler() // Install exception handlers
