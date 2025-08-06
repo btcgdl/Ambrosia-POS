@@ -18,8 +18,7 @@ import org.slf4j.LoggerFactory
 import pos.ambrosia.api.*
 import pos.ambrosia.config.AppConfig
 import pos.ambrosia.utils.UnauthorizedApiException
-// TODO move to utilities folder instead of service folder
-import pos.ambrosia.services.DefaultCredentialsService
+import pos.ambrosia.utils.DefaultCredentialsService
 import pos.ambrosia.db.DatabaseConnection
 import kotlinx.coroutines.*
 

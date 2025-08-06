@@ -3,7 +3,12 @@
 
 **Status: In Development**
 
-> This project is currently under active development. Features and functionalities described below are subject to change as development progresses.
+> [!WARNING] **Advertencia de Seguridad:** El sistema utiliza Bitcoin en local. El usuario y contraseña por defecto son:
+>
+> - **Usuario:** `admin`
+> - **Pin:** `0000`
+>
+> **¡No dejes estas credenciales por defecto en producción! Cambia el usuario y la contraseña inmediatamente después de la instalación para proteger tus fondos.**
 
 <p align="center">
   <img src="imgs/Ambrosia.png" alt="Ambrosia Logo" width="300"/>
@@ -77,7 +82,7 @@ REACT_APP_API_BASE_URL=http://127.0.0.1:9154
 - Si estás usando WSL, coloca la IP correspondiente a tu entorno de WSL (puedes obtenerla con `ip addr`, suele ser una IP tipo `172.x.x.x`). Ejemplo:
 
 ```
-REACT_APP_API_BASE_URL=http://172.18.223.141:5000
+REACT_APP_API_BASE_URL=http://172.18.223.141:9154
 ```
 
 Luego, inicia el entorno de desarrollo del cliente con:
@@ -119,3 +124,9 @@ El script automáticamente:
 - Ejecuta la aplicación con las opciones JVM apropiadas
 
 Para configuración adicional o servicios systemd, consulta la documentación de deployment del proyecto.
+
+---
+
+## ¿Quieres contribuir?
+
+Consulta la [Guía de Contribución](Contributing.md) para saber cómo puedes ayudar y ser parte del futuro de los sistemas POS para restaurantes.

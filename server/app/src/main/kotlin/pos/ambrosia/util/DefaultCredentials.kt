@@ -1,8 +1,10 @@
-package pos.ambrosia.services
+package pos.ambrosia.utils
 
 import java.sql.Connection
 import pos.ambrosia.models.Role
 import pos.ambrosia.models.User
+import pos.ambrosia.services.RolesService
+import pos.ambrosia.services.UsersService
 
 class DefaultCredentialsService(private val connection: Connection) {
 

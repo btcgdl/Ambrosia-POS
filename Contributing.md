@@ -6,6 +6,17 @@
 - 🐛 **Reportar bugs** o sugerir mejoras
 - 💡 **Contribuir con ideas** para nuevas funcionalidades
 - 🧪 **Probar la beta** cuando esté disponible
+- 🍴 **Haz un fork del repositorio** y envía tus Pull Requests (PRs) para proponer cambios
+
+---
+
+### **¿Cómo enviar un Pull Request?**
+
+1. Haz un fork del repositorio.
+2. Clona tu fork en tu máquina local.
+3. Crea una rama para tu cambio.
+4. Realiza tus modificaciones y haz commit.
+5. Envía un Pull Request desde tu rama al repositorio principal.
 
 ---
 
