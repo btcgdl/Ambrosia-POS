@@ -6,7 +6,7 @@
     </appender>
 
     <logger name="org.eclipse.jetty" level="INFO"/>
-    <logger name="io.netty" level="INFO"/>
+    <logger name="io.cio" level="INFO"/>
     <logger name="pos.ambrosia" level="INFO"/>
 
     <logger name="ch.qos.logback" level="OFF"/>

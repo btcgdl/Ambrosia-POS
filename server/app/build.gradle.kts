@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization)
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+
+    // id("org.graalvm.buildtools.native") version "0.10.6"
 }
 
 repositories {
@@ -20,7 +22,7 @@ dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.content.negotiation)
-    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.cio)
     testImplementation(libs.ktor.server.test.host)
 
     // logging
@@ -81,6 +83,35 @@ application {
     // Define the main class for the application.
     mainClass = "pos.ambrosia.AmbrosiaKt"
 }
+
+// graalvmNative {
+//     binaries {
+
+//         named("main") {
+//             fallback.set(false)
+//             verbose.set(true)
+
+//             buildArgs.add("--initialize-at-build-time=ch.qos.logback")
+//             buildArgs.add("--initialize-at-build-time=io.ktor,kotlin")
+//             buildArgs.add("--initialize-at-build-time=org.slf4j.LoggerFactory")
+
+//             buildArgs.add("--initialize-at-build-time=org.slf4j.helpers.Reporter")
+//             buildArgs.add("--initialize-at-build-time=kotlinx.io.bytestring.ByteString")
+//             buildArgs.add("--initialize-at-build-time=kotlinx.io.SegmentPool")
+
+//             buildArgs.add("--initialize-at-build-time=kotlinx.serialization.json.Json")
+//             buildArgs.add("--initialize-at-build-time=kotlinx.serialization.json.JsonImpl")
+//             buildArgs.add("--initialize-at-build-time=kotlinx.serialization.json.ClassDiscriminatorMode")
+//             buildArgs.add("--initialize-at-build-time=kotlinx.serialization.modules.SerializersModuleKt")
+
+//             buildArgs.add("-H:+InstallExitHandlers")
+//             buildArgs.add("-H:+ReportUnsupportedElementsAtRuntime")
+//             buildArgs.add("-H:+ReportExceptionStackTraces")
+
+//             imageName.set("ambrosia")
+//         }
+//     }
+// }
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
