@@ -3,12 +3,13 @@
 
 **Status: In Development**
 
-> [!WARNING] **Advertencia de Seguridad:** El sistema utiliza Bitcoin en local. El usuario y contraseña por defecto son:
+> [!WARNING]
+> Advertencia de Seguridad: El sistema utiliza Bitcoin en local. El usuario y contraseña por defecto son:
 >
-> - **Usuario:** `admin`
-> - **Pin:** `0000`
+> - Usuario: `admin`
+> - Pin: `0000`
 >
-> **¡No dejes estas credenciales por defecto en producción! Cambia el usuario y la contraseña inmediatamente después de la instalación para proteger tus fondos.**
+> ¡No dejes estas credenciales por defecto en producción! Cambia el usuario y la contraseña inmediatamente después de la instalación para proteger tus fondos.
 
 <p align="center">
   <img src="imgs/Ambrosia.png" alt="Ambrosia Logo" width="300"/>
