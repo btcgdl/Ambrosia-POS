@@ -4,12 +4,13 @@
 # Uso: ./run-server.sh [opciones para la aplicación]
 
 # Route to the JAR file
-JAR_PATH="ambrosia.jar"
+INSTALL_DIR="/opt/ambrosia"
+JAR_PATH="$INSTALL_DIR/ambrosia.jar"
 
 # Verificar que el JAR existe
 if [ ! -f "$JAR_PATH" ]; then
     echo "Error: $JAR_PATH not found"
-    echo "Add the JAR file to your datapath."
+    echo "Please ensure Ambrosia POS is installed correctly in $INSTALL_DIR"
     exit 1
 fi
 
