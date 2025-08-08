@@ -3,6 +3,11 @@
 # Script para ejecutar Ambrosia POS Server con logs habilitados
 # Uso: ./run-server.sh [opciones para la aplicación]
 
+# Initialize SDKMAN! if installed
+if [ -f "$HOME/.sdkman/bin/sdkman-init.sh" ]; then
+    source "$HOME/.sdkman/bin/sdkman-init.sh"
+fi
+
 # Route to the JAR file
 INSTALL_DIR="$HOME/.local/opt/ambrosia"
 JAR_PATH="$INSTALL_DIR/ambrosia.jar"
