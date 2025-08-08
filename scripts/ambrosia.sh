@@ -130,6 +130,7 @@ After=network.target
 
 [Service]
 ExecStart=$INSTALL_DIR/run-server.sh
+WorkingDirectory=$INSTALL_DIR
 User=$USER
 Restart=always
 RestartSec=5

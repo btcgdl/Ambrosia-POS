@@ -70,7 +70,7 @@ class Ambrosia : CliktCommand() {
   private val options by DaemonOptions()
 
   override fun run() {
-    echo("Starting Ambrosia POS Server...")
+    echo(green("Running Ambrosia POS Server"))
 
     try {
 
