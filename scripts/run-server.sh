@@ -8,14 +8,16 @@ if [ -f "$HOME/.sdkman/bin/sdkman-init.sh" ]; then
     source "$HOME/.sdkman/bin/sdkman-init.sh"
 fi
 
-# Route to the JAR file
-INSTALL_DIR="$HOME/.local/opt/ambrosia"
-JAR_PATH="$INSTALL_DIR/ambrosia.jar"
+# Determine the script's own directory
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+# Route to the JAR file, assuming it's in the same directory as the script
+JAR_PATH="$SCRIPT_DIR/ambrosia.jar"
 
 # Verificar que el JAR existe
 if [ ! -f "$JAR_PATH" ]; then
     echo "Error: $JAR_PATH not found"
-    echo "Please ensure Ambrosia POS is installed correctly in $INSTALL_DIR"
+    echo "Please ensure Ambrosia POS is installed correctly in $SCRIPT_DIR"
     exit 1
 fi
 

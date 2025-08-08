@@ -15,3 +15,6 @@ bin
 
 # Ignore database files
 *.db
+
+# Ignore vscode workspace storage
+.vscode/

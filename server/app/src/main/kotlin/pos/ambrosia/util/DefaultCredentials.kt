@@ -31,13 +31,3 @@ class DefaultCredentialsService(private val connection: Connection) {
   }
 
 }
-
-/*
-data class User(
-        val id: String? = null,
-        val name: String,
-        val pin: String,
-        val refreshToken: String? = null,
-        val role: String? = null
-)
-*/

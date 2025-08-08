@@ -15,7 +15,6 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
-import org.slf4j.LoggerFactory
 import pos.ambrosia.config.InjectDB
 import pos.ambrosia.config.InjectLogs
 import pos.ambrosia.config.ListValueSource
@@ -86,7 +85,6 @@ class Ambrosia : CliktCommand() {
                                           put("jwt.audience", "ambrosia-pos-users")
                                           put("secret", options.secret)
                                         }
-                                log = LoggerFactory.getLogger("AmbrosiaServer")
                               },
                       configure = {
                         connector {

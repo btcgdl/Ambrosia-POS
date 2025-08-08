@@ -22,7 +22,7 @@ import pos.ambrosia.utils.DefaultCredentialsService
 import pos.ambrosia.db.DatabaseConnection
 import kotlinx.coroutines.*
 
-public val logger = LoggerFactory.getLogger("pos.ambrosia.App")
+public val logger = LoggerFactory.getLogger("Server")
 
 class Api() {
 

@@ -21,6 +21,8 @@ done
 TAG="0.0.1-alpha"
 AMBROSIA_URL="https://github.com/btcgdl/Ambrosia-POS/releases/download/v${TAG}"
 AMBROSIA_JAR="${AMBROSIA_URL}/ambrosia.jar"
+# TODO: in the next release, change this to: 
+# RUN_SERVER="https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/v${TAG}/scripts/run-server.sh"
 RUN_SERVER="https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/run-server.sh"
 
 echo ""
@@ -30,9 +32,9 @@ echo "This script will install Ambrosia POS Point of Sale system"
 echo "-----------------------------------"
 echo "Installing Ambrosia POS ${TAG} from ${AMBROSIA_URL}"
 echo ""
-echo "Absolute install directory path (default: $HOME/.local/opt/ambrosia)"
+echo "Absolute install directory path (default: $HOME/.local/ambrosia)"
 
-INSTALL_DIR="$HOME/.local/opt/ambrosia"
+INSTALL_DIR="$HOME/.local/ambrosia"
 CONFIG_DIR="$HOME/.Ambrosia-POS"
 BIN_DIR="$HOME/.local/bin"
 
@@ -109,8 +111,6 @@ else
   echo "To set up the systemd service later, run the script interactively."
   REPLY="n"
 fi
-
-source .zshrc 2> /dev/null || source .bashrc 2> /dev/null
 
 if [[ ! $REPLY =~ ^[Yy]$ ]]
 then
