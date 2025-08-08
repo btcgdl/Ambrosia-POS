@@ -4,7 +4,7 @@
 # Uso: ./run-server.sh [opciones para la aplicación]
 
 # Route to the JAR file
-INSTALL_DIR="/opt/ambrosia"
+INSTALL_DIR="$HOME/.local/opt/ambrosia"
 JAR_PATH="$INSTALL_DIR/ambrosia.jar"
 
 # Verificar que el JAR existe

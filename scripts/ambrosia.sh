@@ -18,12 +18,11 @@ for arg in "$@"; do
   esac
 done
 
-TAG="v0.0.1-alpha"
+TAG="0.0.1-alpha"
 AMBROSIA_URL="https://github.com/btcgdl/Ambrosia-POS/releases/download/v${TAG}"
 AMBROSIA_JAR="${AMBROSIA_URL}/ambrosia.jar"
 RUN_SERVER="https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/run-server.sh"
 
-echo ""
 echo ""
 echo "🍃 Welcome to Ambrosia POS installer"
 echo "-----------------------------------"
@@ -31,11 +30,14 @@ echo "This script will install Ambrosia POS Point of Sale system"
 echo "-----------------------------------"
 echo "Installing Ambrosia POS ${TAG} from ${AMBROSIA_URL}"
 echo ""
-echo "Absolute install directory path (default: /opt/ambrosia)"
+echo "Absolute install directory path (default: $HOME/.local/opt/ambrosia)"
 
-INSTALL_DIR="/opt/ambrosia"
+INSTALL_DIR="$HOME/.local/opt/ambrosia"
 CONFIG_DIR="$HOME/.Ambrosia-POS"
-BIN_DIR="/usr/local/bin"
+BIN_DIR="$HOME/.local/bin"
+
+# Create bin directory if it doesn't exist
+mkdir -p "$BIN_DIR"
 
 # Check if Java is installed
 if ! command -v java &> /dev/null; then
@@ -55,14 +57,17 @@ fi
 echo "✅ Java version check passed"
 
 # Create installation directory if it doesn't exist
-sudo mkdir -p "$INSTALL_DIR"
+mkdir -p "$INSTALL_DIR"
 
 # Download and extract Ambrosia POS
 echo "Downloading Ambrosia POS JAR..."
-if ! wget -q "$AMBROSIA_JAR" -O "ambrosia-${TAG}.jar"; then
+if ! wget -q "$AMBROSIA_JAR" -O "ambrosia.jar"; then
   echo "❌ Failed to download Ambrosia POS from ${AMBROSIA_JAR}" >&2
   exit 1
 fi
+
+# Make the JAR file executable
+chmod +x "ambrosia.jar"
 
 # Download run-server script
 echo "Downloading run-server script..."
@@ -75,11 +80,17 @@ fi
 chmod +x run-server.sh
 
 # Install files
-sudo mv "ambrosia-${TAG}.jar" "$INSTALL_DIR/ambrosia.jar"
-sudo mv "run-server.sh" "$INSTALL_DIR/run-server.sh"
+mv "ambrosia.jar" "$INSTALL_DIR/ambrosia.jar"
+mv "run-server.sh" "$INSTALL_DIR/run-server.sh"
 
 # Create symbolic link for easy access
-sudo ln -sf "$INSTALL_DIR/run-server.sh" "$BIN_DIR/ambrosia"
+ln -sf "$INSTALL_DIR/run-server.sh" "$BIN_DIR/ambrosia"
+
+# Add bin directory to PATH if not already there
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
+fi
 
 echo "✅ Ambrosia POS installed to $INSTALL_DIR"
 
@@ -99,6 +110,8 @@ else
   REPLY="n"
 fi
 
+source .zshrc 2> /dev/null || source .bashrc 2> /dev/null
+
 if [[ ! $REPLY =~ ^[Yy]$ ]]
 then
   echo ""
@@ -117,11 +130,10 @@ After=network.target
 
 [Service]
 ExecStart=$INSTALL_DIR/run-server.sh
-WorkingDirectory=$INSTALL_DIR
 User=$USER
-Group=$USER
 Restart=always
-RestartSec=10
+RestartSec=5
+LimitNOFILE=4096
 
 [Install]
 WantedBy=multi-user.target
