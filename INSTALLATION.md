@@ -12,7 +12,7 @@
 
 Este proyecto requiere **phoenixd** para el procesamiento de pagos mediante Lightning Network. Si aún no tienes phoenixd instalado, sigue estas instrucciones:
 
-> [!WARNING]
+> [!TIP]
 > La Opción 4 es la única forma de instalar ambos componentes sin configurar servicios systemd automáticamente. Los scripts se ejecutan localmente y te permiten tener control completo sobre la instalación.
 
 ## Instalación automática (Recomendada)
