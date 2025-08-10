@@ -8,8 +8,16 @@ if [ -f "$HOME/.sdkman/bin/sdkman-init.sh" ]; then
     source "$HOME/.sdkman/bin/sdkman-init.sh"
 fi
 
-# Determine the script's own directory
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+# Determine the script's real directory (resolving symlinks)
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+# Resolve symlinks to get the actual script location
+while [ -L "$SCRIPT_PATH" ]; do
+    SCRIPT_DIR=$(cd -- "$(dirname -- "$SCRIPT_PATH")" &> /dev/null && pwd)
+    SCRIPT_PATH=$(readlink "$SCRIPT_PATH")
+    # Handle relative symlinks
+    [[ $SCRIPT_PATH != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
+done
+SCRIPT_DIR=$(cd -- "$(dirname -- "$SCRIPT_PATH")" &> /dev/null && pwd)
 
 # Route to the JAR file, assuming it's in the same directory as the script
 JAR_PATH="$SCRIPT_DIR/ambrosia.jar"
