@@ -18,13 +18,13 @@ for arg in "$@"; do
   esac
 done
 
-TAG="1.0.0"
+TAG="0.0.1-alpha"
 AMBROSIA_URL="https://github.com/btcgdl/Ambrosia-POS/releases/download/v${TAG}"
-AMBROSIA_JAR="${AMBROSIA_URL}/ambrosia-${TAG}.jar"
-AMBROSIA_SCRIPTS="${AMBROSIA_URL}/ambrosia-scripts-${TAG}.tar.gz"
-VERIFIER_URL="https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/verify.sh"
+AMBROSIA_JAR="${AMBROSIA_URL}/ambrosia.jar"
+# TODO: in the next release, change this to: 
+# RUN_SERVER="https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/v${TAG}/scripts/run-server.sh"
+RUN_SERVER="https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/run-server.sh"
 
-echo ""
 echo ""
 echo "🍃 Welcome to Ambrosia POS installer"
 echo "-----------------------------------"
@@ -32,15 +32,14 @@ echo "This script will install Ambrosia POS Point of Sale system"
 echo "-----------------------------------"
 echo "Installing Ambrosia POS ${TAG} from ${AMBROSIA_URL}"
 echo ""
-echo "Absolute install directory path (default: /opt/ambrosia)"
+echo "Absolute install directory path (default: $HOME/.local/ambrosia)"
 
-INSTALL_DIR="/opt/ambrosia"
+INSTALL_DIR="$HOME/.local/ambrosia"
 CONFIG_DIR="$HOME/.Ambrosia-POS"
-BIN_DIR="/usr/local/bin"
+BIN_DIR="$HOME/.local/bin"
 
-# Create installation directories
-sudo mkdir -p $INSTALL_DIR
-mkdir -p $CONFIG_DIR
+# Create bin directory if it doesn't exist
+mkdir -p "$BIN_DIR"
 
 # Check if Java is installed
 if ! command -v java &> /dev/null; then
@@ -59,52 +58,41 @@ fi
 
 echo "✅ Java version check passed"
 
+# Create installation directory if it doesn't exist
+mkdir -p "$INSTALL_DIR"
+
 # Download and extract Ambrosia POS
 echo "Downloading Ambrosia POS JAR..."
-if ! wget -q "$AMBROSIA_JAR" -O "ambrosia-${TAG}.jar"; then
+if ! wget -q "$AMBROSIA_JAR" -O "ambrosia.jar"; then
   echo "❌ Failed to download Ambrosia POS from ${AMBROSIA_JAR}" >&2
   exit 1
 fi
 
-echo "Downloading Ambrosia POS scripts..."
-if ! wget -q "$AMBROSIA_SCRIPTS" -O "ambrosia-scripts-${TAG}.tar.gz"; then
-  echo "❌ Failed to download Ambrosia POS scripts from ${AMBROSIA_SCRIPTS}" >&2
+# Make the JAR file executable
+chmod +x "ambrosia.jar"
+
+# Download run-server script
+echo "Downloading run-server script..."
+if ! wget -q "$RUN_SERVER" -O "run-server.sh"; then
+  echo "❌ Failed to download run-server script from ${RUN_SERVER}" >&2
   exit 1
 fi
 
-if [[ ! -f "verify.sh" ]]; then
-  echo "Downloading the verification script..."
-  if ! wget -q "$VERIFIER_URL"; then
-    echo "❌ Failed to download the verification script." >&2
-    exit 1
-  fi
-  chmod +x verify.sh
-fi
+# Make run-server script executable
+chmod +x run-server.sh
 
-if [[ "$AUTO_YES" == true ]]; then
-  ./verify.sh --yes
-else
-  ./verify.sh
-fi
-if [[ $? -ne 0 ]]; then
-  echo "❌ Verification failed, aborting installation"
-  exit 1
-fi
-rm verify.sh
-
-# Install JAR file
-sudo mv "ambrosia-${TAG}.jar" "$INSTALL_DIR/ambrosia.jar"
-
-# Extract and install scripts
-tar -xzf "ambrosia-scripts-${TAG}.tar.gz"
-sudo cp scripts/*.sh "$INSTALL_DIR/"
-sudo chmod +x "$INSTALL_DIR"/*.sh
+# Install files
+mv "ambrosia.jar" "$INSTALL_DIR/ambrosia.jar"
+mv "run-server.sh" "$INSTALL_DIR/run-server.sh"
 
 # Create symbolic link for easy access
-sudo ln -sf "$INSTALL_DIR/run-server.sh" "$BIN_DIR/ambrosia"
+ln -sf "$INSTALL_DIR/run-server.sh" "$BIN_DIR/ambrosia"
 
-# Clean up downloaded files
-rm -f "ambrosia-scripts-${TAG}.tar.gz"
+# Add bin directory to PATH if not already there
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
+fi
 
 echo "✅ Ambrosia POS installed to $INSTALL_DIR"
 
@@ -144,9 +132,9 @@ After=network.target
 ExecStart=$INSTALL_DIR/run-server.sh
 WorkingDirectory=$INSTALL_DIR
 User=$USER
-Group=$USER
 Restart=always
-RestartSec=10
+RestartSec=5
+LimitNOFILE=4096
 
 [Install]
 WantedBy=multi-user.target

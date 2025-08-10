@@ -9,7 +9,7 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.server.cio.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.*
@@ -18,13 +18,22 @@ import org.slf4j.LoggerFactory
 import pos.ambrosia.api.*
 import pos.ambrosia.config.AppConfig
 import pos.ambrosia.utils.UnauthorizedApiException
+import pos.ambrosia.utils.DefaultCredentialsService
+import pos.ambrosia.db.DatabaseConnection
+import kotlinx.coroutines.*
 
-public val logger = LoggerFactory.getLogger("pos.ambrosia.App")
+public val logger = LoggerFactory.getLogger("Server")
 
 class Api() {
 
+  fun blockingAddUser() = runBlocking {
+    launch { DefaultCredentialsService(DatabaseConnection.getConnection()).addUser()}
+  }
+
   fun Application.module() {
+
     AppConfig.loadConfig() // Load custom config
+    blockingAddUser() // Add default user if there are no users
     // Configure the application
     val config = this.environment.config
     Handler() // Install exception handlers

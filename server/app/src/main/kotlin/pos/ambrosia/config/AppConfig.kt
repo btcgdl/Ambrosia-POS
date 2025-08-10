@@ -3,7 +3,7 @@ package pos.ambrosia.config
 import java.io.File
 import java.io.FileInputStream
 import java.util.Properties
-import org.slf4j.LoggerFactory
+import pos.ambrosia.logger
 
 /**
  * Application configuration manager.
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
  */
 
 object AppConfig {
-    private val logger = LoggerFactory.getLogger("pos.ambrosia.App")
+
     private val properties = Properties()
     private val phoenixProperties = Properties()
     private const val CONFIG_FILE_PATH = ".Ambrosia-POS/ambrosia.conf"

@@ -10,12 +10,11 @@ import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.mordant.rendering.TextColors.*
 import io.ktor.server.config.MapApplicationConfig
 import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.server.cio.*
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
-import org.slf4j.LoggerFactory
 import pos.ambrosia.config.InjectDB
 import pos.ambrosia.config.InjectLogs
 import pos.ambrosia.config.ListValueSource
@@ -71,13 +70,13 @@ class Ambrosia : CliktCommand() {
   private val options by DaemonOptions()
 
   override fun run() {
-    echo("Starting Ambrosia POS Server...")
+    echo(green("Running Ambrosia POS Server"))
 
     try {
 
       val server =
               embeddedServer(
-                      Netty,
+                      CIO,
                       environment =
                               applicationEnvironment {
                                 config =
@@ -86,7 +85,6 @@ class Ambrosia : CliktCommand() {
                                           put("jwt.audience", "ambrosia-pos-users")
                                           put("secret", options.secret)
                                         }
-                                log = LoggerFactory.getLogger("AmbrosiaServer")
                               },
                       configure = {
                         connector {

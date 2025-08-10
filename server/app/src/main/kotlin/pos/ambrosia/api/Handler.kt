@@ -6,7 +6,7 @@ import io.ktor.server.engine.defaultExceptionStatusCode
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import java.sql.SQLException
-import org.slf4j.LoggerFactory
+import pos.ambrosia.logger
 import pos.ambrosia.models.Message
 import pos.ambrosia.utils.AdminOnlyException
 import pos.ambrosia.utils.InvalidCredentialsException
@@ -15,8 +15,6 @@ import pos.ambrosia.utils.PhoenixConnectionException
 import pos.ambrosia.utils.PhoenixNodeInfoException
 import pos.ambrosia.utils.PhoenixServiceException
 import pos.ambrosia.utils.UnauthorizedApiException
-
-private val logger = LoggerFactory.getLogger("pos.ambrosia.Handler")
 
 fun Application.Handler() {
   install(StatusPages) {

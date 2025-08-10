@@ -5,9 +5,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
 import kotlinx.io.files.Path
-import org.slf4j.LoggerFactory
-
-private val logger = LoggerFactory.getLogger("pos.ambrosia.App")
+import pos.ambrosia.logger
 
 object DatabaseConnection {
   @Volatile private var instance: Connection? = null

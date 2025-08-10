@@ -21,6 +21,14 @@ class UsersService(private val connection: Connection) {
             WHERE u.is_deleted = 0
         """
 
+    private const val GET_USER_COUNT =
+            """
+            SELECT COUNT(*)
+            FROM users u
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.is_deleted = 0
+        """
+
     private const val GET_USER_BY_ID =
             """
             SELECT u.id, u.name, u.refresh_token, u.pin, r.role
@@ -125,6 +133,16 @@ class UsersService(private val connection: Connection) {
       users.add(User(id = id, name = name, pin = "****", refreshToken = "****", role = role))
     }
     return users
+  }
+
+  suspend fun getUserCount(): Long {
+    val statement = connection.prepareStatement(GET_USER_COUNT)
+    val resultSet = statement.executeQuery()
+    return if (resultSet.next()) {
+        resultSet.getLong(1)
+    } else {
+        0L // Return 0 if no result is found (unlikely with COUNT)
+    }
   }
 
   suspend fun getUserById(id: String): User? {
