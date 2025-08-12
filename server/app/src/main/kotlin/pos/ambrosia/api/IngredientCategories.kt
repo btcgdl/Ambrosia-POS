@@ -73,7 +73,7 @@ fun Route.ingredientCategories(ingredientCategoryService: IngredientCategoryServ
         return@put
       }
 
-      call.respond(HttpStatusCode.OK, "Ingredient category updated successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Ingredient category updated successfully"))
     }
 
     delete("/{id}") {
@@ -92,7 +92,7 @@ fun Route.ingredientCategories(ingredientCategoryService: IngredientCategoryServ
         return@delete
       }
 
-      call.respond(HttpStatusCode.NoContent, "Ingredient category deleted successfully")
+      call.respond(HttpStatusCode.NoContent, mapOf("id" to id, "message" to "Ingredient category deleted successfully"))
     }
   }
 }

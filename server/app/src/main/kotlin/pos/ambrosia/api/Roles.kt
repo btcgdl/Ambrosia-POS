@@ -51,8 +51,8 @@ fun Route.roles(roleService: RolesService) {
     }
     post("") {
       val user = call.receive<Role>()
-      roleService.addRole(user)
-      call.respond(HttpStatusCode.Created, "Role added successfully")
+      val id = roleService.addRole(user)
+      call.respond(HttpStatusCode.Created, mapOf("id" to id, "message" to "Role added successfully"))
     }
     put("/{id}") {
       val id = call.parameters["id"]
@@ -70,7 +70,7 @@ fun Route.roles(roleService: RolesService) {
         return@put
       }
 
-      call.respond(HttpStatusCode.OK, "Role updated successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Role updated successfully"))
     }
     delete("/{id}") {
       val id = call.parameters["id"]
@@ -85,7 +85,7 @@ fun Route.roles(roleService: RolesService) {
         return@delete
       }
 
-      call.respond(HttpStatusCode.NoContent, "Role deleted successfully")
+      call.respond(HttpStatusCode.NoContent, mapOf("id" to id, "message" to "Role deleted successfully"))
     }
   }
 }

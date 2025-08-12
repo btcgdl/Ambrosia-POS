@@ -48,8 +48,8 @@ fun Route.dishes(dishService: DishService) {
     }
     post("") {
       val dish = call.receive<Dish>()
-      dishService.addDish(dish)
-      call.respond(HttpStatusCode.Created, "Dish added successfully")
+      val id = dishService.addDish(dish)
+      call.respond(HttpStatusCode.Created, mapOf("id" to id, "message" to "Dish added successfully" ))
     }
     put("/{id}") {
       val id = call.parameters["id"]
@@ -67,7 +67,7 @@ fun Route.dishes(dishService: DishService) {
         return@put
       }
 
-      call.respond(HttpStatusCode.OK, "Dish updated successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Dish updated successfully"))
     }
     delete("/{id}") {
       val id = call.parameters["id"]
@@ -77,7 +77,7 @@ fun Route.dishes(dishService: DishService) {
       }
 
       dishService.deleteDish(id)
-      call.respond(HttpStatusCode.NoContent, "Dish deleted successfully")
+      call.respond(HttpStatusCode.NoContent, mapOf("id" to id, "message" to "Dish deleted successfully"))
     }
   }
 }

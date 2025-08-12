@@ -48,8 +48,8 @@ fun Route.spaces(spaceService: SpaceService) {
     }
     post("") {
       val space = call.receive<Space>()
-      spaceService.addSpace(space)
-      call.respond(HttpStatusCode.Created, "Space added successfully")
+      val createdId = spaceService.addSpace(space)
+      call.respond(HttpStatusCode.Created, mapOf("id" to createdId, "message" to "Space added successfully"))
     }
     put("/{id}") {
       val id = call.parameters["id"]
@@ -67,7 +67,7 @@ fun Route.spaces(spaceService: SpaceService) {
         return@put
       }
 
-      call.respond(HttpStatusCode.OK, "Space updated successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Space updated successfully"))
     }
     delete("/{id}") {
       val id = call.parameters["id"]
@@ -82,7 +82,7 @@ fun Route.spaces(spaceService: SpaceService) {
         return@delete
       }
 
-      call.respond(HttpStatusCode.OK, "Space deleted successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Space deleted successfully"))
     }
   }
 }

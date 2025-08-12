@@ -62,8 +62,8 @@ fun Route.tables(tableService: TableService) {
     }
     post("") {
       val table = call.receive<Table>()
-      tableService.addTable(table)
-      call.respond(HttpStatusCode.Created, "Table added successfully")
+      val createdId = tableService.addTable(table)
+      call.respond(HttpStatusCode.Created, mapOf("id" to createdId, "message" to "Table added successfully"))
     }
     put("/{id}") {
       val id = call.parameters["id"]
@@ -81,7 +81,7 @@ fun Route.tables(tableService: TableService) {
         return@put
       }
 
-      call.respond(HttpStatusCode.OK, "Table updated successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Table updated successfully"))
     }
     delete("/{id}") {
       val id = call.parameters["id"]
@@ -96,7 +96,7 @@ fun Route.tables(tableService: TableService) {
         return@delete
       }
 
-      call.respond(HttpStatusCode.OK, "Table deleted successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Table deleted successfully"))
     }
   }
 }
