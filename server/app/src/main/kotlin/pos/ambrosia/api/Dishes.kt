@@ -59,11 +59,11 @@ fun Route.dishes(dishService: DishService) {
       }
 
       val updatedDish = call.receive<Dish>()
-      val isUpdated = dishService.updateDish(updatedDish)
+      val isUpdated = dishService.updateDish(updatedDish.copy(id = id))
       logger.info(isUpdated.toString())
 
       if (!isUpdated) {
-        call.respond(HttpStatusCode.NotFound, "Dish not found")
+        call.respond(HttpStatusCode.NotFound, "Dish with ID: $id not found")
         return@put
       }
 

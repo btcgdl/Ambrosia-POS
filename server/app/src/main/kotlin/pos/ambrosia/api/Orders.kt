@@ -137,10 +137,10 @@ fun Route.orders(orderService: OrderService) {
         val orderWithId = updatedOrder.copy(id = id)
         val isUpdated = orderService.updateOrder(orderWithId)
         if (!isUpdated) {
-          call.respond(HttpStatusCode.NotFound, "Order not found or update failed")
+          call.respond(HttpStatusCode.NotFound, "Order with ID: $id not found")
           return@put
         }
-        call.respond(HttpStatusCode.OK, mapOf("message" to "Order updated successfully"))
+        call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Order updated successfully"))
       } catch (e: Exception) {
         logger.error("Error updating order: ${e.message}")
         call.respond(HttpStatusCode.BadRequest, "Invalid order data")

@@ -69,7 +69,7 @@ fun Route.dishCategories(dishCategoryService: DishCategoryService) {
       val isUpdated = dishCategoryService.updateDishCategory(categoryWithId)
 
       if (!isUpdated) {
-        call.respond(HttpStatusCode.NotFound, "Dish category not found or update failed")
+        call.respond(HttpStatusCode.NotFound, "Dish category with ID: $id not found")
         return@put
       }
 

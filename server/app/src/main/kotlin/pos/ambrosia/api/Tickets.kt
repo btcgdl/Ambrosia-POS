@@ -59,11 +59,11 @@ fun Route.tickets(ticketService: TicketService) {
       }
 
       val updatedTicket = call.receive<Ticket>()
-      val isUpdated = ticketService.updateTicket(updatedTicket)
+      val isUpdated = ticketService.updateTicket(updatedTicket.copy(id = id))
       logger.info(isUpdated.toString())
 
       if (!isUpdated) {
-        call.respond(HttpStatusCode.NotFound, "Ticket not found")
+        call.respond(HttpStatusCode.NotFound, "Ticket with ID: $id not found")
         return@put
       }
 

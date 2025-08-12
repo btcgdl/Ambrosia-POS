@@ -69,7 +69,7 @@ fun Route.ingredientCategories(ingredientCategoryService: IngredientCategoryServ
       val isUpdated = ingredientCategoryService.updateIngredientCategory(categoryWithId)
 
       if (!isUpdated) {
-        call.respond(HttpStatusCode.NotFound, "Ingredient category not found or update failed")
+        call.respond(HttpStatusCode.NotFound, "Ingredient category with ID: $id not found")
         return@put
       }
 
