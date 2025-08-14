@@ -12,13 +12,13 @@ print_header() {
 
 install_ambrosia() {
   echo "➡️  Iniciando instalación de Ambrosia POS..."
-  curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/ambrosia.sh | bash -s -- --yes
+  curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/ambrosia.sh | bash -s -- "$@"
   echo "✅ Ambrosia POS instalado."
 }
 
 install_phoenixd() {
   echo "➡️  Iniciando instalación de phoenixd..."
-  curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/phoenixd.sh | bash -s -- --yes
+  curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/phoenixd.sh | bash -s -- "$@"
   echo "✅ phoenixd instalado."
 }
 

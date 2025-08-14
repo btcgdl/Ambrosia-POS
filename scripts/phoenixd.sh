@@ -18,7 +18,7 @@ for arg in "$@"; do
   esac
 done
 
-TAG="0.6.0"
+TAG="0.6.2"
 PHOENIXD_URL="https://github.com/ACINQ/phoenixd/releases/download/v${TAG}"
 PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-linux-x64.zip"
 VERIFIER_URL="https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/verify.sh"
@@ -29,6 +29,27 @@ echo "⚡️ Welcome to Mastering phoenixd installer"
 echo "-----------------------------------------"
 echo "This script will install linux-x64 version of phoenixd"
 echo "-----------------------------------------"
+
+# Check if phoenixd and phoenix-cli are already installed
+if command -v phoenixd >/dev/null 2>&1 && command -v phoenix-cli >/dev/null 2>&1; then
+  echo "❌ phoenixd and phoenix-cli are already installed on this system"
+  echo "Current phoenixd location: $(which phoenixd)"
+  echo "Current phoenix-cli location: $(which phoenix-cli)"
+  echo ""
+  if [[ "$AUTO_YES" != true ]]; then
+    echo "Do you want to continue with the installation anyway? This will overwrite the existing installation. (y/n): "
+    read -r CONTINUE_REPLY
+    if [[ ! $CONTINUE_REPLY =~ ^[Yy]$ ]]; then
+      echo "Installation cancelled."
+      exit 0
+    fi
+  else
+    echo "Running in auto-yes mode. Installation cancelled to prevent overwriting existing installation."
+    echo "If you want to overwrite the existing installation, run the script interactively without --yes flag."
+    exit 0
+  fi
+fi
+
 echo "Installing phoenixd ${TAG} from ${PHOENIXD_URL}"
 echo ""
 echo "Absolute install directory path (default: /usr/local/bin)"

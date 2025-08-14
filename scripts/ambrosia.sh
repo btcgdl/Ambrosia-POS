@@ -38,6 +38,25 @@ INSTALL_DIR="$HOME/.local/ambrosia"
 CONFIG_DIR="$HOME/.Ambrosia-POS"
 BIN_DIR="$HOME/.local/bin"
 
+# Check if Ambrosia POS is already installed
+if command -v ambrosia >/dev/null 2>&1; then
+  echo "❌ Ambrosia POS is already installed on this system"
+  echo "Current ambrosia location: $(which ambrosia)"
+  echo ""
+  if [[ "$AUTO_YES" != true ]]; then
+    echo "Do you want to continue with the installation anyway? This will overwrite the existing installation. (y/n): "
+    read -r CONTINUE_REPLY
+    if [[ ! $CONTINUE_REPLY =~ ^[Yy]$ ]]; then
+      echo "Installation cancelled."
+      exit 0
+    fi
+  else
+    echo "Running in auto-yes mode. Installation cancelled to prevent overwriting existing installation."
+    echo "If you want to overwrite the existing installation, run the script interactively without --yes flag."
+    exit 0
+  fi
+fi
+
 # Create bin directory if it doesn't exist
 mkdir -p "$BIN_DIR"
 
