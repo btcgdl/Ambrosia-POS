@@ -36,11 +36,11 @@ jobs:
       - name: Check phoenixd installation
         run: command -v phoenixd
 
+      - name: Run phoenixd
+        run: phoenixd --chain=testnet --seed=${{ env.CISEED }} &
+
       - name: Run ambrosia
         run: ambrosia &
-
-      - name: Run phoenixd
-        run: phoenixd &
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./server/gradlew
