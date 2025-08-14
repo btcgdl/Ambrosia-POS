@@ -3,6 +3,30 @@
 # Termina el script inmediatamente si un comando falla.
 set -e
 
+# --- Validación de argumentos ---
+AUTO_YES=false
+for arg in "$@"; do
+  case $arg in
+    --yes|-y)
+      AUTO_YES=true
+      shift
+      ;;
+    *)
+      # Opción desconocida
+      ;;
+  esac
+done
+
+if [[ "$AUTO_YES" != true ]]; then
+  echo "❓ No se detectó el modo automático (--yes)."
+  echo "¿Deseas continuar con la instalación en modo interactivo? (y/n): "
+  read -r REPLY
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Instalación cancelada."
+    exit 0
+  fi
+fi
+
 # --- Funciones para mejorar la legibilidad ---
 print_header() {
   echo "----------------------------------------"
