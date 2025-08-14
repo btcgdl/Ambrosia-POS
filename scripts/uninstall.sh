@@ -155,4 +155,4 @@ echo "Data directory location: ~/.phoenix"
 echo ""
 echo "Note: If you manually added phoenixd to your PATH, please remove those entries"
 echo "from your ~/.bashrc, ~/.zshrc, or other shell configuration files."
-echo ""Desisntalación
+echo ""

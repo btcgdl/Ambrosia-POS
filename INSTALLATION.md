@@ -19,7 +19,7 @@ Este proyecto requiere **phoenixd** para el procesamiento de pagos mediante Ligh
 
 **Opción 1: Instalación completa (Ambrosia + phoenixd)**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/install.sh | bash -s -- --yes
 ```
 
 El script de instalación de phoenixd instala phoenixd automáticamente. El script descarga phoenixd v0.6.2, verifica la integridad del paquete usando GPG y checksums, instala en `/usr/local/bin`, y opcionalmente configura un servicio systemd para inicio automático.
@@ -28,9 +28,7 @@ Check [Mastering Phoenixd](https://btcgdl.github.io/Mastering-phoenixd/) for mor
 
 **Opción 2: Scripts del proyecto (sin systemd)**
 ```bash
-wget https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/install.sh
-chmod +x install.sh
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/install.sh | bash
 ```
 
 ## Desinstalación 
@@ -38,9 +36,7 @@ chmod +x install.sh
 Para desinstalar Ambrosia POS y phoenixd, ejecuta el siguiente script:
 
 ```bash
-wget https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/uninstall.sh
-chmod +x uninstall.sh
-./uninstall.sh
+curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/uninstall.sh | bash
 ```
 
 ## Scripts de Desarrollo
