@@ -12,14 +12,13 @@
 
 Este proyecto requiere **phoenixd** para el procesamiento de pagos mediante Lightning Network. Si aún no tienes phoenixd instalado, sigue estas instrucciones:
 
-> [!TIP]
-> La Opción 2 es la única forma de instalar ambos componentes sin configurar servicios systemd automáticamente. Los scripts se ejecutan localmente y te permiten tener control completo sobre la instalación.
-
-## Instalación automática (Recomendada)
+## Instalación Interactiva (Recomendada)
 
 **Opción 1: Instalación completa (Ambrosia + phoenixd)**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/install.sh | bash -s -- --yes
+wget -q https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/install.sh
+chmod +x install.sh
+./install.sh
 ```
 
 El script de instalación de phoenixd instala phoenixd automáticamente. El script descarga phoenixd v0.6.2, verifica la integridad del paquete usando GPG y checksums, instala en `/usr/local/bin`, y opcionalmente configura un servicio systemd para inicio automático.
