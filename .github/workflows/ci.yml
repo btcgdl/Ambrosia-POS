@@ -34,7 +34,7 @@ jobs:
         run: curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/phoenixd.sh | bash
 
       - name: Check phoenixd installation
-        run: command -v phoenixd
+        run: phoenix-cli getinfo
 
       - name: Run phoenixd
         run: phoenixd --chain=testnet --seed=${{ env.CISEED }} &
