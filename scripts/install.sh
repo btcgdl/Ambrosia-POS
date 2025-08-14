@@ -17,16 +17,6 @@ for arg in "$@"; do
   esac
 done
 
-if [[ "$AUTO_YES" != true ]]; then
-  echo "❓ No se detectó el modo automático (--yes)."
-  echo "¿Deseas continuar con la instalación en modo interactivo? (y/n): "
-  read -r REPLY
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Instalación cancelada."
-    exit 0
-  fi
-fi
-
 # --- Funciones para mejorar la legibilidad ---
 print_header() {
   echo "----------------------------------------"
