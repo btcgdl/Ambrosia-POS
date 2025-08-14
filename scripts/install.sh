@@ -3,6 +3,20 @@
 # Termina el script inmediatamente si un comando falla.
 set -e
 
+# --- Validación de argumentos ---
+AUTO_YES=false
+for arg in "$@"; do
+  case $arg in
+    --yes|-y)
+      AUTO_YES=true
+      shift
+      ;;
+    *)
+      # Opción desconocida
+      ;;
+  esac
+done
+
 # --- Funciones para mejorar la legibilidad ---
 print_header() {
   echo "----------------------------------------"
@@ -12,13 +26,27 @@ print_header() {
 
 install_ambrosia() {
   echo "➡️  Iniciando instalación de Ambrosia POS..."
-  curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/ambrosia.sh | bash -s -- --yes
+  local script_path="/tmp/ambrosia_install_temp.sh"
+  if ! curl -fsSL "https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/ambrosia.sh" -o "$script_path"; then
+    echo "❌ Error al descargar el script de instalación de Ambrosia." >&2
+    exit 1
+  fi
+  chmod +x "$script_path"
+  "$script_path" "$@"
+  rm "$script_path"
   echo "✅ Ambrosia POS instalado."
 }
 
 install_phoenixd() {
   echo "➡️  Iniciando instalación de phoenixd..."
-  curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/phoenixd.sh | bash -s -- --yes
+  local script_path="/tmp/phoenixd_install_temp.sh"
+  if ! curl -fsSL "https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/phoenixd.sh" -o "$script_path"; then
+    echo "❌ Error al descargar el script de instalación de phoenixd." >&2
+    exit 1
+  fi
+  chmod +x "$script_path"
+  "$script_path" "$@"
+  rm "$script_path"
   echo "✅ phoenixd instalado."
 }
 
