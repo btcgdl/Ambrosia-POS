@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TAG="0.6.0"
+TAG="0.6.2"
 
 PHOENIXD_SIG="https://github.com/ACINQ/phoenixd/releases/download/v${TAG}/SHA256SUMS.asc"
 ACINQ_PGP_KEY="https://acinq.co/pgp/padioupm.asc"

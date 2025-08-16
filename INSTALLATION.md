@@ -12,41 +12,31 @@
 
 Este proyecto requiere **phoenixd** para el procesamiento de pagos mediante Lightning Network. Si aún no tienes phoenixd instalado, sigue estas instrucciones:
 
-> [!TIP]
-> La Opción 4 es la única forma de instalar ambos componentes sin configurar servicios systemd automáticamente. Los scripts se ejecutan localmente y te permiten tener control completo sobre la instalación.
-
-## Instalación automática (Recomendada)
+## Instalación Interactiva (Recomendada)
 
 **Opción 1: Instalación completa (Ambrosia + phoenixd)**
+```bash
+wget -q https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/install.sh
+chmod +x install.sh
+./install.sh
+```
+
+El script de instalación de phoenixd instala phoenixd automáticamente. El script descarga phoenixd v0.6.2, verifica la integridad del paquete usando GPG y checksums, instala en `/usr/local/bin`, y opcionalmente configura un servicio systemd para inicio automático.
+
+Check [Mastering Phoenixd](https://btcgdl.github.io/Mastering-phoenixd/) for more details.
+
+**Opción 2: Scripts del proyecto (sin systemd)**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/install.sh | bash
 ```
 
-**Opción 2: Solo Ambrosia**
+## Desinstalación 
+
+Para desinstalar Ambrosia POS y phoenixd, ejecuta el siguiente script:
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/ambrosia.sh | bash -s -- --yes
+curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/uninstall.sh | bash
 ```
-
-**Opción 3: Solo phoenixd**
-```bash
-curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/phoenixd.sh | bash -s -- --yes
-```
-
-El script de instalación de phoenixd instala phoenixd automáticamente. El script descarga phoenixd v0.6.0, verifica la integridad del paquete usando GPG y checksums, instala en `/usr/local/bin`, y opcionalmente configura un servicio systemd para inicio automático.
-
-Check [Mastering Phoenixd](https://btcgdl.github.io/Mastering-phoenixd/) for more details.
-
-**Opción 4: Scripts del proyecto (sin systemd)**
-```bash
-cd scripts
-chmod +x ambrosia.sh phoenixd.sh
-./ambrosia.sh
-./phoenixd.sh
-```
-
-## Instalación manual
-
-Para instalación manual, consulta la [documentación oficial](https://phoenix.acinq.co/server) para obtener las instrucciones específicas para tu sistema operativo.
 
 ## Scripts de Desarrollo
 
