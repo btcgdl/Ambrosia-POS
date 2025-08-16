@@ -187,6 +187,28 @@ export const modules = {
       },
     ],
   },
+  "color-test": {
+    enabled: false,
+    name: "Color Test",
+    routes: [
+      {
+        path: "/color-test",
+        component: "ColorTest",
+        requiresAuth: true,
+        requiresAdmin: true,
+      },
+    ],
+    services: () => import("../modules/spaces/spacesService"),
+    navItems: [
+      {
+        path: "/color-test",
+        label: "Ver colores",
+        icon: "building",
+        roles: [], // Disponible para todos los usuarios autenticados
+        showInNavbar: true,
+      },
+    ],
+  },
 };
 
 // Funciones helper (como tu moduleRegistry original)

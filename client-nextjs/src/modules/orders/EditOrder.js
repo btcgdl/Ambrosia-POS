@@ -394,8 +394,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                     {order?.waiter || "Mesero"}
                   </div>
                   <div className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-                    <DollarSign className="w-3 h-3 mr-1" />$
-                    {order?.total ? order.total.toFixed(2) : "0.00"}
+                    $ {order?.total ? order.total.toFixed(2) : "0.00"}
                   </div>
                 </div>
               </div>
@@ -550,7 +549,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                         Cerrar Pedido
                       </Button>
                       <Button
-                        variant="outline"
+                        variant="bordered"
                         color="warning"
                         size="lg"
                         onPress={() => handleUndo()}

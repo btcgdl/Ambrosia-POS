@@ -230,9 +230,8 @@ export default function Tables({ dynamicParams }) {
                       color={getTableStatusColor(table.status)}
                       variant="flat"
                       className="px-3 py-1"
-                    >
-                      {getTableStatusText(table.status)}
-                    </Badge>
+                      content={getTableStatusText(table.status)}
+                    />
 
                     {/* Capacity if available */}
                     {table.capacity && (
