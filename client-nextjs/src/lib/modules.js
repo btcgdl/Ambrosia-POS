@@ -24,12 +24,14 @@ export const modules = {
         label: "Roles",
         icon: "user-lock",
         roles: ["admin"],
+        showInNavbar: true,
       },
       {
         path: "/users",
         label: "Usuarios",
         icon: "users",
         roles: ["admin"],
+        showInNavbar: true,
       },
     ],
   },
@@ -51,6 +53,7 @@ export const modules = {
         label: "Platillos",
         icon: "salad",
         roles: ["admin"],
+        showInNavbar: true,
       },
     ],
   },
@@ -86,16 +89,32 @@ export const modules = {
     services: () => import("../modules/cashier/cashierService"),
     navItems: [
       {
+        path: "/open-turn",
+        label: "Abrir Turno",
+        icon: "play-circle",
+        roles: [], // Disponible para todos los usuarios autenticados
+        showInNavbar: false,
+      },
+      {
+        path: "/close-turn",
+        label: "Cerrar Turno",
+        icon: "pause-circle",
+        roles: [], // Disponible para todos los usuarios autenticados
+        showInNavbar: false,
+      },
+      {
         path: "/wallet",
         label: "Cartera",
         icon: "wallet",
         roles: ["admin"],
+        showInNavbar: true,
       },
       {
         path: "/reports",
         label: "Reportes",
         icon: "chart-line",
         roles: ["admin"],
+        showInNavbar: false, // Oculto del navbar pero accesible por URL
       },
     ],
   },
@@ -122,7 +141,8 @@ export const modules = {
         path: "/all-orders",
         label: "Ordenes",
         icon: "clipboard-clock",
-        roles: ["admin"],
+        roles: [], // Disponible para todos los usuarios autenticados
+        showInNavbar: true,
       },
     ],
   },
@@ -134,7 +154,7 @@ export const modules = {
         path: "/rooms",
         component: "Rooms",
         requiresAuth: true,
-        requiresAdmin: true,
+        requiresAdmin: false,
       },
       {
         path: "/tables/:roomId",
@@ -152,10 +172,18 @@ export const modules = {
     services: () => import("../modules/spaces/spacesService"),
     navItems: [
       {
+        path: "/rooms",
+        label: "Ver Salas",
+        icon: "building",
+        roles: [], // Disponible para todos los usuarios autenticados
+        showInNavbar: true,
+      },
+      {
         path: "/spaces",
         label: "Administrar Espacios",
         icon: "door-open",
         roles: ["admin"],
+        showInNavbar: true,
       },
     ],
   },
@@ -224,6 +252,9 @@ export function getNavigationItems(userRoles = []) {
     if (!config.enabled) return;
 
     config.navItems?.forEach((item) => {
+      // Si está marcado como oculto del navbar, no mostrarlo
+      if (item.showInNavbar === false) return;
+
       // Verificar roles
       const hasPermission =
         !item.roles || item.roles.some((role) => userRoles.includes(role));
@@ -238,4 +269,100 @@ export function getNavigationItems(userRoles = []) {
   });
 
   return navItems;
+}
+
+// Filtrar módulos basado en autenticación y permisos
+export function getAvailableModules(isAuthenticated = false, isAdmin = false) {
+  const availableModules = {};
+
+  Object.entries(modules).forEach(([moduleKey, moduleConfig]) => {
+    if (!moduleConfig.enabled) return;
+
+    // Filtrar rutas del módulo
+    const availableRoutes = moduleConfig.routes.filter((route) => {
+      // Si la ruta no requiere autenticación, siempre está disponible
+      if (!route.requiresAuth) return true;
+
+      // Si la ruta requiere autenticación pero el usuario no está logueado
+      if (route.requiresAuth && !isAuthenticated) return false;
+
+      // Si la ruta requiere admin pero el usuario no es admin
+      if (route.requiresAdmin && !isAdmin) return false;
+
+      return true;
+    });
+
+    // Filtrar navItems del módulo
+    const availableNavItems = (moduleConfig.navItems || []).filter(
+      (navItem) => {
+        // Si no está autenticado, no puede ver nada
+        if (!isAuthenticated) return false;
+
+        // Si está marcado como oculto del navbar, no mostrarlo
+        if (navItem.showInNavbar === false) return false;
+
+        // Si no tiene roles definidos o es array vacío, está disponible para todos los autenticados
+        if (!navItem.roles || navItem.roles.length === 0) return true;
+
+        // Verificar si el usuario tiene el rol requerido
+        if (navItem.roles.includes("admin") && !isAdmin) return false;
+
+        return true;
+      },
+    );
+
+    // Solo incluir el módulo si tiene rutas o navItems disponibles
+    if (availableRoutes.length > 0 || availableNavItems.length > 0) {
+      availableModules[moduleKey] = {
+        ...moduleConfig,
+        routes: availableRoutes,
+        navItems: availableNavItems,
+      };
+    }
+  });
+
+  return availableModules;
+}
+
+// Obtener solo las rutas de navegación disponibles para el usuario
+export function getAvailableNavigation(
+  isAuthenticated = false,
+  isAdmin = false,
+) {
+  const availableModules = getAvailableModules(isAuthenticated, isAdmin);
+  const navItems = [];
+
+  Object.entries(availableModules).forEach(([moduleKey, config]) => {
+    config.navItems?.forEach((item) => {
+      navItems.push({
+        ...item,
+        module: moduleKey,
+      });
+    });
+  });
+
+  return navItems;
+}
+
+// Verificar si el usuario tiene acceso a una ruta específica
+export function hasAccessToRoute(
+  pathname,
+  isAuthenticated = false,
+  isAdmin = false,
+) {
+  const routeConfig = findRouteConfig(pathname);
+  if (!routeConfig) return false;
+
+  const route = routeConfig.route;
+
+  // Si la ruta no requiere autenticación, está disponible
+  if (!route.requiresAuth) return true;
+
+  // Si requiere autenticación pero no está logueado
+  if (route.requiresAuth && !isAuthenticated) return false;
+
+  // Si requiere admin pero no es admin
+  if (route.requiresAdmin && !isAdmin) return false;
+
+  return true;
 }
