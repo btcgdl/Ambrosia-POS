@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { createOrder, getAllOrders, getUserById } from "./ordersService";
+import { formatCurrency, useCurrency } from "../../lib/currencyUtils";
 import formatDate from "../../lib/formatDate";
 import { useRouter } from "next/navigation";
 import {
@@ -56,6 +57,9 @@ export default function Orders() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  
+  // Hook personalizado para manejar monedas
+  const { systemCurrency, loading: currencyLoading, formatAmount } = useCurrency();
 
   useEffect(() => {
     async function fetchData() {
@@ -162,11 +166,32 @@ export default function Orders() {
     }
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("es-ES", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
+  // Componente para mostrar precio formateado
+  const FormattedPrice = ({ amount }) => {
+    const [formattedPrice, setFormattedPrice] = useState("");
+    
+    useEffect(() => {
+      async function formatPrice() {
+        if (formatAmount) {
+          const formatted = await formatAmount(amount);
+          setFormattedPrice(formatted);
+        } else {
+          // Fallback mientras carga la moneda del sistema
+          const fallback = new Intl.NumberFormat("es-ES", {
+            style: "currency",
+            currency: systemCurrency?.baseCurrency?.acronym || "MXN",
+          }).format(amount);
+          setFormattedPrice(fallback);
+        }
+      }
+      formatPrice();
+    }, [amount, formatAmount, systemCurrency]);
+
+    return (
+      <span className={`font-semibold ${amount > 0 ? "text-green-600" : "text-gray-400"}`}>
+        {formattedPrice || "..."}
+      </span>
+    );
   };
 
   // Paginación
@@ -414,15 +439,7 @@ export default function Orders() {
                           </Chip>
                         </TableCell>
                         <TableCell>
-                          <span
-                            className={`font-semibold ${
-                              order.total > 0
-                                ? "text-green-600"
-                                : "text-gray-400"
-                            }`}
-                          >
-                            {formatCurrency(order.total)}
-                          </span>
+                          <FormattedPrice amount={order.total} />
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-1 text-sm text-gray-500">

@@ -10,7 +10,7 @@ import {
 
 export async function middleware(request) {
   const pathname = request.nextUrl.pathname;
-  
+
   console.log("🛡️ Middleware ejecutándose para:", pathname);
 
   // Rutas completamente públicas (sin autenticación)
@@ -21,14 +21,14 @@ export async function middleware(request) {
 
   // Verificar si es una ruta de módulo válida
   const routeConfig = findRouteConfig(pathname);
-  
+
   if (!routeConfig) {
     console.log("❓ Ruta no encontrada en módulos");
   } else {
     console.log("🎯 Ruta encontrada:", {
       path: routeConfig.route.path,
       requiresAuth: routeConfig.route.requiresAuth,
-      requiresAdmin: routeConfig.route.requiresAdmin
+      requiresAdmin: routeConfig.route.requiresAdmin,
     });
   }
 
@@ -36,7 +36,12 @@ export async function middleware(request) {
   const requiresAuth = routeConfig?.route?.requiresAuth;
   const requiresAdmin = routeConfig?.route?.requiresAdmin;
 
-  console.log("📊 Requiere auth:", requiresAuth, "| Requiere admin:", requiresAdmin);
+  console.log(
+    "📊 Requiere auth:",
+    requiresAuth,
+    "| Requiere admin:",
+    requiresAdmin,
+  );
 
   // Manejar rutas que requieren autenticación
   if (requiresAuth) {
@@ -108,12 +113,15 @@ export async function middleware(request) {
     // Si la ruta requiere permisos de admin, verificarlo
     if (requiresAdmin) {
       const decoded = decodeToken(accessToken);
-      
+
       if (!decoded?.isAdmin) {
-        console.log("❌ Usuario sin permisos de admin intentando acceder a:", pathname);
+        console.log(
+          "❌ Usuario sin permisos de admin intentando acceder a:",
+          pathname,
+        );
         return NextResponse.redirect(new URL("/unauthorized", request.url));
       }
-      
+
       console.log("✅ Usuario admin accediendo a:", pathname);
     }
   }
@@ -133,9 +141,10 @@ export async function middleware(request) {
     }
 
     // Si no existe, verificar si parece ser un módulo para redirigir a 404
-    const potentialModule = pathname.split('/')[1];
-    const isLikelyModuleRoute = potentialModule && 
-      Object.keys(modules).some(module => pathname.startsWith(`/${module}`));
+    const potentialModule = pathname.split("/")[1];
+    const isLikelyModuleRoute =
+      potentialModule &&
+      Object.keys(modules).some((module) => pathname.startsWith(`/${module}`));
 
     if (isLikelyModuleRoute) {
       console.log("❌ Ruta de módulo inválida, redirigiendo a 404");

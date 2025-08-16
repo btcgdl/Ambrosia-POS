@@ -54,14 +54,17 @@ export default function ModuleNavigation({ children }) {
     <div className="flex w-screen h-screen">
       <aside className="w-1/6 h-full bg-[#1c7c54] flex flex-col">
         <div className="h-[25%] flex flex-col items-center justify-end pb-4">
-          <Link href={isAuthenticated ? getHomeRoute(user) : "/auth"} className="group">
+          <Link
+            href={isAuthenticated ? getHomeRoute(user) : "/auth"}
+            className="group"
+          >
             <LucideIcons.Home className="w-24 h-24 text-white cursor-pointer group-hover:scale-110 transition-transform" />
           </Link>
           <div className="text-center">
             {isAuthenticated ? (
               <>
                 <p className="text-white text-[13px] mt-1">
-                  {user?.name || "Usuario"}
+                  {localStorage.getItem("username") || "Usuario"}
                 </p>
                 <p className="text-white/80 text-[11px]">
                   {isAdmin ? "ADMINISTRADOR" : "USUARIO"}

@@ -99,6 +99,7 @@ export default function PinLoginNew() {
         const decodedToken = jwt.decode(accessToken);
         localStorage.setItem("userId", decodedToken.userId);
         localStorage.setItem("roleId", decodedToken.role);
+        localStorage.setItem("username", employee.name);
         addToast({
           title: "Inicio de sesión exitoso",
           description: `¡Bienvenido ${employee.name}! Acceso concedido como ${employee.role}.`,

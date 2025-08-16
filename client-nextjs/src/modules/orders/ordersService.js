@@ -204,3 +204,8 @@ export async function getPayments() {
 export async function getPaymentByTicketId(id) {
   return await apiClient(`/payments/ticket-payments/by-ticket/${id}`);
 }
+
+export async function getBaseCurrency() {
+  const response = await apiClient("/base-currency");
+  return response;
+}

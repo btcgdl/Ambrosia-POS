@@ -492,7 +492,12 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                     orderDishes.map((item) => {
                       const dish = dishes.find((d) => d.id === item.dish_id);
                       return (
-                        <Card key={item.id} className="border">
+                        <Card
+                          key={item.id}
+                          className="border w-full"
+                          isPressable
+                          onPress={() => handleRemoveDish(item.id)}
+                        >
                           <CardBody className="p-4">
                             <div className="flex justify-between items-center">
                               <div className="flex-1">
@@ -504,15 +509,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                                 </div>
                               </div>
                               {order && order.status === "open" && (
-                                <Button
-                                  variant="outline"
-                                  color="danger"
-                                  size="sm"
-                                  onPress={() => handleRemoveDish(item.id)}
-                                  disabled={isLoading}
-                                >
-                                  <Minus className="w-4 h-4" />
-                                </Button>
+                                <Minus className="w-4 h-4" />
                               )}
                             </div>
                           </CardBody>
