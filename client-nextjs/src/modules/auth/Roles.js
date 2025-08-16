@@ -81,7 +81,9 @@ export default function Roles() {
           variant: "solid",
           color: "success",
         });
+        console.log("Rol actualizado correctamente", editing, form);
       } else {
+        console.log("Creando rol", form);
         await addRole(form);
         addToast({
           title: "Éxito",
@@ -109,6 +111,7 @@ export default function Roles() {
   };
 
   const startEdit = (role) => {
+    console.log("Editando rol", role);
     setForm({
       role: role.role,
       password: role.password,
@@ -134,6 +137,7 @@ export default function Roles() {
     setError("");
     setIsLoading(true);
     try {
+      console.log("Eliminando rol", deleteId);
       await deleteRole(deleteId);
       const response = await getRoles();
       setRoles(response);
@@ -316,10 +320,13 @@ export default function Roles() {
 
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      checked={form.isAdmin}
-                      onChange={(checked) =>
-                        setForm((prev) => ({ ...prev, isAdmin: checked }))
-                      }
+                      isSelected={form.isAdmin}
+                      onValueChange={(checked) => {
+                        setForm((prev) => ({
+                          ...prev,
+                          isAdmin: checked,
+                        }));
+                      }}
                       disabled={isLoading}
                       color="primary"
                     >

@@ -28,13 +28,18 @@ export async function GET(request, { params }) {
     console.log('Response status:', response.status);
     console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
-    // Verificar si la respuesta es JSON
-    const contentType = response.headers.get('content-type');
+    // Para status 204 (No Content), no intentar parsear body
     let data;
-    if (contentType && contentType.includes('application/json')) {
-      data = await response.json();
+    if (response.status === 204) {
+      data = null;
     } else {
-      data = await response.text();
+      // Verificar si la respuesta es JSON
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
     }
 
     // Copiar cookies de la respuesta
@@ -106,13 +111,18 @@ export async function POST(request, { params }) {
     console.log('Response status:', response.status);
     console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
-    // Verificar si la respuesta es JSON
-    const contentType = response.headers.get('content-type');
+    // Para status 204 (No Content), no intentar parsear body
     let data;
-    if (contentType && contentType.includes('application/json')) {
-      data = await response.json();
+    if (response.status === 204) {
+      data = null;
     } else {
-      data = await response.text();
+      // Verificar si la respuesta es JSON
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
     }
 
     // Copiar cookies de la respuesta
@@ -182,13 +192,18 @@ export async function PUT(request, { params }) {
     console.log('Response status:', response.status);
     console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
-    // Verificar si la respuesta es JSON
-    const contentType = response.headers.get('content-type');
+    // Para status 204 (No Content), no intentar parsear body
     let data;
-    if (contentType && contentType.includes('application/json')) {
-      data = await response.json();
+    if (response.status === 204) {
+      data = null;
     } else {
-      data = await response.text();
+      // Verificar si la respuesta es JSON
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
     }
 
     // Copiar cookies de la respuesta
@@ -256,13 +271,18 @@ export async function DELETE(request, { params }) {
     console.log('Response status:', response.status);
     console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
-    // Verificar si la respuesta es JSON
-    const contentType = response.headers.get('content-type');
+    // Para status 204 (No Content), no intentar parsear body
     let data;
-    if (contentType && contentType.includes('application/json')) {
-      data = await response.json();
+    if (response.status === 204) {
+      data = null;
     } else {
-      data = await response.text();
+      // Verificar si la respuesta es JSON
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
     }
 
     // Copiar cookies de la respuesta
