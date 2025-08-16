@@ -1,19 +1,13 @@
 "use client";
 import { useModules } from '../../hooks/useModules';
 import Link from 'next/link';
+import LoadingCard from '../LoadingCard';
 
 export function DynamicNavigation() {
   const { availableNavigation, isAuthenticated, isAdmin, isLoading } = useModules();
 
   if (isLoading) {
-    return (
-      <div className="p-4">
-        <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-        </div>
-      </div>
-    );
+    return <LoadingCard message="Cargando navegación..." fullScreen={false} />;
   }
 
   if (!isAuthenticated) {

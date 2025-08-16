@@ -170,7 +170,7 @@ export default function Tables({ dynamicParams }) {
             <div className="flex items-center justify-between w-full">
               <Button
                 variant="ghost"
-                onPress={() => router.push("/spaces")}
+                onPress={() => router.push("/")}
                 className="text-forest hover:bg-mint/20"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />

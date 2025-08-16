@@ -18,6 +18,7 @@ import {
 } from "@heroui/react";
 import { useAuth } from "./useAuth";
 import { getCookie } from "./../../lib/utils";
+import { useRouter } from "next/navigation";
 export default function PinLoginNew() {
   const [pin, setPin] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
@@ -33,6 +34,7 @@ export default function PinLoginNew() {
     },
   ]);
   const { login, logout } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     async function getUsersFromService() {
@@ -91,7 +93,8 @@ export default function PinLoginNew() {
     const employee = employees.find((emp) => emp.id === selectedUser);
 
     setTimeout(async () => {
-      if (await loginFromService({ name: employee.name, pin })) {
+      try {
+        await loginFromService({ name: employee.name, pin });
         const accessToken = getCookie("accessToken");
         const decodedToken = jwt.decode(accessToken);
         localStorage.setItem("userId", decodedToken.userId);
@@ -104,10 +107,12 @@ export default function PinLoginNew() {
         setPin("");
         setSelectedUser("");
         login();
-      } else {
+        router.push("/");
+        setIsLoading(false);
+      } catch (error) {
         setError("PIN incorrecto para el empleado seleccionado.");
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }, 1000);
   };
 

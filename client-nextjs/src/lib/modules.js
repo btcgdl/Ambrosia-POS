@@ -176,7 +176,7 @@ export const modules = {
         label: "Ver Salas",
         icon: "building",
         roles: [], // Disponible para todos los usuarios autenticados
-        showInNavbar: true,
+        showInNavbar: false,
       },
       {
         path: "/spaces",

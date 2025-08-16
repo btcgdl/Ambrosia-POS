@@ -1,7 +1,8 @@
 ﻿"use client";
 import React, { createContext, useEffect, useRef } from "react";
-import { RefreshToken } from "./authService";
+import { logoutFromService, RefreshToken } from "./authService";
 import { useJwtAuth } from "../../hooks/useJwtAuth";
+import { apiClient } from "../../services/apiClient";
 
 export const AuthContext = createContext();
 
@@ -46,9 +47,10 @@ export function AuthProvider({ children }) {
     jwtAuth.checkAuthStatus();
   };
 
-  const logout = () => {
+  const logout = async () => {
     stopTokenRefresh();
     // También limpiar el sistema JWT
+    await logoutFromService();
     jwtAuth.logout();
   };
 

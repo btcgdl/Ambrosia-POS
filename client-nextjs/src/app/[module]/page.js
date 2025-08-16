@@ -1,6 +1,7 @@
 import { modules, findRouteConfig } from "../../lib/modules";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
+import LoadingCard from "../../components/LoadingCard";
 
 export function generateStaticParams() {
   return Object.keys(modules)
@@ -26,7 +27,7 @@ export default async function ModulePage({ params }) {
     () =>
       import(`../../modules/${componentPath}/${routeConfig.route.component}`),
     {
-      loading: () => <div>Cargando {modules[routeConfig.module].name}...</div>,
+      loading: () => <LoadingCard message={`Cargando ${modules[routeConfig.module].name}...`} />,
       ssr: true,
     },
   );

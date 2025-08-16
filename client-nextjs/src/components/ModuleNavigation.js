@@ -4,6 +4,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useModules } from "../hooks/useModules";
 import { useContext } from "react";
 import { AuthContext } from "../modules/auth/AuthProvider";
+import { getHomeRoute } from "../lib/getHomeRoute";
+import LoadingCard from "./LoadingCard";
 import * as LucideIcons from "lucide-react";
 
 // Componente para iconos Lucide React dinámico
@@ -39,44 +41,34 @@ export default function ModuleNavigation({ children }) {
   const pathname = usePathname();
   const router = useRouter();
   const { logout } = useContext(AuthContext);
-  const { availableNavigation, isAuthenticated, isAdmin, user, isLoading } = useModules();
+  const { availableNavigation, isAuthenticated, isAdmin, user, isLoading } =
+    useModules();
 
   // Si está cargando, mostrar spinner
   if (isLoading) {
-    return (
-      <div className="flex w-screen h-screen">
-        <aside className="w-1/6 h-full bg-[#1c7c54] flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-          <p className="text-white text-sm mt-2">Cargando...</p>
-        </aside>
-        <div className="w-[85%] h-full overflow-y-auto bg-gray-50">
-          {children}
-        </div>
-      </div>
-    );
+    console.log(user);
+    return <LoadingCard message="Cargando módulos..." />;
   }
 
   return (
     <div className="flex w-screen h-screen">
       <aside className="w-1/6 h-full bg-[#1c7c54] flex flex-col">
         <div className="h-[25%] flex flex-col items-center justify-end pb-4">
-          <Link href={isAuthenticated ? "/" : "/auth"} className="group">
+          <Link href={isAuthenticated ? getHomeRoute(user) : "/auth"} className="group">
             <LucideIcons.Home className="w-24 h-24 text-white cursor-pointer group-hover:scale-110 transition-transform" />
           </Link>
           <div className="text-center">
             {isAuthenticated ? (
               <>
                 <p className="text-white text-[13px] mt-1">
-                  {user?.name || 'Usuario'}
+                  {user?.name || "Usuario"}
                 </p>
                 <p className="text-white/80 text-[11px]">
-                  {isAdmin ? 'ADMINISTRADOR' : 'USUARIO'}
+                  {isAdmin ? "ADMINISTRADOR" : "USUARIO"}
                 </p>
               </>
             ) : (
-              <p className="text-white/80 text-[13px] mt-1">
-                INVITADO
-              </p>
+              <p className="text-white/80 text-[13px] mt-1">INVITADO</p>
             )}
           </div>
         </div>
