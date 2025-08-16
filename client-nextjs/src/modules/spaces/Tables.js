@@ -78,7 +78,6 @@ export default function Tables({ dynamicParams }) {
           addToast({
             title: "Mesa Abierta",
             description: `Mesa ${table.name} abierta exitosamente`,
-            variant: "solid",
             color: "success",
           });
 
