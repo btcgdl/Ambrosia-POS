@@ -1,7 +1,7 @@
 "use client";
 import { addToast } from "@heroui/react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = "/api";
 export async function apiClient(
   endpoint,
   { method = "GET", headers = {}, body, credentials = "include" } = {},

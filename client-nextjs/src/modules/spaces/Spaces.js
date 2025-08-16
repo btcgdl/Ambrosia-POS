@@ -209,10 +209,9 @@ export default function Spaces() {
     setShowDeleteModal(true);
   };
 
-  const selectedRoom =
-    rooms === undefined
-      ? rooms.find((r) => r.id === selectedRoomId)
-      : null || null;
+  const selectedRoom = selectedRoomId
+    ? rooms.find((r) => r.id === selectedRoomId)
+    : null;
 
   if (isLoading && rooms.length === 0) {
     return (

@@ -4,14 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node generate-env.cjs && next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node generate-env.cjs && next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@heroui/react": "^2.8.2",
     "framer-motion": "^12.23.12",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.536.0",
     "next": "15.4.5",
     "react": "19.1.0",

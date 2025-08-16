@@ -1,92 +1,91 @@
-﻿import {apiClient} from '../../services/apiClient';
-
+﻿import { apiClient } from "../../services/apiClient";
 
 export async function getAllOrders() {
-    const response = await apiClient('/orders');
-    return response ? response : [];
+  const response = await apiClient("/orders");
+  return response ? response : [];
 }
 
 export async function getOrders() {
-    const orders = await apiClient('/orders');
-    return orders ? orders : [];
+  const orders = await apiClient("/orders");
+  return orders ? orders : [];
 }
 
 export async function addOrder(order) {
-    return await apiClient('/orders', {
-        method: 'POST',
-        body: order,
-    });
+  return await apiClient("/orders", {
+    method: "POST",
+    body: order,
+  });
 }
 
 export async function getUsers() {
-    return await apiClient('/users');
+  return await apiClient("/users");
 }
 
 export async function getUserById(userId) {
-    const response = await apiClient(`/users/${userId}`);
-    return response;
+  const response = await apiClient(`/users/${userId}`);
+  return response;
 }
 
 export async function getTables() {
-    const response = await apiClient('/tables');
-    return response  ? response : [];
+  const response = await apiClient("/tables");
+  return response ? response : [];
 }
 
 export async function createOrderInTable(tableId) {
-    return await createOrder()
+  return await createOrder();
 }
 
 export async function getOrderById(orderId) {
-    const response = await apiClient(`/orders/${orderId}`);
-    return response;
+  const response = await apiClient(`/orders/${orderId}`);
+  return response;
 }
 
 export async function createOrder(tableId = null) {
-    //localStorage.setItem('userId', "");
-    if (!localStorage.getItem('userId')) {
-        throw new Error('No hay usuario logeado');
-    }
-    const response = await getUserById(localStorage.getItem('userId'));
-    //const response = {id: localStorage.getItem('userId'), name: "JordyArreglaLaDBConnection"};
-    if (response){
-        const body = {
-            user_id: response.id,
-            waiter: response.name,
-            status: "open",
-            total: 0,
-            created_at: Date.now(),
-        }
-        if (tableId) body.table_id = tableId;
-        return await apiClient('/orders', {
-            method: 'POST',
-            body: body,
-        });
-    }
-    else{
-
-    }
+  //localStorage.setItem('userId', "");
+  if (!localStorage.getItem("userId")) {
+    throw new Error("No hay usuario logeado");
+  }
+  const response = await getUserById(localStorage.getItem("userId"));
+  //const response = {id: localStorage.getItem('userId'), name: "JordyArreglaLaDBConnection"};
+  if (response) {
+    const body = {
+      user_id: response.id,
+      waiter: response.name,
+      status: "open",
+      total: 0,
+      created_at: Date.now(),
+    };
+    if (tableId) body.table_id = tableId;
+    return await apiClient("/orders", {
+      method: "POST",
+      body: body,
+    });
+  } else {
+  }
 }
 
 export async function addDishToOrder(pedidoId, dish) {
-    return await apiClient(`/orders/${pedidoId}/dishes`, {
-        method: 'POST',
-        body: [{
-            dish_id: dish.id,
-            price_at_order: dish.price,
-            notes: "none"
-        }]
-    });
+  return await apiClient(`/orders/${pedidoId}/dishes`, {
+    method: "POST",
+    body: [
+      {
+        dish_id: dish.id,
+        price_at_order: dish.price,
+        notes: "none",
+      },
+    ],
+  });
 }
 
 export async function removeDishToOrder(pedidoId, dish) {
-    return await apiClient(`/orders/${pedidoId}/dishes/${dish}`, {
-        method: 'DELETE',
-    })
+  return await apiClient(`/orders/${pedidoId}/dishes/${dish}`, {
+    method: "DELETE",
+  });
 }
 
 export async function getDishesByOrder(orderId) {
-    const dishes = await apiClient(`/orders/${orderId}/dishes`);
-    return dishes ? dishes : [];
+  const dishes = await apiClient(`/orders/${orderId}/dishes`);
+  return dishes ? dishes : [];
 }
 
 /*export async function createOrder(pin, tableId = null) {
@@ -125,83 +124,83 @@ export async function getDishesByOrder(orderId) {
 }*/
 
 export async function updateOrder(order) {
-    return await apiClient(`/orders/${order.id}`, {
-        method: 'PUT',
-        body: order,
-    });
+  return await apiClient(`/orders/${order.id}`, {
+    method: "PUT",
+    body: order,
+  });
 }
 
 export async function updateTable(table) {
-    table.status = "available"
-    table.order_id = null
-    return await apiClient(`/tables/${table.id}`, {
-        method: 'PUT',
-        body: table,
-    });
+  table.status = "available";
+  table.order_id = null;
+  return await apiClient(`/tables/${table.id}`, {
+    method: "PUT",
+    body: table,
+  });
 }
 
 export async function addTicket(ticket) {
-    return await apiClient('/tickets', {
-        method: 'POST',
-        body: ticket,
-    });
+  return await apiClient("/tickets", {
+    method: "POST",
+    body: ticket,
+  });
 }
 
 export async function updateTicket(ticketId, updatedTicket) {
-    return await apiClient(`/tickets/${ticketId}`, {
-        method: 'PATCH',
-        body: updatedTicket,
-    });
+  return await apiClient(`/tickets/${ticketId}`, {
+    method: "PATCH",
+    body: updatedTicket,
+  });
 }
 
 export async function getTicketByOrderId(orderId) {
-    return await apiClient(`/get-ticket-by-order-id/${orderId}`, {});
+  return await apiClient(`/get-ticket-by-order-id/${orderId}`, {});
 }
 
 export async function createTicket(ticket) {
-    return await apiClient('/tickets', {
-        method: 'POST',
-        body: ticket,
-    })
+  return await apiClient("/tickets", {
+    method: "POST",
+    body: ticket,
+  });
 }
 
-export async function createPayment(payment){
-    return await apiClient('/payments', {
-        method: 'POST',
-        body: payment,
-    })
+export async function createPayment(payment) {
+  return await apiClient("/payments", {
+    method: "POST",
+    body: payment,
+  });
 }
 
-export async function addPaymentToTicket(ticketId, paymentId){
-    return await apiClient('/payments/ticket-payments', {
-        method: 'POST',
-        body:{
-            payment_id: paymentId,
-            ticket_id: ticketId,
-        }
-    })
+export async function addPaymentToTicket(ticketId, paymentId) {
+  return await apiClient("/payments/ticket-payments", {
+    method: "POST",
+    body: {
+      payment_id: paymentId,
+      ticket_id: ticketId,
+    },
+  });
 }
 
-export async function getPaymentMethods(){
-    const paymentMethods = await apiClient('/payments/methods');
-    return paymentMethods ? paymentMethods : [];
+export async function getPaymentMethods() {
+  const paymentMethods = await apiClient("/payments/methods");
+  return paymentMethods ? paymentMethods : [];
 }
 
-export async function getPaymentCurrencies(){
-    const paymentCurrencies = await apiClient('/payments/currencies');
-    return paymentCurrencies ? paymentCurrencies : [];
+export async function getPaymentCurrencies() {
+  const paymentCurrencies = await apiClient("/payments/currencies");
+  return paymentCurrencies ? paymentCurrencies : [];
 }
 
-export async function getTickets(){
-    const tickets = await apiClient('/tickets');
-    return tickets ? tickets : [];
+export async function getTickets() {
+  const tickets = await apiClient("/tickets");
+  return tickets ? tickets : [];
 }
 
-export async function getPayments(){
-    const payments = await apiClient('/payments');
-    return payments ? payments : [];
+export async function getPayments() {
+  const payments = await apiClient("/payments");
+  return payments ? payments : [];
 }
 
-export async function getPaymentByTicketId(id){
-    return await apiClient(`/payments/ticket-payments/by-ticket/${id}`);
+export async function getPaymentByTicketId(id) {
+  return await apiClient(`/payments/ticket-payments/by-ticket/${id}`);
 }

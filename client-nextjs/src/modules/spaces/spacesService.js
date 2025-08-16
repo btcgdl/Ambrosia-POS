@@ -36,6 +36,7 @@ export async function getTables() {
 }
 
 export async function addTable(table) {
+  console.log(table);
   return await apiClient("/tables", {
     method: "POST",
     body: table,

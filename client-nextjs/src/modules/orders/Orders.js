@@ -262,6 +262,7 @@ export default function Orders() {
                   className="flex-1"
                 />
                 <Select
+                  aria-label="Rows per page"
                   placeholder="Filas por página"
                   selectedKeys={[rowsPerPage.toString()]}
                   onSelectionChange={(keys) => {

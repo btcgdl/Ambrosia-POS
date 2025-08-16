@@ -3,9 +3,19 @@ export const modules = {
     enabled: true,
     name: "Autenticación",
     routes: [
-      { path: "/auth", component: "PinLogin" },
-      { path: "/roles", component: "Roles" },
-      { path: "/users", component: "Users" },
+      { path: "/auth", component: "PinLogin", requiresAuth: false },
+      {
+        path: "/roles",
+        component: "Roles",
+        requiresAuth: true,
+        requiresAdmin: true,
+      },
+      {
+        path: "/users",
+        component: "Users",
+        requiresAuth: true,
+        requiresAdmin: true,
+      },
     ],
     services: () => import("../modules/auth/authService"),
     navItems: [
@@ -26,7 +36,14 @@ export const modules = {
   dishes: {
     enabled: true,
     name: "Platillos",
-    routes: [{ path: "/dishes", component: "Dishes" }],
+    routes: [
+      {
+        path: "/dishes",
+        component: "Dishes",
+        requiresAuth: true,
+        requiresAdmin: true,
+      },
+    ],
     services: () => import("../modules/dishes/dishesService"),
     navItems: [
       {
@@ -41,10 +58,30 @@ export const modules = {
     enabled: true,
     name: "Wallet",
     routes: [
-      { path: "/open-turn", component: "OpenTurn" },
-      { path: "/close-turn", component: "CloseTurn" },
-      { path: "/reports", component: "Reports" },
-      { path: "/wallet", component: "Wallet" },
+      {
+        path: "/open-turn",
+        component: "OpenTurn",
+        requiresAuth: true,
+        requiresAdmin: false,
+      },
+      {
+        path: "/close-turn",
+        component: "CloseTurn",
+        requiresAuth: true,
+        requiresAdmin: false,
+      },
+      {
+        path: "/reports",
+        component: "Reports",
+        requiresAuth: true,
+        requiresAdmin: true,
+      },
+      {
+        path: "/wallet",
+        component: "Wallet",
+        requiresAuth: true,
+        requiresAdmin: true,
+      },
     ],
     services: () => import("../modules/cashier/cashierService"),
     navItems: [
@@ -66,8 +103,18 @@ export const modules = {
     enabled: true,
     name: "Ordenes",
     routes: [
-      { path: "/all-orders", component: "Orders" },
-      { path: "/modify-order/:pedidoId", component: "EditOrder" },
+      {
+        path: "/all-orders",
+        component: "Orders",
+        requiresAuth: true,
+        requiresAdmin: false,
+      },
+      {
+        path: "/modify-order/:pedidoId",
+        component: "EditOrder",
+        requiresAuth: true,
+        requiresAdmin: false,
+      },
     ],
     services: () => import("../modules/orders/ordersService"),
     navItems: [
@@ -83,9 +130,24 @@ export const modules = {
     enabled: true,
     name: "Salas",
     routes: [
-      { path: "/rooms", component: "Rooms" },
-      { path: "/tables/:roomId", component: "Tables" },
-      { path: "/spaces", component: "Spaces" },
+      {
+        path: "/rooms",
+        component: "Rooms",
+        requiresAuth: true,
+        requiresAdmin: true,
+      },
+      {
+        path: "/tables/:roomId",
+        component: "Tables",
+        requiresAuth: true,
+        requiresAdmin: false,
+      },
+      {
+        path: "/spaces",
+        component: "Spaces",
+        requiresAuth: true,
+        requiresAdmin: true,
+      },
     ],
     services: () => import("../modules/spaces/spacesService"),
     navItems: [
