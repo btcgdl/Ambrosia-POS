@@ -48,8 +48,8 @@ fun Route.suppliers(supplierService: SupplierService) {
     }
     post("") {
       val supplier = call.receive<Supplier>()
-      supplierService.addSupplier(supplier)
-      call.respond(HttpStatusCode.Created, "Supplier added successfully")
+      val createdId = supplierService.addSupplier(supplier)
+      call.respond(HttpStatusCode.Created, mapOf("id" to createdId, "message" to "Supplier added successfully"))
     }
     put("/{id}") {
       val id = call.parameters["id"]
@@ -59,15 +59,15 @@ fun Route.suppliers(supplierService: SupplierService) {
       }
 
       val updatedSupplier = call.receive<Supplier>()
-      val isUpdated = supplierService.updateSupplier(updatedSupplier)
+      val isUpdated = supplierService.updateSupplier(updatedSupplier.copy(id = id))
       logger.info(isUpdated.toString())
 
       if (!isUpdated) {
-        call.respond(HttpStatusCode.NotFound, "Supplier not found")
+        call.respond(HttpStatusCode.NotFound, "Supplier with ID: $id not found")
         return@put
       }
 
-      call.respond(HttpStatusCode.OK, "Supplier updated successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Supplier updated successfully"))
     }
     delete("/{id}") {
       val id = call.parameters["id"]
@@ -82,7 +82,7 @@ fun Route.suppliers(supplierService: SupplierService) {
         return@delete
       }
 
-      call.respond(HttpStatusCode.OK, "Supplier deleted successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Supplier deleted successfully"))
     }
   }
 }

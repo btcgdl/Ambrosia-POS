@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import jwt from "jsonwebtoken";
 import { getRoleName, getUsers, loginFromService } from "./authService";
 import { ChefHat, Delete, LogIn, Users, Trash2 } from "lucide-react";
 import {
@@ -15,6 +16,9 @@ import {
   Select,
   SelectItem,
 } from "@heroui/react";
+import { useAuth } from "./useAuth";
+import { getCookie } from "./../../lib/utils";
+import { useRouter } from "next/navigation";
 export default function PinLoginNew() {
   const [pin, setPin] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
@@ -29,6 +33,8 @@ export default function PinLoginNew() {
       avatar: "MG",
     },
   ]);
+  const { login, logout } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     async function getUsersFromService() {
@@ -87,7 +93,13 @@ export default function PinLoginNew() {
     const employee = employees.find((emp) => emp.id === selectedUser);
 
     setTimeout(async () => {
-      if (await loginFromService({ name: employee.name, pin })) {
+      try {
+        await loginFromService({ name: employee.name, pin });
+        const accessToken = getCookie("accessToken");
+        const decodedToken = jwt.decode(accessToken);
+        localStorage.setItem("userId", decodedToken.userId);
+        localStorage.setItem("roleId", decodedToken.role);
+        localStorage.setItem("username", employee.name);
         addToast({
           title: "Inicio de sesión exitoso",
           description: `¡Bienvenido ${employee.name}! Acceso concedido como ${employee.role}.`,
@@ -95,10 +107,13 @@ export default function PinLoginNew() {
         });
         setPin("");
         setSelectedUser("");
-      } else {
+        login();
+        router.push("/");
+        setIsLoading(false);
+      } catch (error) {
         setError("PIN incorrecto para el empleado seleccionado.");
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }, 1000);
   };
 

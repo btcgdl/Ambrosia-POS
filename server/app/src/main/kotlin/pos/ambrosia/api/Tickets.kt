@@ -49,7 +49,7 @@ fun Route.tickets(ticketService: TicketService) {
     post("") {
       val ticket = call.receive<Ticket>()
       val generatedId = ticketService.addTicket(ticket)
-      call.respond(HttpStatusCode.Created, mapOf("id" to generatedId))
+      call.respond(HttpStatusCode.Created, mapOf("id" to generatedId, "message" to "Ticket added successfully"))
     }
     put("/{id}") {
       val id = call.parameters["id"]
@@ -59,15 +59,15 @@ fun Route.tickets(ticketService: TicketService) {
       }
 
       val updatedTicket = call.receive<Ticket>()
-      val isUpdated = ticketService.updateTicket(updatedTicket)
+      val isUpdated = ticketService.updateTicket(updatedTicket.copy(id = id))
       logger.info(isUpdated.toString())
 
       if (!isUpdated) {
-        call.respond(HttpStatusCode.NotFound, "Ticket not found")
+        call.respond(HttpStatusCode.NotFound, "Ticket with ID: $id not found")
         return@put
       }
 
-      call.respond(HttpStatusCode.OK, "Ticket updated successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Ticket updated successfully"))
     }
     delete("/{id}") {
       val id = call.parameters["id"]
@@ -82,7 +82,7 @@ fun Route.tickets(ticketService: TicketService) {
         return@delete
       }
 
-      call.respond(HttpStatusCode.OK, "Ticket deleted successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Ticket deleted successfully"))
     }
   }
 }

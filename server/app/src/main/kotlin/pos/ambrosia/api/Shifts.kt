@@ -50,7 +50,7 @@ fun Route.shifts(shiftService: ShiftService) {
     post("") {
       val shift = call.receive<Shift>()
       val createdShift = shiftService.addShift(shift)
-      call.respond(HttpStatusCode.Created, mapOf("shiftId" to createdShift))
+      call.respond(HttpStatusCode.Created, mapOf("id" to createdShift, "message" to "Shift added successfully"))
     }
     put("/{id}") {
       val id = call.parameters["id"]
@@ -60,15 +60,15 @@ fun Route.shifts(shiftService: ShiftService) {
       }
 
       val updatedShift = call.receive<Shift>()
-      val isUpdated = shiftService.updateShift(updatedShift)
+      val isUpdated = shiftService.updateShift(updatedShift.copy(id = id))
       logger.info(isUpdated.toString())
 
       if (!isUpdated) {
-        call.respond(HttpStatusCode.NotFound, "Shift not found")
+        call.respond(HttpStatusCode.NotFound, "Shift with ID: $id not found")
         return@put
       }
 
-      call.respond(HttpStatusCode.OK, "Shift updated successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Shift updated successfully"))
     }
     delete("/{id}") {
       val id = call.parameters["id"]
@@ -83,7 +83,7 @@ fun Route.shifts(shiftService: ShiftService) {
         return@delete
       }
 
-      call.respond(HttpStatusCode.OK, "Shift deleted successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Shift deleted successfully"))
     }
   }
 }

@@ -396,6 +396,7 @@ export default function Wallet() {
                         </span>
                       </div>
                       <Progress
+                        aria-label="Balance Channel"
                         value={(channel.balanceSat / channel.capacitySat) * 100}
                         className="max-w-full"
                         color="primary"
