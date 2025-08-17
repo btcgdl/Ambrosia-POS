@@ -91,7 +91,8 @@ export default function Spaces() {
         ...roomForm,
         capacity: roomForm.capacity ? parseInt(roomForm.capacity) : null,
       };
-      await addRoom(roomData);
+      console.log(roomData.name);
+      await addRoom({ name: roomData.name });
       await fetchRooms();
       setShowRoomModal(false);
       setRoomForm({ name: "", description: "", capacity: "" });
@@ -208,7 +209,9 @@ export default function Spaces() {
     setShowDeleteModal(true);
   };
 
-  const selectedRoom = rooms.find((r) => r.id === selectedRoomId) || null;
+  const selectedRoom = selectedRoomId
+    ? rooms.find((r) => r.id === selectedRoomId)
+    : null;
 
   if (isLoading && rooms.length === 0) {
     return (
@@ -339,11 +342,6 @@ export default function Spaces() {
                       <Card
                         key={room.id}
                         className="border hover:shadow-md transition-shadow cursor-pointer"
-                        isPressable
-                        onPress={() => {
-                          setSelectedRoomId(room.id);
-                          setActiveTab("tables");
-                        }}
                       >
                         <CardBody className="p-4">
                           <div className="flex justify-between items-start mb-3">
@@ -378,8 +376,7 @@ export default function Spaces() {
                               variant="outline"
                               color="primary"
                               size="sm"
-                              onPress={(e) => {
-                                e.stopPropagation();
+                              onPress={() => {
                                 setSelectedRoomId(room.id);
                                 setActiveTab("tables");
                               }}
@@ -393,7 +390,6 @@ export default function Spaces() {
                                 color="primary"
                                 size="sm"
                                 onPress={(e) => {
-                                  e.stopPropagation();
                                   openEditModal(room);
                                 }}
                                 disabled={isLoading}
@@ -496,7 +492,9 @@ export default function Spaces() {
         <Modal
           isOpen={showRoomModal}
           onClose={() => setShowRoomModal(false)}
+          className="bg-white ring-2 ring-gray-300 shadow-2xl"
           size="lg"
+          backdrop="blur"
         >
           <ModalContent>
             <ModalHeader>

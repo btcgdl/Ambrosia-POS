@@ -86,10 +86,9 @@ export default function TableAdmin({ room }) {
     try {
       setIsLoading(true);
       const tableData = {
-        ...tableForm,
+        name: tableForm.name,
         space_id: room.id,
-        order_id: null,
-        capacity: tableForm.capacity ? parseInt(tableForm.capacity) : null,
+        // capacity: tableForm.capacity ? parseInt(tableForm.capacity) : null,
       };
       await addTable(tableData);
       await fetchTables();
@@ -129,9 +128,12 @@ export default function TableAdmin({ room }) {
       setIsLoading(true);
       const tableData = {
         ...editingTable,
-        ...tableForm,
-        capacity: tableForm.capacity ? parseInt(tableForm.capacity) : null,
+        id: editingTable.id,
+        name: editingTable.name,
+        // ...tableForm,
+        // capacity: tableForm.capacity ? parseInt(tableForm.capacity) : null,
       };
+      console.log(tableData);
       await updateTable(tableData);
       await fetchTables();
       setShowTableModal(false);
@@ -410,6 +412,8 @@ export default function TableAdmin({ room }) {
         isOpen={showTableModal}
         onClose={() => setShowTableModal(false)}
         size="lg"
+        className="bg-white"
+        backdrop="blur"
       >
         <ModalContent>
           <ModalHeader>
@@ -445,7 +449,7 @@ export default function TableAdmin({ room }) {
                 }}
                 required
               />
-              <Input
+              {/* <Input
                 label="Capacidad (opcional)"
                 placeholder="Número de personas"
                 type="number"
@@ -494,7 +498,7 @@ export default function TableAdmin({ room }) {
                     <span>Reservada</span>
                   </div>
                 </SelectItem>
-              </Select>
+              </Select>*/}
             </div>
           </ModalBody>
           <ModalFooter>

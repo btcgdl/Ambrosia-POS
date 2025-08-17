@@ -1,7 +1,7 @@
 "use client";
 import { addToast } from "@heroui/react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = "/api";
 export async function apiClient(
   endpoint,
   { method = "GET", headers = {}, body, credentials = "include" } = {},
@@ -31,7 +31,6 @@ export async function apiClient(
         });
         return;
       }
-      throw new Error(errorMsg);
       const errorMsg =
         typeof data === "string" ? data : data?.message || "Error desconocido";
       console.log(errorMsg);
@@ -46,7 +45,11 @@ export async function apiClient(
     //if (showLog) showLog("success", "Operación exitosa");
     return data;
   } catch (err) {
-    if (showLog && err instanceof Error) showLog("error", err.message);
+    addToast({
+      title: "Error",
+      description: err.message,
+      color: "danger",
+    });
     throw err;
   }
 }

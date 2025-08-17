@@ -1,7 +1,6 @@
 import { apiClient } from "../../services/apiClient";
 
 export async function loginFromService({ name, pin }) {
-  console.log("Logging in...", { name, pin });
   return await apiClient("/auth/login", {
     method: "POST",
     body: { name, pin },
@@ -72,7 +71,6 @@ export async function deleteUser(userId) {
 
 export async function getRoleName(roleId) {
   const role = await apiClient(`/roles/${roleId}`);
-  console.log(role);
   return role ? role.role : null;
 }
 

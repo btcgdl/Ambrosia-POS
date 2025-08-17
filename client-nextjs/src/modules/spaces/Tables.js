@@ -78,7 +78,6 @@ export default function Tables({ dynamicParams }) {
           addToast({
             title: "Mesa Abierta",
             description: `Mesa ${table.name} abierta exitosamente`,
-            variant: "solid",
             color: "success",
           });
 
@@ -170,7 +169,7 @@ export default function Tables({ dynamicParams }) {
             <div className="flex items-center justify-between w-full">
               <Button
                 variant="ghost"
-                onPress={() => router.push("/spaces")}
+                onPress={() => router.push("/")}
                 className="text-forest hover:bg-mint/20"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
@@ -230,9 +229,8 @@ export default function Tables({ dynamicParams }) {
                       color={getTableStatusColor(table.status)}
                       variant="flat"
                       className="px-3 py-1"
-                    >
-                      {getTableStatusText(table.status)}
-                    </Badge>
+                      content={getTableStatusText(table.status)}
+                    />
 
                     {/* Capacity if available */}
                     {table.capacity && (

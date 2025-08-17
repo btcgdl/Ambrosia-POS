@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import RoomList from "./RoomList";
 import RoomForm from "./RoomForm";
 import TableAdmin from "./TableAdmin";
+import LoadingCard from "../LoadingCard";
 import {
   getRooms,
   addRoom,
@@ -73,7 +74,7 @@ export default function RoomAdmin() {
     : [];
 
   if (isLoading) {
-    return <div className="p-4 text-2xl">Cargando salas...</div>;
+    return <LoadingCard message="Cargando salas..." />;
   }
 
   if (error && rooms.length === 0) {

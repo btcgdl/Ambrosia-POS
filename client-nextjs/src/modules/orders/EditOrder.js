@@ -19,10 +19,11 @@ import {
 } from "./ordersService";
 import { getCategories, getDishes } from "../dishes/dishesService";
 import ConfirmationPopup from "../../components/ConfirmationPopup";
+import LoadingCard from "../../components/LoadingCard";
 import BitcoinPriceService from "../../services/bitcoinPriceService";
 import { apiClient } from "../../services/apiClient";
 import { createInvoice } from "../cashier/cashierService";
-import QRCode from "react-qr-code";
+import { QRCode } from "react-qr-code";
 import { useRouter } from "next/navigation";
 import {
   ChefHat,
@@ -36,6 +37,7 @@ import {
   Bitcoin,
   DollarSign,
   Receipt,
+  CheckCircle,
 } from "lucide-react";
 import {
   Card,
@@ -44,11 +46,6 @@ import {
   Button,
   Badge,
   Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Select,
   SelectItem,
   Divider,
@@ -329,18 +326,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
   );
 
   if (isLoading && !order) {
-    return (
-      <div className="min-h-screen gradient-fresh flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-2xl border-0 bg-white">
-          <CardBody className="flex flex-col items-center justify-center py-12">
-            <Spinner size="lg" color="success" />
-            <p className="text-lg font-semibold text-deep mt-4">
-              Cargando pedido...
-            </p>
-          </CardBody>
-        </Card>
-      </div>
-    );
+    return <LoadingCard message="Cargando pedido..." />;
   }
 
   if (error && !order) {
@@ -408,8 +394,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                     {order?.waiter || "Mesero"}
                   </div>
                   <div className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-                    <DollarSign className="w-3 h-3 mr-1" />$
-                    {order?.total ? order.total.toFixed(2) : "0.00"}
+                    $ {order?.total ? order.total.toFixed(2) : "0.00"}
                   </div>
                 </div>
               </div>
@@ -507,7 +492,12 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                     orderDishes.map((item) => {
                       const dish = dishes.find((d) => d.id === item.dish_id);
                       return (
-                        <Card key={item.id} className="border">
+                        <Card
+                          key={item.id}
+                          className="border w-full"
+                          isPressable
+                          onPress={() => handleRemoveDish(item.id)}
+                        >
                           <CardBody className="p-4">
                             <div className="flex justify-between items-center">
                               <div className="flex-1">
@@ -519,15 +509,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                                 </div>
                               </div>
                               {order && order.status === "open" && (
-                                <Button
-                                  variant="outline"
-                                  color="danger"
-                                  size="sm"
-                                  onPress={() => handleRemoveDish(item.id)}
-                                  disabled={isLoading}
-                                >
-                                  <Minus className="w-4 h-4" />
-                                </Button>
+                                <Minus className="w-4 h-4" />
                               )}
                             </div>
                           </CardBody>
@@ -553,7 +535,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                   {order?.status === "open" && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         color="primary"
                         size="lg"
                         onPress={() => setShowPaymentMethodDialog(true)}
@@ -564,7 +546,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                         Cerrar Pedido
                       </Button>
                       <Button
-                        variant="outline"
+                        variant="bordered"
                         color="warning"
                         size="lg"
                         onPress={() => handleUndo()}
@@ -630,111 +612,153 @@ export default function EditOrder({ dynamicParams, searchParams }) {
           </div>
         </div>
 
-        {/* Modales */}
-        <Modal
+        {/* Modal de Método de Pago */}
+        <ConfirmationPopup
           isOpen={showPaymentMethodDialog}
-          onClose={handleCancelDialog}
-          size="2xl"
-        >
-          <ModalContent>
-            <ModalHeader>
-              <div className="flex items-center space-x-2">
-                <CreditCard className="w-5 h-5 text-forest" />
-                <span>Seleccionar Método de Pago</span>
-              </div>
-            </ModalHeader>
-            <ModalBody>
+          title="Seleccionar Método de Pago"
+          hideDefaultButtons={true}
+          type="info"
+          customBody={
+            <div className="space-y-6">
+              {/* Grid de métodos de pago */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {paymentMethods.map((method) => (
-                  <Button
+                  <button
                     key={method.id}
-                    variant={
-                      selectedPaymentMethod === method.id ? "solid" : "outline"
-                    }
-                    color="primary"
-                    size="lg"
-                    onPress={() => handlePaymentMethodSelect(method.id)}
-                    className={`h-16 ${selectedPaymentMethod === method.id ? "gradient-forest text-white" : ""}`}
+                    className={`group relative py-6 px-6 rounded-xl border-2 transition-all duration-200 touch-manipulation ${
+                      selectedPaymentMethod === method.id
+                        ? "border-green-500 bg-green-50 shadow-lg scale-105"
+                        : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md hover:scale-102"
+                    }`}
+                    onClick={() => handlePaymentMethodSelect(method.id)}
                   >
-                    <div className="flex items-center space-x-2">
-                      <span>{getPaymentIcon(method.name)}</span>
-                      <span>{method.name}</span>
+                    <div className="flex flex-col items-center gap-3">
+                      <div
+                        className={`text-3xl transition-transform group-hover:scale-110 ${
+                          selectedPaymentMethod === method.id
+                            ? "transform scale-110"
+                            : ""
+                        }`}
+                      >
+                        {getPaymentIcon(method.name)}
+                      </div>
+                      <span
+                        className={`font-semibold text-lg ${
+                          selectedPaymentMethod === method.id
+                            ? "text-green-700"
+                            : "text-gray-700"
+                        }`}
+                      >
+                        {method.name}
+                      </span>
                     </div>
-                  </Button>
+
+                    {/* Indicador de selección */}
+                    {selectedPaymentMethod === method.id && (
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-4 h-4 text-white" />
+                      </div>
+                    )}
+                  </button>
                 ))}
               </div>
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                variant="outline"
-                color="danger"
-                onPress={handleCancelDialog}
-              >
-                Cancelar
-              </Button>
-              <Button
-                variant="solid"
-                color="success"
-                onPress={handleConfirmPaymentMethod}
-                disabled={!selectedPaymentMethod || isLoading}
-                className="gradient-forest text-white"
-              >
-                {isLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <Spinner size="sm" color="white" />
-                    <span>Procesando...</span>
-                  </div>
-                ) : (
-                  "Confirmar Pago"
-                )}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
 
-        <Modal isOpen={!!createdInvoice} onClose={handleCancelDialog} size="lg">
-          <ModalContent>
-            <ModalHeader>
-              <div className="flex items-center space-x-2">
-                <Bitcoin className="w-5 h-5 text-forest" />
-                <span>Pago con Bitcoin</span>
+              {/* Botones de acción */}
+              <div className="flex gap-4 pt-4 border-t border-gray-100">
+                <button
+                  className="flex-1 py-3 px-6 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors font-medium touch-manipulation"
+                  onClick={handleCancelDialog}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="flex-1 py-3 px-6 bg-green-500 text-white rounded-lg hover:bg-green-600 active:bg-green-700 transition-colors font-medium touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed gradient-forest"
+                  onClick={handleConfirmPaymentMethod}
+                  disabled={!selectedPaymentMethod || isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Procesando...</span>
+                    </div>
+                  ) : (
+                    "Confirmar Pago"
+                  )}
+                </button>
               </div>
-            </ModalHeader>
-            <ModalBody>
+            </div>
+          }
+          onClose={handleCancelDialog}
+        />
+
+        {/* Modal de Pago Bitcoin */}
+        {createdInvoice && (
+          <ConfirmationPopup
+            isOpen={!!createdInvoice}
+            title="Pago con Bitcoin"
+            hideDefaultButtons={true}
+            type="info"
+            customBody={
               <div className="flex flex-col items-center space-y-6">
-                <div className="bg-white p-4 rounded-lg shadow-sm border">
-                  <QRCode value={createdInvoice?.serialized} size={200} />
-                </div>
+                {/* Header con ícono */}
                 <div className="text-center">
-                  <p className="text-deep font-semibold mb-2">
-                    Escanea el código QR para realizar el pago
+                  <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Bitcoin className="w-8 h-8 text-yellow-600" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-deep mb-2">
+                    Solicita al cliente que escanee el código QR
+                  </h4>
+                  <p className="text-gray-600 text-sm">
+                    El cliente debe usar su billetera Bitcoin para completar el
+                    pago
                   </p>
-                  <p className="text-forest text-sm">
-                    El cliente debe escanear este código con su billetera
-                    Bitcoin
+                </div>
+
+                {/* QR Code con marco elegante */}
+                <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                  <QRCode
+                    value={createdInvoice?.serialized || ""}
+                    size={220}
+                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                  />
+                </div>
+
+                {/* Información del monto */}
+                <div className="bg-gray-50 rounded-lg p-4 w-full text-center">
+                  <p className="text-sm text-gray-600">
+                    Monto total del pedido
                   </p>
+                  <p className="text-2xl font-bold text-deep">
+                    ${order?.total?.toFixed(2) || "0.00"}
+                  </p>
+                </div>
+
+                {/* Botones de acción mejorados */}
+                <div className="flex gap-4 w-full pt-2">
+                  <button
+                    className="flex-1 py-4 px-6 border-2 border-red-200 text-red-600 rounded-xl hover:bg-red-50 hover:border-red-300 active:bg-red-100 transition-all font-semibold touch-manipulation"
+                    onClick={handlePaymentCancel}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <span>❌</span>
+                      <span>No Pagó</span>
+                    </div>
+                  </button>
+                  <button
+                    className="flex-1 py-4 px-6 bg-green-500 text-white rounded-xl hover:bg-green-600 active:bg-green-700 transition-all font-semibold touch-manipulation gradient-forest"
+                    onClick={handlePaymentConfirm}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      <span>Confirmar Pago</span>
+                    </div>
+                  </button>
                 </div>
               </div>
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                variant="outline"
-                color="danger"
-                onPress={handlePaymentCancel}
-              >
-                No Pagó
-              </Button>
-              <Button
-                variant="solid"
-                color="success"
-                onPress={handlePaymentConfirm}
-                className="gradient-forest text-white"
-              >
-                Confirmar Pago
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+            }
+            onClose={handleCancelDialog}
+          />
+        )}
       </div>
     </div>
   );

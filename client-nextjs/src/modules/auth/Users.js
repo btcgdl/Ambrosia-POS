@@ -323,6 +323,7 @@ export default function Users() {
                   />
 
                   <Select
+                    aria-label="Rol del Usuario"
                     label="Rol del Usuario"
                     placeholder="Selecciona un rol"
                     selectedKeys={form.role ? [form.role] : []}
@@ -342,7 +343,11 @@ export default function Users() {
                     disabled={isLoading || roles.length === 0}
                   >
                     {roles.map((role) => (
-                      <SelectItem key={role.id} value={role.id}>
+                      <SelectItem
+                        key={role.id}
+                        value={role.id}
+                        aria-label={role.role}
+                      >
                         <div className="flex items-center space-x-2">
                           <span>{role.role}</span>
                           {role.isAdmin && (

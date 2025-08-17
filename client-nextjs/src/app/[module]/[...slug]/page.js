@@ -1,6 +1,7 @@
 import { findRouteConfig, modules } from "../../../lib/modules";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
+import LoadingCard from "../../../components/LoadingCard";
 
 export default async function ModuleSubPage({ params, searchParams }) {
   const { module, slug } = await params;
@@ -41,7 +42,7 @@ export default async function ModuleSubPage({ params, searchParams }) {
         `../../../modules/${componentPath}/${routeConfig.route.component}`
       ),
     {
-      loading: () => <div>Cargando...</div>,
+      loading: () => <LoadingCard message="Cargando componente..." />,
       ssr: true,
     },
   );

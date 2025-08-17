@@ -1,11 +1,14 @@
 ﻿"use client";
 import React, { createContext, useEffect, useRef } from "react";
-import { RefreshToken } from "./authService";
+import { logoutFromService, RefreshToken } from "./authService";
+import { useJwtAuth } from "../../hooks/useJwtAuth";
+import { apiClient } from "../../services/apiClient";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const intervalRef = useRef(null);
+  const jwtAuth = useJwtAuth();
 
   const refreshToken = async () => {
     try {
@@ -22,13 +25,12 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    refreshToken();
-
+    // Refresh cada 4 minutos (simple y predecible)
     intervalRef.current = setInterval(() => {
       refreshToken();
-    }, 298000);
+    }, 240000); // 4 minutos
 
-    console.log("⏱️ Token refresher iniciado");
+    console.log("⏱️ Token refresher iniciado cada 4 minutos");
   };
 
   const stopTokenRefresh = () => {
@@ -41,10 +43,15 @@ export function AuthProvider({ children }) {
 
   const login = () => {
     startTokenRefresh();
+    // También activar el sistema JWT
+    jwtAuth.checkAuthStatus();
   };
 
-  const logout = () => {
+  const logout = async () => {
     stopTokenRefresh();
+    // También limpiar el sistema JWT
+    await logoutFromService();
+    jwtAuth.logout();
   };
 
   useEffect(() => {
@@ -56,6 +63,12 @@ export function AuthProvider({ children }) {
   const value = {
     login,
     logout,
+    // Exponer funcionalidades JWT
+    user: jwtAuth.user,
+    isAuthenticated: jwtAuth.isAuthenticated,
+    isLoading: jwtAuth.isLoading,
+    refreshTokens: jwtAuth.refreshTokens,
+    checkAuthStatus: jwtAuth.checkAuthStatus,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

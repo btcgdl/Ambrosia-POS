@@ -24,6 +24,9 @@ export default function Rooms() {
       try {
         setIsLoading(true);
         const response = await getRooms();
+        if (response === undefined) {
+          response = 0;
+        }
         setRooms(response);
       } catch (err) {
         setError("Error al cargar las salas");
