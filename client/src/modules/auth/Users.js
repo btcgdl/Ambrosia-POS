@@ -364,13 +364,13 @@ export default function Users() {
                   <Input
                     name="pin"
                     label="PIN de Acceso"
-                    placeholder="4-6 dígitos"
+                    placeholder="4 dígitos"
                     type={showPin ? "text" : "password"}
                     value={form.pin}
                     onChange={handleChange}
                     variant="bordered"
                     size="lg"
-                    maxLength={6}
+                    maxLength={4}
                     startContent={<Hash className="w-4 h-4 text-gray-400" />}
                     endContent={
                       <Button

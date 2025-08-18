@@ -244,7 +244,7 @@ export default function PinLoginNew() {
                 value={pin}
                 readOnly
                 size="lg"
-                placeholder="••••"
+                placeholder="----"
                 maxLength={4}
               />
             </div>
