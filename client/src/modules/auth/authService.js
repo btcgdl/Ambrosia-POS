@@ -71,7 +71,6 @@ export async function deleteUser(userId) {
 
 export async function getRoleName(roleId) {
   const role = await apiClient(`/roles/${roleId}`);
-  console.log(role);
   return role ? role.role : null;
 }
 

@@ -39,38 +39,7 @@ curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/
 ```
 
 ## Scripts de Desarrollo
-
-### Cliente (Frontend - React/Electron)
-
-Para instalar las dependencias del cliente, ejecuta:
-
-```sh
-cd client
-npm install
-```
-
-Antes de iniciar el entorno de desarrollo, crea un archivo `.env` dentro de la carpeta `client/` con la siguiente variable:
-
-```
-REACT_APP_API_BASE_URL=http://127.0.0.1:9154
-```
-
-- Si estás trabajando directamente en Linux, usa `http://127.0.0.1:9154`.
-- Si estás usando WSL, coloca la IP correspondiente a tu entorno de WSL (puedes obtenerla con `ip addr`, suele ser una IP tipo `172.x.x.x`). Ejemplo:
-
-```
-REACT_APP_API_BASE_URL=http://172.18.223.141:9154
-```
-
-Luego, inicia el entorno de desarrollo del cliente con:
-
-```sh
-HOST="127.0.0.1" npm start
-```
-
 ### Servidor (Backend - Kotlin/Gradle)
-
-**Desarrollo**
 
 Para ejecutar el servidor en modo de desarrollo dirígete a `server/` y ejecuta:
 
@@ -78,26 +47,16 @@ Para ejecutar el servidor en modo de desarrollo dirígete a `server/` y ejecuta:
 ./gradlew run
 ```
 
-**Producción**
+### Cliente (Frontend - React/Electron)
 
-Para desplegar en producción, primero construye el JAR:
-
-```sh
-./gradlew jar
-```
-
-Esto generará `ambrosia.jar` en `server/app/build/libs/`. Copia este archivo junto con el script `scripts/run-server.sh` a tu servidor de producción.
-
-Para ejecutar en producción:
+Para instalar las dependencias del cliente dirígete a `client/` y ejecuta:
 
 ```sh
-chmod +x run-server.sh
-./run-server.sh
+npm install
 ```
 
-El script automáticamente:
-- Busca el archivo `ambrosia.jar` en el directorio actual
-- Configura el logging usando `$HOME/.Ambrosia-POS/Ambrosia-Logs.xml` si existe
-- Ejecuta la aplicación con las opciones JVM apropiadas
+Luego, inicia el entorno de desarrollo del cliente con:
 
-Para configuración adicional o servicios systemd, consulta la documentación de deployment del proyecto.
+```sh
+npm run dev
+```

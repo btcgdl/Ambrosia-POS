@@ -1,19 +1,11 @@
-import {getLogger} from "../utils/loggerStore";
+"use client";
+import { addToast } from "@heroui/react";
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const API_BASE_URL = "/api";
 export async function apiClient(
-    endpoint,
-    {
-      method = "GET",
-      headers = {},
-      body,
-      credentials = "include",
-    } = {}
+  endpoint,
+  { method = "GET", headers = {}, body, credentials = "include" } = {},
 ) {
-
-  const showLog = getLogger();
-  if (showLog) showLog("loading", "Cargando...");
-
   try {
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
       method,
@@ -26,19 +18,38 @@ export async function apiClient(
     });
 
     const contentType = res.headers.get("content-type");
-    const data = contentType?.includes("application/json") ? await res.json() : await res.text();
+    const data = contentType?.includes("application/json")
+      ? await res.json()
+      : await res.text();
 
     if (!res.ok) {
-      const errorMsg = typeof data === "string" ? data : data?.data || "Error desconocido";
-      if (showLog) showLog("error", errorMsg);
+      if (res.status === 403) {
+        addToast({
+          color: "danger",
+          title: "Error",
+          description: "Usuario no autorizado",
+        });
+        return;
+      }
+      const errorMsg =
+        typeof data === "string" ? data : data?.message || "Error desconocido";
+      console.log(errorMsg);
+      addToast({
+        color: "danger",
+        title: "Error",
+        description: errorMsg,
+      });
       throw new Error(errorMsg);
     }
 
     //if (showLog) showLog("success", "Operación exitosa");
-    if (showLog) showLog("endLoading", "")
     return data;
   } catch (err) {
-    if (showLog && err instanceof Error) showLog("error", err.message);
+    addToast({
+      title: "Error",
+      description: err.message,
+      color: "danger",
+    });
     throw err;
   }
 }

@@ -1,17 +1,15 @@
-﻿import { useState } from "react";
-import NavBar from "../../components/navbar/NavBar";
-import Header from "../../components/header/Header";
+"use client";
+import { useState } from "react";
 import { openTurn } from "./cashierService";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { useTurn } from "./useTurn";
-import { getHomeRoute } from "../../utils/getHomeRoute";
 
 export default function OpenTurn() {
   const [initialAmount, setInitialAmount] = useState("1");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const navigate = useNavigate();
+  const navigate = useRouter();
   const { updateTurn } = useTurn();
   const report = {
     date: "1/1/2023",
@@ -44,7 +42,7 @@ export default function OpenTurn() {
     try {
       const response = await openTurn();
       updateTurn(response.shiftId);
-      navigate(getHomeRoute());
+      navigate("/");
     } catch (err) {
       setError(err.message || "Error al abrir el turno");
     } finally {

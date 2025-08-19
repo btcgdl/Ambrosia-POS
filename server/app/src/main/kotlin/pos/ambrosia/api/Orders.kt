@@ -88,8 +88,8 @@ fun Route.orders(orderService: OrderService) {
           return@post
         }
         call.respond(
-                HttpStatusCode.Created,
-                mapOf("message" to "Order added successfully", "id" to orderId)
+          HttpStatusCode.Created,
+          mapOf("id" to orderId, "message" to "Order created successfully")
         )
       } catch (e: Exception) {
         logger.error("Error creating order: ${e.message}")
@@ -116,8 +116,8 @@ fun Route.orders(orderService: OrderService) {
         // Update order total based on dishes
         orderService.updateOrderTotal(orderId)
         call.respond(
-                HttpStatusCode.Created,
-                mapOf("message" to "Order with dishes created successfully", "id" to orderId)
+          HttpStatusCode.Created,
+          mapOf("message" to "Order with dishes created successfully", "id" to orderId)
         )
       } catch (e: Exception) {
         logger.error("Error creating order with dishes: ${e.message}")
@@ -137,10 +137,10 @@ fun Route.orders(orderService: OrderService) {
         val orderWithId = updatedOrder.copy(id = id)
         val isUpdated = orderService.updateOrder(orderWithId)
         if (!isUpdated) {
-          call.respond(HttpStatusCode.NotFound, "Order not found or update failed")
+          call.respond(HttpStatusCode.NotFound, "Order with ID: $id not found")
           return@put
         }
-        call.respond(HttpStatusCode.OK, mapOf("message" to "Order updated successfully"))
+        call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Order updated successfully"))
       } catch (e: Exception) {
         logger.error("Error updating order: ${e.message}")
         call.respond(HttpStatusCode.BadRequest, "Invalid order data")
@@ -160,7 +160,7 @@ fun Route.orders(orderService: OrderService) {
           call.respond(HttpStatusCode.NotFound, "Order not found")
           return@delete
         }
-        call.respond(HttpStatusCode.OK, mapOf("message" to "Order deleted successfully"))
+        call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Order deleted successfully"))
       } catch (e: Exception) {
         logger.error("Error deleting order: ${e.message}")
         call.respond(HttpStatusCode.InternalServerError, "Error deleting order")
@@ -204,14 +204,14 @@ fun Route.orders(orderService: OrderService) {
 
         // Convert DTO to OrderDish objects
         val dishes =
-                dishRequests.map { request ->
-                  OrderDish(
-                          order_id = orderId,
-                          dish_id = request.dish_id,
-                          price_at_order = request.price_at_order,
-                          notes = request.notes
-                  )
-                }
+          dishRequests.map { request ->
+            OrderDish(
+              order_id = orderId,
+              dish_id = request.dish_id,
+              price_at_order = request.price_at_order,
+              notes = request.notes
+            )
+          }
 
         val added = orderService.addDishesToOrder(orderId, dishes)
         if (!added) {
@@ -222,8 +222,8 @@ fun Route.orders(orderService: OrderService) {
         // Update order total
         orderService.updateOrderTotal(orderId)
         call.respond(
-                HttpStatusCode.Created,
-                mapOf("message" to "Dishes added to order successfully")
+          HttpStatusCode.Created,
+          mapOf("orderId" to orderId, "message" to "Dishes added to order successfully")
         )
       } catch (e: Exception) {
         logger.error("Error adding dishes to order: ${e.message}")
@@ -250,7 +250,7 @@ fun Route.orders(orderService: OrderService) {
 
         // Update order total
         orderService.updateOrderTotal(orderId)
-        call.respond(HttpStatusCode.OK, mapOf("message" to "Order dish updated successfully"))
+        call.respond(HttpStatusCode.OK, mapOf("orderId" to orderId, "dishId" to dishId, "message" to "Order dish updated successfully"))
       } catch (e: Exception) {
         logger.error("Error updating order dish: ${e.message}")
         call.respond(HttpStatusCode.BadRequest, "Invalid dish data")
@@ -274,7 +274,7 @@ fun Route.orders(orderService: OrderService) {
 
         // Update order total
         orderService.updateOrderTotal(orderId)
-        call.respond(HttpStatusCode.OK, mapOf("message" to "Dish removed from order successfully"))
+        call.respond(HttpStatusCode.OK, mapOf("orderId" to orderId, "dishId" to dishId, "message" to "Dish removed from order successfully"))
       } catch (e: Exception) {
         logger.error("Error removing order dish: ${e.message}")
         call.respond(HttpStatusCode.InternalServerError, "Error removing order dish")
@@ -298,8 +298,8 @@ fun Route.orders(orderService: OrderService) {
         // Update order total to 0
         orderService.updateOrderTotal(orderId)
         call.respond(
-                HttpStatusCode.OK,
-                mapOf("message" to "All dishes removed from order successfully")
+          HttpStatusCode.OK,
+          mapOf("orderId" to orderId, "message" to "All dishes removed from order successfully")
         )
       } catch (e: Exception) {
         logger.error("Error removing all order dishes: ${e.message}")
@@ -323,8 +323,8 @@ fun Route.orders(orderService: OrderService) {
           return@put
         }
         call.respond(
-                HttpStatusCode.OK,
-                mapOf("message" to "Order total updated successfully", "total" to newTotal)
+          HttpStatusCode.OK,
+          mapOf("message" to "Order total updated successfully", "total" to newTotal)
         )
       } catch (e: Exception) {
         logger.error("Error calculating order total: ${e.message}")

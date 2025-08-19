@@ -1,119 +1,302 @@
+"use client";
 import { useState } from "react";
+import { Plus, Edit, Trash2, Check, X, Tags } from "lucide-react";
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Input,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Divider,
+} from "@heroui/react";
 
-export default function     CategoryManager({ categories, addCategory, deleteCategory, updateCategory}) {
-    const [newCategory, setNewCategory] = useState("");
-    const [editingCategory, setEditingCategory] = useState(null);
-    const [categoryEditValue, setCategoryEditValue] = useState("");
-    const [error, setError] = useState("");
+export default function CategoryManager({
+  categories,
+  addCategory,
+  deleteCategory,
+  updateCategory,
+}) {
+  const [newCategory, setNewCategory] = useState("");
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [categoryEditValue, setCategoryEditValue] = useState("");
+  const [error, setError] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const handleAddCategory = async () => {
-        if (!newCategory) {
-            setError("La categoría no puede estar vacía");
-            return;
-        }
-        try {
-            setError("");
-            await addCategory(newCategory);
-            setNewCategory("");
-        } catch (err) {
-            setError(err.message || "Error al agregar la categoría");
-        }
-    };
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) {
+      setError("La categoría no puede estar vacía");
+      return;
+    }
+    try {
+      setError("");
+      setIsLoading(true);
+      await addCategory(newCategory.trim());
+      setNewCategory("");
+    } catch (err) {
+      setError(err.message || "Error al agregar la categoría");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const handleUpdateCategory = async () => {
-        if (!categoryEditValue) {
-            setError("La categoría no puede estar vacía");
-            return;
-        }
-        try {
-            setError("");
-            await updateCategory(editingCategory.id, categoryEditValue);
-            setEditingCategory(null);
-            setCategoryEditValue("");
-        } catch (err) {
-            setError(err.message || "Error al actualizar la categoría");
-        }
-    };
+  const handleUpdateCategory = async () => {
+    if (!categoryEditValue.trim()) {
+      setError("La categoría no puede estar vacía");
+      return;
+    }
+    try {
+      setError("");
+      setIsLoading(true);
+      await updateCategory(editingCategory.id, categoryEditValue.trim());
+      setEditingCategory(null);
+      setCategoryEditValue("");
+    } catch (err) {
+      setError(err.message || "Error al actualizar la categoría");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    return (
-        <div className="w-full max-w-md h-full flex flex-col gap-4 overflow-x-hidden">
-            <h2 className="text-3xl font-bold break-words">Categorías</h2>
+  const confirmDelete = (category) => {
+    setCategoryToDelete(category);
+    setShowDeleteModal(true);
+  };
 
-            {error && <p className="text-red-600 text-xl break-words">{error}</p>}
+  const handleDelete = async () => {
+    try {
+      setIsLoading(true);
+      await deleteCategory(categoryToDelete.id);
+      setShowDeleteModal(false);
+      setCategoryToDelete(null);
+    } catch (err) {
+      setError(err.message || "Error al eliminar la categoría");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-            <div className="flex flex-wrap gap-2 w-full">
-                <input
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    className="flex-1 p-2 rounded text-xl min-w-0"
-                    placeholder="Nueva categoría"
-                />
-                <button
-                    onClick={handleAddCategory}
-                    className="bg-green-500 px-4 py-2 text-white text-base rounded whitespace-nowrap"
-                >
-                    Agregar
-                </button>
+  const startEdit = (category) => {
+    setEditingCategory(category);
+    setCategoryEditValue(category.name);
+    setError("");
+  };
+
+  const cancelEdit = () => {
+    setEditingCategory(null);
+    setCategoryEditValue("");
+    setError("");
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Formulario para nueva categoría */}
+      <Card className="shadow-lg border-0 bg-white">
+        <CardHeader>
+          <h3 className="text-lg font-bold text-deep flex items-center">
+            <Plus className="w-5 h-5 mr-2" />
+            Nueva Categoría
+          </h3>
+        </CardHeader>
+        <CardBody>
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm font-semibold">{error}</p>
             </div>
+          )}
 
-            <ul className="flex flex-col gap-3 overflow-y-auto">
-                {categories.map((cat) => (
-                    <li
-                        key={cat.id}
-                        className="bg-white rounded-xl p-4 flex flex-wrap justify-between items-center text-xl break-words"
-                    >
-                        {editingCategory?.id === cat.id ? (
-                            <>
-                                <input
-                                    value={categoryEditValue}
-                                    onChange={(e) => setCategoryEditValue(e.target.value)}
-                                    className="flex-1 p-2 mr-4 rounded min-w-0"
-                                />
-                                <div className="flex gap-2 mt-2">
-                                    <button
-                                        onClick={handleUpdateCategory}
-                                        className="bg-green-500 text-white px-4 py-2 rounded text-base whitespace-nowrap"
-                                    >
-                                        ✔
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setEditingCategory(null);
-                                            setCategoryEditValue("");
-                                            setError("");
-                                        }}
-                                        className="bg-gray-400 text-white px-4 py-2 rounded text-base whitespace-nowrap"
-                                    >
-                                        ✖
-                                    </button>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <span className="break-words flex-1 min-w-0">{cat.name}</span>
-                                <div className="flex gap-2 mt-2 flex-wrap justify-end">
-                                    <button
-                                        onClick={() => {
-                                            setEditingCategory(cat);
-                                            setCategoryEditValue(cat.name);
-                                        }}
-                                        className="bg-blue-500 text-white px-4 py-2 rounded text-base whitespace-nowrap"
-                                    >
-                                        Editar
-                                    </button>
-                                    <button
-                                        onClick={() => deleteCategory(cat.id)}
-                                        className="bg-red-500 text-white px-4 py-2 rounded text-base whitespace-nowrap"
-                                    >
-                                        Eliminar
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        </div>
+          <div className="flex space-x-3">
+            <Input
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              placeholder="Nombre de la categoría"
+              variant="bordered"
+              size="lg"
+              startContent={<Tags className="w-4 h-4 text-gray-400" />}
+              classNames={{
+                input: "text-base",
+              }}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleAddCategory();
+                }
+              }}
+              disabled={isLoading}
+            />
+            <Button
+              onPress={handleAddCategory}
+              variant="solid"
+              color="primary"
+              size="lg"
+              disabled={isLoading || !newCategory.trim()}
+              className="gradient-forest text-white min-w-unit-24"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Agregar
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
 
-    );
+      {/* Lista de categorías */}
+      <Card className="shadow-lg border-0 bg-white">
+        <CardHeader>
+          <h3 className="text-lg font-bold text-deep flex items-center">
+            <Tags className="w-5 h-5 mr-2" />
+            Categorías Existentes ({categories.length})
+          </h3>
+        </CardHeader>
+        <CardBody>
+          {categories.length > 0 ? (
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {categories.map((category) => (
+                <Card
+                  key={category.id}
+                  className="border hover:shadow-md transition-shadow"
+                >
+                  <CardBody className="p-4">
+                    {editingCategory?.id === category.id ? (
+                      // Modo edición
+                      <div className="flex items-center space-x-3">
+                        <Input
+                          value={categoryEditValue}
+                          onChange={(e) => setCategoryEditValue(e.target.value)}
+                          variant="bordered"
+                          size="md"
+                          className="flex-1"
+                          onKeyPress={(e) => {
+                            if (e.key === "Enter") {
+                              handleUpdateCategory();
+                            }
+                            if (e.key === "Escape") {
+                              cancelEdit();
+                            }
+                          }}
+                          disabled={isLoading}
+                          autoFocus
+                        />
+                        <Button
+                          variant="outline"
+                          color="success"
+                          size="sm"
+                          onPress={handleUpdateCategory}
+                          disabled={isLoading || !categoryEditValue.trim()}
+                        >
+                          <Check className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          color="default"
+                          size="sm"
+                          onPress={cancelEdit}
+                          disabled={isLoading}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      // Modo vista
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-mint rounded-full flex items-center justify-center">
+                            <Tags className="w-4 h-4 text-forest" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-deep text-base">
+                              {category.name}
+                            </h4>
+                            <p className="text-sm text-forest">
+                              ID: {category.id}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            color="primary"
+                            size="sm"
+                            onPress={() => startEdit(category)}
+                            disabled={isLoading}
+                          >
+                            <Edit className="w-4 h-4 mr-1" />
+                            Editar
+                          </Button>
+                          <Button
+                            variant="outline"
+                            color="danger"
+                            size="sm"
+                            onPress={() => confirmDelete(category)}
+                            disabled={isLoading}
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Eliminar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Tags className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-deep mb-2">
+                No hay categorías
+              </h3>
+              <p className="text-gray-500 mb-6">
+                Crea tu primera categoría para organizar los platillos
+              </p>
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      {/* Modal de confirmación */}
+      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
+        <ModalContent>
+          <ModalHeader>
+            <div className="flex items-center space-x-2">
+              <Trash2 className="w-5 h-5 text-red-600" />
+              <span>Confirmar Eliminación</span>
+            </div>
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-deep">
+              ¿Estás seguro de que quieres eliminar la categoría{" "}
+              <span className="font-bold">"{categoryToDelete?.name}"</span>?
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              Esta acción no se puede deshacer y puede afectar los platillos
+              asociados a esta categoría.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="outline"
+              color="default"
+              onPress={() => setShowDeleteModal(false)}
+              disabled={isLoading}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="solid"
+              color="danger"
+              onPress={handleDelete}
+              disabled={isLoading}
+            >
+              {isLoading ? "Eliminando..." : "Eliminar Categoría"}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </div>
+  );
 }

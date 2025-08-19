@@ -48,8 +48,8 @@ fun Route.ingredients(ingredientService: IngredientService) {
     }
     post("") {
       val ingredient = call.receive<Ingredient>()
-      ingredientService.addIngredient(ingredient)
-      call.respond(HttpStatusCode.Created, "Ingredient added successfully")
+      val createdId = ingredientService.addIngredient(ingredient)
+      call.respond(HttpStatusCode.Created, mapOf("id" to createdId, "message" to "Ingredient added successfully"))
     }
     put("/{id}") {
       val id = call.parameters["id"]
@@ -59,15 +59,15 @@ fun Route.ingredients(ingredientService: IngredientService) {
       }
 
       val updatedIngredient = call.receive<Ingredient>()
-      val isUpdated = ingredientService.updateIngredient(updatedIngredient)
+      val isUpdated = ingredientService.updateIngredient(updatedIngredient.copy(id = id))
       logger.info(isUpdated.toString())
 
       if (!isUpdated) {
-        call.respond(HttpStatusCode.NotFound, "Ingredient not found")
+        call.respond(HttpStatusCode.NotFound, "Ingredient with ID: $id not found")
         return@put
       }
 
-      call.respond(HttpStatusCode.OK, "Ingredient updated successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Ingredient updated successfully"))
     }
     delete("/{id}") {
       val id = call.parameters["id"]
@@ -82,7 +82,7 @@ fun Route.ingredients(ingredientService: IngredientService) {
         return@delete
       }
 
-      call.respond(HttpStatusCode.OK, "Ingredient deleted successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Ingredient deleted successfully"))
     }
     get("/low_stock/{threshold}") {
       val threshold = call.parameters["threshold"]?.toFloatOrNull()

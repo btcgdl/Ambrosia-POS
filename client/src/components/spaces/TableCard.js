@@ -1,11 +1,13 @@
-﻿import { useNavigate } from "react-router-dom";
+"use client";
 import { useEffect, useState } from "react";
 import { createOrder } from "../../modules/orders/ordersService";
 import { updateTable } from "../../modules/spaces/spacesService";
 import ConfirmationPopup from "../ConfirmationPopup";
+import { useRouter } from "next/navigation";
+import { Sofa } from "lucide-react";
 
 export default function TableCard({ tableData }) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [bgColor, setBgColor] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -21,7 +23,7 @@ export default function TableCard({ tableData }) {
     if (tableData.status === "available") {
       setIsOpen(true);
     } else if (tableData.status === "occupied") {
-      navigate(`/modify-order/${tableData.order_id}`);
+      router.push(`/modify-order/${tableData.order_id}`);
     }
   }
 
@@ -32,7 +34,7 @@ export default function TableCard({ tableData }) {
       tableData.status = "occupied";
       await updateTable(tableData);
     }
-    navigate(`/modify-order/${orderResponse.id}`);
+    router.push(`/modify-order/${orderResponse.id}`);
   }
 
   return (
@@ -51,7 +53,7 @@ export default function TableCard({ tableData }) {
         onClick={tableClicked}
         className={`h-full w-[200px] min-w-[200px] border-2 border-gray-400 rounded-md flex flex-col items-center justify-center p-4 hover:bg-gray-100 transition-all text-center ${bgColor}`}
       >
-        <i className="bi bi-microsoft text-4xl mb-2"></i>
+        <Sofa />
         <span className="text-lg font-semibold">{tableData.name}</span>
       </button>
     </>

@@ -1,11 +1,51 @@
-﻿import { useEffect, useState } from "react";
-import "react-calendar/dist/Calendar.css";
-
-import { useNavigate } from "react-router-dom";
-import {getOrders, getPaymentMethods, getPayments, getTickets} from "../orders/ordersService";
-import {generateReportFromData} from "./cashierService";
+"use client";
+import { useEffect, useState } from "react";
+import {
+  getOrders,
+  getPaymentMethods,
+  getPayments,
+  getTickets,
+} from "../orders/ordersService";
+import { generateReportFromData } from "./cashierService";
+import { useRouter } from "next/navigation";
+import {
+  ChefHat,
+  BarChart3,
+  Calendar,
+  DollarSign,
+  TrendingUp,
+  Clock,
+  Users,
+  CreditCard,
+  Bitcoin,
+  Banknote,
+  Receipt,
+  PieChart,
+  Home,
+  Lock,
+  AlertCircle,
+  CheckCircle,
+  FileText,
+} from "lucide-react";
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Input,
+  Spinner,
+  Divider,
+  Progress,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@heroui/react";
+import { addToast } from "@heroui/react";
 
 export default function Reports() {
+  const router = useRouter();
   const [startDate, setStartDate] = useState(
     new Date().toISOString().split("T")[0],
   );
@@ -19,8 +59,7 @@ export default function Reports() {
   const [orders, setOrders] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [payments, setPayments] = useState([]);
-
-  const navigate = useNavigate();
+  const [showCloseTurnModal, setShowCloseTurnModal] = useState(false);
 
   const formatDate = (dateString) => {
     const [year, month, day] = dateString.split("-");
@@ -33,7 +72,12 @@ export default function Reports() {
     });
   };
 
-
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("es-ES", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };
 
   const handleGenerateReport = async () => {
     setLoading(true);
@@ -41,12 +85,24 @@ export default function Reports() {
 
     if (!startDate || !endDate) {
       setError("Debes seleccionar ambas fechas");
+      addToast({
+        title: "Error",
+        description: "Debes seleccionar ambas fechas",
+        variant: "solid",
+        color: "danger",
+      });
       setLoading(false);
       return;
     }
 
     if (new Date(startDate) > new Date(endDate)) {
       setError("La fecha de inicio no puede ser mayor a la fecha final");
+      addToast({
+        title: "Error",
+        description: "La fecha de inicio no puede ser mayor a la fecha final",
+        variant: "solid",
+        color: "danger",
+      });
       setLoading(false);
       return;
     }
@@ -59,16 +115,27 @@ export default function Reports() {
         paymentMethods,
       });
       setReportData(report);
+      addToast({
+        title: "Reporte Generado",
+        description: "El reporte se ha generado correctamente",
+        variant: "solid",
+        color: "success",
+      });
     } catch (err) {
       setError("Error al generar el reporte");
+      addToast({
+        title: "Error",
+        description: "No se pudo generar el reporte",
+        variant: "solid",
+        color: "danger",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-
   const handleCloseTurn = () => {
-    navigate("/close-turn");
+    router.push("/close-turn");
   };
 
   const setQuickDateRange = (days) => {
@@ -86,7 +153,12 @@ export default function Reports() {
       setError("");
 
       try {
-        const [ticketsResponse, ordersResponse, paymentsResponse, paymentMethodsResponse] = await Promise.all([
+        const [
+          ticketsResponse,
+          ordersResponse,
+          paymentsResponse,
+          paymentMethodsResponse,
+        ] = await Promise.all([
           getTickets(),
           getOrders(),
           getPayments(),
@@ -109,6 +181,12 @@ export default function Reports() {
       } catch (err) {
         console.error(err);
         setError("Error al generar el reporte");
+        addToast({
+          title: "Error",
+          description: "No se pudo cargar la información",
+          variant: "solid",
+          color: "danger",
+        });
       } finally {
         setLoading(false);
       }
@@ -119,178 +197,407 @@ export default function Reports() {
 
   function getPaymentIcon(method) {
     const m = method?.toLowerCase();
-    if (m === "efectivo") return "💵";
-    if (m === "btc" || m === "bitcoin") return "₿";
-    if (m === "tarjeta de débito" || m === "debito") return "🏧";
-    if (m === "tarjeta de crédito" || m === "credito") return "💳";
-    return "❓";
+    if (m === "efectivo") return <Banknote className="w-4 h-4" />;
+    if (m === "btc" || m === "bitcoin") return <Bitcoin className="w-4 h-4" />;
+    if (m === "tarjeta de débito" || m === "debito")
+      return <CreditCard className="w-4 h-4" />;
+    if (m === "tarjeta de crédito" || m === "credito")
+      return <CreditCard className="w-4 h-4" />;
+    return <DollarSign className="w-4 h-4" />;
+  }
+
+  function getPaymentColor(method) {
+    const m = method?.toLowerCase();
+    if (m === "efectivo") return "success";
+    if (m === "btc" || m === "bitcoin") return "warning";
+    if (m === "tarjeta de débito" || m === "debito") return "primary";
+    if (m === "tarjeta de crédito" || m === "credito") return "secondary";
+    return "default";
+  }
+
+  if (loading && !reportData) {
+    return (
+      <div className="min-h-screen gradient-fresh flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-2xl border-0 bg-white">
+          <CardBody className="flex flex-col items-center justify-center py-12">
+            <Spinner size="lg" color="success" />
+            <p className="text-lg font-semibold text-deep mt-4">
+              Cargando reportes...
+            </p>
+          </CardBody>
+        </Card>
+      </div>
+    );
   }
 
   return (
-    <main className="h-[90%] w-full flex items-center justify-center">
-      <div className="h-[90%] w-[90%] bg-amber-100 rounded-xl p-6 flex flex-col gap-6 overflow-y-auto">
-        <h2 className="text-4xl font-bold text-center">Reportes de Ventas</h2>
+    <div className="min-h-screen gradient-fresh p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <Card className="mb-6 shadow-lg border-0 bg-white">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between w-full">
+              <Button
+                variant="ghost"
+                onPress={() => router.push("/")}
+                className="text-forest hover:bg-mint/20"
+              >
+                <Home className="w-5 h-5 mr-2" />
+                Inicio
+              </Button>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
+                  <BarChart3 className="w-6 h-6 text-blue-600" />
+                </div>
+                <h1 className="text-2xl font-bold text-deep">
+                  Reportes de Ventas
+                </h1>
+                <p className="text-forest text-sm">
+                  Análisis financiero del restaurante
+                </p>
+              </div>
+              <div className="w-20" />
+            </div>
+          </CardHeader>
+        </Card>
 
-        {/* Error message */}
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-xl text-xl text-center">
-            {error}
-          </div>
+          <Card className="mb-6 bg-red-50 border-red-200">
+            <CardBody>
+              <div className="flex items-center space-x-2">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+                <p className="text-red-600 font-semibold">{error}</p>
+              </div>
+            </CardBody>
+          </Card>
         )}
 
-        {/* Selector de fechas */}
-        <div className="bg-white rounded-xl p-6 shadow-md">
-          <div className="flex flex-col gap-6">
-            <h3 className="text-2xl font-semibold text-center">
+        {/* Selector de Fechas */}
+        <Card className="mb-6 shadow-lg border-0 bg-white">
+          <CardHeader>
+            <h3 className="text-lg font-bold text-deep flex items-center">
+              <Calendar className="w-5 h-5 mr-2" />
               Seleccionar Período
             </h3>
+          </CardHeader>
+          <CardBody>
+            <div className="space-y-6">
+              {/* Botones de acceso rápido */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button
+                  variant="outline"
+                  color="primary"
+                  size="lg"
+                  onPress={() => setQuickDateRange(0)}
+                  className="h-16"
+                >
+                  <div className="flex flex-col items-center">
+                    <Calendar className="w-5 h-5 mb-1" />
+                    <span>Hoy</span>
+                  </div>
+                </Button>
+                <Button
+                  variant="outline"
+                  color="primary"
+                  size="lg"
+                  onPress={() => setQuickDateRange(7)}
+                  className="h-16"
+                >
+                  <div className="flex flex-col items-center">
+                    <Calendar className="w-5 h-5 mb-1" />
+                    <span>7 días</span>
+                  </div>
+                </Button>
+                <Button
+                  variant="outline"
+                  color="primary"
+                  size="lg"
+                  onPress={() => setQuickDateRange(30)}
+                  className="h-16"
+                >
+                  <div className="flex flex-col items-center">
+                    <Calendar className="w-5 h-5 mb-1" />
+                    <span>30 días</span>
+                  </div>
+                </Button>
+              </div>
 
-            {/* Botones de acceso rápido */}
-            <div className="grid grid-cols-3 gap-4">
-              <button
-                onClick={() => setQuickDateRange(0)}
-                className="bg-blue-100 text-blue-800 text-lg py-3 px-4 rounded-xl hover:bg-blue-200 transition-colors font-semibold"
-              >
-                📅 Hoy
-              </button>
-              <button
-                onClick={() => setQuickDateRange(7)}
-                className="bg-blue-100 text-blue-800 text-lg py-3 px-4 rounded-xl hover:bg-blue-200 transition-colors font-semibold"
-              >
-                📅 7 días
-              </button>
-              <button
-                onClick={() => setQuickDateRange(30)}
-                className="bg-blue-100 text-blue-800 text-lg py-3 px-4 rounded-xl hover:bg-blue-200 transition-colors font-semibold"
-              >
-                📅 30 días
-              </button>
-            </div>
-
-            {/* Selectores de fecha */}
-            <div className="grid grid-cols-2 gap-6">
-              <div className="flex flex-col gap-3">
-                <label className="text-xl font-semibold text-center">
-                  Fecha Inicio
-                </label>
-                <input
+              {/* Selectores de fecha */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
                   type="date"
+                  label="Fecha de Inicio"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="text-xl p-4 rounded-xl border-2 border-gray-300 focus:border-blue-500 focus:outline-none text-center"
+                  variant="bordered"
+                  size="lg"
+                  startContent={<Calendar className="w-4 h-4 text-gray-400" />}
+                  classNames={{
+                    input: "text-base",
+                    label: "text-sm font-semibold text-deep",
+                  }}
                   disabled={loading}
                 />
-              </div>
-              <div className="flex flex-col gap-3">
-                <label className="text-xl font-semibold text-center">
-                  Fecha Final
-                </label>
-                <input
+                <Input
                   type="date"
+                  label="Fecha Final"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="text-xl p-4 rounded-xl border-2 border-gray-300 focus:border-blue-500 focus:outline-none text-center"
+                  variant="bordered"
+                  size="lg"
+                  startContent={<Calendar className="w-4 h-4 text-gray-400" />}
+                  classNames={{
+                    input: "text-base",
+                    label: "text-sm font-semibold text-deep",
+                  }}
                   disabled={loading}
                 />
               </div>
-            </div>
 
-            <button
-              onClick={handleGenerateReport}
-              className="bg-green-500 text-white text-2xl py-6 rounded-xl hover:bg-green-600 transition-colors font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
-              disabled={loading}
-            >
-              {loading ? "Generando reporte..." : "🔍 Generar Reporte"}
-            </button>
-          </div>
-        </div>
+              <Button
+                onPress={handleGenerateReport}
+                variant="solid"
+                color="primary"
+                size="lg"
+                disabled={loading}
+                className="w-full gradient-forest text-white h-16"
+              >
+                {loading ? (
+                  <div className="flex items-center space-x-2">
+                    <Spinner size="sm" color="white" />
+                    <span>Generando reporte...</span>
+                  </div>
+                ) : (
+                  <>
+                    <FileText className="w-5 h-5 mr-2" />
+                    Generar Reporte
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
 
         {/* Resultados del reporte */}
         {reportData && (
-          <div className="bg-white rounded-xl p-6 shadow-md flex-1">
-            <div className="flex flex-col gap-6">
-              <div className="text-center">
-                <h3 className="text-3xl font-bold mb-4">Resumen General</h3>
-                <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-6 mb-4">
-                  <p className="text-xl mb-2">
-                    📅 Periodo:{" "}
-                    <strong>{formatDate(reportData.startDate)}</strong> -{" "}
-                    <strong>{formatDate(reportData.endDate)}</strong>
-                  </p>
-                </div>
-                <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6">
-                  <p className="text-4xl font-bold text-green-600">
-                    💰 ${reportData.totalBalance.toFixed(2)}
-                  </p>
-                  <p className="text-xl text-gray-700 mt-2">Balance Total</p>
-                </div>
-              </div>
+          <div className="space-y-6">
+            {/* Resumen General */}
+            <Card className="shadow-lg border-0 bg-white">
+              <CardHeader>
+                <h3 className="text-lg font-bold text-deep flex items-center">
+                  <TrendingUp className="w-5 h-5 mr-2" />
+                  Resumen General
+                </h3>
+              </CardHeader>
+              <CardBody>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Período */}
+                  <Card className="bg-blue-50 border-blue-200">
+                    <CardBody className="text-center p-4">
+                      <Calendar className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                      <p className="text-sm text-blue-700 font-medium">
+                        Período
+                      </p>
+                      <p className="text-lg font-bold text-blue-900 mt-1">
+                        {formatDate(reportData.startDate)} -{" "}
+                        {formatDate(reportData.endDate)}
+                      </p>
+                    </CardBody>
+                  </Card>
 
-              <div className="grid gap-6">
-                {reportData.reports.map((report, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-amber-50 rounded-xl p-6 border-2 border-amber-200"
-                  >
-                    <div className="flex justify-between items-center mb-6">
-                      <h4 className="text-2xl font-bold">
-                        📆 {report.date}
-                      </h4>
-                      <div className="bg-green-100 px-4 py-2 rounded-xl">
-                        <p className="text-2xl font-bold text-green-700">
-                          ${report.balance.toFixed(2)}
-                        </p>
-                      </div>
-                    </div>
+                  {/* Balance Total */}
+                  <Card className="bg-green-50 border-green-200">
+                    <CardBody className="text-center p-4">
+                      <DollarSign className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                      <p className="text-sm text-green-700 font-medium">
+                        Balance Total
+                      </p>
+                      <p className="text-2xl font-bold text-green-900 mt-1">
+                        {formatCurrency(reportData.totalBalance)}
+                      </p>
+                    </CardBody>
+                  </Card>
 
-                    <div className="grid gap-4">
-                      <h5 className="text-xl font-semibold border-b-2 border-amber-300 pb-2">
-                        🎫 Tickets del día ({report.tickets.length})
-                      </h5>
-                      {report.tickets.map((ticket, i) => (
-                        <div
-                          key={i}
-                          className="bg-white p-4 rounded-xl border-2 border-gray-200 flex justify-between items-center"
-                        >
-                          <div className="flex flex-col">
-                            <span className="text-2xl font-bold text-green-600">
-                              ${ticket.amount.toFixed(2)}
-                            </span>
-                            <span className="text-lg text-gray-600">
-                              Por: {ticket.userName}
-                            </span>
+                  {/* Tickets Total */}
+                  <Card className="bg-purple-50 border-purple-200">
+                    <CardBody className="text-center p-4">
+                      <Receipt className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                      <p className="text-sm text-purple-700 font-medium">
+                        Total Tickets
+                      </p>
+                      <p className="text-2xl font-bold text-purple-900 mt-1">
+                        {reportData.reports.reduce(
+                          (total, day) => total + day.tickets.length,
+                          0,
+                        )}
+                      </p>
+                    </CardBody>
+                  </Card>
+                </div>
+              </CardBody>
+            </Card>
+
+            {/* Reportes por Día */}
+            <Card className="shadow-lg border-0 bg-white">
+              <CardHeader>
+                <h3 className="text-lg font-bold text-deep flex items-center">
+                  <PieChart className="w-5 h-5 mr-2" />
+                  Desglose por Día
+                </h3>
+              </CardHeader>
+              <CardBody>
+                <div className="space-y-6 max-h-96 overflow-y-auto">
+                  {reportData.reports.map((report, idx) => (
+                    <Card key={idx} className="border">
+                      <CardHeader className="pb-3">
+                        <div className="flex justify-between items-center w-full">
+                          <div className="flex items-center space-x-2">
+                            <Calendar className="w-5 h-5 text-blue-600" />
+                            <h4 className="text-lg font-bold text-deep">
+                              {report.date}
+                            </h4>
                           </div>
-                          <div className="text-right">
-                            <span
-                              className={`px-4 py-2 rounded-xl text-lg font-bold ${
-                                ticket.paymentMethod === "Efectivo"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-blue-100 text-blue-800"
-                              }`}
-                            >
-                              {getPaymentIcon(ticket.paymentMethod)} {ticket.paymentMethod}
-                            </span>
+                          <div className="bg-green-100 px-4 py-2 rounded-lg">
+                            <p className="text-lg font-bold text-green-700">
+                              {formatCurrency(report.balance)}
+                            </p>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+                      </CardHeader>
+                      <CardBody>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-forest font-medium">
+                              Total de tickets:
+                            </span>
+                            <span className="font-bold text-deep">
+                              {report.tickets.length}
+                            </span>
+                          </div>
+
+                          <Divider />
+
+                          <div className="space-y-3">
+                            <h5 className="font-semibold text-deep flex items-center">
+                              <Receipt className="w-4 h-4 mr-2" />
+                              Tickets del Día
+                            </h5>
+                            {report.tickets.length > 0 ? (
+                              <div className="space-y-2 max-h-40 overflow-y-auto">
+                                {report.tickets.map((ticket, i) => (
+                                  <Card key={i} className="bg-gray-50 border">
+                                    <CardBody className="p-3">
+                                      <div className="flex justify-between items-center">
+                                        <div>
+                                          <p className="font-bold text-deep">
+                                            {formatCurrency(ticket.amount)}
+                                          </p>
+                                          <div className="flex items-center space-x-1 text-sm text-forest">
+                                            <Users className="w-3 h-3" />
+                                            <span>Por: {ticket.userName}</span>
+                                          </div>
+                                        </div>
+                                        <div
+                                          className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium bg-${getPaymentColor(ticket.paymentMethod)}-100 text-${getPaymentColor(ticket.paymentMethod)}-800`}
+                                        >
+                                          {getPaymentIcon(ticket.paymentMethod)}
+                                          <span>{ticket.paymentMethod}</span>
+                                        </div>
+                                      </div>
+                                    </CardBody>
+                                  </Card>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-center py-4 text-gray-500">
+                                <Receipt className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                                <p>No hay tickets para este día</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardBody>
+                    </Card>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
           </div>
         )}
 
         {/* Botón de cerrar turno */}
-        <div className="mt-4">
-          <button
-            onClick={handleCloseTurn}
-            className="w-full bg-red-500 text-white text-3xl py-6 rounded-xl hover:bg-red-600 transition-colors font-bold"
-          >
-            🔒 Cerrar Turno
-          </button>
-        </div>
+        <Card className="shadow-lg border-0 bg-white">
+          <CardBody>
+            <Button
+              onPress={() => setShowCloseTurnModal(true)}
+              variant="solid"
+              color="danger"
+              size="lg"
+              className="w-full h-16"
+            >
+              <Lock className="w-5 h-5 mr-2" />
+              Cerrar Turno
+            </Button>
+          </CardBody>
+        </Card>
+
+        {/* Modal de confirmación */}
+        <Modal
+          isOpen={showCloseTurnModal}
+          onClose={() => setShowCloseTurnModal(false)}
+        >
+          <ModalContent>
+            <ModalHeader>
+              <div className="flex items-center space-x-2">
+                <Lock className="w-5 h-5 text-red-600" />
+                <span>Confirmar Cierre de Turno</span>
+              </div>
+            </ModalHeader>
+            <ModalBody>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <AlertCircle className="w-5 h-5 text-orange-600" />
+                  <span className="text-deep font-medium">
+                    ¿Estás seguro de que quieres cerrar el turno?
+                  </span>
+                </div>
+                <p className="text-forest text-sm">
+                  Esta acción finalizará el turno actual y generará un reporte
+                  final. Asegúrate de que todas las operaciones del día estén
+                  completas.
+                </p>
+                {reportData && (
+                  <Card className="bg-blue-50 border-blue-200">
+                    <CardBody className="p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-blue-700 font-medium">
+                          Balance del período:
+                        </span>
+                        <span className="text-blue-900 font-bold">
+                          {formatCurrency(reportData.totalBalance)}
+                        </span>
+                      </div>
+                    </CardBody>
+                  </Card>
+                )}
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                variant="outline"
+                color="default"
+                onPress={() => setShowCloseTurnModal(false)}
+              >
+                Cancelar
+              </Button>
+              <Button variant="solid" color="danger" onPress={handleCloseTurn}>
+                <Lock className="w-4 h-4 mr-1" />
+                Cerrar Turno
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </div>
-    </main>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
+"use client";
 import { use, useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   addDishToOrder,
   addPaymentToTicket,
@@ -19,18 +19,45 @@ import {
 } from "./ordersService";
 import { getCategories, getDishes } from "../dishes/dishesService";
 import ConfirmationPopup from "../../components/ConfirmationPopup";
+import LoadingCard from "../../components/LoadingCard";
 import BitcoinPriceService from "../../services/bitcoinPriceService";
 import { apiClient } from "../../services/apiClient";
 import { createInvoice } from "../cashier/cashierService";
-import QRCode from "react-qr-code";
+import { QRCode } from "react-qr-code";
+import { useRouter } from "next/navigation";
+import {
+  ChefHat,
+  ArrowLeft,
+  Plus,
+  Minus,
+  ShoppingCart,
+  CreditCard,
+  Users,
+  Utensils,
+  Bitcoin,
+  DollarSign,
+  Receipt,
+  CheckCircle,
+} from "lucide-react";
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Badge,
+  Spinner,
+  Select,
+  SelectItem,
+  Divider,
+} from "@heroui/react";
+import { addToast } from "@heroui/react";
 
 const priceService = new BitcoinPriceService();
 
-export default function EditOrder() {
-  const { pedidoId } = useParams();
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const isNew = searchParams.get("isNew") === "true";
+export default function EditOrder({ dynamicParams, searchParams }) {
+  const pedidoId = dynamicParams?.pedidoId;
+  const router = useRouter();
+  const isNew = searchParams?.isNew === "true";
   const [order, setOrder] = useState(null);
   const [dishes, setDishes] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -179,7 +206,7 @@ export default function EditOrder() {
         if (table) {
           await updateTable(table);
         }
-        navigate("/all-orders");
+        router.push("/all-orders");
       }
     } catch (err) {
       setError("Error al cambiar el estado del pedido");
@@ -299,22 +326,33 @@ export default function EditOrder() {
   );
 
   if (isLoading && !order) {
-    return (
-      <main className="h-[90%] w-full flex items-center justify-center">
-        <div className="h-[80%] w-[80%] bg-amber-200 flex flex-col items-center justify-center p-6">
-          <p className="text-3xl font-bold">Cargando pedido...</p>
-        </div>
-      </main>
-    );
+    return <LoadingCard message="Cargando pedido..." />;
   }
 
   if (error && !order) {
     return (
-      <main className="h-[90%] w-full flex items-center justify-center">
-        <div className="h-[80%] w-[80%] bg-amber-200 flex flex-col items-center justify-center p-6">
-          <p className="text-3xl font-bold text-red-600">{error}</p>
-        </div>
-      </main>
+      <div className="min-h-screen gradient-fresh flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-2xl border-0 bg-white">
+          <CardHeader className="text-center pb-4">
+            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+              <ChefHat className="w-8 h-8 text-red-600" />
+            </div>
+          </CardHeader>
+          <CardBody className="text-center">
+            <h2 className="text-xl font-bold text-deep mb-2">Error</h2>
+            <p className="text-red-600 mb-4">{error}</p>
+            <Button
+              variant="outline"
+              color="primary"
+              onPress={() => router.push("/rooms")}
+              className="w-full"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Volver a Espacios
+            </Button>
+          </CardBody>
+        </Card>
+      </div>
     );
   }
 
@@ -329,216 +367,399 @@ export default function EditOrder() {
   };
 
   return (
-    <main className="h-[90%] w-full flex items-center justify-center p-6">
-      <div className="h-full w-full bg-amber-100 rounded-lg flex flex-col p-6 gap-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-4xl font-bold">
-            Pedido #{pedidoId.substring(0, 4)} -{" "}
-            {order?.waiter || "Desconocido"}
-          </h2>
-          <span className="text-2xl font-bold">
-            Total: ${order?.total ? order.total.toFixed(2) : "0.00"}
-          </span>
-        </div>
-        {error && <p className="text-red-600 text-xl">{error}</p>}
-        <div className="flex flex-1 gap-6 overflow-y-auto">
-          <div className="w-1/2 flex flex-col gap-4">
-            <h3 className="text-2xl font-semibold">Categorías</h3>
-            <div className="grid grid-cols-2  gap-4 overflow-y-auto touch-pan-y">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  className={`py-6 px-8 text-2xl rounded-lg ${
-                    selectedCategory === category
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                  }`}
-                  onClick={() => setSelectedCategory(category)}
-                  disabled={isLoading}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
-            <h3 className="text-2xl font-semibold mt-4">
-              Platillos Disponibles
-            </h3>
-            <div className="grid grid-cols-2 gap-4 overflow-y-auto max-h-[300px] p-2">
-              {filteredDishes.map((dish) => (
-                <button
-                  key={dish.id}
-                  className="bg-green-100 text-gray-800 py-6 px-8 text-xl rounded-lg hover:bg-green-200 flex flex-col items-start"
-                  onClick={() => handleAddDish(dish)}
-                  disabled={isLoading}
-                >
-                  <span className="font-bold">{dish.name}</span>
-                  <span>${dish.price.toFixed(2)}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="w-1/2 flex flex-col gap-4">
-            <h3 className="text-2xl font-semibold">Platillos Seleccionados</h3>
-            <div className="flex-1 bg-white rounded-lg p-4 overflow-y-auto max-h-[400px]">
-              {orderDishes.length > 0 ? (
-                <ul className="space-y-2">
-                  {orderDishes.map((item) => (
-                    <li
-                      key={item.id}
-                      className="flex justify-between items-center bg-gray-100 p-4 rounded-lg"
-                    >
-                      <span className="text-xl">
-                        {dishes.find((dish) => dish.id === item.dish_id).name} -
-                        $
-                        {dishes
-                          .find((dish) => dish.id === item.dish_id)
-                          .price.toFixed(2)}
-                      </span>
-                      {order && order.status === "open" && (
-                        <>
-                          <button
-                            className="bg-red-500 text-white py-2 px-4 text-lg rounded-lg hover:bg-red-600"
-                            onClick={() => handleRemoveDish(item.id)}
-                            disabled={isLoading}
-                          >
-                            Eliminar
-                          </button>
-                        </>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-xl text-gray-500">
-                  No hay platillos seleccionados.
-                </p>
-              )}
-            </div>
-            <div className="flex justify-between items-center mt-4">
-              <div className="flex gap-4">
-                {order?.status === "open" && (
-                  <>
-                    <button
-                      className="bg-blue-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-blue-600"
-                      onClick={() => setShowPaymentMethodDialog(true)}
-                      disabled={isLoading}
-                    >
-                      Cerrar Pedido
-                    </button>
-                  </>
-                )}
-                {order?.status === "closed" && (
-                  <>
-                    <button
-                      className="bg-blue-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-blue-600"
-                      onClick={() => handleChangeOrderStatus("open")}
-                      disabled={isLoading}
-                    >
-                      Reabrir Pedido
-                    </button>
-                    <button
-                      className="bg-green-500 text-white py-4 px-8 text-2xl rounded-lg hover:bg-green-600"
-                      onClick={() => setShowPaymentMethodDialog(true)}
-                      disabled={isLoading}
-                    >
-                      Pagar
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <ConfirmationPopup
-              isOpen={showPaymentMethodDialog}
-              title="Seleccionar Método de Pago"
-              hideDefaultButtons={true}
-              customBody={
-                <div>
-                  <div className="flex flex-col gap-4">
-                    {paymentMethods.map((method) => (
-                      <button
-                        key={method.id}
-                        className={`py-4 px-6 text-xl rounded-lg flex items-center justify-center gap-2 transition-colors touch-manipulation ${
-                          selectedPaymentMethod === method.id
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400"
-                        }`}
-                        onClick={() => handlePaymentMethodSelect(method.id)}
-                      >
-                        <span>{getPaymentIcon(method.name)}</span>
-                        <span>{method.name}</span>
-                      </button>
-                    ))}
+    <div className="min-h-screen gradient-fresh p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <Card className="mb-6 shadow-lg border-0 bg-white">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between w-full">
+              <Button
+                variant="ghost"
+                onPress={() => router.push("/rooms")}
+                className="text-forest hover:bg-mint/20"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Volver
+              </Button>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-mint rounded-full flex items-center justify-center mb-2">
+                  <Receipt className="w-6 h-6 text-forest" />
+                </div>
+                <h1 className="text-xl font-bold text-deep">
+                  Pedido #{pedidoId.substring(0, 8)}
+                </h1>
+                <div className="flex items-center space-x-4 mt-2">
+                  <div className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                    <Users className="w-3 h-3 mr-1" />
+                    {order?.waiter || "Mesero"}
                   </div>
-
-                  {/* Botones personalizados */}
-                  <div className="flex justify-between gap-4 mt-6 pt-4 border-t">
-                    <button
-                      className="bg-red-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-red-600 active:bg-red-700 transition-colors touch-manipulation disabled:opacity-50"
-                      onClick={handleCancelDialog}
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      className="bg-green-500 text-white py-4 px-8 text-xl rounded-lg hover:bg-green-600 active:bg-green-700 transition-colors touch-manipulation disabled:opacity-50"
-                      onClick={handleConfirmPaymentMethod}
-                      disabled={!selectedPaymentMethod || isLoading}
-                    >
-                      {isLoading ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Cargando...</span>
-                        </div>
-                      ) : (
-                        "Confirmar"
-                      )}
-                    </button>
+                  <div className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                    $ {order?.total ? order.total.toFixed(2) : "0.00"}
                   </div>
                 </div>
-              }
-              onClose={handleCancelDialog}
-            />
+              </div>
+              <div className="w-20" />
+            </div>
+          </CardHeader>
+        </Card>
 
-            {createdInvoice && (
-              <ConfirmationPopup
-                isOpen={!!createdInvoice} // Corregido: debe ser boolean
-                title="Por favor pide al cliente que realice la transacción"
-                hideDefaultButtons={true} // Agregado para usar botones personalizados
-                customBody={
-                  <div className="flex flex-col items-center gap-6">
-                    {/* QR Code */}
-                    <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <QRCode value={createdInvoice?.serialized} size={200} />
-                    </div>
+        {error && (
+          <Card className="mb-6 bg-red-50 border-red-200">
+            <CardBody>
+              <p className="text-red-600 text-center font-semibold">{error}</p>
+            </CardBody>
+          </Card>
+        )}
 
-                    {/* Información adicional */}
-                    <p className="text-center text-gray-600">
-                      Escanea el código QR para realizar el pago
-                    </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Panel de Menú */}
+          <div className="space-y-6">
+            {/* Categorías */}
+            <Card className="shadow-lg border-0 bg-white">
+              <CardHeader>
+                <h3 className="text-lg font-bold text-deep flex items-center">
+                  <Utensils className="w-5 h-5 mr-2" />
+                  Categorías
+                </h3>
+              </CardHeader>
+              <CardBody>
+                <div className="grid grid-cols-2 gap-3">
+                  {categories.map((category) => (
+                    <Button
+                      key={category.id}
+                      variant={
+                        selectedCategory === category ? "solid" : "outline"
+                      }
+                      color="primary"
+                      size="lg"
+                      onPress={() => setSelectedCategory(category)}
+                      disabled={isLoading}
+                      className={`h-16 ${selectedCategory === category ? "gradient-forest text-white" : ""}`}
+                    >
+                      {category.name}
+                    </Button>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
 
-                    {/* Botones personalizados */}
-                    <div className="flex flex-col gap-3 w-full sm:flex-row">
-                      <button
-                        className="flex-1 px-6 py-4 bg-red-500 text-white rounded-lg hover:bg-red-600 active:bg-red-700 transition-colors font-medium text-base min-h-12 touch-manipulation"
-                        onClick={handlePaymentCancel}
+            {/* Platillos */}
+            {selectedCategory && (
+              <Card className="shadow-lg border-0 bg-white">
+                <CardHeader>
+                  <h3 className="text-lg font-bold text-deep">
+                    Platillos - {selectedCategory.name}
+                  </h3>
+                </CardHeader>
+                <CardBody>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+                    {filteredDishes.map((dish) => (
+                      <Card
+                        key={dish.id}
+                        className="border hover:shadow-md transition-shadow cursor-pointer"
+                        isPressable
+                        onPress={() => handleAddDish(dish)}
                       >
-                        No Pagó
-                      </button>
-                      <button
-                        className="flex-1 px-6 py-4 bg-green-500 text-white rounded-lg hover:bg-green-600 active:bg-green-700 transition-colors font-medium text-base min-h-12 touch-manipulation"
-                        onClick={handlePaymentConfirm}
-                      >
-                        Pagado
-                      </button>
-                    </div>
+                        <CardBody className="p-4">
+                          <div className="flex flex-col">
+                            <span className="font-bold text-deep">
+                              {dish.name}
+                            </span>
+                            <span className="text-forest text-sm">
+                              ${dish.price.toFixed(2)}
+                            </span>
+                          </div>
+                        </CardBody>
+                      </Card>
+                    ))}
                   </div>
-                }
-                onClose={handleCancelDialog}
-              />
+                </CardBody>
+              </Card>
             )}
           </div>
+          {/* Panel de Pedido */}
+          <div className="space-y-6">
+            <Card className="shadow-lg border-0 bg-white">
+              <CardHeader>
+                <h3 className="text-lg font-bold text-deep flex items-center">
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  Platillos Seleccionados
+                </h3>
+              </CardHeader>
+              <CardBody>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {orderDishes.length > 0 ? (
+                    orderDishes.map((item) => {
+                      const dish = dishes.find((d) => d.id === item.dish_id);
+                      return (
+                        <Card
+                          key={item.id}
+                          className="border w-full"
+                          isPressable
+                          onPress={() => handleRemoveDish(item.id)}
+                        >
+                          <CardBody className="p-4">
+                            <div className="flex justify-between items-center">
+                              <div className="flex-1">
+                                <span className="font-semibold text-deep">
+                                  {dish?.name}
+                                </span>
+                                <div className="text-forest text-sm">
+                                  ${dish?.price.toFixed(2)}
+                                </div>
+                              </div>
+                              {order && order.status === "open" && (
+                                <Minus className="w-4 h-4" />
+                              )}
+                            </div>
+                          </CardBody>
+                        </Card>
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-8">
+                      <ShoppingCart className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-gray-500">
+                        No hay platillos seleccionados
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardBody>
+            </Card>
+
+            {/* Acciones */}
+            <Card className="shadow-lg border-0 bg-white">
+              <CardBody>
+                <div className="space-y-4">
+                  {order?.status === "open" && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Button
+                        variant="ghost"
+                        color="primary"
+                        size="lg"
+                        onPress={() => setShowPaymentMethodDialog(true)}
+                        disabled={isLoading}
+                        className="h-14"
+                      >
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Cerrar Pedido
+                      </Button>
+                      <Button
+                        variant="bordered"
+                        color="warning"
+                        size="lg"
+                        onPress={() => handleUndo()}
+                        disabled={isLoading || undoStack.length === 0}
+                        className="h-14"
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Deshacer
+                      </Button>
+                    </div>
+                  )}
+
+                  {order?.status === "closed" && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Button
+                        variant="outline"
+                        color="primary"
+                        size="lg"
+                        onPress={() => handleChangeOrderStatus("open")}
+                        disabled={isLoading}
+                        className="h-14"
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Reabrir Pedido
+                      </Button>
+                      <Button
+                        variant="solid"
+                        color="success"
+                        size="lg"
+                        onPress={() => setShowPaymentMethodDialog(true)}
+                        disabled={isLoading}
+                        className="gradient-forest text-white h-14"
+                      >
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Procesar Pago
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Status Badge */}
+                  <Divider />
+                  <div className="text-center">
+                    <div
+                      className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+                        order?.status === "open"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : order?.status === "closed"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      Estado:{" "}
+                      {order?.status === "open"
+                        ? "Abierto"
+                        : order?.status === "closed"
+                          ? "Cerrado"
+                          : "Pagado"}
+                    </div>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+          </div>
         </div>
+
+        {/* Modal de Método de Pago */}
+        <ConfirmationPopup
+          isOpen={showPaymentMethodDialog}
+          title="Seleccionar Método de Pago"
+          hideDefaultButtons={true}
+          type="info"
+          customBody={
+            <div className="space-y-6">
+              {/* Grid de métodos de pago */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {paymentMethods.map((method) => (
+                  <button
+                    key={method.id}
+                    className={`group relative py-6 px-6 rounded-xl border-2 transition-all duration-200 touch-manipulation ${
+                      selectedPaymentMethod === method.id
+                        ? "border-green-500 bg-green-50 shadow-lg scale-105"
+                        : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md hover:scale-102"
+                    }`}
+                    onClick={() => handlePaymentMethodSelect(method.id)}
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <div
+                        className={`text-3xl transition-transform group-hover:scale-110 ${
+                          selectedPaymentMethod === method.id
+                            ? "transform scale-110"
+                            : ""
+                        }`}
+                      >
+                        {getPaymentIcon(method.name)}
+                      </div>
+                      <span
+                        className={`font-semibold text-lg ${
+                          selectedPaymentMethod === method.id
+                            ? "text-green-700"
+                            : "text-gray-700"
+                        }`}
+                      >
+                        {method.name}
+                      </span>
+                    </div>
+
+                    {/* Indicador de selección */}
+                    {selectedPaymentMethod === method.id && (
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-4 h-4 text-white" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* Botones de acción */}
+              <div className="flex gap-4 pt-4 border-t border-gray-100">
+                <button
+                  className="flex-1 py-3 px-6 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors font-medium touch-manipulation"
+                  onClick={handleCancelDialog}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="flex-1 py-3 px-6 bg-green-500 text-white rounded-lg hover:bg-green-600 active:bg-green-700 transition-colors font-medium touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed gradient-forest"
+                  onClick={handleConfirmPaymentMethod}
+                  disabled={!selectedPaymentMethod || isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Procesando...</span>
+                    </div>
+                  ) : (
+                    "Confirmar Pago"
+                  )}
+                </button>
+              </div>
+            </div>
+          }
+          onClose={handleCancelDialog}
+        />
+
+        {/* Modal de Pago Bitcoin */}
+        {createdInvoice && (
+          <ConfirmationPopup
+            isOpen={!!createdInvoice}
+            title="Pago con Bitcoin"
+            hideDefaultButtons={true}
+            type="info"
+            customBody={
+              <div className="flex flex-col items-center space-y-6">
+                {/* Header con ícono */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Bitcoin className="w-8 h-8 text-yellow-600" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-deep mb-2">
+                    Solicita al cliente que escanee el código QR
+                  </h4>
+                  <p className="text-gray-600 text-sm">
+                    El cliente debe usar su billetera Bitcoin para completar el
+                    pago
+                  </p>
+                </div>
+
+                {/* QR Code con marco elegante */}
+                <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                  <QRCode
+                    value={createdInvoice?.serialized || ""}
+                    size={220}
+                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                  />
+                </div>
+
+                {/* Información del monto */}
+                <div className="bg-gray-50 rounded-lg p-4 w-full text-center">
+                  <p className="text-sm text-gray-600">
+                    Monto total del pedido
+                  </p>
+                  <p className="text-2xl font-bold text-deep">
+                    ${order?.total?.toFixed(2) || "0.00"}
+                  </p>
+                </div>
+
+                {/* Botones de acción mejorados */}
+                <div className="flex gap-4 w-full pt-2">
+                  <button
+                    className="flex-1 py-4 px-6 border-2 border-red-200 text-red-600 rounded-xl hover:bg-red-50 hover:border-red-300 active:bg-red-100 transition-all font-semibold touch-manipulation"
+                    onClick={handlePaymentCancel}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <span>❌</span>
+                      <span>No Pagó</span>
+                    </div>
+                  </button>
+                  <button
+                    className="flex-1 py-4 px-6 bg-green-500 text-white rounded-xl hover:bg-green-600 active:bg-green-700 transition-all font-semibold touch-manipulation gradient-forest"
+                    onClick={handlePaymentConfirm}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      <span>Confirmar Pago</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            }
+            onClose={handleCancelDialog}
+          />
+        )}
       </div>
-    </main>
+    </div>
   );
 }

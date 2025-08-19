@@ -1,13 +1,12 @@
+"use client";
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import NavBar from "../../components/navbar/NavBar";
-import Header from "../../components/header/Header";
 import { createOrder } from "./ordersService";
+import { useRouter } from "next/navigation";
 
 export default function CreateOrder() {
   //deprecated unused
   const { tableId } = useParams();
-  const navigate = useNavigate();
+  const navigate = useRouter();
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);

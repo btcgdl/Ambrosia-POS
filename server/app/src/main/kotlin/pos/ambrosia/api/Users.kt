@@ -53,7 +53,7 @@ fun Route.users(userService: UsersService) {
         call.respond(HttpStatusCode.BadRequest, "Failed to add user")
         return@post
       }
-      call.respond(HttpStatusCode.Created, "User added successfully")
+      call.respond(HttpStatusCode.Created, mapOf("id" to result, "message" to "User added successfully"))
     }
     put("/{id}") {
       val id = call.parameters["id"]
@@ -71,7 +71,7 @@ fun Route.users(userService: UsersService) {
         return@put
       }
 
-      call.respond(HttpStatusCode.OK, "User updated successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "User updated successfully"))
     }
     delete("/{id}") {
       val id = call.parameters["id"]
@@ -86,7 +86,7 @@ fun Route.users(userService: UsersService) {
         return@delete
       }
 
-      call.respond(HttpStatusCode.NoContent, "User deleted successfully")
+      call.respond(HttpStatusCode.NoContent, mapOf("id" to id, "message" to "User deleted successfully"))
     }
   }
 }

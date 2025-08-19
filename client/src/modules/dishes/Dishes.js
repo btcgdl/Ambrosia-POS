@@ -1,6 +1,5 @@
+"use client";
 import { useState, useEffect } from "react";
-import NavBar from "../../components/navbar/NavBar";
-import Header from "../../components/header/Header";
 import CategoryManager from "./CategoryManager";
 import DishManager from "./DishManager";
 import {
@@ -13,12 +12,42 @@ import {
   deleteCategory,
   updateCategory,
 } from "./dishesService";
+import {
+  ChefHat,
+  Utensils,
+  Plus,
+  Edit,
+  Trash2,
+  Home,
+  Cookie,
+  Tags,
+} from "lucide-react";
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Input,
+  Spinner,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Divider,
+  Tabs,
+  Tab,
+} from "@heroui/react";
+import { useRouter } from "next/navigation";
+import { addToast } from "@heroui/react";
 
 export default function Dishes() {
+  const router = useRouter();
   const [dishes, setDishes] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("categories");
 
   useEffect(() => {
     async function fetchData() {
@@ -32,6 +61,12 @@ export default function Dishes() {
         setCategories(categoriesResponse);
       } catch (err) {
         setError("Error al cargar los datos");
+        addToast({
+          title: "Error",
+          description: "No se pudieron cargar los datos",
+          variant: "solid",
+          color: "danger",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -45,8 +80,20 @@ export default function Dishes() {
       await addCategory(category);
       const response = await getCategories();
       setCategories(response);
+      addToast({
+        title: "Éxito",
+        description: "Categoría creada correctamente",
+        variant: "solid",
+        color: "success",
+      });
     } catch (err) {
       setError(err.message || "Error al agregar la categoría");
+      addToast({
+        title: "Error",
+        description: err.message || "Error al agregar la categoría",
+        variant: "solid",
+        color: "danger",
+      });
     }
   };
 
@@ -60,8 +107,20 @@ export default function Dishes() {
       ]);
       setDishes(dishesResponse);
       setCategories(categoriesResponse);
+      addToast({
+        title: "Éxito",
+        description: "Categoría eliminada correctamente",
+        variant: "solid",
+        color: "success",
+      });
     } catch (err) {
       setError(err.message || "Error al eliminar la categoría");
+      addToast({
+        title: "Error",
+        description: err.message || "Error al eliminar la categoría",
+        variant: "solid",
+        color: "danger",
+      });
     }
   };
 
@@ -75,8 +134,20 @@ export default function Dishes() {
       ]);
       setDishes(dishesResponse);
       setCategories(categoriesResponse);
+      addToast({
+        title: "Éxito",
+        description: "Categoría actualizada correctamente",
+        variant: "solid",
+        color: "success",
+      });
     } catch (err) {
       setError(err.message || "Error al actualizar la categoría");
+      addToast({
+        title: "Error",
+        description: err.message || "Error al actualizar la categoría",
+        variant: "solid",
+        color: "danger",
+      });
     }
   };
 
@@ -86,8 +157,20 @@ export default function Dishes() {
       await addDish(dish);
       const response = await getDishes();
       setDishes(response);
+      addToast({
+        title: "Éxito",
+        description: "Platillo creado correctamente",
+        variant: "solid",
+        color: "success",
+      });
     } catch (err) {
       setError(err.message || "Error al agregar el platillo");
+      addToast({
+        title: "Error",
+        description: err.message || "Error al agregar el platillo",
+        variant: "solid",
+        color: "danger",
+      });
     }
   };
 
@@ -97,8 +180,20 @@ export default function Dishes() {
       await updateDish(dish);
       const response = await getDishes();
       setDishes(response);
+      addToast({
+        title: "Éxito",
+        description: "Platillo actualizado correctamente",
+        variant: "solid",
+        color: "success",
+      });
     } catch (err) {
       setError(err.message || "Error al actualizar el platillo");
+      addToast({
+        title: "Error",
+        description: err.message || "Error al actualizar el platillo",
+        variant: "solid",
+        color: "danger",
+      });
     }
   };
 
@@ -108,53 +203,168 @@ export default function Dishes() {
       await deleteDish(dishId);
       const response = await getDishes();
       setDishes(response);
+      addToast({
+        title: "Éxito",
+        description: "Platillo eliminado correctamente",
+        variant: "solid",
+        color: "success",
+      });
     } catch (err) {
       setError(err.message || "Error al eliminar el platillo");
+      addToast({
+        title: "Error",
+        description: err.message || "Error al eliminar el platillo",
+        variant: "solid",
+        color: "danger",
+      });
     }
   };
 
   if (isLoading) {
     return (
-      <main className="h-[90%] w-full flex items-center justify-center">
-        <div className="h-[95%] w-[95%] bg-amber-100 rounded-xl p-4 flex items-center justify-center">
-          <p className="text-3xl font-bold">
-            Cargando platillos y categorías...
-          </p>
-        </div>
-      </main>
+      <div className="min-h-screen gradient-fresh flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-2xl border-0 bg-white">
+          <CardBody className="flex flex-col items-center justify-center py-12">
+            <Spinner size="lg" color="success" />
+            <p className="text-lg font-semibold text-deep mt-4">
+              Cargando platillos y categorías...
+            </p>
+          </CardBody>
+        </Card>
+      </div>
     );
   }
 
   if (error && dishes.length === 0 && categories.length === 0) {
     return (
-      <main className="h-[90%] w-full flex items-center justify-center">
-        <div className="h-[95%] w-[95%] bg-amber-100 rounded-xl p-4 flex items-center justify-center">
-          <p className="text-3xl font-bold text-red-600">{error}</p>
-        </div>
-      </main>
+      <div className="min-h-screen gradient-fresh flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-2xl border-0 bg-white">
+          <CardHeader className="text-center pb-4">
+            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+              <ChefHat className="w-8 h-8 text-red-600" />
+            </div>
+          </CardHeader>
+          <CardBody className="text-center">
+            <h2 className="text-xl font-bold text-deep mb-2">Error</h2>
+            <p className="text-red-600 mb-4">{error}</p>
+            <Button
+              variant="outline"
+              color="primary"
+              onPress={() => window.location.reload()}
+              className="w-full"
+            >
+              Intentar de nuevo
+            </Button>
+          </CardBody>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <main className="h-[90%] w-full flex items-center justify-center">
-      <div className="h-[95%] w-[95%] bg-amber-100 rounded-xl p-4 flex gap-6">
+    <div className="min-h-screen gradient-fresh p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <Card className="mb-6 shadow-lg border-0 bg-white">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between w-full">
+              <Button
+                variant="ghost"
+                onPress={() => router.push("/")}
+                className="text-forest hover:bg-mint/20"
+              >
+                <Home className="w-5 h-5 mr-2" />
+                Inicio
+              </Button>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-mint rounded-full flex items-center justify-center mb-2">
+                  <Utensils className="w-6 h-6 text-forest" />
+                </div>
+                <h1 className="text-2xl font-bold text-deep">
+                  Gestión de Platillos
+                </h1>
+                <p className="text-forest text-sm">
+                  {categories.length} categorías • {dishes.length} platillos
+                </p>
+              </div>
+              <div className="w-20" />
+            </div>
+          </CardHeader>
+        </Card>
+
         {error && (
-          <p className="text-red-600 text-xl absolute top-20">{error}</p>
+          <Card className="mb-6 bg-red-50 border-red-200">
+            <CardBody>
+              <p className="text-red-600 text-center font-semibold">{error}</p>
+            </CardBody>
+          </Card>
         )}
-        <CategoryManager
-          categories={categories}
-          addCategory={handleAddCategory}
-          deleteCategory={handleDeleteCategory}
-          updateCategory={handleUpdateCategory}
-        />
-        <DishManager
-          dishes={dishes}
-          categories={categories}
-          addDish={handleAddDish}
-          updateDish={handleUpdateDish}
-          deleteDish={handleDeleteDish}
-        />
+
+        {/* Tabs Navigation */}
+        <Card className="mb-6 shadow-lg border-0 bg-white">
+          <CardBody className="p-0">
+            <Tabs
+              selectedKey={activeTab}
+              onSelectionChange={setActiveTab}
+              variant="underlined"
+              classNames={{
+                tabList:
+                  "gap-6 w-full relative rounded-none p-0 border-b border-divider",
+                cursor: "w-full bg-forest",
+                tab: "max-w-fit px-6 py-4 h-12",
+                tabContent: "group-data-[selected=true]:text-forest",
+              }}
+            >
+              <Tab
+                key="categories"
+                title={
+                  <div className="flex items-center space-x-2">
+                    <Tags className="w-4 h-4" />
+                    <span>Categorías</span>
+                    <div className="bg-mint text-forest rounded-full px-2 py-0.5 text-xs font-medium">
+                      {categories.length}
+                    </div>
+                  </div>
+                }
+              />
+              <Tab
+                key="dishes"
+                title={
+                  <div className="flex items-center space-x-2">
+                    <Cookie className="w-4 h-4" />
+                    <span>Platillos</span>
+                    <div className="bg-mint text-forest rounded-full px-2 py-0.5 text-xs font-medium">
+                      {dishes.length}
+                    </div>
+                  </div>
+                }
+              />
+            </Tabs>
+          </CardBody>
+        </Card>
+
+        {/* Content */}
+        <div className="space-y-6">
+          {activeTab === "categories" && (
+            <CategoryManager
+              categories={categories}
+              addCategory={handleAddCategory}
+              deleteCategory={handleDeleteCategory}
+              updateCategory={handleUpdateCategory}
+            />
+          )}
+
+          {activeTab === "dishes" && (
+            <DishManager
+              dishes={dishes}
+              categories={categories}
+              addDish={handleAddDish}
+              updateDish={handleUpdateDish}
+              deleteDish={handleDeleteDish}
+            />
+          )}
+        </div>
       </div>
-    </main>
+    </div>
   );
 }

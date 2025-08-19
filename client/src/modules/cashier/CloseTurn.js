@@ -1,15 +1,14 @@
-﻿import { useState } from "react";
-import NavBar from "../../components/navbar/NavBar";
-import Header from "../../components/header/Header";
+"use client";
+import { useState } from "react";
 import { closeTurn } from "./cashierService";
-import { useNavigate } from "react-router-dom";
 import { useTurn } from "./useTurn";
+import { useRouter } from "next/navigation";
 
 export default function CloseTurn() {
   const [finalAmount, setFinalAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const navigate = useRouter();
   const [success, setSuccess] = useState(false);
   const { openTurn, updateTurn } = useTurn();
 

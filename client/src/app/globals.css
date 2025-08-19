@@ -1,0 +1,176 @@
+@import "tailwindcss";
+@plugin './hero.ts';
+/* Note: You may need to change the path to fit your project structure */
+@source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
+/*https://coolors.co/1c7c54-73e2a7-def4c6-1b512d-b1cf5f*/
+
+@theme {
+  /* Color Primario - Verde Bosque #1C7C54 */
+  --color-primary-50: #e8f5ef;
+  --color-primary-100: #c5e7d7;
+  --color-primary-200: #9ed8bc;
+  --color-primary-300: #77c9a1;
+  --color-primary-400: #59bd8d;
+  --color-primary-500: #1c7c54; /* Tu color base */
+  --color-primary-600: #19704c;
+  --color-primary-700: #166343;
+  --color-primary-800: #145739;
+  --color-primary-900: #0f4129;
+  --color-primary-950: #0a2b1b;
+
+  /* Color Secundario - Verde Menta #73E2A7 */
+  --color-secondary-50: #f0fcf5;
+  --color-secondary-100: #dbf8e7;
+  --color-secondary-200: #b9f1d0;
+  --color-secondary-300: #73e2a7; /* Tu color base */
+  --color-secondary-400: #5dd994;
+  --color-secondary-500: #3dc874;
+  --color-secondary-600: #2fb15d;
+  --color-secondary-700: #27944d;
+  --color-secondary-800: #23773f;
+  --color-secondary-900: #1e6135;
+  --color-secondary-950: #0d3a1e;
+
+  /* Color de Acento - Verde Lima #B1CF5F */
+  --color-accent-50: #f8fce8;
+  --color-accent-100: #eff8c6;
+  --color-accent-200: #e0f190;
+  --color-accent-300: #b1cf5f; /* Tu color base */
+  --color-accent-400: #a3c54a;
+  --color-accent-500: #8db331;
+  --color-accent-600: #729425;
+  --color-accent-700: #567120;
+  --color-accent-800: #45591e;
+  --color-accent-900: #3a4a1c;
+  --color-accent-950: #1f290b;
+
+  /* Color Claro - Crema Verde #DEF4C6 */
+  --color-light-50: #fdfef8;
+  --color-light-100: #fbfeef;
+  --color-light-200: #f5fcdb;
+  --color-light-300: #def4c6; /* Tu color base */
+  --color-light-400: #d1eeaa;
+  --color-light-500: #bce482;
+  --color-light-600: #a0d05f;
+  --color-light-700: #7fab46;
+  --color-light-800: #65893a;
+  --color-light-900: #537132;
+  --color-light-950: #2a3a17;
+
+  /* Color Oscuro - Verde Profundo #1B512D */
+  --color-dark-50: #e9f2ec;
+  --color-dark-100: #c8e0cf;
+  --color-dark-200: #a3ccaf;
+  --color-dark-300: #7eb88f;
+  --color-dark-400: #62a876;
+  --color-dark-500: #46985d;
+  --color-dark-600: #347a48;
+  --color-dark-700: #266139;
+  --color-dark-800: #1b512d; /* Tu color base */
+  --color-dark-900: #143d22;
+  --color-dark-950: #0a1f11;
+
+  /* Colores neutros complementarios */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --color-gray-950: #030712;
+
+  /* Configuración de diseño */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-full: 9999px;
+}
+
+/* Los colores ahora se manejan completamente por el plugin de HeroUI en hero.ts */
+
+/* Utilidades personalizadas para tu paleta */
+@layer utilities {
+  /* Colores principales */
+  .text-forest {
+    color: var(--color-primary-500);
+  }
+  .bg-forest {
+    background-color: var(--color-primary-500);
+  }
+  .border-forest {
+    border-color: var(--color-primary-500);
+  }
+
+  .text-mint {
+    color: var(--color-secondary-300);
+  }
+  .bg-mint {
+    background-color: var(--color-secondary-300);
+  }
+  .border-mint {
+    border-color: var(--color-secondary-300);
+  }
+
+  .text-lime {
+    color: var(--color-accent-300);
+  }
+  .bg-lime {
+    background-color: var(--color-accent-300);
+  }
+  .border-lime {
+    border-color: var(--color-accent-300);
+  }
+
+  .text-cream {
+    color: var(--color-light-300);
+  }
+  .bg-cream {
+    background-color: var(--color-light-300);
+  }
+  .border-cream {
+    border-color: var(--color-light-300);
+  }
+
+  .text-deep {
+    color: var(--color-dark-800);
+  }
+  .bg-deep {
+    background-color: var(--color-dark-800);
+  }
+  .border-deep {
+    border-color: var(--color-dark-800);
+  }
+
+  /* Gradientes personalizados */
+  .gradient-forest {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary-500) 0%,
+      var(--color-secondary-300) 100%
+    );
+  }
+
+  .gradient-nature {
+    background: linear-gradient(
+      135deg,
+      var(--color-dark-800) 0%,
+      var(--color-primary-500) 50%,
+      var(--color-accent-300) 100%
+    );
+  }
+
+  .gradient-fresh {
+    background: linear-gradient(
+      135deg,
+      var(--color-secondary-300) 0%,
+      var(--color-accent-300) 100%
+    );
+  }
+}

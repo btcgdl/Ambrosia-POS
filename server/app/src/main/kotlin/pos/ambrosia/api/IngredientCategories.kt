@@ -69,11 +69,11 @@ fun Route.ingredientCategories(ingredientCategoryService: IngredientCategoryServ
       val isUpdated = ingredientCategoryService.updateIngredientCategory(categoryWithId)
 
       if (!isUpdated) {
-        call.respond(HttpStatusCode.NotFound, "Ingredient category not found or update failed")
+        call.respond(HttpStatusCode.NotFound, "Ingredient category with ID: $id not found")
         return@put
       }
 
-      call.respond(HttpStatusCode.OK, "Ingredient category updated successfully")
+      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Ingredient category updated successfully"))
     }
 
     delete("/{id}") {
@@ -86,13 +86,13 @@ fun Route.ingredientCategories(ingredientCategoryService: IngredientCategoryServ
       val isDeleted = ingredientCategoryService.deleteIngredientCategory(id)
       if (!isDeleted) {
         call.respond(
-                HttpStatusCode.BadRequest,
-                "Cannot delete ingredient category - it may be in use or not found"
+          HttpStatusCode.BadRequest,
+          "Cannot delete ingredient category - it may be in use or not found"
         )
         return@delete
       }
 
-      call.respond(HttpStatusCode.NoContent, "Ingredient category deleted successfully")
+      call.respond(HttpStatusCode.NoContent, mapOf("id" to id, "message" to "Ingredient category deleted successfully"))
     }
   }
 }
