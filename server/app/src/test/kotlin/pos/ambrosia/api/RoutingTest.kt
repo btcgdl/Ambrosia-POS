@@ -1,4 +1,4 @@
-package pos.ambrosia
+package pos.ambrosia.test
 
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -6,11 +6,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
 import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.config.*
-import io.ktor.server.testing.*
-import io.ktor.server.engine.*
-import io.ktor.server.cio.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -24,7 +19,6 @@ class RoutingE2ETest {
     private val serverPort = 9154
     private val serverHost = "127.0.0.1"
     private val serverUrl = "http://$serverHost:$serverPort"
-    private lateinit var server: ApplicationEngine
     private val client = HttpClient()
 
     @Test

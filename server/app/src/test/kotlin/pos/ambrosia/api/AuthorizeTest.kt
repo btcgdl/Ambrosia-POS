@@ -1,2 +1,0 @@
-package pos.ambrosia.api
-
