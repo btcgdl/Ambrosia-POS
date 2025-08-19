@@ -86,8 +86,8 @@ fun Route.ingredientCategories(ingredientCategoryService: IngredientCategoryServ
       val isDeleted = ingredientCategoryService.deleteIngredientCategory(id)
       if (!isDeleted) {
         call.respond(
-                HttpStatusCode.BadRequest,
-                "Cannot delete ingredient category - it may be in use or not found"
+          HttpStatusCode.BadRequest,
+          "Cannot delete ingredient category - it may be in use or not found"
         )
         return@delete
       }

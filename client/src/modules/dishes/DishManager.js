@@ -338,7 +338,7 @@ export default function DishManager({
                             </h4>
                             <div className="flex items-center space-x-4 text-sm text-forest">
                               <span className="flex items-center">
-                                <DollarSign className="w-3 h-3 mr-1" />$
+                                <DollarSign className="w-3 h-3 mr-1" />
                                 {dish.price.toFixed(2)}
                               </span>
                               <div className="flex items-center bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">

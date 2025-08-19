@@ -25,8 +25,8 @@ fun Application.Handler() {
     exception<Throwable> { call, cause ->
       logger.error("Unhandled Throwable: ${cause.message}", cause)
       call.respondText(
-              text = cause.message ?: "",
-              status = defaultExceptionStatusCode(cause) ?: HttpStatusCode.InternalServerError
+        text = cause.message ?: "",
+        status = defaultExceptionStatusCode(cause) ?: HttpStatusCode.InternalServerError
       )
     }
     exception<InvalidCredentialsException> { call, cause ->
@@ -52,15 +52,15 @@ fun Application.Handler() {
     exception<PhoenixNodeInfoException> { call, cause ->
       logger.error("Phoenix node info error: ${cause.message}")
       call.respond(
-              HttpStatusCode.ServiceUnavailable,
-              Message("Unable to retrieve node information")
+        HttpStatusCode.ServiceUnavailable,
+        Message("Unable to retrieve node information")
       )
     }
     exception<PhoenixBalanceException> { call, cause ->
       logger.error("Phoenix balance error: ${cause.message}")
       call.respond(
-              HttpStatusCode.ServiceUnavailable,
-              Message("Unable to retrieve balance information")
+        HttpStatusCode.ServiceUnavailable,
+        Message("Unable to retrieve balance information")
       )
     }
     exception<PhoenixServiceException> { call, cause ->

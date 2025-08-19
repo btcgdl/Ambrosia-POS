@@ -79,8 +79,7 @@ fun Route.wallet(phoenixService: PhoenixService) {
       // Get specific incoming payment
       get("/incoming/{paymentHash}") {
         val paymentHash =
-                call.parameters["paymentHash"]
-                        ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing paymentHash")
+          call.parameters["paymentHash"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing paymentHash")
         val payment = phoenixService.getIncomingPayment(paymentHash)
         call.respond(HttpStatusCode.OK, payment)
       }
@@ -100,8 +99,7 @@ fun Route.wallet(phoenixService: PhoenixService) {
       // Get specific outgoing payment by ID
       get("/outgoing/{paymentId}") {
         val paymentId =
-                call.parameters["paymentId"]
-                        ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing paymentId")
+          call.parameters["paymentId"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing paymentId")
         val payment = phoenixService.getOutgoingPayment(paymentId)
         call.respond(HttpStatusCode.OK, payment)
       }
@@ -109,8 +107,7 @@ fun Route.wallet(phoenixService: PhoenixService) {
       // Get specific outgoing payment by hash
       get("/outgoingbyhash/{paymentHash}") {
         val paymentHash =
-                call.parameters["paymentHash"]
-                        ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing paymentHash")
+          call.parameters["paymentHash"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing paymentHash")
         val payment = phoenixService.getOutgoingPaymentByHash(paymentHash)
         call.respond(HttpStatusCode.OK, payment)
       }
