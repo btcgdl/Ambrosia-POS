@@ -52,7 +52,8 @@ install_phoenixd() {
 
 # --- Flujo principal de ejecución ---
 print_header
-install_ambrosia
 install_phoenixd
+install_ambrosia
+
 
 echo "🎉 ¡Instalación completa!"
