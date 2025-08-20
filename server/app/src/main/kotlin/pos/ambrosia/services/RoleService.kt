@@ -32,7 +32,7 @@ class RolesService(private val connection: Connection) {
     val encryptedPin =
             SecurePinProcessor.hashPinForStorage(
                     role.password?.toCharArray() ?: charArrayOf(),
-                    generatedId
+                    role.role
             )
 
     statement.setString(1, generatedId)
@@ -93,7 +93,8 @@ class RolesService(private val connection: Connection) {
     }
   }
 
-  suspend fun updateRole(role: Role): Boolean {
+  suspend fun updateRole(id: String?, role: Role): Boolean {
+    if (id == null) return false
     // Verificar que el nombre del rol no exista ya (excluyendo el rol actual)
     if (role.id != null && roleNameExistsExcludingId(role.role, role.id)) {
       logger.error("Role name already exists: ${role.role}")
@@ -101,8 +102,15 @@ class RolesService(private val connection: Connection) {
     }
 
     val statement = connection.prepareStatement(UPDATE_ROLE)
+
+    val encryptedPin =
+      SecurePinProcessor.hashPinForStorage(
+        role.password?.toCharArray() ?: charArrayOf(),
+        id
+      )
+
     statement.setString(1, role.role)
-    statement.setString(2, role.password)
+    statement.setString(2, SecurePinProcessor.byteArrayToBase64(encryptedPin))
     statement.setBoolean(3, role.isAdmin ?: false)
     statement.setString(4, role.id)
 
