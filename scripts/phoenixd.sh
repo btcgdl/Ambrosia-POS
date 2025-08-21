@@ -20,7 +20,21 @@ done
 
 TAG="0.6.2"
 PHOENIXD_URL="https://github.com/ACINQ/phoenixd/releases/download/v${TAG}"
-PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-linux-x64.zip"
+
+# Detect the OS architecture and set the appropriate URL
+ARCH=$(uname -m)
+if [[ "$ARCH" == "x86_64" ]]; then
+  PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-linux-x64.zip"
+elif [[ "$ARCH" == "aarch64" ]]; then
+  PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-linux-arm64.zip"
+else
+  echo "❌ Unsupported architecture: $ARCH"
+  exit 1
+fi
+
+echo "Detected architecture: $ARCH"
+echo "Using URL: $PHOENIXD_ZIP"
+
 VERIFIER_URL="https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/verify.sh"
 
 echo ""
