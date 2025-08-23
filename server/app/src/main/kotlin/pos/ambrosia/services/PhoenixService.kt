@@ -1,6 +1,7 @@
 package pos.ambrosia.services
 
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
@@ -49,8 +50,7 @@ class PhoenixService(private val phoenixUrl: String = "http://localhost:9740") {
         )
       }
 
-      val responseText = response.bodyAsText()
-      return Json.decodeFromString<NodeInfo>(responseText)
+      return response.body<NodeInfo>()
     } catch (e: PhoenixNodeInfoException) {
       throw e
     } catch (e: Exception) {
@@ -66,8 +66,7 @@ class PhoenixService(private val phoenixUrl: String = "http://localhost:9740") {
         throw PhoenixBalanceException("Phoenix node returned status code: ${response.status.value}")
       }
 
-      val responseText = response.bodyAsText()
-      return Json.decodeFromString<PhoenixBalance>(responseText)
+      return response.body<PhoenixBalance>()
     } catch (e: PhoenixBalanceException) {
       throw e
     } catch (e: Exception) {
@@ -95,8 +94,7 @@ class PhoenixService(private val phoenixUrl: String = "http://localhost:9740") {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
 
-      val responseText = response.bodyAsText()
-      return Json.decodeFromString<CreateInvoiceResponse>(responseText)
+      return response.body<CreateInvoiceResponse>()
     } catch (e: Exception) {
       throw PhoenixServiceException("Failed to create invoice on Phoenix: ${e.message}")
     }
@@ -139,8 +137,7 @@ class PhoenixService(private val phoenixUrl: String = "http://localhost:9740") {
       if (response.status.value != 200) {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
-      val responseText = response.bodyAsText()
-      return Json.decodeFromString<PaymentResponse>(responseText)
+      return response.body<PaymentResponse>()
     } catch (e: Exception) {
       throw PhoenixServiceException("Failed to pay invoice on Phoenix: ${e.message}")
     }
@@ -162,8 +159,7 @@ class PhoenixService(private val phoenixUrl: String = "http://localhost:9740") {
       if (response.status.value != 200) {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
-      val responseText = response.bodyAsText()
-      return Json.decodeFromString<PaymentResponse>(responseText)
+      return response.body<PaymentResponse>()
     } catch (e: Exception) {
       throw PhoenixServiceException("Failed to pay offer on Phoenix: ${e.message}")
     }
@@ -185,8 +181,7 @@ class PhoenixService(private val phoenixUrl: String = "http://localhost:9740") {
       if (response.status.value != 200) {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
-      val responseText = response.bodyAsText()
-      return Json.decodeFromString<PaymentResponse>(responseText)
+      return response.body<PaymentResponse>()
     } catch (e: Exception) {
       throw PhoenixServiceException("Failed to pay onchain transaction on Phoenix: ${e.message}")
     }
@@ -236,8 +231,7 @@ class PhoenixService(private val phoenixUrl: String = "http://localhost:9740") {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
 
-      val responseText = response.bodyAsText()
-      return Json.decodeFromString<List<IncomingPayment>>(responseText)
+      return response.body<List<IncomingPayment>>()
     } catch (e: Exception) {
       throw PhoenixServiceException("Failed to list incoming payments on Phoenix: ${e.message}")
     }
@@ -251,8 +245,7 @@ class PhoenixService(private val phoenixUrl: String = "http://localhost:9740") {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
 
-      val responseText = response.bodyAsText()
-      return Json.decodeFromString<IncomingPayment>(responseText)
+      return response.body<IncomingPayment>()
     } catch (e: Exception) {
       throw PhoenixServiceException("Failed to get incoming payment on Phoenix: ${e.message}")
     }
@@ -279,8 +272,7 @@ class PhoenixService(private val phoenixUrl: String = "http://localhost:9740") {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
 
-      val responseText = response.bodyAsText()
-      return Json.decodeFromString<List<OutgoingPayment>>(responseText)
+      return response.body<List<OutgoingPayment>>()
     } catch (e: Exception) {
       throw PhoenixServiceException("Failed to list outgoing payments on Phoenix: ${e.message}")
     }
@@ -294,8 +286,7 @@ class PhoenixService(private val phoenixUrl: String = "http://localhost:9740") {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
 
-      val responseText = response.bodyAsText()
-      return Json.decodeFromString<OutgoingPayment>(responseText)
+      return response.body<OutgoingPayment>()
     } catch (e: Exception) {
       throw PhoenixServiceException("Failed to get outgoing payment on Phoenix: ${e.message}")
     }
@@ -310,8 +301,7 @@ class PhoenixService(private val phoenixUrl: String = "http://localhost:9740") {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
 
-      val responseText = response.bodyAsText()
-      return Json.decodeFromString<OutgoingPayment>(responseText)
+      return response.body<OutgoingPayment>()
     } catch (e: Exception) {
       throw PhoenixServiceException(
               "Failed to get outgoing payment by hash on Phoenix: ${e.message}"
