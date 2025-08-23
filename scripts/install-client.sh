@@ -16,13 +16,31 @@ for arg in "$@"; do
   esac
 done
 
-# Variables
-APP_NAME="ambrosia-client"
-INSTALL_DIR="$HOME/.local/ambrosia/client"
-SERVICE_FILE="/etc/systemd/system/$APP_NAME.service"
-SRC_DIR=$(dirname "$(readlink -f "$0")")/../client
+TAG="0.1.0-alpha"
+CLIENT_DIST_FILE="ambrosia-client-${TAG}.tar.gz"
+CLIENT_DIST_URL="https://github.com/btcgdl/Ambrosia-POS/releases/download/v${TAG}/${CLIENT_DIST_FILE}"
 
-echo "=== Starting Ambrosia POS Client installation ==="
+echo " Starting Ambrosia POS Client installation "
+
+INSTALL_DIR="$HOME/.local/ambrosia/client"
+SERVICE_FILE="/etc/systemd/system/ambrosia-client.service"
+
+# Check if Ambrosia Client is already installed
+if [ -d "${INSTALL_DIR}" ]; then
+  echo "⚠️ Ambrosia Client is already installed at ${INSTALL_DIR}"
+  if [[ "$AUTO_YES" != true ]]; then
+    read -p "Do you want to continue? This will overwrite the existing installation. (y/n): " -r CONTINUE_REPLY
+    if [[ ! $CONTINUE_REPLY =~ ^[Yy]$ ]]; then
+      echo "Installation cancelled."
+      exit 0
+    fi
+  else
+    echo "Running in auto-yes mode. Overwriting existing installation."
+  fi
+  # Clean up old installation
+  echo "Removing existing installation..."
+  rm -rf "${INSTALL_DIR}"
+fi
 
 # Check if Node.js and npm are installed
 if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
@@ -35,13 +53,21 @@ echo "✅ Node.js and npm check passed."
 echo "Setting up installation directory at $INSTALL_DIR..."
 mkdir -p "$INSTALL_DIR"
 
-echo "Copying client files from $SRC_DIR..."
-if [ ! -d "$SRC_DIR" ]; then
-    echo "❌ Error: Client directory not found at $SRC_DIR"
-    exit 1
+# --- Download and extract client ---
+echo "Downloading client from $CLIENT_DIST_URL..."
+TEMP_DIR=$(mktemp -d)
+# Use wget or curl
+if command -v wget &> /dev/null; then
+    wget -q -O "${TEMP_DIR}/${CLIENT_DIST_FILE}" "$CLIENT_DIST_URL"
+else
+    curl -sL -o "${TEMP_DIR}/${CLIENT_DIST_FILE}" "$CLIENT_DIST_URL"
 fi
-# Use -a to preserve attributes and . to include dotfiles
-cp -a "$SRC_DIR"/. "$INSTALL_DIR"/
+
+echo "Extracting client files to $INSTALL_DIR..."
+# Assuming tarball has a top-level dir e.g., 'ambrosia-client-0.1.0-alpha/'
+tar -xzf "${TEMP_DIR}/${CLIENT_DIST_FILE}" -C "$INSTALL_DIR" --strip-components=1
+rm -rf "$TEMP_DIR"
+
 
 # --- Install production dependencies ---
 echo "Installing Node.js dependencies..."
@@ -51,15 +77,14 @@ npm install --production
 echo "Dependencies installed."
 
 # --- Optionally, create and configure the systemd service ---
+REPLY="n"
 if [[ "$AUTO_YES" == true ]]; then
   echo "Auto-installing systemd service..."
   REPLY="y"
-elif [[ -t 0 ]]; then
-  echo "Do you want to set up a systemd service (requires sudo permissions)? (y/n): "
-  read -r REPLY
+elif [[ -t 0 ]]; then # Check if running in a terminal
+  read -p "Do you want to set up a systemd service (requires sudo permissions)? (y/n): " -r REPLY
 else
   echo "Running in non-interactive mode. Skipping systemd service setup."
-  REPLY="n"
 fi
 
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -69,7 +94,7 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
   echo "To start it manually, run:"
   echo "cd $INSTALL_DIR && npm start"
   echo ""
-  exit
+  exit 0
 fi
 
 NPM_EXEC_PATH=$(which npm)
@@ -80,7 +105,7 @@ fi
 
 echo "Creating systemd service file at $SERVICE_FILE..."
 
-sudo tee "$SERVICE_FILE" > /dev/null <<EOF
+sudo tee "$SERVICE_FILE" > /dev/null << EOF
 [Unit]
 Description=Ambrosia POS Client (Next.js)
 After=network.target
@@ -99,13 +124,13 @@ WantedBy=multi-user.target
 EOF
 
 # --- Enable and start the service ---
-echo "Enabling and starting service '$APP_NAME'..."
+echo "Enabling and starting service 'ambrosia-client'..."
 sudo systemctl daemon-reload
-sudo systemctl enable "$APP_NAME"
-sudo systemctl restart "$APP_NAME"
-sudo systemctl status "$APP_NAME" --no-pager
+sudo systemctl enable "ambrosia-client"
+sudo systemctl restart "ambrosia-client"
+sudo systemctl status "ambrosia-client" --no-pager
 
 echo ""
 echo "✅ Installation completed!"
 echo "Ambrosia POS client is running as a systemd service."
-echo "To view the logs, use: journalctl -u $APP_NAME -f"
+echo "To view the logs, use: journalctl -u ambrosia-client -f"
