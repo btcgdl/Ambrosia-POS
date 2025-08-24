@@ -59,9 +59,12 @@ data class IncomingPayment(
         val description: String? = null,
         val invoice: String? = null,
         val isPaid: Boolean,
+        val isExpired: Boolean? = null,
+        val requestedSat: Long? = null,
         val receivedSat: Long,
         val fees: Long,
         val payerKey: String? = null,
+        val expiresAt: Long? = null,
         val completedAt: Long? = null,
         val createdAt: Long
 )

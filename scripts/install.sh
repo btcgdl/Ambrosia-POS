@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Termina el script inmediatamente si un comando falla.
+# Exit immediately if a command exits with a non-zero status.
 set -e
 
-# --- Validación de argumentos ---
+# --- Argument validation ---
 AUTO_YES=false
 for arg in "$@"; do
   case $arg in
@@ -12,47 +12,62 @@ for arg in "$@"; do
       shift
       ;;
     *)
-      # Opción desconocida
+      # Unknown option
       ;;
   esac
 done
 
-# --- Funciones para mejorar la legibilidad ---
+# --- Functions for readability ---
 print_header() {
   echo "----------------------------------------"
-  echo " 🚀 Instalador Unificado Ambrosia & Phoenixd"
+  echo " 🚀 Unified Ambrosia & Phoenixd Installer"
   echo "----------------------------------------"
 }
 
 install_ambrosia() {
-  echo "➡️  Iniciando instalación de Ambrosia POS..."
+  echo "➡️  Starting Ambrosia POS installation..."
   local script_path="/tmp/ambrosia_install_temp.sh"
   if ! curl -fsSL "https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/ambrosia.sh" -o "$script_path"; then
-    echo "❌ Error al descargar el script de instalación de Ambrosia." >&2
+    echo "❌ Error downloading Ambrosia installation script." >&2
     exit 1
   fi
   chmod +x "$script_path"
   "$script_path" "$@"
   rm "$script_path"
-  echo "✅ Ambrosia POS instalado."
+  echo "✅ Ambrosia POS installed."
 }
 
 install_phoenixd() {
-  echo "➡️  Iniciando instalación de phoenixd..."
+  echo "➡️  Starting phoenixd installation..."
   local script_path="/tmp/phoenixd_install_temp.sh"
   if ! curl -fsSL "https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/phoenixd.sh" -o "$script_path"; then
-    echo "❌ Error al descargar el script de instalación de phoenixd." >&2
+    echo "❌ Error downloading phoenixd installation script." >&2
     exit 1
   fi
   chmod +x "$script_path"
   "$script_path" "$@"
   rm "$script_path"
-  echo "✅ phoenixd instalado."
+  echo "✅ phoenixd installed."
 }
 
-# --- Flujo principal de ejecución ---
-print_header
-install_ambrosia
-install_phoenixd
+install_client() {
+  echo "➡️  Starting client installation..."
+  local script_path="/tmp/client_install_temp.sh"
+  if ! curl -fsSL "https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/install-client.sh" -o "$script_path"; then
+    echo "❌ Error downloading client installation script." >&2
+    exit 1
+  fi
+  chmod +x "$script_path"
+  "$script_path" "$@"
+  rm "$script_path"
+  echo "✅ Client installed."
+}
 
-echo "🎉 ¡Instalación completa!"
+# --- Main execution flow ---
+print_header
+install_phoenixd
+install_ambrosia
+install_client
+
+
+echo "🎉 Installation complete!"

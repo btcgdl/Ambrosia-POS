@@ -20,14 +20,31 @@ done
 
 TAG="0.6.2"
 PHOENIXD_URL="https://github.com/ACINQ/phoenixd/releases/download/v${TAG}"
-PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-linux-x64.zip"
+
+# Detect the OS architecture and set the appropriate URL
+ARCH=$(uname -m)
+OS=$(uname -s)
+if [[ "$ARCH" == "x86_64" ]]; then
+  PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-linux-x64.zip"
+  OS="linux-x64"
+elif [[ "$ARCH" == "aarch64" ]]; then
+  PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-linux-arm64.zip"
+  OS="linux-arm64"
+else
+  echo "❌ Unsupported architecture: $ARCH"
+  exit 1
+fi
+
+echo "Detected architecture: $ARCH"
+echo "Using URL: $PHOENIXD_ZIP"
+
 VERIFIER_URL="https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/verify.sh"
 
 echo ""
 echo ""
 echo "⚡️ Welcome to Mastering phoenixd installer"
 echo "-----------------------------------------"
-echo "This script will install linux-x64 version of phoenixd"
+echo "This script will install linux-${OS} version of phoenixd"
 echo "-----------------------------------------"
 
 # Check if phoenixd and phoenix-cli are already installed
@@ -86,9 +103,9 @@ if [[ $? -ne 0 ]]; then
 fi
 rm verify.sh
 
-sudo unzip -j phoenixd-${TAG}-linux-x64.zip -d /usr/local/bin
+sudo unzip -j phoenixd-${TAG}-${OS}.zip -d /usr/local/bin
 
-rm -f phoenixd-${TAG}-linux-x64.zip
+rm -f phoenixd-${TAG}-${OS}.zip
 
 echo "✅ phoenixd installed to $INSTALL_DIR"
 

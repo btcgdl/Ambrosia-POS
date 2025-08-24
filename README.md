@@ -1,5 +1,5 @@
 # Ambrosia-POS
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/JordyPirata/Ambrosia-POS)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/btcgdl/Ambrosia-POS)
 
 **Status: In Development**
 

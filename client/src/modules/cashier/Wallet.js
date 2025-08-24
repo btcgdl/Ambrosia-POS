@@ -7,7 +7,7 @@ import {
   getOutgoingTransactions,
   payInvoiceFromService,
 } from "./cashierService";
-import QRCode from "react-qr-code";
+import { QRCode } from "react-qr-code";
 import {
   ChefHat,
   Wallet as WalletIcon,

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Script para ejecutar Ambrosia POS Server con logs habilitados
-# Uso: ./run-server.sh [opciones para la aplicación]
+# Script to run Ambrosia POS Server with logging enabled
+# Usage: ./run-server.sh [application options]
 
 # Initialize SDKMAN! if installed
 if [ -f "$HOME/.sdkman/bin/sdkman-init.sh" ]; then
@@ -22,23 +22,23 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "$SCRIPT_PATH")" &> /dev/null && pwd)
 # Route to the JAR file, assuming it's in the same directory as the script
 JAR_PATH="$SCRIPT_DIR/ambrosia.jar"
 
-# Verificar que el JAR existe
+# Verify that the JAR exists
 if [ ! -f "$JAR_PATH" ]; then
     echo "Error: $JAR_PATH not found"
     echo "Please ensure Ambrosia POS is installed correctly in $SCRIPT_DIR"
     exit 1
 fi
 
-# Directorio de configuración personalizado
+# Custom configuration directory
 CONFIG_DIR="$HOME/.Ambrosia-POS"
 
-# Configuración de logging
+# Logging configuration
 LOGBACK_CONFIG="$CONFIG_DIR/Ambrosia-Logs.xml"
 
-# Opciones de la JVM para logging
+# JVM options for logging
 JVM_OPTS=""
 
-# Verificar que el archivo de configuración de logs existe
+# Verify that the log configuration file exists
 if [ -f "$LOGBACK_CONFIG" ]; then
     echo "Using external logback configuration: $LOGBACK_CONFIG"
     JVM_OPTS="-Dlogback.configurationFile=file:$LOGBACK_CONFIG"

@@ -196,15 +196,6 @@ export default function Rooms() {
                   Administrar espacios
                 </span>
               </p>
-              <Button
-                variant="solid"
-                color="primary"
-                onPress={() => router.push("/spaces")}
-                className="gradient-forest text-white"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Administrar Espacios
-              </Button>
             </CardBody>
           </Card>
         )}

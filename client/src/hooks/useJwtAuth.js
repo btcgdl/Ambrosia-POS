@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect, useCallback } from 'react';
-import { decodeToken, isTokenExpired, shouldRefreshToken } from '../lib/auth';
-import { getCookieValue } from '../modules/auth/authService';
+import { useState, useEffect, useCallback } from "react";
+import { decodeToken, isTokenExpired, shouldRefreshToken } from "../lib/auth";
+import { getCookieValue } from "../modules/auth/authService";
 
 export function useJwtAuth() {
   const [user, setUser] = useState(null);
@@ -9,27 +9,27 @@ export function useJwtAuth() {
   const [isLoading, setIsLoading] = useState(true);
 
   const getAccessToken = useCallback(() => {
-    return getCookieValue('accessToken');
+    return getCookieValue("accessToken");
   }, []);
 
   const getRefreshToken = useCallback(() => {
-    return getCookieValue('refreshToken');
+    return getCookieValue("refreshToken");
   }, []);
 
   const refreshTokens = useCallback(async () => {
     try {
-      const response = await fetch('/api/auth/refresh', {
-        method: 'POST',
-        credentials: 'include',
+      const response = await fetch("/api/auth/refresh", {
+        method: "POST",
+        credentials: "include",
       });
 
       if (response.ok) {
         return true;
       }
-      
+
       return false;
     } catch (error) {
-      console.error('Error refreshing tokens:', error);
+      console.error("Error refreshing tokens:", error);
       return false;
     }
   }, []);
@@ -40,6 +40,7 @@ export function useJwtAuth() {
 
     if (!accessToken) {
       setIsAuthenticated(false);
+      localStorage.clear;
       setUser(null);
       return false;
     }
@@ -58,7 +59,7 @@ export function useJwtAuth() {
           }
         }
       }
-      
+
       setIsAuthenticated(false);
       setUser(null);
       return false;
@@ -76,8 +77,10 @@ export function useJwtAuth() {
   }, [getAccessToken, getRefreshToken, refreshTokens]);
 
   const logout = useCallback(() => {
-    document.cookie = 'accessToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    document.cookie = 'refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.cookie =
+      "accessToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    document.cookie =
+      "refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     setUser(null);
     setIsAuthenticated(false);
   }, []);
@@ -101,7 +104,7 @@ export function useJwtAuth() {
 
       const now = Math.floor(Date.now() / 1000);
       const timeToExpiry = decoded.exp - now;
-      
+
       // Si quedan menos de 2 minutos, refrescar
       if (timeToExpiry <= 120) {
         console.log(`🔄 Refrescando token (expira en ${timeToExpiry}s)`);
@@ -118,8 +121,8 @@ export function useJwtAuth() {
       checkAuthStatus();
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, [checkAuthStatus]);
 
   return {
