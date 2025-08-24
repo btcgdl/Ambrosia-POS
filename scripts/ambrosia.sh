@@ -20,7 +20,7 @@ done
 
 TAG="0.1.1-alpha"
 AMBROSIA_URL="https://github.com/btcgdl/Ambrosia-POS/releases/download/v${TAG}"
-AMBROSIA_JAR=""${AMBROSIA_URL}/ambrosia-${TAG}.jar"
+AMBROSIA_JAR="${AMBROSIA_URL}/ambrosia-${TAG}.jar"
 RUN_SERVER="https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/v${TAG}/scripts/run-server.sh"
 
 echo ""
