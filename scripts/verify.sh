@@ -31,11 +31,11 @@ verify_package() {
   else
     # Interactive mode
     while true; do
-      read -r -p "Verify package signature and integrity? (Y/N): " response
+      read -r -p "Verify package signature and integrity? (y/n): " response
       case "$response" in
         [Yy]) break ;;
         [Nn]) echo "Verification skipped." ; return 0 ;;
-        *) echo "Invalid input. Please enter Y or N." ;;
+        *) echo "Invalid input. Please enter y or n." ;;
       esac
     done
   fi

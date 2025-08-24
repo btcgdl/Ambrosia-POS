@@ -156,3 +156,51 @@ echo ""
 echo "Note: If you manually added phoenixd to your PATH, please remove those entries"
 echo "from your ~/.bashrc, ~/.zshrc, or other shell configuration files."
 echo ""
+
+# Uninstall Ambrosia Client
+CLIENT_INSTALL_DIR="$HOME/.local/ambrosia/client"
+CLIENT_SERVICE_FILE="/etc/systemd/system/ambrosia-client.service"
+
+echo ""
+echo "🗑️  Ambrosia POS Client Uninstaller"
+echo "-----------------------------------"
+echo "This script will remove all Ambrosia POS Client components from your system."
+echo ""
+
+if [[ "$AUTO_YES" == true ]]; then
+  # Auto-yes mode
+  REPLY="y"
+elif [[ -t 0 ]]; then
+  # Interactive mode
+  echo "Are you sure you want to uninstall Ambrosia POS Client? (y/n): "
+  read -r REPLY
+else
+  # Non-interactive mode
+  echo "Running in non-interactive mode. Proceeding with uninstallation."
+  REPLY="y"
+fi
+
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+  echo "Client uninstallation cancelled."
+else
+  # Check if systemd service exists and stop/disable it
+  if [ -f "$CLIENT_SERVICE_FILE" ]; then
+    echo "Stopping and disabling Ambrosia POS Client service..."
+    sudo systemctl stop ambrosia-client 2>/dev/null || true
+    sudo systemctl disable ambrosia-client 2>/dev/null || true
+    sudo rm -f "$CLIENT_SERVICE_FILE" 2>/dev/null || true
+    sudo systemctl daemon-reload 2>/dev/null || true
+    echo "✅ Client systemd service removed"
+  fi
+
+  # Remove installation directory
+  if [ -d "$CLIENT_INSTALL_DIR" ]; then
+    echo "Removing client installation directory..."
+    rm -rf "$CLIENT_INSTALL_DIR"
+    echo "✅ Client installation directory removed"
+  fi
+
+  echo ""
+  echo "✅ Ambrosia POS Client has been uninstalled successfully!"
+  echo ""
+fi
