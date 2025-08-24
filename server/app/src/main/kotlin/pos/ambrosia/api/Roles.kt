@@ -60,7 +60,7 @@ fun Route.roles(roleService: RolesService) {
       }
 
       val updatedRole = call.receive<Role>()
-      val isUpdated = roleService.updateRole(updatedRole.copy(id = id))
+      val isUpdated = roleService.updateRole(id, updatedRole)
       logger.info(isUpdated.toString())
 
       if (!isUpdated) {

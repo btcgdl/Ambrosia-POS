@@ -24,14 +24,14 @@ object SecurePinProcessor {
   private const val ITERATION_COUNT = 10000
   private const val KEY_LENGTH = 256
 
-  fun hashPinForStorage(pin: CharArray, userName: String): ByteArray {
+  fun hashPinForStorage(pin: CharArray, id: String): ByteArray {
     try {
       val appMasterKey = getAppMasterKey()
       if (appMasterKey.isEmpty()) {
         throw IllegalStateException("App Master Key no cargada o está vacía.")
       }
 
-      val combinedSalt = (appMasterKey.plus(userName.toByteArray(Charsets.UTF_8)))
+      val combinedSalt = (appMasterKey.plus(id.toByteArray(Charsets.UTF_8)))
 
       val spec = PBEKeySpec(pin, combinedSalt, ITERATION_COUNT, KEY_LENGTH)
       val factory = SecretKeyFactory.getInstance(HASH_ALGORITHM)
