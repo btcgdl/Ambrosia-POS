@@ -47,10 +47,6 @@ npm -v # Should print "10.9.3".
 > ```
 > **Nota:** Recuerda añadir `source "$HOME/.sdkman/bin/sdkman-init.sh"` a tu archivo `~/.bashrc` o `~/.zshrc` para que `sdk` esté disponible en todas las futuras sesiones de tu terminal.
 
-### Phoenix - Lightning Network Daemon (phoenixd)
-
-Este proyecto requiere **phoenixd** para el procesamiento de pagos mediante Lightning Network. Si aún no tienes phoenixd instalado, sigue estas instrucciones:
-
 ## Instalación Interactiva (Recomendada)
 
 **Opción 1: Instalación completa (Ambrosia + phoenixd)**
@@ -88,14 +84,24 @@ Para ejecutar el servidor en modo de desarrollo dirígete a `server/` y ejecuta:
 
 ### Cliente (Frontend - React/Electron)
 
-Para instalar las dependencias del cliente dirígete a `client/` y ejecuta:
+Dentro del directorio `client/`, puedes utilizar los siguientes scripts:
 
-```sh
-npm install
-```
+- **Instalar dependencias:**
+  ```sh
+  npm install
+  ```
 
-Luego, inicia el entorno de desarrollo del cliente con:
+- **Iniciar en modo de desarrollo:**
+  ```sh
+  npm run dev
+  ```
 
-```sh
-npm run dev
-```
+- **Compilar para producción:**
+  ```sh
+  npm run build
+  ```
+
+- **Iniciar en modo de producción (después de compilar):**
+  ```sh
+  npm start
+  ```
