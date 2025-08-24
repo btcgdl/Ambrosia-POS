@@ -34,18 +34,18 @@ npm -v # Should print "10.9.3".
 > **Instalación de JDK con SDKMAN!**
 >
 > Para instalar Java Development Kit (JDK), recomendamos usar [SDKMAN!](https://sdkman.io/), una herramienta para gestionar múltiples versiones de Kits de Desarrollo de Software.
->
-> ```bash
-> # Instalar SDKMAN!
-> curl -s "https://get.sdkman.io" | bash
-> 
-> # Cargar SDKMAN! en la sesión actual y agregarlo a tu shell
-> source "$HOME/.sdkman/bin/sdkman-init.sh"
-> 
-> # Instalar Java 21
-> sdk install java 21.0.8-tem
-> ```
-> **Nota:** Recuerda añadir `source "$HOME/.sdkman/bin/sdkman-init.sh"` a tu archivo `~/.bashrc` o `~/.zshrc` para que `sdk` esté disponible en todas las futuras sesiones de tu terminal.
+
+```bash
+# Instalar SDKMAN!
+curl -s "https://get.sdkman.io" | bash
+
+# Cargar SDKMAN! en la sesión actual y agregarlo a tu shell
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+ 
+# Instalar Java 21
+sdk install java 21.0.8-tem
+ ```
+ **Nota:** Recuerda añadir `source "$HOME/.sdkman/bin/sdkman-init.sh"` a tu archivo `~/.bashrc` o `~/.zshrc` para que `sdk` esté disponible en todas las futuras sesiones de tu terminal.
 
 ## Instalación Interactiva (Recomendada)
 
