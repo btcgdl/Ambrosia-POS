@@ -16,7 +16,7 @@ for arg in "$@"; do
   esac
 done
 
-TAG="0.1.0-alpha"
+TAG="0.1.1-alpha"
 CLIENT_DIST_FILE="ambrosia-client-${TAG}.tar.gz"
 CLIENT_DIST_URL="https://github.com/btcgdl/Ambrosia-POS/releases/download/v${TAG}/${CLIENT_DIST_FILE}"
 
@@ -64,7 +64,7 @@ else
 fi
 
 echo "Extracting client files to $INSTALL_DIR..."
-# Assuming tarball has a top-level dir e.g., 'ambrosia-client-0.1.0-alpha/'
+# Assuming tarball has a top-level dir e.g., 'ambrosia-client-0.1.1-alpha/'
 tar -xzf "${TEMP_DIR}/${CLIENT_DIST_FILE}" -C "$INSTALL_DIR" --strip-components=1
 rm -rf "$TEMP_DIR"
 
