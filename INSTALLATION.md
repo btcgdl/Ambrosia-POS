@@ -30,7 +30,7 @@ nvm current # Should print "v22.18.0".
 npm -v # Should print "10.9.3".
 ```
 
-> [! NOTE]
+> [!NOTE]
 > **Instalación de JDK con SDKMAN!**
 >
 > Para instalar Java Development Kit (JDK), recomendamos usar [SDKMAN!](https://sdkman.io/), una herramienta para gestionar múltiples versiones de Kits de Desarrollo de Software.
