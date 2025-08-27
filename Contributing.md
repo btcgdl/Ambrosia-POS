@@ -1,25 +1,25 @@
-## **¿Cómo puedes contribuir?**
+## **How can you contribute?**
 
-¡Nos encanta la colaboración de la comunidad! Si quieres ser parte del futuro de los pagos con Bitcoin, puedes:
+We love community collaboration! If you want to be part of the future of Bitcoin payments, you can:
 
-- 🔍 **Revisar nuestro código** en [GitHub](https://github.com/btcgdl/Ambrosia-POS)
-- 🐛 **Reportar bugs** o sugerir mejoras
-- 💡 **Contribuir con ideas** para nuevas funcionalidades
-- 🧪 **Probar la beta** cuando esté disponible
-- 🍴 **Haz un fork del repositorio** y envía tus Pull Requests (PRs) para proponer cambios
-
----
-
-### **¿Cómo enviar un Pull Request?**
-
-1. Haz un fork del repositorio.
-2. Clona tu fork en tu máquina local.
-3. Crea una rama para tu cambio.
-4. Realiza tus modificaciones y haz commit.
-5. Envía un Pull Request desde tu rama al repositorio principal.
+- 🔍 **Review our code** on [GitHub](https://github.com/btcgdl/Ambrosia-POS)
+- 🐛 **Report bugs** or suggest improvements
+- 💡 **Contribute ideas** for new features
+- 🧪 **Test the beta** when it's available
+- 🍴 **Fork the repository** and send your Pull Requests (PRs) to propose changes
 
 ---
 
-**¡Mantente conectado para más actualizaciones!**
+### **How to submit a Pull Request?**
 
-Síguenos en nuestras redes sociales y únete a la comunidad de desarrolladores y empresarios que están construyendo el futuro de los pagos con Bitcoin.
+1. Fork the repository.
+2. Clone your fork on your local machine.
+3. Create a branch for your change.
+4. Make your modifications and commit them.
+5. Send a Pull Request from your branch to the main repository.
+
+---
+
+**Stay connected for more updates!**
+
+Follow us on our social media and join the community of developers and entrepreneurs who are building the future of Bitcoin payments.

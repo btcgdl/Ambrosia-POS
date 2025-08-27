@@ -1,16 +1,16 @@
-# Guía de Instalación - Ambrosia POS
+# Installation Guide - Ambrosia POS
 
-## Dependencias del Proyecto
+## Project Dependencies
 
-### Requisitos principales
+### Main Requirements
 
-- **npm**: Para gestionar las dependencias del frontend (React/Electron).
-- **Gradle 8.1.4**: Para construir y gestionar el backend en Kotlin.
-- **JDK 21**: Java Development Kit versión 21, requerido para compilar y ejecutar el backend.
+- **npm**: To manage frontend dependencies (React/Electron).
+- **Gradle 8.1.4**: To build and manage the Kotlin backend.
+- **JDK 21**: Java Development Kit version 21, required to compile and run the backend.
 
-### Instalación de Node.js y npm con nvm
+### Installing Node.js and npm with nvm
 
-Se recomienda utilizar `nvm` (Node Version Manager) para instalar Node.js y npm. Esto permite gestionar múltiples versiones de Node.js fácilmente.
+It is recommended to use `nvm` (Node Version Manager) to install Node.js and npm. This allows you to easily manage multiple versions of Node.js.
 
 ```bash
 # Download and install nvm:
@@ -31,9 +31,9 @@ npm -v # Should print "10.9.3".
 ```
 
 > [!NOTE]
-> **Instalación de JDK con SDKMAN!**
+> **Installing JDK with SDKMAN!**
 >
-> Para instalar Java Development Kit (JDK), recomendamos usar [SDKMAN!](https://sdkman.io/), una herramienta para gestionar múltiples versiones de Kits de Desarrollo de Software.
+> To install the Java Development Kit (JDK), we recommend using [SDKMAN!](https://sdkman.io/), a tool for managing multiple versions of Software Development Kits.
 
 ```bash
 # Instalar SDKMAN!
@@ -45,63 +45,63 @@ source "$HOME/.sdkman/bin/sdkman-init.sh"
 # Instalar Java 21
 sdk install java 21.0.8-tem
  ```
- **Nota:** Recuerda añadir `source "$HOME/.sdkman/bin/sdkman-init.sh"` a tu archivo `~/.bashrc` o `~/.zshrc` para que `sdk` esté disponible en todas las futuras sesiones de tu terminal.
+ **Note:** Remember to add `source "$HOME/.sdkman/bin/sdkman-init.sh"` to your `~/.bashrc` or `~/.zshrc` file so that `sdk` is available in all future terminal sessions.
 
-## Instalación Interactiva (Recomendada)
+## Interactive Installation (Recommended)
 
-**Opción 1: Instalación completa (Ambrosia + phoenixd)**
+**Option 1: Full Installation (Ambrosia + phoenixd)**
 ```bash
 wget -q https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/install.sh
 chmod +x install.sh
 ./install.sh
 ```
 
-El script de instalación de phoenixd instala phoenixd automáticamente. El script descarga phoenixd v0.6.2, verifica la integridad del paquete usando GPG y checksums, instala en `/usr/local/bin`, y opcionalmente configura un servicio systemd para inicio automático.
+The phoenixd installation script installs phoenixd automatically. The script downloads phoenixd v0.6.2, verifies the package integrity using GPG and checksums, installs it in `/usr/local/bin`, and optionally configures a systemd service for automatic startup.
 
 Check [Mastering Phoenixd](https://btcgdl.github.io/Mastering-phoenixd/) for more details.
 
-**Opción 2: Scripts del proyecto (sin systemd)**
+**Option 2: Project Scripts (without systemd)**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/install.sh | bash
 ```
 
-## Desinstalación 
+## Uninstallation 
 
-Para desinstalar Ambrosia POS y phoenixd, ejecuta el siguiente script:
+To uninstall Ambrosia POS and phoenixd, run the following script:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/uninstall.sh | bash
 ```
 
-## Scripts de Desarrollo
-### Servidor (Backend - Kotlin/Gradle)
+## Development Scripts
+### Server (Backend - Kotlin/Gradle)
 
-Para ejecutar el servidor en modo de desarrollo dirígete a `server/` y ejecuta:
+To run the server in development mode, go to the `server/` directory and run:
 
 ```sh
 ./gradlew run
 ```
 
-### Cliente (Frontend - React/Electron)
+### Client (Frontend - React/Electron)
 
-Dentro del directorio `client/`, puedes utilizar los siguientes scripts:
+Inside the `client/` directory, you can use the following scripts:
 
-- **Instalar dependencias:**
+- **Install dependencies:**
   ```sh
   npm install
   ```
 
-- **Iniciar en modo de desarrollo:**
+- **Start in development mode:**
   ```sh
   npm run dev
   ```
 
-- **Compilar para producción:**
+- **Build for production:**
   ```sh
   npm run build
   ```
 
-- **Iniciar en modo de producción (después de compilar):**
+- **Start in production mode (after building):**
   ```sh
   npm start
   ```

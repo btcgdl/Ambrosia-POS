@@ -4,36 +4,36 @@
 **Status: In Development**
 
 > [!WARNING]
-> Advertencia de Seguridad: El sistema utiliza Bitcoin en local. El usuario y contraseña por defecto son:
+> Security Warning: The system uses Bitcoin locally. The default username and password are:
 >
-> - Usuario: `cooluser1`
+> - User: `cooluser1`
 > - Pin: `0000`
 >
-> ¡No dejes estas credenciales por defecto en producción! Cambia el usuario y la contraseña inmediatamente después de la instalación para proteger tus fondos.
+> Do not leave these default credentials in production! Change the username and password immediately after installation to protect your funds.
 
 <p align="center">
   <img src="imgs/Ambrosia.png" alt="Ambrosia Logo" width="300"/>
 </p>
 
-Este repositorio contiene la documentación y detalles del proyecto de un sistema de punto de venta (POS) para restaurantes, con un frontend desarrollado en React y Electron, y un backend en Kotlin. A continuación, se describen los archivos principales y su contenido:
+This repository contains the documentation and project details for a restaurant point of sale (POS) system, with a frontend developed in React and Electron, and a backend in Kotlin. The main files and their contents are described below:
 
-## Archivos Principales
+## Main Files
 
-- [Propuesta.md](Propuesta.md): Contiene una descripción general del sistema, incluyendo los módulos principales y sus funcionalidades. Es ideal para entender el alcance y propósito del proyecto.
-- [Tabla-de-Objetivos.md](Tabla-de-Objetivos.md): Presenta una tabla detallada con los módulos del sistema y sus objetivos.
+- [PROPOSAL.md](PROPOSAL.md): Contains a general description of the system, including the main modules and their functionalities. It is ideal for understanding the scope and purpose of the project.
+- [OBJECTIVES_TABLE.md](OBJECTIVES_TABLE.md): Presents a detailed table with the system's modules and their objectives.
 
-## Descripción General
+## General Description
 
-El sistema está diseñado para optimizar las operaciones diarias de un restaurante, como la gestión de pedidos, mesas y finanzas, con una interfaz moderna y reactiva. Incluye funcionalidades como autenticación, gestión de usuarios, manejo de menús, pedidos, punto de venta, y más.
+The system is designed to optimize the daily operations of a restaurant, such as managing orders, tables, and finances, with a modern and reactive interface. It includes features like authentication, user management, menu handling, orders, point of sale, and more.
 
-Consulta los archivos mencionados para obtener más detalles sobre el proyecto.
+Consult the mentioned files for more details about the project.
 
-## Instalación
+## Installation
 
-Para instalar Ambrosia POS, consulta la [Guía de Instalación](INSTALLATION.md) donde encontrarás todas las opciones disponibles y las instrucciones detalladas para configurar el sistema.
+To install Ambrosia POS, refer to the [Installation Guide](INSTALLATION.md) where you will find all available options and detailed instructions for setting up the system.
 
 ---
 
-## ¿Quieres contribuir?
+## Want to contribute?
 
-Consulta la [Guía de Contribución](Contributing.md) para saber cómo puedes ayudar y ser parte del futuro de los sistemas POS para restaurantes.
+Check out the [Contribution Guide](Contributing.md) to learn how you can help and be part of the future of POS systems for restaurants.
