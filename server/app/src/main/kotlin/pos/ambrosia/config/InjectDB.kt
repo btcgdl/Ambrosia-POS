@@ -15,7 +15,7 @@ object InjectDB
         val client = HttpClient(CIO)
         return try {
             runBlocking {
-                val response: HttpResponse = client.get("https://github.com/btcgdl/Ambrosia-POS/raw/main/db/ambrosia.db")
+                val response: HttpResponse = client.get("https://github.com/btcgdl/Ambrosia-POS/releases/download/v1.0/db/ambrosia.db")
                 if (response.status == HttpStatusCode.OK) {
                     destination.writeBytes(response.readRawBytes())
                     true

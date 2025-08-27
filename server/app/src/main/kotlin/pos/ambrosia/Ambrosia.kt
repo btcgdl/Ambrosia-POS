@@ -23,6 +23,8 @@ import pos.ambrosia.config.SeedGenerator
 fun main(args: Array<String>) = Ambrosia().main(args)
 
 class Ambrosia : CliktCommand() {
+  // En algún archivo de configuración o en Application.kt
+  val AppVersion: String = Ambrosia::class.java.getPackage().implementationVersion ?: "-dev"
   val datadir = Path(Path(System.getProperty("user.home")), ".Ambrosia-POS")
   private val confFile = Path(datadir, "ambrosia.conf")
 
@@ -70,7 +72,7 @@ class Ambrosia : CliktCommand() {
   private val options by DaemonOptions()
 
   override fun run() {
-    echo(green("Running Ambrosia POS Server"))
+    echo(green("Running Ambrosia POS Server v$AppVersion"))
 
     try {
 

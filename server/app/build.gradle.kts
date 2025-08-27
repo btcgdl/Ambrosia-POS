@@ -1,3 +1,5 @@
+version = "0.1.1-alpha"
+
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     alias(libs.plugins.kotlin.jvm)
@@ -56,6 +58,7 @@ tasks.named<JavaExec>("run") {
 tasks.named<Jar>("jar") {
     manifest {
         attributes["Main-Class"] = "pos.ambrosia.AmbrosiaKt"
+        attributes("Implementation-Version" to project.version)  
     }
     
     // Incluir todas las dependencias (fat jar)
@@ -69,7 +72,7 @@ tasks.named<Jar>("jar") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     // Cambiar el nombre del archivo resultante
-    archiveFileName.set("ambrosia.jar")
+    archiveFileName.set("ambrosia-${version}.jar")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
