@@ -11,13 +11,14 @@ import java.io.File
 object InjectDB
 {
 
-    private fun downloadDB(destination: File): Boolean {
+    private fun downloadDB(destination: File, tag: String): Boolean {
         val client = HttpClient(CIO)
         return try {
             runBlocking {
-                val response: HttpResponse = client.get("https://github.com/btcgdl/Ambrosia-POS/raw/main/db/ambrosia.db")
+                val response: HttpResponse = client.get("https://github.com/btcgdl/Ambrosia-POS/releases/download/v${tag}/ambrosia-${tag}.db")
                 if (response.status == HttpStatusCode.OK) {
                     destination.writeBytes(response.readRawBytes())
+                    println("Database downloaded and saved as ${destination.name}")
                     true
                 } else {
                     false
@@ -34,9 +35,10 @@ object InjectDB
     /**
      * Copies the database file from the project directory if it doesn't exist in config
      */
-    fun ensureDatabase(datadir: String): Boolean {
+    fun ensureDatabase(datadir: String, tag: String): Boolean {
 
-        val dbFile = File(datadir, "ambrosia.db")
+        val dbFileName = "ambrosia.db" // Nombre fijo para evitar inconsistencias
+        val dbFile = File(datadir, dbFileName)
 
         if (dbFile.exists()) {
             return true
@@ -45,12 +47,12 @@ object InjectDB
         try {
             // Try to find the database file in the project db directory
             val projectRoot = File(System.getProperty("user.dir")).parentFile.parentFile
-            val sourceDbFile = File(projectRoot, "db/ambrosia.db")
+            val sourceDbFile = File(projectRoot, "db/ambrosia-${tag}.db") // Busca el archivo con el nombre original
             
             if (!sourceDbFile.exists()) {
                 
                 // Fallback to downloading from GitHub
-                if (!downloadDB(dbFile)) {
+                if (!downloadDB(dbFile, tag)) {
                     println("Failed to download database from GitHub")
                     return false
                 }

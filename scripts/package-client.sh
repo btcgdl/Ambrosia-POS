@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-TAG="0.1.1-alpha"
+TAG="0.1.2-alpha"
 # Navigate to the client directory
 cd "$(dirname "$0")/../client"
 
