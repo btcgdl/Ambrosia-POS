@@ -34,7 +34,7 @@ object InjectDB
     /**
      * Copies the database file from the project directory if it doesn't exist in config
      */
-    fun ensureDatabase(datadir: String): Boolean {
+    fun ensureDatabase(datadir: String, tag: String): Boolean {
 
         val dbFile = File(datadir, "ambrosia.db")
 
@@ -50,7 +50,7 @@ object InjectDB
             if (!sourceDbFile.exists()) {
                 
                 // Fallback to downloading from GitHub
-                if (!downloadDB(dbFile)) {
+                if (!downloadDB(dbFile, tag)) {
                     println("Failed to download database from GitHub")
                     return false
                 }
