@@ -18,6 +18,7 @@ object InjectDB
                 val response: HttpResponse = client.get("https://github.com/btcgdl/Ambrosia-POS/releases/download/v${tag}/ambrosia-${tag}.db")
                 if (response.status == HttpStatusCode.OK) {
                     destination.writeBytes(response.readRawBytes())
+                    println("Database downloaded and saved as ${destination.name}")
                     true
                 } else {
                     false
@@ -36,7 +37,7 @@ object InjectDB
      */
     fun ensureDatabase(datadir: String, tag: String): Boolean {
 
-        val dbFileName = "ambrosia-${tag}.db" 
+        val dbFileName = "ambrosia.db" // Nombre fijo para evitar inconsistencias
         val dbFile = File(datadir, dbFileName)
 
         if (dbFile.exists()) {
@@ -46,7 +47,7 @@ object InjectDB
         try {
             // Try to find the database file in the project db directory
             val projectRoot = File(System.getProperty("user.dir")).parentFile.parentFile
-            val sourceDbFile = File(projectRoot, "db/$dbFileName") // También usa el nombre dinámico aquí
+            val sourceDbFile = File(projectRoot, "db/ambrosia-${tag}.db") // Busca el archivo con el nombre original
             
             if (!sourceDbFile.exists()) {
                 
