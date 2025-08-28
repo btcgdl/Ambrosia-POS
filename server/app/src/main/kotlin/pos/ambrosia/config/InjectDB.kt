@@ -36,7 +36,8 @@ object InjectDB
      */
     fun ensureDatabase(datadir: String, tag: String): Boolean {
 
-        val dbFile = File(datadir, "ambrosia.db")
+        val dbFileName = "ambrosia-${tag}.db" 
+        val dbFile = File(datadir, dbFileName)
 
         if (dbFile.exists()) {
             return true
@@ -45,7 +46,7 @@ object InjectDB
         try {
             // Try to find the database file in the project db directory
             val projectRoot = File(System.getProperty("user.dir")).parentFile.parentFile
-            val sourceDbFile = File(projectRoot, "db/ambrosia.db")
+            val sourceDbFile = File(projectRoot, "db/$dbFileName") // También usa el nombre dinámico aquí
             
             if (!sourceDbFile.exists()) {
                 
