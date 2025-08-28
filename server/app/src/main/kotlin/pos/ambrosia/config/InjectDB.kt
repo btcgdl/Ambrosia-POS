@@ -11,11 +11,11 @@ import java.io.File
 object InjectDB
 {
 
-    private fun downloadDB(destination: File): Boolean {
+    private fun downloadDB(destination: File, tag: String): Boolean {
         val client = HttpClient(CIO)
         return try {
             runBlocking {
-                val response: HttpResponse = client.get("https://github.com/btcgdl/Ambrosia-POS/releases/download/v1.0/db/ambrosia.db")
+                val response: HttpResponse = client.get("https://github.com/btcgdl/Ambrosia-POS/releases/download/v${tag}/ambrosia-${tag}.db")
                 if (response.status == HttpStatusCode.OK) {
                     destination.writeBytes(response.readRawBytes())
                     true

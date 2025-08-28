@@ -31,7 +31,7 @@ class Ambrosia : CliktCommand() {
   init {
 
     SystemFileSystem.createDirectories(datadir)
-    InjectDB.ensureDatabase(datadir.toString())
+    InjectDB.ensureDatabase(datadir.toString(), AppVersion)
     InjectLogs.ensureLogConfig(datadir.toString())
 
     context {
