@@ -29,11 +29,22 @@ fun ApplicationCall.getCurrentUser(): UserInfo? {
 }
 
 /**
+ * Plugin de Ktor para verificar los privilegios de administrador.
+ * Este plugin se asegura de que solo los administradores puedan acceder a una ruta.
+ * Se debe usar dentro de un bloque `authenticate`.
+ */
+val AdminAccess = createRouteScopedPlugin(name = "AdminAccess") {
+    on(AuthenticationChecked) { call ->
+        call.requireAdmin()
+    }
+}
+
+/**
  * Función de extensión para crear rutas que requieren autenticación y privilegios de administrador
  */
 fun Route.authenticateAdmin(name: String = "auth-jwt", build: Route.() -> Unit): Route {
   return authenticate(name) {
-    intercept(ApplicationCallPipeline.Call) { call.requireAdmin() }
+    install(AdminAccess)
     build()
   }
 }
