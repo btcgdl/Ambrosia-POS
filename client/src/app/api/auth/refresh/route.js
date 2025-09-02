@@ -49,7 +49,7 @@ export async function POST(request) {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 15 * 60, // 15 minutos
+        maxAge: 1 * 60, // 1 minuto
         path: "/",
       });
     }

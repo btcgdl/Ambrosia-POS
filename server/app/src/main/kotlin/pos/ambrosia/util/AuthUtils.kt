@@ -22,9 +22,9 @@ fun ApplicationCall.getCurrentUser(): UserInfo? {
   val principal = principal<JWTPrincipal>() ?: return null
 
   return UserInfo(
-          userId = principal.getClaim("userId", String::class) ?: return null,
-          role = principal.getClaim("role", String::class) ?: return null,
-          isAdmin = principal.getClaim("isAdmin", Boolean::class) ?: false
+    userId = principal.getClaim("userId", String::class) ?: return null,
+    role = principal.getClaim("role", String::class) ?: return null,
+    isAdmin = principal.getClaim("isAdmin", Boolean::class) ?: false
   )
 }
 
@@ -34,9 +34,9 @@ fun ApplicationCall.getCurrentUser(): UserInfo? {
  * Se debe usar dentro de un bloque `authenticate`.
  */
 val AdminAccess = createRouteScopedPlugin(name = "AdminAccess") {
-    on(AuthenticationChecked) { call ->
-        call.requireAdmin()
-    }
+  on(AuthenticationChecked) { call ->
+    call.requireAdmin()
+  }
 }
 
 /**

@@ -48,8 +48,8 @@ fun Route.auth(userService: UsersService, tokenService: TokenService) {
       Cookie(
         name = "accessToken",
         value = accessTokenResponse,
-        maxAge = 15 * 60, // 15 minutos en segundos
-        httpOnly = false, // No accesible desde JavaScript
+        maxAge = 1 * 60, // 1 minutos en segundos
+        httpOnly = false, // Accesible desde JavaScript
         secure = false, // Cambiar a true en producción con HTTPS
         path = "/",
       )
@@ -60,7 +60,7 @@ fun Route.auth(userService: UsersService, tokenService: TokenService) {
         name = "refreshToken",
         value = refreshTokenResponse,
         maxAge = 30 * 24 * 60 * 60, // 30 días en segundos
-        httpOnly = true, // No accesible desde JavaScript
+        httpOnly = true, 
         secure = false, // Cambiar a true en producción con HTTPS
         path = "/",
       )
