@@ -98,13 +98,16 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 NPM_EXEC_PATH=$(which npm)
+NPM_DIR=$(dirname "$NPM_EXEC_PATH")
+NODE_EXEC_PATH=$(which node)
+NODE_DIR=$(dirname "$NODE_EXEC_PATH")
+
 if [ -z "$NPM_EXEC_PATH" ]; then
     echo "❌ Could not find npm executable."
     exit 1
 fi
 
 echo "Creating systemd service file at $SERVICE_FILE..."
-
 sudo tee "$SERVICE_FILE" > /dev/null << EOF
 [Unit]
 Description=Ambrosia POS Client (Next.js)
@@ -113,6 +116,8 @@ After=network.target
 [Service]
 User=$USER
 WorkingDirectory=$INSTALL_DIR
+Environment=PATH=$NPM_DIR:$NODE_DIR:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=NODE_ENV=production
 ExecStart=$NPM_EXEC_PATH start
 Restart=always
 RestartSec=10
