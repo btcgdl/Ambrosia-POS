@@ -22,10 +22,21 @@ fun ApplicationCall.getCurrentUser(): UserInfo? {
   val principal = principal<JWTPrincipal>() ?: return null
 
   return UserInfo(
-          userId = principal.getClaim("userId", String::class) ?: return null,
-          role = principal.getClaim("role", String::class) ?: return null,
-          isAdmin = principal.getClaim("isAdmin", Boolean::class) ?: false
+    userId = principal.getClaim("userId", String::class) ?: return null,
+    role = principal.getClaim("role", String::class) ?: return null,
+    isAdmin = principal.getClaim("isAdmin", Boolean::class) ?: false
   )
+}
+
+/**
+ * Plugin de Ktor para verificar los privilegios de administrador.
+ * Este plugin se asegura de que solo los administradores puedan acceder a una ruta.
+ * Se debe usar dentro de un bloque `authenticate`.
+ */
+val AdminAccess = createRouteScopedPlugin(name = "AdminAccess") {
+  on(AuthenticationChecked) { call ->
+    call.requireAdmin()
+  }
 }
 
 /**
@@ -33,7 +44,7 @@ fun ApplicationCall.getCurrentUser(): UserInfo? {
  */
 fun Route.authenticateAdmin(name: String = "auth-jwt", build: Route.() -> Unit): Route {
   return authenticate(name) {
-    intercept(ApplicationCallPipeline.Call) { call.requireAdmin() }
+    install(AdminAccess)
     build()
   }
 }
