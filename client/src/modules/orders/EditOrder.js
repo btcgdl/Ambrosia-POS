@@ -66,6 +66,8 @@ export default function EditOrder({ dynamicParams, searchParams }) {
   const [error, setError] = useState("");
   const [undoStack, setUndoStack] = useState([]);
   const [createdInvoice, setCreatedInvoice] = useState(null);
+  const [generatedCashInfo, setGeneratedCashInfo] = useState(null);
+  const [cashReceived, setCashReceived] = useState('');
   const [showCurrencyDialog, setShowCurrencyDialog] = useState(false);
   const [showPaymentMethodDialog, setShowPaymentMethodDialog] = useState(false);
   const [showGenerateInvoiceDialog, setShowGenerateInvoiceDialog] =
@@ -260,6 +262,17 @@ export default function EditOrder({ dynamicParams, searchParams }) {
         `/payments/methods/${selectedPaymentMethod}`,
       );
       console.log("Currency Data:", paymentMethodData);
+
+      if (paymentMethodData.name === "Efectivo") {
+        // Generar información para el pago en efectivo
+        const cashInfo = {
+          order_id: order.id,
+          total_amount: total,
+          currency: currencyBase.currency_id,
+        };
+        setGeneratedCashInfo(cashInfo);
+        return;
+      }
 
       if (paymentMethodData.name === "BTC") {
         const currencyBaseData = await apiClient(
@@ -690,6 +703,96 @@ export default function EditOrder({ dynamicParams, searchParams }) {
           }
           onClose={handleCancelDialog}
         />
+        {/* Modal de Pago Efectivo */}
+        {/* Modal de Pago Efectivo */}
+{generatedCashInfo && (
+  <ConfirmationPopup
+    isOpen={!!generatedCashInfo}
+    title="Pago en Efectivo"
+    hideDefaultButtons={true}
+    type="info"
+    customBody={
+      <div className="flex flex-col items-center space-y-6">
+        {/* Header */}
+        <div className="text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">💵</span>
+          </div>
+          <h4 className="text-lg font-semibold text-gray-800 mb-2">
+            Ingresa el monto recibido en efectivo
+          </h4>
+          <p className="text-gray-600 text-sm">
+            Calcularemos el cambio a devolver al cliente
+          </p>
+        </div>
+
+        {/* Información del monto */}
+        <div className="bg-gray-50 rounded-lg p-4 w-full text-center">
+          <p className="text-sm text-gray-600">Monto total del pedido</p>
+          <p className="text-2xl font-bold text-gray-800">
+            ${order?.total?.toFixed(2) || "0.00"}
+          </p>
+        </div>
+
+        {/* Input para el efectivo recibido */}
+        <div className="w-full">
+          <label className="block text-sm text-gray-600 mb-2">
+            Efectivo recibido
+          </label>
+          <input
+            type="text"
+            value={cashReceived}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*\.?\d*$/.test(value)) {
+                setCashReceived(value);
+              }
+            }}
+            placeholder="0.00"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
+          />
+          {cashReceived && (
+            <p className="text-sm text-gray-600 mt-2">
+              Cambio a devolver: <span className="font-bold">
+                ${(cashReceived ? (parseFloat(cashReceived) - order.total).toFixed(2) : '0.00')}
+              </span>
+            </p>
+          )}
+        </div>
+
+        {/* Botones de acción */}
+        <div className="flex gap-4 w-full pt-2">
+          <button
+            className="flex-1 py-4 px-6 border-2 border-red-200 text-red-600 rounded-xl hover:bg-red-50 hover:border-red-300 active:bg-red-100 transition-all font-semibold touch-manipulation"
+            onClick={handlePaymentCancel}
+          >
+            <div className="flex items-center justify-center gap-2">
+              <span>❌</span>
+              <span>Cancelar</span>
+            </div>
+          </button>
+          <button
+            className="flex-1 py-4 px-6 bg-green-500 text-white rounded-xl hover:bg-green-600 active:bg-green-700 transition-all font-semibold touch-manipulation"
+            onClick={() => {
+              if (parseFloat(cashReceived) >= order.total) {
+                alert(`Payment confirmed! Change to give: $${(parseFloat(cashReceived) - order.total).toFixed(2)}`);
+                handlePaymentConfirm();
+              } else {
+                alert('Insufficient cash received!');
+              }
+            }}
+          >
+            <div className="flex items-center justify-center gap-2">
+              <CheckCircle className="w-5 h-5" />
+              <span>Confirmar Pago</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    }
+    onClose={handleCancelDialog}
+  />
+)}
 
         {/* Modal de Pago Bitcoin */}
         {createdInvoice && (
