@@ -46,10 +46,10 @@ export async function POST(request) {
     // Establecer las nuevas cookies si vienen en la respuesta
     if (data.accessToken) {
       nextResponse.cookies.set("accessToken", data.accessToken, {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 15 * 60, // 15 minutos
+        maxAge: 1 * 60, // 1 minuto
         path: "/",
       });
     }

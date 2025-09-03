@@ -20,31 +20,29 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
   private val algorithm = Algorithm.HMAC256(secret)
 
   val verifier: JWTVerifier =
-          JWT.require(algorithm).withAudience(audience).withIssuer(issuer).build()
+    JWT.require(algorithm).withAudience(audience).withIssuer(issuer).build()
 
   fun generateAccessToken(user: AuthResponse): String =
-          JWT.create()
-                  .withAudience(audience)
-                  .withIssuer(issuer)
-                  .withClaim("userId", user.id.toString())
-                  .withClaim("role", user.role)
-                  .withClaim("isAdmin", user.isAdmin)
-                  .withClaim("realm", "Ambrosia-Server")
-                  .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(15)))
-                  .sign(algorithm)
+    JWT.create()
+    .withAudience(audience)
+    .withIssuer(issuer)
+    .withClaim("userId", user.id.toString())
+    .withClaim("role", user.role)
+    .withClaim("isAdmin", user.isAdmin)
+    .withClaim("realm", "Ambrosia-Server")
+    .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(15)))
+    .sign(algorithm)
 
   fun generateRefreshToken(user: AuthResponse): String {
     val refreshToken =
-            JWT.create()
-                    .withAudience(audience)
-                    .withIssuer(issuer)
-                    .withClaim("userId", user.id.toString())
-                    .withClaim("role", user.role)
-                    .withClaim("isAdmin", user.isAdmin)
-                    .withClaim("type", "refresh")
-                    .withClaim("realm", "Ambrosia-Server")
-                    .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)))
-                    .sign(algorithm)
+      JWT.create()
+      .withAudience(audience)
+      .withIssuer(issuer)
+      .withClaim("userId", user.id.toString())
+      .withClaim("type", "refresh")
+      .withClaim("realm", "Ambrosia-Server")
+      .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)))
+      .sign(algorithm)
 
     // Almacenar el refresh token en la base de datos
     user.id?.let { saveRefreshTokenToDatabase(it, refreshToken) }
@@ -69,16 +67,36 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
   fun getUserFromRefreshToken(refreshToken: String): AuthResponse? {
     return try {
       val decodedJWT = verifier.verify(refreshToken)
-      val userId = decodedJWT.getClaim("userId")?.asString()
-      val role = decodedJWT.getClaim("role")?.asString()
-      val name = decodedJWT.getClaim("name")?.asString()
-      val isAdmin = decodedJWT.getClaim("isAdmin")?.asBoolean() ?: false
-
-      if (userId != null && role != null) {
-        AuthResponse(id = userId, role = role, name = name ?: "", isAdmin = isAdmin)
-      } else {
-        null
+      val userId = decodedJWT.getClaim("userId")?.asString() ?: return null
+      
+      // Verificar que el token en la base de datos coincide con el token proporcionado
+      if (!isRefreshTokenInDatabase(userId, refreshToken)) {
+        return null
       }
+      
+      // Obtener la información actual del usuario desde la base de datos
+      val sql = """
+        SELECT u.id, u.name, r.role, r.isAdmin 
+        FROM users u
+        JOIN roles r ON u.role_id = r.id
+        WHERE u.id = ? AND u.refresh_token = ? AND u.is_deleted = 0
+      """
+      
+      connection.prepareStatement(sql).use { statement ->
+        statement.setString(1, userId)
+        statement.setString(2, refreshToken)
+        val resultSet = statement.executeQuery()
+        
+        if (resultSet.next()) {
+          return AuthResponse(
+            id = resultSet.getString("id"),
+            name = resultSet.getString("name"),
+            role = resultSet.getString("role"),
+            isAdmin = resultSet.getBoolean("isAdmin")
+          )
+        }
+      }
+      return null
     } catch (e: JWTVerificationException) {
       null
     }

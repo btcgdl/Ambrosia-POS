@@ -63,12 +63,11 @@ class Api() {
           }
         }
         verifier(
-                JWT.require(Algorithm.HMAC256(config.property("secret").getString()))
-                        .withIssuer(config.property("jwt.issuer").getString())
-                        .withAudience(config.property("jwt.audience").getString())
-                        .withClaim("realm", "Ambrosia-Server")
-                        .build()
-        )
+          JWT.require(Algorithm.HMAC256(config.property("secret").getString()))
+          .withIssuer(config.property("jwt.issuer").getString())
+          .withAudience(config.property("jwt.audience").getString())
+          .withClaim("realm", "Ambrosia-Server")
+          .build())
         validate { credential ->
           if (credential.payload.getClaim("userId").asString() != "") {
             JWTPrincipal(credential.payload)
@@ -77,6 +76,21 @@ class Api() {
           }
         }
         challenge { _, _ -> throw UnauthorizedApiException() }
+      }
+
+      jwt("auth-jwt-wallet") {
+        verifier(JWT.require(Algorithm.HMAC256(config.property("secret").getString()))
+          .withIssuer(config.property("jwt.issuer").getString())
+          .withAudience(config.property("jwt.audience").getString())
+          .withClaim("realm", "Ambrosia-Server")
+          .build())
+        validate { credential ->
+          if (credential.payload.getClaim("scope").asString() == "wallet_access") {
+            JWTPrincipal(credential.payload)
+          } else {
+            null 
+          }
+        }
       }
     }
     configureRouting()

@@ -25,12 +25,12 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    // Refresh cada 4 minutos (simple y predecible)
+    // Refresh cada 1 minuto (simple y predecible)
     intervalRef.current = setInterval(() => {
       refreshToken();
-    }, 240000); // 4 minutos
+    }, 50000); // 50 segundos
 
-    console.log("⏱️ Token refresher iniciado cada 4 minutos");
+    console.log("⏱️ Token refresher iniciado cada 50 segundos");
   };
 
   const stopTokenRefresh = () => {
