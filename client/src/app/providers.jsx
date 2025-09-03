@@ -10,7 +10,7 @@ export default function Providers({ children }) {
       <AuthProvider>
         <TurnProvider>
           <HeroUIProvider>
-            <ToastProvider placement="bottom-left" maxVisibleToasts={1} />
+            <ToastProvider placement="top-right" maxVisibleToasts={1} />
             {children}
           </HeroUIProvider>
         </TurnProvider>

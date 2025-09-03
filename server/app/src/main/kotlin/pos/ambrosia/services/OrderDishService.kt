@@ -8,17 +8,18 @@ import pos.ambrosia.models.OrderDish
 class OrderDishService(private val connection: Connection) {
   companion object {
     private const val ADD_ORDER_DISH =
-            "INSERT INTO orders_dishes (id, order_id, dish_id, price_at_order, notes) VALUES (?, ?, ?, ?, ?)"
+            "INSERT INTO orders_dishes (id, order_id, dish_id, price_at_order, notes, status, should_prepare) VALUES (?, ?, ?, ?, ?, ?, ?)"
     private const val GET_ORDER_DISHES_BY_ORDER =
-            "SELECT id, order_id, dish_id, price_at_order, notes FROM orders_dishes WHERE order_id = ?"
+            "SELECT id, order_id, dish_id, price_at_order, notes, status, should_prepare FROM orders_dishes WHERE order_id = ?"
     private const val GET_ORDER_DISH_BY_ID =
-            "SELECT id, order_id, dish_id, price_at_order, notes FROM orders_dishes WHERE id = ?"
+            "SELECT id, order_id, dish_id, price_at_order, notes, status, should_prepare FROM orders_dishes WHERE id = ?"
     private const val UPDATE_ORDER_DISH =
-            "UPDATE orders_dishes SET price_at_order = ?, notes = ? WHERE id = ?"
+            "UPDATE orders_dishes SET price_at_order = ?, notes = ?, status = ?, should_prepare = ? WHERE id = ?"
     private const val DELETE_ORDER_DISH = "DELETE FROM orders_dishes WHERE id = ?"
     private const val DELETE_ORDER_DISHES_BY_ORDER = "DELETE FROM orders_dishes WHERE order_id = ?"
     private const val CHECK_ORDER_EXISTS = "SELECT id FROM orders WHERE id = ? AND is_deleted = 0"
     private const val CHECK_DISH_EXISTS = "SELECT id FROM dishes WHERE id = ? AND is_deleted = 0"
+    private const val CHECK_STATUS = "SELECT id FROM orders_dishes WHERE status = ?"
   }
 
   private fun orderExists(orderId: String): Boolean {
@@ -41,7 +42,9 @@ class OrderDishService(private val connection: Connection) {
             order_id = resultSet.getString("order_id"),
             dish_id = resultSet.getString("dish_id"),
             price_at_order = resultSet.getDouble("price_at_order"),
-            notes = resultSet.getString("notes")
+            notes = resultSet.getString("notes"),
+            status = resultSet.getString("status"),
+            should_prepare = resultSet.getBoolean("should_prepare")
     )
   }
 
@@ -66,6 +69,8 @@ class OrderDishService(private val connection: Connection) {
     statement.setString(3, orderDish.dish_id)
     statement.setDouble(4, orderDish.price_at_order)
     statement.setString(5, orderDish.notes)
+    statement.setString(6, orderDish.status)
+    statement.setBoolean(7, orderDish.should_prepare)
 
     val rowsAffected = statement.executeUpdate()
 
@@ -111,7 +116,9 @@ class OrderDishService(private val connection: Connection) {
     val statement = connection.prepareStatement(UPDATE_ORDER_DISH)
     statement.setDouble(1, orderDish.price_at_order)
     statement.setString(2, orderDish.notes)
-    statement.setString(3, orderDish.id)
+    statement.setString(3, orderDish.status)
+    statement.setBoolean(4, orderDish.should_prepare)
+    statement.setString(5, orderDish.id)
 
     val rowsUpdated = statement.executeUpdate()
     if (rowsUpdated > 0) {
@@ -146,5 +153,14 @@ class OrderDishService(private val connection: Connection) {
       logger.info("No dishes found for order: $orderId")
     }
     return true // Return true even if no rows deleted (order might not have dishes)
+  }
+
+  suspend fun checkOrderDishStatus(id: String, status: String): Boolean {
+    val statement = connection.prepareStatement(CHECK_STATUS)
+    statement.setString(1, status)
+    statement.setString(2, id)
+    val resultSet = statement.executeQuery()
+
+    return resultSet.next()
   }
 }

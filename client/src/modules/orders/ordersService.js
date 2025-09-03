@@ -64,18 +64,19 @@ export async function createOrder(tableId = null) {
   }
 }
 
-export async function addDishToOrder(pedidoId, dish) {
+export async function addDishToOrder(pedidoId, dishId, dishPrice) {
   return await apiClient(`/orders/${pedidoId}/dishes`, {
     method: "POST",
     body: [
       {
-        dish_id: dish.id,
-        price_at_order: dish.price,
-        notes: "none",
-      },
+        dish_id: dishId,
+        price_at_order: dishPrice,
+        notes: null
+      }
     ],
   });
 }
+
 
 export async function removeDishToOrder(pedidoId, dish) {
   return await apiClient(`/orders/${pedidoId}/dishes/${dish}`, {
@@ -136,6 +137,20 @@ export async function updateTable(table) {
   return await apiClient(`/tables/${table.id}`, {
     method: "PUT",
     body: table,
+  });
+}
+
+export async function updateOrderDish(orderId, dishId, orderDish) {
+  return await apiClient(`/orders/${orderId}/dishes/${dishId}`, {
+    method: "PUT",
+    body: orderDish,
+  });
+}
+
+export async function sendOrderDishes(orderId, dishIds) {
+  return await apiClient(`/orders/${orderId}/dishes/send`, {
+    method: "PUT", 
+    body: { dishIds },
   });
 }
 
