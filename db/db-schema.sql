@@ -131,6 +131,8 @@ CREATE TABLE orders_dishes (
     dish_id BLOB NOT NULL,
     price_at_order REAL NOT NULL,
     notes TEXT,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'in_progress', 'done', 'cancelled')),
+    should_prepare BOOLEAN NOT NULL DEFAULT 1,
     FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
     FOREIGN KEY (dish_id) REFERENCES dishes (id) ON DELETE CASCADE
 );

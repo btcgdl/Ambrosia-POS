@@ -209,7 +209,9 @@ fun Route.orders(orderService: OrderService) {
               order_id = orderId,
               dish_id = request.dish_id,
               price_at_order = request.price_at_order,
-              notes = request.notes
+              notes = request.notes,
+              status = "pending",
+              should_prepare = true
             )
           }
 

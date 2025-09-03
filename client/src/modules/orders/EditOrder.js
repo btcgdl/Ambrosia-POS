@@ -14,12 +14,43 @@ import {
   getUserById,
   removeDishToOrder,
   updateOrder,
+  updateOrderDish,
   updateTable,
   updateTicket,
+  sendOrderDishes,
 } from "./ordersService";
+
+const STATUS_CONFIG = {
+  pending: {
+    text: "Pendiente",
+    color: "warning",
+    className: "bg-yellow-100 text-yellow-800 border-yellow-300",
+  },
+  sent: {
+    text: "Enviado",
+    color: "primary",
+    className: "bg-blue-100 text-blue-800 border-blue-300",
+  },
+  in_progress: {
+    text: "En Proceso",
+    color: "secondary",
+    className: "bg-purple-100 text-purple-800 border-purple-300",
+  },
+  completed: {
+    text: "Completado",
+    color: "success",
+    className: "bg-green-100 text-green-800 border-green-300",
+  },
+  cancelled: {
+    text: "Cancelado",
+    color: "danger",
+    className: "bg-red-100 text-red-800 border-red-300",
+  },
+};
 import { getCategories, getDishes } from "../dishes/dishesService";
 import ConfirmationPopup from "../../components/ConfirmationPopup";
 import LoadingCard from "../../components/LoadingCard";
+import VirtualKeyboard from "../../components/VirtualKeyboard";
 import BitcoinPriceService from "../../services/bitcoinPriceService";
 import { apiClient } from "../../services/apiClient";
 import { createInvoice } from "../cashier/cashierService";
@@ -38,6 +69,11 @@ import {
   DollarSign,
   Receipt,
   CheckCircle,
+  Send,
+  FileText,
+  Pencil,
+  Trash2,
+  Lock,
 } from "lucide-react";
 import {
   Card,
@@ -49,6 +85,15 @@ import {
   Select,
   SelectItem,
   Divider,
+  Chip,
+  Input,
+  Switch,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
 } from "@heroui/react";
 import { addToast } from "@heroui/react";
 
@@ -77,6 +122,16 @@ export default function EditOrder({ dynamicParams, searchParams }) {
   //const [generateInvoice, setGenerateInvoice] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [paymentCurrencies, setPaymentCurrencies] = useState([]);
+  const [selectedDishForEdit, setSelectedDishForEdit] = useState(null);
+  const [dishNotes, setDishNotes] = useState("");
+  const [dishShouldPrepare, setDishShouldPrepare] = useState(true);
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [dishQuantities, setDishQuantities] = useState({});
+  const {
+    isOpen: isEditDishOpen,
+    onOpen: onEditDishOpen,
+    onClose: onEditDishClose,
+  } = useDisclosure();
 
   const getPaymentIcon = (name) => {
     if (name.toLowerCase().includes("efectivo")) return "💵";
@@ -146,8 +201,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
     if (order.status !== "open") return;
     setIsLoading(true);
     try {
-      const response = await addDishToOrder(pedidoId, dish);
-      //const response = await updateOrder(pedidoId, { dishes: newDishes });
+      const response = await addDishToOrder(pedidoId, dish.id, dish.price);
       const orderResponse = await getOrderById(order.id);
       const dishesResponse = await getDishesByOrder(pedidoId);
       setOrderDishes(dishesResponse);
@@ -159,7 +213,16 @@ export default function EditOrder({ dynamicParams, searchParams }) {
     }
   };
 
-  const handleRemoveDish = async (instanceId) => {
+  const handleRemoveDish = async (instance) => {
+    const instanceId = instance.id;
+    if (!instanceId) return;
+    if (instance.status !== "pending") {
+      addToast({
+        color: "warning",
+        description: "Solo se pueden eliminar platillos pendientes",
+      });
+      return;
+    }
     const newDishes = (order.dishes || []).filter(
       (item) => item.instanceId !== instanceId,
     );
@@ -189,6 +252,194 @@ export default function EditOrder({ dynamicParams, searchParams }) {
       setError("Error al deshacer la acción");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSendDishes = async () => {
+    const pendingDishes = orderDishes.filter(
+      (dish) => dish.status === "pending",
+    );
+    if (pendingDishes.length === 0) {
+      addToast({
+        color: "warning",
+        description: "No hay platillos pendientes para enviar",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      console.log(pendingDishes);
+      pendingDishes.map(
+        async (dish) =>
+          await updateOrderDish(pedidoId, dish.id, {
+            ...dish,
+            status: dish.status === "pending" ? "sent" : dish.status,
+          }),
+      );
+      const orderResponse = await getOrderById(pedidoId);
+      const orderDishesResponse = await getDishesByOrder(pedidoId);
+      setOrder(orderResponse);
+      setOrderDishes(orderDishesResponse);
+
+      addToast({
+        color: "success",
+        description: `${pendingDishes.length} platillos enviados a cocina`,
+      });
+    } catch (err) {
+      setError("Error al enviar platillos");
+      addToast({
+        color: "danger",
+        description: "Error al enviar platillos a cocina",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOpenEditDish = (dish) => {
+    setSelectedDishForEdit(dish);
+    setDishNotes(dish.notes || "");
+    setDishShouldPrepare(dish.should_prepare !== false);
+    onEditDishOpen();
+  };
+
+  const handleOpenKeyboard = (dish) => {
+    if (dish.status !== "pending") {
+      addToast({
+        color: "warning",
+        description: "Solo se pueden editar platillos pendientes",
+      });
+      return;
+    }
+    setSelectedDishForEdit(dish);
+    setDishNotes(dish.notes || "");
+    setShowKeyboard(true);
+  };
+
+  const handleCloseKeyboard = (finalText = null) => {
+    setShowKeyboard(false);
+    if (selectedDishForEdit && finalText !== null) {
+      // Solo actualizar si se pasó texto final (cuando se acepta)
+      handleUpdateDishNotes(
+        selectedDishForEdit.id,
+        finalText,
+        selectedDishForEdit.should_prepare !== false,
+        false,
+      );
+    }
+  };
+
+  const handleQuantityChange = (dishId, change) => {
+    setDishQuantities((prev) => ({
+      ...prev,
+      [dishId]: Math.max(0, (prev[dishId] || 1) + change),
+    }));
+  };
+
+  const handleAddMultipleDishes = async (dish, quantity) => {
+    console.log(order.status);
+    if (order.status == "paid") {
+      addToast({
+        description: "No se puede agregar platillos a un pedido pagado",
+        color: "danger",
+      });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      // Agregar platillos uno por uno ya que el servidor solo permite uno a la vez
+      for (let i = 0; i < quantity; i++) {
+        await addDishToOrder(pedidoId, dish.id, dish.price);
+      }
+
+      const orderResponse = await getOrderById(pedidoId);
+      const orderDishesResponse = await getDishesByOrder(pedidoId);
+      setOrder(orderResponse);
+      setOrderDishes(orderDishesResponse);
+
+      addToast({
+        color: "success",
+        description: `${quantity} ${dish.name} agregados al pedido`,
+      });
+    } catch (err) {
+      setError("Error al agregar platillos");
+      addToast({
+        color: "danger",
+        description: "Error al agregar platillos al pedido",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateDishNotes = async (
+    dishId,
+    notes,
+    shouldPrepare,
+    closeModal = true,
+  ) => {
+    // Verificar que el platillo esté en estado pending
+    const currentDish = orderDishes.find((d) => d.id === dishId);
+    if (!currentDish) {
+      addToast({
+        color: "danger",
+        description: "Platillo no encontrado",
+      });
+      return;
+    }
+
+    if (currentDish.status !== "pending") {
+      addToast({
+        color: "warning",
+        description: "Solo se pueden editar platillos pendientes",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Create complete OrderDish object matching server model
+      const orderDishUpdate = {
+        id: currentDish.id,
+        order_id: currentDish.order_id,
+        dish_id: currentDish.dish_id,
+        price_at_order: currentDish.price_at_order,
+        notes: notes || null,
+        status: currentDish.status,
+        should_prepare: shouldPrepare,
+      };
+
+      await updateOrderDish(pedidoId, dishId, orderDishUpdate);
+      const orderDishesResponse = await getDishesByOrder(pedidoId);
+      setOrderDishes(orderDishesResponse);
+
+      if (closeModal) {
+        onEditDishClose();
+      }
+
+      addToast({
+        color: "success",
+        description: "Platillo actualizado correctamente",
+      });
+    } catch (err) {
+      setError("Error al actualizar el platillo");
+      addToast({
+        color: "danger",
+        description: "Error al actualizar el platillo",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveDishEdit = () => {
+    if (selectedDishForEdit) {
+      handleUpdateDishNotes(
+        selectedDishForEdit.id,
+        dishNotes,
+        dishShouldPrepare,
+      );
     }
   };
 
@@ -453,25 +704,71 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                 </CardHeader>
                 <CardBody>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto">
-                    {filteredDishes.map((dish) => (
-                      <Card
-                        key={dish.id}
-                        className="border hover:shadow-md transition-shadow cursor-pointer"
-                        isPressable
-                        onPress={() => handleAddDish(dish)}
-                      >
-                        <CardBody className="p-4">
-                          <div className="flex flex-col">
-                            <span className="font-bold text-deep">
-                              {dish.name}
-                            </span>
-                            <span className="text-forest text-sm">
-                              ${dish.price.toFixed(2)}
-                            </span>
-                          </div>
-                        </CardBody>
-                      </Card>
-                    ))}
+                    {filteredDishes.map((dish) => {
+                      const quantity = dishQuantities[dish.id] || 1;
+                      return (
+                        <Card
+                          key={dish.id}
+                          className="border hover:shadow-md transition-shadow"
+                        >
+                          <CardBody className="p-4">
+                            <div className="flex flex-col space-y-3">
+                              <div className="flex flex-col">
+                                <span className="font-bold text-deep">
+                                  {dish.name}
+                                </span>
+                                <span className="text-forest text-sm">
+                                  ${dish.price.toFixed(2)}
+                                </span>
+                              </div>
+
+                              {/* Selector de cantidad */}
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center space-x-3">
+                                  <Button
+                                    isIconOnly
+                                    size="lg"
+                                    variant="ghost"
+                                    onPress={() =>
+                                      handleQuantityChange(dish.id, -1)
+                                    }
+                                    isDisabled={quantity <= 1}
+                                    className="h-12 w-12"
+                                  >
+                                    <Minus className="w-6 h-6" />
+                                  </Button>
+                                  <span className="min-w-12 text-center font-bold text-lg">
+                                    {quantity}
+                                  </span>
+                                  <Button
+                                    isIconOnly
+                                    size="lg"
+                                    variant="ghost"
+                                    onPress={() =>
+                                      handleQuantityChange(dish.id, 1)
+                                    }
+                                    className="h-12 w-12"
+                                  >
+                                    <Plus className="w-6 h-6" />
+                                  </Button>
+                                </div>
+
+                                <Button
+                                  size="lg"
+                                  color="primary"
+                                  onPress={() =>
+                                    handleAddMultipleDishes(dish, quantity)
+                                  }
+                                  className="font-semibold h-12"
+                                >
+                                  Agregar
+                                </Button>
+                              </div>
+                            </div>
+                          </CardBody>
+                        </Card>
+                      );
+                    })}
                   </div>
                 </CardBody>
               </Card>
@@ -483,7 +780,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
               <CardHeader>
                 <h3 className="text-lg font-bold text-deep flex items-center">
                   <ShoppingCart className="w-5 h-5 mr-2" />
-                  Platillos Seleccionados
+                  Platillos Pedidos
                 </h3>
               </CardHeader>
               <CardBody>
@@ -494,23 +791,98 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                       return (
                         <Card
                           key={item.id}
-                          className="border w-full"
-                          isPressable
-                          onPress={() => handleRemoveDish(item.id)}
+                          className="border w-full overflow-auto"
                         >
                           <CardBody className="p-4">
-                            <div className="flex justify-between items-center">
-                              <div className="flex-1">
-                                <span className="font-semibold text-deep">
-                                  {dish?.name}
-                                </span>
-                                <div className="text-forest text-sm">
-                                  ${dish?.price.toFixed(2)}
+                            <div className="space-y-3">
+                              {/* Información básica del platillo */}
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-deep text-lg">
+                                    {dish?.name}
+                                  </h4>
+                                  <p className="text-forest text-sm">
+                                    ${dish?.price.toFixed(2)}
+                                  </p>
+                                  {/* Notas - Siempre visibles y editables */}
+                                  <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-sm font-medium text-gray-700">
+                                        Notas especiales:
+                                      </span>
+                                    </div>
+                                    <p
+                                      onClick={() => handleOpenKeyboard(item)}
+                                      className="text-forest text-sm hover:bg-gray-200 border rounded-2xl px-4 py-1 w-fit truncate"
+                                    >
+                                      📝{" "}
+                                      {item.notes
+                                        ? item.notes
+                                        : "Sin notas especiales"}
+                                    </p>
+                                  </div>
+                                  <Chip
+                                    className={`text-sm mt-2 ${STATUS_CONFIG[item.status]?.className || "bg-gray-100 text-gray-800 border-gray-300"}`}
+                                    color={
+                                      STATUS_CONFIG[item.status]?.color ||
+                                      "default"
+                                    }
+                                  >
+                                    {STATUS_CONFIG[item.status]?.text ||
+                                      item.status}
+                                  </Chip>
+                                </div>
+
+                                {/* Switch de preparar - Siempre visible */}
+                                <div className="flex flex-col items-end gap-2">
+                                  <div className="text-end">
+                                    {/* Advertencia para platillos no editables */}
+                                    {item.status !== "pending" ? (
+                                      <div className="text-xs text-orange-700 bg-orange-100 p-2 rounded-lg border border-orange-200">
+                                        <Lock />
+                                      </div>
+                                    ) : (
+                                      <div>
+                                        <div className="text-xs text-gray-600 text-right">
+                                          Preparar despues
+                                        </div>
+                                        <Switch
+                                          isSelected={
+                                            item.should_prepare !== false
+                                          }
+                                          onValueChange={(value) =>
+                                            handleUpdateDishNotes(
+                                              item.id,
+                                              item.notes,
+                                              value,
+                                              false,
+                                            )
+                                          }
+                                          size="lg"
+                                          isDisabled={item.status !== "pending"}
+                                          className="mt-2"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                  {/* Botón de eliminar - Solo para pending */}
+                                  {item.status === "pending" &&
+                                    order &&
+                                    order.status === "open" && (
+                                      <div>
+                                        <Button
+                                          color="danger"
+                                          variant="ghost"
+                                          onPress={() => handleRemoveDish(item)}
+                                          size="md"
+                                          isIconOnly
+                                        >
+                                          <Trash2 />
+                                        </Button>
+                                      </div>
+                                    )}
                                 </div>
                               </div>
-                              {order && order.status === "open" && (
-                                <Minus className="w-4 h-4" />
-                              )}
                             </div>
                           </CardBody>
                         </Card>
@@ -538,28 +910,45 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                         variant="ghost"
                         color="primary"
                         size="lg"
-                        onPress={() => setShowPaymentMethodDialog(true)}
+                        onPress={() => {
+                          if (
+                            orderDishes.some(
+                              (dish) => dish.status === "pending",
+                            )
+                          ) {
+                            addToast({
+                              color: "warning",
+                              description:
+                                "El pedido no puede ser cerrado porque hay platillos sin enviar a cocina",
+                            });
+                            return;
+                          }
+                          setShowPaymentMethodDialog(true);
+                        }}
                         disabled={isLoading}
                         className="h-14"
                       >
                         <CreditCard className="w-4 h-4 mr-2" />
                         Cerrar Pedido
                       </Button>
-                      <Button
-                        variant="bordered"
-                        color="warning"
-                        size="lg"
-                        onPress={() => handleUndo()}
-                        disabled={isLoading || undoStack.length === 0}
-                        className="h-14"
-                      >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Deshacer
-                      </Button>
+                      {orderDishes.some(
+                        (dish) => dish.status === "pending",
+                      ) && (
+                        <Button
+                          variant="bordered"
+                          color="warning"
+                          size="lg"
+                          onPress={handleSendDishes}
+                          className="h-14"
+                          startContent={<Send className="w-6 h-6" />}
+                        >
+                          Enviar a Cocina
+                        </Button>
+                      )}
                     </div>
                   )}
 
-                  {order?.status === "closed" && (
+                  {order?.status === "paid" && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Button
                         variant="outline"
@@ -759,6 +1148,66 @@ export default function EditOrder({ dynamicParams, searchParams }) {
             onClose={handleCancelDialog}
           />
         )}
+
+        {/* Modal para editar platillo */}
+        <Modal isOpen={isEditDishOpen} onClose={onEditDishClose} size="md">
+          <ModalContent>
+            <ModalHeader>
+              <h3 className="text-lg font-semibold">
+                Editar Platillo:{" "}
+                {selectedDishForEdit &&
+                  dishes.find((d) => d.id === selectedDishForEdit.dish_id)
+                    ?.name}
+              </h3>
+            </ModalHeader>
+            <ModalBody>
+              <div className="space-y-4">
+                <div>
+                  <Input
+                    label="Notas"
+                    placeholder="Agregar notas especiales (ej: sin cebolla, extra picante)"
+                    value={dishNotes}
+                    onChange={(e) => setDishNotes(e.target.value)}
+                    startContent={
+                      <FileText className="w-4 h-4 text-gray-400" />
+                    }
+                  />
+                </div>
+                <div>
+                  <Switch
+                    isSelected={dishShouldPrepare}
+                    onValueChange={setDishShouldPrepare}
+                  >
+                    ¿Debe prepararse en cocina?
+                  </Switch>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Si está deshabilitado, el platillo no se enviará a cocina
+                  </p>
+                </div>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="danger" variant="light" onPress={onEditDishClose}>
+                Cancelar
+              </Button>
+              <Button
+                color="primary"
+                onPress={handleSaveDishEdit}
+                disabled={isLoading}
+              >
+                {isLoading ? <Spinner size="sm" /> : "Guardar"}
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        {/* Teclado Virtual */}
+        <VirtualKeyboard
+          isOpen={showKeyboard}
+          value={dishNotes}
+          onChange={setDishNotes}
+          onClose={handleCloseKeyboard}
+        />
       </div>
     </div>
   );

@@ -95,7 +95,9 @@ data class OrderDish(
         val order_id: String,
         val dish_id: String,
         val price_at_order: Double,
-        val notes: String? = null
+        val notes: String? = null,
+        val status: String,
+        val should_prepare: Boolean
 )
 
 // NEW: DTO for adding dishes to an order
