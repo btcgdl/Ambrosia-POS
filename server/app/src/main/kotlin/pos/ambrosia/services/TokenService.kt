@@ -49,6 +49,15 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
     return refreshToken
   }
 
+  fun generateWalletAccessToken(userId: String): String =
+      JWT.create()
+      .withAudience(audience)
+      .withIssuer(issuer)
+      .withClaim("scope", "wallet_access")
+      .withClaim("userId", userId)
+      .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(2)))
+      .sign(algorithm)
+
   fun validateRefreshToken(refreshToken: String): Boolean {
     return try {
       val decodedJWT = verifier.verify(refreshToken)

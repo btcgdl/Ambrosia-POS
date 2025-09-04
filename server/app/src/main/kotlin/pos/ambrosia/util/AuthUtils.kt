@@ -1,9 +1,15 @@
 package pos.ambrosia.utils
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.routing.*
+import java.security.MessageDigest
+import java.util.Date
+import java.util.concurrent.TimeUnit
+import pos.ambrosia.config.AppConfig
 import pos.ambrosia.logger
 
 /** Extensión para verificar si el usuario actual es administrador */
@@ -28,6 +34,7 @@ fun ApplicationCall.getCurrentUser(): UserInfo? {
   )
 }
 
+
 /**
  * Plugin de Ktor para verificar los privilegios de administrador.
  * Este plugin se asegura de que solo los administradores puedan acceder a una ruta.
@@ -45,6 +52,12 @@ val AdminAccess = createRouteScopedPlugin(name = "AdminAccess") {
 fun Route.authenticateAdmin(name: String = "auth-jwt", build: Route.() -> Unit): Route {
   return authenticate(name) {
     install(AdminAccess)
+    build()
+  }
+}
+
+fun Route.authenticateWallet(name: String = "auth-jwt-wallet", build: Route.() -> Unit): Route {
+  return authenticate(name) {
     build()
   }
 }

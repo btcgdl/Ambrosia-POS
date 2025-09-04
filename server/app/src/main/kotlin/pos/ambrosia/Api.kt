@@ -79,6 +79,18 @@ class Api() {
       }
 
       jwt("auth-jwt-wallet") {
+        authHeader { call ->
+          try {
+            val token = call.request.cookies["walletAccessToken"]
+            if (token != null) {
+              HttpAuthHeader.Single("Bearer", token)
+            } else {
+              null
+            }
+          } catch (cause: Throwable) {
+            null
+          }
+        }
         verifier(JWT.require(Algorithm.HMAC256(config.property("secret").getString()))
           .withIssuer(config.property("jwt.issuer").getString())
           .withAudience(config.property("jwt.audience").getString())

@@ -74,10 +74,10 @@ class UsersService(private val connection: Connection) {
       logger.info("Authentication result: $isValidPin")
       if (isValidPin) {
         return AuthResponse(
-                id = userIdString,
-                name = resultSet.getString("name"),
-                role = resultSet.getString("role_id"),
-                isAdmin = resultSet.getBoolean("isAdmin")
+          id = userIdString,
+          name = resultSet.getString("name"),
+          role = resultSet.getString("role_id"),
+          isAdmin = resultSet.getBoolean("isAdmin")
         )
       }
     }
@@ -139,9 +139,9 @@ class UsersService(private val connection: Connection) {
     val statement = connection.prepareStatement(GET_USER_COUNT)
     val resultSet = statement.executeQuery()
     return if (resultSet.next()) {
-        resultSet.getLong(1)
+      resultSet.getLong(1)
     } else {
-        0L // Return 0 if no result is found (unlikely with COUNT)
+      0L // Return 0 if no result is found (unlikely with COUNT)
     }
   }
 
