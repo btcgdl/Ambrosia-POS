@@ -25,7 +25,8 @@ data class User(
         val name: String,
         val pin: String,
         val refreshToken: String? = null,
-        val role: String? = null
+        val role: String? = null,
+        val isAdmin: Boolean? = false
 )
 
 @Serializable
@@ -152,4 +153,9 @@ data class Shift(
 data class DishCategory(
         val id: String? = null,
         val name: String,
+)
+
+@Serializable
+data class RolePassword(
+        val password: String
 )

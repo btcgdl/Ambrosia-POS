@@ -4,15 +4,6 @@ import java.sql.Connection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Ticket
 
-// data class Ticket(
-//         val id: String?,
-//         val order_id: String,
-//         val user_id: String,
-//         val ticket_date: String,
-//         val status: Int,
-//         val total_amount: Double,
-//         val notes: String?
-// )
 class TicketService(private val connection: Connection) {
   companion object {
     private const val ADD_TICKET =
@@ -100,15 +91,15 @@ class TicketService(private val connection: Connection) {
     val tickets = mutableListOf<Ticket>()
     while (resultSet.next()) {
       val ticket =
-              Ticket(
-                      id = resultSet.getString("id"),
-                      order_id = resultSet.getString("order_id"),
-                      user_id = resultSet.getString("user_id"),
-                      ticket_date = resultSet.getString("ticket_date"),
-                      status = resultSet.getInt("status"),
-                      total_amount = resultSet.getDouble("total_amount"),
-                      notes = resultSet.getString("notes")
-              )
+        Ticket(
+          id = resultSet.getString("id"),
+          order_id = resultSet.getString("order_id"),
+          user_id = resultSet.getString("user_id"),
+          ticket_date = resultSet.getString("ticket_date"),
+          status = resultSet.getInt("status"),
+          total_amount = resultSet.getDouble("total_amount"),
+          notes = resultSet.getString("notes")
+        )
       tickets.add(ticket)
     }
     logger.info("Retrieved ${tickets.size} tickets")
@@ -121,13 +112,13 @@ class TicketService(private val connection: Connection) {
     val resultSet = statement.executeQuery()
     return if (resultSet.next()) {
       Ticket(
-              id = resultSet.getString("id"),
-              order_id = resultSet.getString("order_id"),
-              user_id = resultSet.getString("user_id"),
-              ticket_date = resultSet.getString("ticket_date"),
-              status = resultSet.getInt("status"),
-              total_amount = resultSet.getDouble("total_amount"),
-              notes = resultSet.getString("notes")
+        id = resultSet.getString("id"),
+        order_id = resultSet.getString("order_id"),
+        user_id = resultSet.getString("user_id"),
+        ticket_date = resultSet.getString("ticket_date"),
+        status = resultSet.getInt("status"),
+        total_amount = resultSet.getDouble("total_amount"),
+        notes = resultSet.getString("notes")
       )
     } else {
       logger.warn("Ticket not found with ID: $id")
@@ -142,15 +133,15 @@ class TicketService(private val connection: Connection) {
     val tickets = mutableListOf<Ticket>()
     while (resultSet.next()) {
       val ticket =
-              Ticket(
-                      id = resultSet.getString("id"),
-                      order_id = resultSet.getString("order_id"),
-                      user_id = resultSet.getString("user_id"),
-                      ticket_date = resultSet.getString("ticket_date"),
-                      status = resultSet.getInt("status"),
-                      total_amount = resultSet.getDouble("total_amount"),
-                      notes = resultSet.getString("notes")
-              )
+        Ticket(
+          id = resultSet.getString("id"),
+          order_id = resultSet.getString("order_id"),
+          user_id = resultSet.getString("user_id"),
+          ticket_date = resultSet.getString("ticket_date"),
+          status = resultSet.getInt("status"),
+          total_amount = resultSet.getDouble("total_amount"),
+          notes = resultSet.getString("notes")
+        )
       tickets.add(ticket)
     }
     logger.info("Retrieved ${tickets.size} tickets for order: $orderId")
@@ -164,15 +155,15 @@ class TicketService(private val connection: Connection) {
     val tickets = mutableListOf<Ticket>()
     while (resultSet.next()) {
       val ticket =
-              Ticket(
-                      id = resultSet.getString("id"),
-                      order_id = resultSet.getString("order_id"),
-                      user_id = resultSet.getString("user_id"),
-                      ticket_date = resultSet.getString("ticket_date"),
-                      status = resultSet.getInt("status"),
-                      total_amount = resultSet.getDouble("total_amount"),
-                      notes = resultSet.getString("notes")
-              )
+        Ticket(
+          id = resultSet.getString("id"),
+          order_id = resultSet.getString("order_id"),
+          user_id = resultSet.getString("user_id"),
+          ticket_date = resultSet.getString("ticket_date"),
+          status = resultSet.getInt("status"),
+          total_amount = resultSet.getDouble("total_amount"),
+          notes = resultSet.getString("notes")
+        )
       tickets.add(ticket)
     }
     logger.info("Retrieved ${tickets.size} tickets for user: $userId")
