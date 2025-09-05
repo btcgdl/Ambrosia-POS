@@ -30,10 +30,10 @@ class RolesService(private val connection: Connection) {
     val statement = connection.prepareStatement(ADD_ROLE)
 
     val encryptedPin =
-            SecurePinProcessor.hashPinForStorage(
-                    role.password?.toCharArray() ?: charArrayOf(),
-                    role.role
-            )
+      SecurePinProcessor.hashPinForStorage(
+        pin = role.password?.toCharArray() ?: charArrayOf(),
+        id = generatedId
+      )
 
     statement.setString(1, generatedId)
     statement.setString(2, role.role)
@@ -64,12 +64,12 @@ class RolesService(private val connection: Connection) {
     val roles = mutableListOf<Role>()
     while (resultSet.next()) {
       val role =
-              Role(
-                      id = resultSet.getString("id"),
-                      role = resultSet.getString("role"),
-                      password = resultSet.getString("password"),
-                      isAdmin = resultSet.getBoolean("isAdmin")
-              )
+        Role(
+          id = resultSet.getString("id"),
+          role = resultSet.getString("role"),
+          password = resultSet.getString("password"),
+          isAdmin = resultSet.getBoolean("isAdmin")
+        )
       roles.add(role)
     }
     logger.info("Retrieved ${roles.size} roles")

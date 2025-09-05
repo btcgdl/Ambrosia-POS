@@ -43,8 +43,8 @@ object SecurePinProcessor {
       throw RuntimeException("Error al hashear el PIN con la clave maestra", e)
     }
   }
-  fun verifyPin(enteredPin: CharArray, userName: String, storedHash: ByteArray): Boolean {
-    val newHash = hashPinForStorage(enteredPin, userName)
+  fun verifyPin(enteredPin: CharArray, id: String, storedHash: ByteArray): Boolean {
+    val newHash = hashPinForStorage(enteredPin, id)
     logger.info("Pins: " + newHash + " = " + storedHash)
     return MessageDigest.isEqual(newHash, storedHash)
   }

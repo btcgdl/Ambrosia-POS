@@ -2,25 +2,36 @@ package pos.ambrosia.api
 
 import io.ktor.http.*
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.Application
+import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.sql.Connection
+import pos.ambrosia.utils.InvalidCredentialsException
+import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.models.Phoenix.CreateInvoiceRequest
 import pos.ambrosia.models.Phoenix.PayInvoiceRequest
 import pos.ambrosia.models.Phoenix.PayOfferRequest
 import pos.ambrosia.models.Phoenix.PayOnchainRequest
 import pos.ambrosia.services.PhoenixService
+import pos.ambrosia.services.AuthService
+import pos.ambrosia.services.TokenService
 import pos.ambrosia.utils.authenticateAdmin
+import pos.ambrosia.utils.authenticateWallet
+import pos.ambrosia.utils.getCurrentUser
+import pos.ambrosia.models.RolePassword
 
 fun Application.configureWallet() {
+  val connection: Connection = DatabaseConnection.getConnection()
   val phoenixService = PhoenixService()
+  val authService = AuthService(connection)
+  val tokenService = TokenService(environment, connection)
 
-  routing { route("/wallet") { wallet(phoenixService) } }
+  routing { route("/wallet") { wallet(phoenixService, tokenService, authService) } }
 }
 
-fun Route.wallet(phoenixService: PhoenixService) {
+fun Route.wallet(phoenixService: PhoenixService, tokenService: TokenService, authService: AuthService) {
   authenticate("auth-jwt") {
     post("/createinvoice") {
       val request = call.receive<CreateInvoiceRequest>()
@@ -29,7 +40,32 @@ fun Route.wallet(phoenixService: PhoenixService) {
     }
   }
   authenticateAdmin {
-
+    post("/auth") {
+      val rolePassword = call.receive<RolePassword>()
+      val userInfo = call.getCurrentUser() ?: throw InvalidCredentialsException()
+      val result = authService.authenticateByRole(userInfo.userId, rolePassword.password.toCharArray())
+      if (result == true) {
+        val token = tokenService.generateWalletAccessToken(userInfo.userId)
+        call.response.cookies.append(
+          Cookie(
+            name = "walletAccessToken", 
+            value = token, 
+            httpOnly = true, 
+            secure = false, 
+            path = "/"
+          )
+        )
+        call.respond(HttpStatusCode.OK, mapOf("message" to "Login successful"))
+      } else {
+        call.respond(HttpStatusCode.Unauthorized)
+      }
+    }
+    post("/logout") {
+      call.response.cookies.append("walletAccessToken", "", maxAge = 0)
+      call.respond(HttpStatusCode.OK, mapOf("status" to "ok"))
+    }
+  }
+  authenticate("auth-jwt-wallet") {
     // Get wallet/node info
     get("/getinfo") {
       val nodeInfo = phoenixService.getNodeInfo()

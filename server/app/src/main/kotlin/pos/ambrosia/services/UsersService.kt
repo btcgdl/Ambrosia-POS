@@ -31,7 +31,7 @@ class UsersService(private val connection: Connection) {
 
     private const val GET_USER_BY_ID =
             """
-            SELECT u.id, u.name, u.refresh_token, u.pin, r.role
+            SELECT u.id, u.name, u.refresh_token, u.pin, r.role, r.isAdmin
             FROM users u
             JOIN roles r ON u.role_id = r.id
             WHERE u.id = ? AND u.is_deleted = 0
@@ -44,44 +44,10 @@ class UsersService(private val connection: Connection) {
 
     private const val DELETE_USER = "UPDATE users SET is_deleted = 1 WHERE id = ?"
 
-    private const val GET_USER_FOR_AUTH =
-            """
-            SELECT u.id, u.name, u.pin, u.role_id as role_id, r.role, r.isAdmin as isAdmin
-            FROM users u
-            JOIN roles r ON u.role_id = r.id
-            WHERE u.name = ? AND u.is_deleted = 0
-        """
-
     private const val CHECK_ROLE_EXISTS =
             """
             SELECT id FROM roles WHERE id = ? AND is_deleted = 0
         """
-  }
-
-  fun authenticateUser(name: String, pin: CharArray): AuthResponse? {
-    val statement = connection.prepareStatement(GET_USER_FOR_AUTH)
-    statement.setString(1, name)
-    val resultSet = statement.executeQuery()
-    if (resultSet.next()) {
-      val userIdString = resultSet.getString("id")
-      val storedPinHashBase64 = resultSet.getString("pin")
-      logger.info("Authenticating user: $userIdString")
-      val storedPinHash = SecurePinProcessor.base64ToByteArray(storedPinHashBase64)
-
-      val isValidPin = SecurePinProcessor.verifyPin(pin, userIdString, storedPinHash)
-      pin.fill('\u0000') // Limpiar PIN de memoria
-
-      logger.info("Authentication result: $isValidPin")
-      if (isValidPin) {
-        return AuthResponse(
-                id = userIdString,
-                name = resultSet.getString("name"),
-                role = resultSet.getString("role_id"),
-                isAdmin = resultSet.getBoolean("isAdmin")
-        )
-      }
-    }
-    return null
   }
 
   private fun roleExists(roleId: String): Boolean {
@@ -139,9 +105,9 @@ class UsersService(private val connection: Connection) {
     val statement = connection.prepareStatement(GET_USER_COUNT)
     val resultSet = statement.executeQuery()
     return if (resultSet.next()) {
-        resultSet.getLong(1)
+      resultSet.getLong(1)
     } else {
-        0L // Return 0 if no result is found (unlikely with COUNT)
+      0L // Return 0 if no result is found (unlikely with COUNT)
     }
   }
 
@@ -154,8 +120,9 @@ class UsersService(private val connection: Connection) {
       val name = resultSet.getString("name")
       val refreshToken = resultSet.getString("refresh_token")
       val role = resultSet.getString("role")
+      val isAdmin = resultSet.getBoolean("isAdmin")
       // No devolvemos el PIN hasheado
-      return User(id = userId, name = name, pin = "****", refreshToken = refreshToken, role = role)
+      return User(id = userId, name = name, pin = "****", refreshToken = refreshToken, role = role, isAdmin = isAdmin)
     }
     return null
   }
