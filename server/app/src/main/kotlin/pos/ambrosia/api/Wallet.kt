@@ -18,7 +18,6 @@ import pos.ambrosia.services.PhoenixService
 import pos.ambrosia.services.AuthService
 import pos.ambrosia.services.TokenService
 import pos.ambrosia.utils.authenticateAdmin
-import pos.ambrosia.utils.authenticateWallet
 import pos.ambrosia.utils.getCurrentUser
 import pos.ambrosia.models.RolePassword
 
