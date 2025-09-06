@@ -8,20 +8,20 @@ import pos.ambrosia.utils.SecurePinProcessor
 class AuthService(private val connection: Connection) {
   companion object {
     private const val GET_USER_FOR_AUTH_BY_NAME =
-            """
-            SELECT u.id, u.name, u.pin, u.role_id as role_id, r.role, r.isAdmin as isAdmin
-            FROM users u
-            JOIN roles r ON u.role_id = r.id
-            WHERE u.name = ? AND u.is_deleted = 0
-        """
+      """
+      SELECT u.id, u.name, u.pin, u.role_id as role_id, r.role, r.isAdmin as isAdmin
+      FROM users u
+      JOIN roles r ON u.role_id = r.id
+      WHERE u.name = ? AND u.is_deleted = 0
+      """
 
     private const val GET_USER_AND_ROLE_FOR_AUTH_BY_USERID =
-            """
-            SELECT u.id, r.password as role_password, r.id as role_id
-            FROM users u
-            JOIN roles r ON u.role_id = r.id
-            WHERE u.id = ? AND u.is_deleted = 0
-        """
+      """
+      SELECT u.id, r.password as role_password, r.id as role_id
+      FROM users u
+      JOIN roles r ON u.role_id = r.id
+      WHERE u.id = ? AND u.is_deleted = 0
+      """
   }
 
   fun authenticateUser(name: String, pin: CharArray): AuthResponse? {

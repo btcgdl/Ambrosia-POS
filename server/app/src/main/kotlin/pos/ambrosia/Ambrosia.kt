@@ -41,33 +41,33 @@ class Ambrosia : CliktCommand() {
   }
   inner class DaemonOptions : OptionGroup(name = "DaemonOptions") {
     val httpBindIp by
-            option("--http-bind-ip", help = "Bind ip for the http api").defaultLazy {
-              val value = "127.0.0.1" // Default value
-              SystemFileSystem.sink(this@Ambrosia.confFile, append = true).buffered().use {
-                it.writeString("\nhttp-bind-ip=$value")
-              }
-              value
-            }
+      option("--http-bind-ip", help = "Bind ip for the http api").defaultLazy {
+        val value = "127.0.0.1" // Default value
+        SystemFileSystem.sink(this@Ambrosia.confFile, append = true).buffered().use {
+          it.writeString("\nhttp-bind-ip=$value")
+        }
+        value
+      }
     val httpBindPort by
-            option("--http-bind-port", help = "Bind port for the http api").int().defaultLazy {
-              val value = 9154 // Dinnerefault value
-              SystemFileSystem.sink(this@Ambrosia.confFile, append = true).buffered().use {
-                it.writeString("\nhttp-bind-port=$value")
-              }
-              value
-            }
+      option("--http-bind-port", help = "Bind port for the http api").int().defaultLazy {
+        val value = 9154 // Dinnerefault value
+        SystemFileSystem.sink(this@Ambrosia.confFile, append = true).buffered().use {
+          it.writeString("\nhttp-bind-port=$value")
+        }
+        value
+      }
     val secret by
-            option("--secret", help = "Secret key for the server").defaultLazy {
-              val seed = SeedGenerator.generateSeed() // Generate a new seed
-              SystemFileSystem.sink(this@Ambrosia.confFile, append = true).buffered().use {
-                it.writeString("\nsecret=$seed")
-              }
-              val hash = SeedGenerator.generateSecureSeed(seedInput = seed)
-              SystemFileSystem.sink(this@Ambrosia.confFile, append = true).buffered().use {
-                it.writeString("\nsecret-hash=$hash")
-              }
-              seed
-            }
+      option("--secret", help = "Secret key for the server").defaultLazy {
+        val seed = SeedGenerator.generateSeed() // Generate a new seed
+        SystemFileSystem.sink(this@Ambrosia.confFile, append = true).buffered().use {
+          it.writeString("\nsecret=$seed")
+        }
+        val hash = SeedGenerator.generateSecureSeed(seedInput = seed)
+        SystemFileSystem.sink(this@Ambrosia.confFile, append = true).buffered().use {
+          it.writeString("\nsecret-hash=$hash")
+        }
+        seed
+      }
   }
   private val options by DaemonOptions()
 
@@ -77,25 +77,25 @@ class Ambrosia : CliktCommand() {
     try {
 
       val server =
-              embeddedServer(
-                      CIO,
-                      environment =
-                              applicationEnvironment {
-                                config =
-                                        MapApplicationConfig().apply {
-                                          put("jwt.issuer", "ambrosia-pos")
-                                          put("jwt.audience", "ambrosia-pos-users")
-                                          put("secret", options.secret)
-                                        }
-                              },
-                      configure = {
-                        connector {
-                          port = options.httpBindPort
-                          host = options.httpBindIp
-                        }
-                      },
-                      module = { Api().run { module() } }
-              )
+        embeddedServer(
+          CIO,
+          environment =
+            applicationEnvironment {
+              config =
+                MapApplicationConfig().apply {
+                  put("jwt.issuer", "ambrosia-pos")
+                  put("jwt.audience", "ambrosia-pos-users")
+                  put("secret", options.secret)
+                }
+            },
+          configure = {
+            connector {
+              port = options.httpBindPort
+              host = options.httpBindIp
+            }
+          },
+          module = { Api().run { module() } }
+        )
       server.start(wait = true)
     } catch (e: Exception) {
       echo("Error starting server: ${e.message}", err = true)
