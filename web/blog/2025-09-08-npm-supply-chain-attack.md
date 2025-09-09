@@ -45,7 +45,7 @@ async function checkethereumw() {
 
 ## Impacto en Ambrosia POS: Análisis y Conclusión
 
-Al enterarnos de este incidente, el equipo de Ambrosia realizó una auditoría de seguridad inmediata de nuestras dependencias para determinar si nuestro proyecto.
+Al enterarnos de este incidente, el equipo de Ambrosia realizó una auditoría de seguridad inmediata de nuestras dependencias para determinar si nuestro proyecto había sido vulnerado.
 
 Nuestra investigación confirmó que Ambrosia POS, a través de dependencias de la interfaz de usuario, utiliza tres de los paquetes mencionados en las alertas de seguridad: `simple-swizzle`, `color-name` y `color-convert`.
 
