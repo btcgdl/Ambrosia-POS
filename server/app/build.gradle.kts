@@ -44,6 +44,7 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktor-version")
 
     // Database dependencies
+    implementation("org.flywaydb:flyway-core:11.11.2")
     implementation("org.xerial:sqlite-jdbc:3.49.1.0")
 
     // Console helper

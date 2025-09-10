@@ -15,10 +15,10 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
-import pos.ambrosia.config.InjectDB
 import pos.ambrosia.config.InjectLogs
 import pos.ambrosia.config.ListValueSource
 import pos.ambrosia.config.SeedGenerator
+import org.flywaydb.core.Flyway
 
 fun main(args: Array<String>) = Ambrosia().main(args)
 
@@ -31,7 +31,6 @@ class Ambrosia : CliktCommand() {
   init {
 
     SystemFileSystem.createDirectories(datadir)
-    InjectDB.ensureDatabase(datadir.toString(), AppVersion)
     InjectLogs.ensureLogConfig(datadir.toString())
 
     context {
@@ -73,7 +72,8 @@ class Ambrosia : CliktCommand() {
 
   override fun run() {
     echo(green("Running Ambrosia POS Server v$AppVersion"))
-
+    Flyway.configure().dataSource("jdbc:sqlite:${datadir}/ambrosia.db", null , null)
+      .mixed(true).load().migrate()
     try {
 
       val server =

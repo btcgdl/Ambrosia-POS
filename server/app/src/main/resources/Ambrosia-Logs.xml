@@ -5,6 +5,7 @@
         </encoder>
     </appender>
 
+    <logger name="org.flywaydb.core" level="WARN" />
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.cio" level="INFO"/>
     <logger name="pos.ambrosia" level="INFO"/>
