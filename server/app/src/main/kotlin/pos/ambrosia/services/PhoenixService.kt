@@ -17,7 +17,7 @@ import pos.ambrosia.models.Phoenix.*
 import pos.ambrosia.utils.*
 
 /** Service for interacting with Phoenix Lightning node */
-class PhoenixService(private val phoenixUrl: String = "http://localhost:9740") {
+class PhoenixService(private val phoenixUrl: String = "http://phoenixd:9740") {
   private val httpClient =
           HttpClient(CIO) {
             install(Auth) {
