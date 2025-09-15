@@ -1,13 +1,9 @@
 
 package pos.ambrosia.util
+import kotlinx.serialization.Serializable
+import pos.ambrosia.models.TicketEntry
 
-data class TicketEntry(
-	var name: String,
-	var comments: MutableList<String> = mutableListOf(),
-	var number: Int = 0,
-	var cost: Double? = null
-)
-
+@Serializable
 class Ticket {
 	val entries: MutableList<TicketEntry> = mutableListOf()
 

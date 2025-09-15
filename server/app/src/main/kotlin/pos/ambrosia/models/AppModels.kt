@@ -159,3 +159,11 @@ data class DishCategory(
 data class RolePassword(
 	val password: String
 )
+
+@Serializable
+data class TicketEntry(
+	var name: String,
+	var comments: MutableList<String> = mutableListOf(),
+	var number: Int = 0,
+	var cost: Double? = null
+)
