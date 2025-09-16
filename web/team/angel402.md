@@ -20,7 +20,6 @@ Soy un programador con experiencia en el ecosistema de **Unity y .NET**, y actua
 | Contacto | Información |
 | :--- | :--- |
 | **Email** | `angeldesarrollo402@gmail.com` |
-| **Teléfono** | `+52 33 3138 9946` |
 | **Ubicación** | Guadalajara, Jalisco, México |
 | **Portafolio** | [**angel402.github.io**](https://angel402.github.io/#/) |
 

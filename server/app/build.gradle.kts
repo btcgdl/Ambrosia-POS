@@ -17,7 +17,6 @@ repositories {
 }
 
 dependencies {
-
     // Test dependencies
     testImplementation("org.jetbrains.kotlin:kotlin-test:$2.1.20")
     // ktor dependencies
@@ -42,6 +41,7 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:$ktor-version")
     implementation("io.ktor:ktor-client-auth:$ktor-version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor-version")
+    implementation("com.github.anastaciocintra:escpos-coffee:4.1.0")
 
     // Database dependencies
     implementation("org.flywaydb:flyway-core:11.11.2")

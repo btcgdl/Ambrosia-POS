@@ -18,7 +18,6 @@ Soy un desarrollador autodidacta con enfoque full stack, especializado en los ec
 
 | Contacto | Información |
 | :--- | :--- |
-| **Teléfono** | `+52 33 1942 4174` |
 | **Email** | `jordi77alva@gmail.com` |
 | **Ubicación** | Guadalajara, Jalisco, México |
 | **Perfiles** | [GitHub](https://github.com/jordypirata)  |
