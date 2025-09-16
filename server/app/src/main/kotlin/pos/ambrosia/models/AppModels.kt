@@ -167,3 +167,18 @@ data class TicketEntry(
 	var number: Int = 0,
 	var cost: Double? = null
 )
+
+enum class TicketType {
+  KITCHEN,
+  CUSTOMER
+}
+
+@Serializable
+class TicketPrinter {
+	val entries: MutableList<TicketEntry> = mutableListOf()
+}
+@Serializable
+data class PrintRequest(val ticket: TicketPrinter, val type: TicketType)
+
+@Serializable
+data class SetPrinterRequest(val type: TicketType, val printerName: String)

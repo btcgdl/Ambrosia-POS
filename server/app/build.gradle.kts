@@ -17,7 +17,6 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.anastaciocintra:escpos-coffee:4.1.0")
     // Test dependencies
     testImplementation("org.jetbrains.kotlin:kotlin-test:$2.1.20")
     // ktor dependencies

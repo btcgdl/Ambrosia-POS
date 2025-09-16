@@ -1,5 +1,3 @@
-// server/app/src/main/kotlin/pos/ambrosia/api/Printer.kt
-
 package pos.ambrosia.api
 
 import io.ktor.http.*
@@ -8,15 +6,11 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import pos.ambrosia.services.PrinterManager
-import pos.ambrosia.services.TicketType
-import pos.ambrosia.util.Ticket // Importa tu clase Ticket
+import pos.ambrosia.models.TicketPrinter 
+import pos.ambrosia.models.TicketType
+import pos.ambrosia.models.SetPrinterRequest
+import pos.ambrosia.models.PrintRequest
 
-// Define una clase para recibir los datos del POST
-@kotlinx.serialization.Serializable
-data class PrintRequest(val ticket: Ticket, val type: TicketType)
-
-@kotlinx.serialization.Serializable
-data class SetPrinterRequest(val type: TicketType, val printerName: String)
 
 fun Application.configurePrinter() {
   routing {
