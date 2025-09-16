@@ -210,6 +210,16 @@ CREATE TABLE base_currency (
     FOREIGN KEY (currency_id) REFERENCES currency (id) ON DELETE RESTRICT
 );
 
+CREATE TABLE config (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    restaurant_name TEXT NOT NULL,
+    address TEXT,
+    phone TEXT,
+    email TEXT,
+    tax_id TEXT,
+    logo BLOB
+);
+
 INSERT INTO payment_methods (id, name) VALUES
     ('32332081-7a2b-4e67-a198-fddf2451f426', 'Efectivo'),
     ('6440df5d-c76c-4074-9256-dd2dccf8a50b', 'Tarjeta de Crédito'),
