@@ -48,7 +48,7 @@ fun Route.auth(tokenService: TokenService, authService: AuthService) {
 			Cookie(
 				name = "accessToken",
 				value = accessTokenResponse,
-				expires = GMTDate(System.currentTimeMillis() + (60 * 1000L)), // 15 min
+				expires = GMTDate(System.currentTimeMillis() + (60 * 1000L)), // 60 s
 				httpOnly = false, // Accesible desde JavaScript
 				secure = false, // Cambiar a true en producción con HTTPS
 				path = "/",
@@ -92,12 +92,12 @@ fun Route.auth(tokenService: TokenService, authService: AuthService) {
       // Generar SOLO un nuevo access token (NO generar nuevo refresh token)
       val newAccessToken = tokenService.generateAccessToken(userInfo)
 
-      // Actualizar SOLO la cookie del access token
+      // Actualizar SOLO la cookie del access token (60 s)
       call.response.cookies.append(
 				Cookie(
 					name = "accessToken",
 					value = newAccessToken,
-					expires = GMTDate(System.currentTimeMillis() + (60 * 1000L)), // 15 min
+					expires = GMTDate(System.currentTimeMillis() + (60 * 1000L)), // 60 s
 					httpOnly = false,
 					secure = false,
 					path = "/"
