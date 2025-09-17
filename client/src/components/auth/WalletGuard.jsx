@@ -121,6 +121,9 @@ export default function WalletGuard({
             />
           </ModalBody>
           <ModalFooter>
+            <Button color="secondary" onPress={() => setIsOpen(false)}>
+              Cancelar
+            </Button>
             <Button
               color="primary"
               onPress={handleSubmit}
