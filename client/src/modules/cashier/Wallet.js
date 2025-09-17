@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import WalletGuard from "../../components/auth/WalletGuard";
 import {
   createInvoice,
   getIncomingTransactions,
@@ -46,7 +47,7 @@ import {
 import { useRouter } from "next/navigation";
 import { addToast } from "@heroui/react";
 
-export default function Wallet() {
+function WalletInner() {
   const router = useRouter();
   const [info, setInfo] = useState(null);
   const [invoiceAmount, setInvoiceAmount] = useState("");
@@ -793,5 +794,18 @@ export default function Wallet() {
         </Modal>
       </div>
     </div>
+  );
+}
+
+export default function Wallet() {
+  return (
+    <WalletGuard
+      placeholder={<div className="min-h-screen gradient-fresh p-4" />}
+      title="Confirmar acceso a Wallet"
+      passwordLabel="Contraseña"
+      confirmText="Entrar"
+    >
+      <WalletInner />
+    </WalletGuard>
   );
 }

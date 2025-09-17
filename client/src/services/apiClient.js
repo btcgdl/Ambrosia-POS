@@ -23,11 +23,18 @@ export async function apiClient(
       : await res.text();
 
     if (!res.ok) {
-      if (res.status === 403) {
+      if (res.status === 403 || res.status === 401) {
+        try {
+          if (typeof window !== "undefined" && String(endpoint).startsWith("/wallet")) {
+            window.dispatchEvent(new CustomEvent("wallet:unauthorized"));
+            // Silenciar toast para wallet y permitir que el guard maneje la UX
+            return;
+          }
+        } catch (_) {}
         addToast({
           color: "danger",
           title: "Error",
-          description: "Usuario no autorizado",
+          description: res.status === 401 ? "No autenticado" : "Usuario no autorizado",
         });
         return;
       }
