@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -44,22 +45,31 @@ export async function POST(request) {
     );
 
     // Establecer las nuevas cookies si vienen en la respuesta
+    const nowSec = Math.floor(Date.now() / 1000);
     if (data.accessToken) {
+      const decodedAccess = jwt.decode(data.accessToken);
+      const accessExp = decodedAccess?.exp;
+      const accessMaxAge = accessExp ? Math.max(0, accessExp - nowSec) : 60; // fallback 60s
       nextResponse.cookies.set("accessToken", data.accessToken, {
         httpOnly: false,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 1 * 60, // 1 minuto
+        maxAge: accessMaxAge,
         path: "/",
       });
     }
 
     if (data.refreshToken) {
+      const decodedRefresh = jwt.decode(data.refreshToken);
+      const refreshExp = decodedRefresh?.exp;
+      const refreshMaxAge = refreshExp
+        ? Math.max(0, refreshExp - nowSec)
+        : 30 * 24 * 60 * 60; // fallback 30 días
       nextResponse.cookies.set("refreshToken", data.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60, // 7 días
+        maxAge: refreshMaxAge,
         path: "/",
       });
     }
