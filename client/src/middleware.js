@@ -16,7 +16,7 @@ export async function middleware(request) {
   // Rutas completamente públicas (sin autenticación)
   const publicApiRoutes = ["/api/auth/login", "/api/auth/refresh"];
   const isPublicApiRoute = publicApiRoutes.some((route) =>
-    pathname.startsWith(route),
+    pathname.startsWith(route)
   );
 
   // Verificar si es una ruta de módulo válida
@@ -40,7 +40,7 @@ export async function middleware(request) {
     "📊 Requiere auth:",
     requiresAuth,
     "| Requiere admin:",
-    requiresAdmin,
+    requiresAdmin
   );
 
   // Manejar rutas que requieren autenticación
@@ -50,7 +50,7 @@ export async function middleware(request) {
     const refreshToken = getRefreshTokenFromCookies(request.cookies);
 
     // Si no hay token de acceso, redirigir a login
-    if (!accessToken) {
+    if (!refreshToken) {
       console.log("❌ No hay token, redirigiendo a /auth");
       return NextResponse.redirect(new URL("/auth", request.url));
     }
@@ -68,7 +68,7 @@ export async function middleware(request) {
                 Cookie: request.headers.get("cookie") || "",
               },
               credentials: "include",
-            },
+            }
           );
 
           if (refreshResponse.ok) {
@@ -117,7 +117,7 @@ export async function middleware(request) {
       if (!decoded?.isAdmin) {
         console.log(
           "❌ Usuario sin permisos de admin intentando acceder a:",
-          pathname,
+          pathname
         );
         return NextResponse.redirect(new URL("/unauthorized", request.url));
       }

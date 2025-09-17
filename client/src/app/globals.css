@@ -3,6 +3,7 @@
 /* Note: You may need to change the path to fit your project structure */
 @source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
 @custom-variant dark (&:is(.dark *));
+
 /*https://coolors.co/1c7c54-73e2a7-def4c6-1b512d-b1cf5f*/
 
 @theme {
