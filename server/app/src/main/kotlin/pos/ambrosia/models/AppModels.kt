@@ -182,3 +182,14 @@ data class PrintRequest(val ticket: TicketPrinter, val type: TicketType)
 
 @Serializable
 data class SetPrinterRequest(val type: TicketType, val printerName: String)
+
+@Serializable
+data class Config(
+    val id: Int = 1,
+    val restaurantName: String,
+    val address: String?,
+    val phone: String?,
+    val email: String?,
+    val taxId: String?,
+    val logo: ByteArray?
+)
