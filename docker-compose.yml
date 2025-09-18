@@ -5,13 +5,13 @@ services:
     restart: unless-stopped
     networks:
       - default
-    command: "--seed-path=/run/secrets/phoenixd_seed"
+    # Removed: command (let it use default seed path)
+    # Removed: secrets
     expose:
       - "9740"
     volumes:
-      - "phoenixd_datadir:/phoenix/.phoenix"
-    secrets:
-      - phoenixd_seed
+      - phoenixd_datadir:/root/.phoenix  # Mount to default $HOME/.phoenix for auto-generation
+
   ambrosia:
     build: server/
     image: ambrosia
@@ -21,9 +21,10 @@ services:
       - default
     volumes:
       - ambrosia_datadir:/root/.Ambrosia-POS
-      - phoenixd_datadir:/root/.phoenix
+      - phoenixd_datadir:/root/.phoenix  # Shares the persisted phoenix dir (incl. seed)
     depends_on:
       - phoenixd
+
   ambrosia-client:
     build: client/
     image: ambrosia-client
@@ -38,11 +39,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-        NEXT_PUBLIC_API_URL: http://ambrosia:9154
-volumes:
-  phoenixd_datadir:
-  ambrosia_datadir:
-secrets:
-  phoenixd_seed:
-    file: ~/.phoenix/seed.dat
+      NEXT_PUBLIC_API_URL: http://ambrosia:9154
 
+volumes:
+  phoenixd_datadir:  # Docker-managed; auto-creates on first run
+  ambrosia_datadir:
