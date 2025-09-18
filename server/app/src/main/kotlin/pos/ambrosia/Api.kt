@@ -31,6 +31,7 @@ class Api() {
   }
 
   fun Application.module() {
+    AppConfig.loadConfig()
     blockingAddUser() // Add default user if there are no users
     // Configure the application
     val config = this.environment.config
