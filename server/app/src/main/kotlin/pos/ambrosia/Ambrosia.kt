@@ -18,6 +18,7 @@ import kotlinx.io.writeString
 import pos.ambrosia.config.InjectLogs
 import pos.ambrosia.config.ListValueSource
 import pos.ambrosia.config.SeedGenerator
+import pos.ambrosia.config.AppConfig
 import org.flywaydb.core.Flyway
 
 fun main(args: Array<String>) = Ambrosia().main(args)
@@ -29,7 +30,7 @@ class Ambrosia : CliktCommand() {
   private val confFile = Path(datadir, "ambrosia.conf")
 
   init {
-
+    AppConfig.loadConfig()
     SystemFileSystem.createDirectories(datadir)
     InjectLogs.ensureLogConfig(datadir.toString())
 
@@ -67,6 +68,19 @@ class Ambrosia : CliktCommand() {
         }
         seed
       }
+    val phoenixdUrl by
+      option("--phoenixd-url", help = "phoenixd API url, eg http://phoenixd:9740").defaultLazy {
+        val value = "http://localhost:9740" // Default value
+        SystemFileSystem.sink(this@Ambrosia.confFile, append = true).buffered().use {
+          it.writeString("\nphoenixd-url=$value")
+        }
+        value
+      }
+    val phoenixdPassword by
+      option("--phoenixd-password", help = "http-password for phoenixd API").defaultLazy {
+        val value = AppConfig.getPhoenixProperty("http-password") ?: throw Exception("phoenixd http-password on found in phoenix.conf, please provide it with --phoenixd-password or in the phoenix.conf file")
+        value
+      }
   }
   private val options by DaemonOptions()
 
@@ -86,6 +100,8 @@ class Ambrosia : CliktCommand() {
                   put("jwt.issuer", "ambrosia-pos")
                   put("jwt.audience", "ambrosia-pos-users")
                   put("secret", options.secret)
+                  put("phoenixd-url", options.phoenixdUrl)
+                  put("phoenixd-password", options.phoenixdPassword)
                 }
             },
           configure = {
