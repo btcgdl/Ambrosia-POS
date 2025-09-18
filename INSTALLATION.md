@@ -74,6 +74,25 @@ curl -fsSL https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/
 ```
 
 ## Development Scripts
+
+### docker-compose with all 3 images (phoenixd, ambrosia, and ambrosia-client)
+To set up the entire docker-compose environment (including installing dependencies if not already installed):
+
+This command will optionally build the client and server docker images (required on first run)
+```sh
+make run-rebuild
+```
+
+This command will only rebuild the server jar and restart any containers whose images have been rebuilt:
+```sh
+make run
+```
+
+Command for rebuilding the server image without rebuilding the other containers (useful for rapid development on the server Kotlin code):
+```sh
+cd server/ && ./gradlew jar && cd .. && docker-compose build ambrosia && make run
+```
+
 ### Server (Backend - Kotlin/Gradle)
 
 To run the server in development mode, go to the `server/` directory and run:
