@@ -1,4 +1,4 @@
-.PHONY: install-jdk install-docker install-docker-compose build-jar up run run-rebuild
+.PHONY: install-jdk install-docker install-docker-compose build-jar up run run-rebuild create-secrets
 
 install-jdk:
 	@if ! command -v java > /dev/null 2>&1 || ! java -version 2>&1 | grep -q "21"; then \
@@ -39,10 +39,14 @@ install-docker-compose:
 build-jar:
 	cd server && ./gradlew jar
 
+create-secrets:
+	mkdir -p ~/.phoenix
+	touch ~/.phoenix/seed.dat
+
 up:
 	docker-compose up $(if $(REBUILD),--build)
 
-run: install-jdk install-docker install-docker-compose build-jar up
+run: install-jdk install-docker install-docker-compose build-jar create-secrets up
 
 run-rebuild: REBUILD=1
 run-rebuild: run
