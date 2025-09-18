@@ -30,7 +30,6 @@ class Ambrosia : CliktCommand() {
   private val confFile = Path(datadir, "ambrosia.conf")
 
   init {
-    AppConfig.loadConfig()
     SystemFileSystem.createDirectories(datadir)
     InjectLogs.ensureLogConfig(datadir.toString())
 
