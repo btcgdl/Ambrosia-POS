@@ -10,7 +10,7 @@ services:
     expose:
       - "9740"
     volumes:
-      - phoenixd_datadir:/root/.phoenix  # Mount to default $HOME/.phoenix for auto-generation
+      - phoenixd_datadir:/phoenix/.phoenix  # Mount to default $HOME/.phoenix for auto-generation
 
   ambrosia:
     build: server/
