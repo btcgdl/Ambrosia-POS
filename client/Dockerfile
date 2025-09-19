@@ -1,9 +1,15 @@
-FROM node:22
+# Build stage
+FROM node:22-slim AS builder
+WORKDIR /app
+COPY . .
+RUN NO_ZIP=1 ./package-client.sh
+
+# Runtime stage
+FROM node:22-slim AS runtime
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
-COPY . .
 ENV NODE_ENV=production
-RUN npm run build
+RUN npm i --omit=dev && npm cache clean --force
+COPY --from=builder /tmp/ambrosia-client-dist/ .
 EXPOSE 3000
 CMD ["npm", "run", "start"]

@@ -2,8 +2,6 @@
 set -e
 
 TAG="0.1.2-alpha"
-# Navigate to the client directory
-cd "$(dirname "$0")/../client"
 
 echo "=== Packaging Next.js application for distribution ==="
 
@@ -35,19 +33,17 @@ cp generate-env.cjs "/tmp/$PACKAGE_NAME/"
 
 # 4. Copy installation script
 echo "Copying installation script..."
-cp ../scripts/install-client.sh "/tmp/$PACKAGE_NAME/"
 
-# 5. Create compressed file
-DIST_FILE="ambrosia-client-$TAG.tar.gz"
-echo "Creating distribution file: $DIST_FILE..."
-cd /tmp
-tar -czf "$DIST_FILE" "$PACKAGE_NAME"
-cd -
-
-mv "/tmp/$DIST_FILE" ./dist/
-
-# 6. Clean up
-rm -rf "/tmp/$PACKAGE_NAME"
+# 5. Create compressed file if not NO_ZIP=1
+if [ "${NO_ZIP:-0}" != "1" ]; then
+  DIST_FILE="ambrosia-client-$TAG.tar.gz"
+  echo "Creating distribution file: $DIST_FILE..."
+  cd /tmp
+  tar -czf "$DIST_FILE" "$PACKAGE_NAME"
+  cd -
+  # 6. Clean up
+  mv "/tmp/$DIST_FILE" ./dist/
+fi
 
 echo ""
 echo "✅ Packaging complete!"
