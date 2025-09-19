@@ -6,7 +6,9 @@ import com.github.anastaciocintra.escpos.Style
 import com.github.anastaciocintra.escpos.EscPosConst
 import java.io.IOException
 import javax.print.PrintService
+import pos.ambrosia.models.TicketData
 import pos.ambrosia.models.TicketPrinter
+import pos.ambrosia.models.TicketTemplate
 import pos.ambrosia.models.TicketType
 
 object PrinterManager {
@@ -16,14 +18,13 @@ object PrinterManager {
   val title = Style()
     .setFontSize(Style.FontSize.`_3`, Style.FontSize.`_2`)
     .setJustification(EscPosConst.Justification.Center)
-  
+
   val subtitle = Style()
     .setFontSize(Style.FontSize.`_2`, Style.FontSize.`_1`)
     .setJustification(EscPosConst.Justification.Center)
 
-  val bold = Style()
-    .setBold(true)
-  
+  val bold = Style().setBold(true)
+
   fun getAvailablePrinters(): Array<String> {
     return PrinterOutputStream.getListPrintServicesNames()
   }
@@ -36,36 +37,68 @@ object PrinterManager {
     }
   }
 
-  fun printTicket(ticket: TicketPrinter, type: TicketType) {
+  suspend fun printCustomTicket(
+      ticketData: TicketData,
+      template: TicketTemplate,
+      type: TicketType,
+      configService: ConfigService
+  ) {
     val printerService =
-			when (type) {
-				TicketType.KITCHEN -> kitchenPrinter
-				TicketType.CUSTOMER -> customerPrinter
-			} ?: throw IOException("Printer for type $type not configured.")
+        when (type) {
+            TicketType.KITCHEN -> kitchenPrinter
+            TicketType.CUSTOMER -> customerPrinter
+        } ?: throw IOException("Printer for type $type not configured.")
+
+    try {
+        val printerOutputStream = PrinterOutputStream(printerService)
+        val escpos = EscPos(printerOutputStream)
+        val config = configService.getConfig()
+
+        val ticketFactory = TicketFactory(template)
+        ticketFactory.build(escpos, ticketData, config)
+
+        escpos.feed(5).cut(EscPos.CutMode.FULL)
+        escpos.close()
+    } catch (e: Exception) {
+        throw IOException("Failed to print ticket: ${e.message}", e)
+    }
+  }
+
+  suspend fun printTicket(ticket: TicketPrinter, type: TicketType, configService: ConfigService) {
+    val printerService =
+      when (type) {
+        TicketType.KITCHEN -> kitchenPrinter
+        TicketType.CUSTOMER -> customerPrinter
+      }
+              ?: throw IOException("Printer for type $type not configured.")
 
     try {
       val printerOutputStream = PrinterOutputStream(printerService)
       val escpos = EscPos(printerOutputStream)
+      val config = configService.getConfig()
 
-      escpos.writeLF(title, "Example Restaurant");
-      escpos.writeLF("Sucursal Lopez Cotilla 1520");
-      escpos.writeLF("Col. Americana");
-      escpos.writeLF("C.P. 44160. Gdl, Jal");
-      escpos.writeLF("TEL (33) 3615 6173");
-      escpos.writeLF("N_Mesa: " + 1 + "          " + "Fecha: " + "2024-10-10");
-      escpos.writeLF("N_Sala: " + "Sala VIP");
-      escpos.writeLF("N_ticket: " + "000123");
-      escpos.feed(1);
-      escpos.writeLF(bold,"Plato                     P.SubTotal  P.Total")
-            .writeLF(bold,"---------------------------------------------");
+      if (config != null) {
+        escpos.writeLF(title, config.restaurantName)
+        config.address?.let { escpos.writeLF(it) }
+        config.phone?.let { escpos.writeLF("TEL $it") }
+      }
+
+      escpos.writeLF("N_Mesa: " + 1 + "          " + "Fecha: " + "2024-10-10")
+      escpos.writeLF("N_Sala: " + "Sala VIP")
+      escpos.writeLF("N_ticket: " + "000123")
+      escpos.feed(1)
+      escpos.writeLF(bold, "Plato                     P.SubTotal  P.Total")
+      escpos.writeLF(bold, "---------------------------------------------")
+
       ticket.entries.forEach { entry ->
         escpos.writeLF("${entry.number}x ${entry.name}                  ${entry.cost}")
         if (entry.comments.isNotEmpty()) {
           entry.comments.forEach { comment -> escpos.writeLF("  - $comment") }
         }
       }
-      escpos.writeLF(bold,"---------------------------------------------");
-      escpos.writeLF(bold,"                              Total S/: " + 100.00);
+
+      escpos.writeLF(bold, "---------------------------------------------")
+      escpos.writeLF(bold, "                              Total S/: " + 100.00)
       escpos.feed(5).cut(EscPos.CutMode.FULL)
       escpos.close()
     } catch (e: Exception) {

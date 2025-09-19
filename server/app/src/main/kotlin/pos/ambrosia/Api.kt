@@ -122,5 +122,6 @@ class Api() {
     configureWallet()
     configurePrinter()
     configureConfig()
+    configureTicketTemplates()
   }
 }
