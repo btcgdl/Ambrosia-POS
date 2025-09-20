@@ -1,4 +1,4 @@
-package pos.ambrosia.test
+package pos.ambrosia.e2e
 
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -14,8 +14,9 @@ import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlin.test.*
 import pos.ambrosia.api.configureRouting
+import e2e.TestServer
 
-class RoutingE2ETest {
+class RoutingE2ETest : TestServer() {
   private val serverPort = 9154
   private val serverHost = "127.0.0.1"
   private val serverUrl = "http://$serverHost:$serverPort"

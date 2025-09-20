@@ -19,6 +19,7 @@ repositories {
 dependencies {
     // Test dependencies
     testImplementation("org.jetbrains.kotlin:kotlin-test:$2.1.20")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.2.20")
     // ktor dependencies
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.serialization.kotlinx.json)
@@ -116,8 +117,3 @@ application {
 //         }
 //     }
 // }
-
-tasks.named<Test>("test") {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
-}

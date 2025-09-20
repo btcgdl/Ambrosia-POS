@@ -23,7 +23,7 @@ import pos.ambrosia.models.RolePassword
 
 fun Application.configureWallet() {
   val connection: Connection = DatabaseConnection.getConnection()
-  val phoenixService = PhoenixService()
+  val phoenixService = PhoenixService(environment)
   val authService = AuthService(connection)
   val tokenService = TokenService(environment, connection)
 

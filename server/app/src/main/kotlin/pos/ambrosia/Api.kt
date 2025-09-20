@@ -31,8 +31,7 @@ class Api() {
   }
 
   fun Application.module() {
-
-    AppConfig.loadConfig() // Load custom config
+    AppConfig.loadConfig()
     blockingAddUser() // Add default user if there are no users
     // Configure the application
     val config = this.environment.config
@@ -122,5 +121,6 @@ class Api() {
     configureShifts()
     configureWallet()
     configurePrinter()
+    configureConfig()
   }
 }
