@@ -8,6 +8,7 @@
 >
 > - User: `cooluser1`
 > - Pin: `0000`
+> - Wallet `password123`
 >
 > Do not leave these default credentials in production! Change the username and password immediately after installation to protect your funds.
 
