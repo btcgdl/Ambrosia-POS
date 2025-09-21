@@ -7,7 +7,7 @@ export async function apiClient(
   { method = "GET", headers = {}, body, credentials = "include" } = {},
 ) {
   try {
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const doFetch = () => fetch(`${API_BASE_URL}${endpoint}`, {
       method,
       credentials,
       headers: {
@@ -16,6 +16,21 @@ export async function apiClient(
       },
       body: body ? JSON.stringify(body) : undefined,
     });
+
+    let res = await doFetch();
+
+    // Auto-intento de refresh en 401 una sola vez
+    if (res.status === 401 && !String(endpoint).startsWith("/auth/refresh")) {
+      try {
+        const refreshRes = await fetch(`${API_BASE_URL}/auth/refresh`, {
+          method: "POST",
+          credentials: "include",
+        });
+        if (refreshRes.ok) {
+          res = await doFetch();
+        }
+      } catch (_) {}
+    }
 
     const contentType = res.headers.get("content-type");
     const data = contentType?.includes("application/json")

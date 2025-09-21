@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import jwt from "jsonwebtoken";
-import { getRoleName, getUsers, loginFromService } from "./authService";
+import { getUsers, loginFromService } from "./authService";
 import { ChefHat, Delete, LogIn, Users, Trash2 } from "lucide-react";
 import {
   addToast,
@@ -17,7 +16,6 @@ import {
   SelectItem,
 } from "@heroui/react";
 import { useAuth } from "./useAuth";
-import { getCookie } from "./../../lib/utils";
 import { useRouter } from "next/navigation";
 export default function PinLoginNew() {
   const [pin, setPin] = useState("");
@@ -95,11 +93,18 @@ export default function PinLoginNew() {
     setTimeout(async () => {
       try {
         await loginFromService({ name: employee.name, pin });
-        const accessToken = getCookie("accessToken");
-        const decodedToken = jwt.decode(accessToken);
-        localStorage.setItem("userId", decodedToken.userId);
-        localStorage.setItem("roleId", decodedToken.role);
-        localStorage.setItem("username", employee.name);
+
+        // Consultar usuario desde /api/auth/me (servidor) para datos derivados
+        const meRes = await fetch("/api/auth/me", { credentials: "include" });
+        if (meRes.ok) {
+          const me = await meRes.json();
+          // Mantener compatibilidad con módulos que leen localStorage
+          if (me?.userId) localStorage.setItem("userId", me.userId);
+          if (me?.role) localStorage.setItem("roleId", me.role);
+          // Nombre visible (no sensible) desde selección
+          localStorage.setItem("username", employee.name);
+        }
+
         addToast({
           title: "Inicio de sesión exitoso",
           description: `¡Bienvenido ${employee.name}! Acceso concedido como ${employee.role}.`,
