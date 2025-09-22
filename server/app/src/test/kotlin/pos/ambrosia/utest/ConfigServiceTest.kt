@@ -10,14 +10,11 @@ import java.sql.ResultSet
 import kotlin.test.*
 
 class ConfigServiceTest {
-
     private val mockConnection: Connection = mock()
     private val mockStatement: PreparedStatement = mock()
     private val mockResultSet: ResultSet = mock()
 
-    /**
-     * Helper function to set up all the mock behavior for a successful `getConfig` call.
-     */
+    // Helper function to set up all the mock behavior for a successful `getConfig` call.
     private fun setupGetConfigMock(config: Config) {
         whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement)
         whenever(mockStatement.executeQuery()).thenReturn(mockResultSet)
@@ -31,9 +28,7 @@ class ConfigServiceTest {
         whenever(mockResultSet.getBytes("logo")).thenReturn(config.logo)
     }
 
-    /**
-     * Helper function to set up mock behavior for when `getConfig` finds no data.
-     */
+    // Helper function to set up mock behavior for when `getConfig` finds no data.
     private fun setupGetConfigToReturnNull() {
         whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement)
         whenever(mockStatement.executeQuery()).thenReturn(mockResultSet)
@@ -42,40 +37,28 @@ class ConfigServiceTest {
 
     @Test
     fun `getConfig returns config when found`() = runBlocking {
-        // Arrange
-        val expectedConfig = Config(1, "Test Cafe", "123 Lane", "555", "a@b.com", "T123", byteArrayOf())
-        setupGetConfigMock(expectedConfig)
-        val service = ConfigService(mockConnection)
-
-        // Act
-        val result = service.getConfig()
-
-        assertEquals(expectedConfig, result)
+        val expectedConfig = Config(1, "Test Cafe", "123 Lane", "555", "a@b.com", "T123", byteArrayOf()) // Arrange
+        setupGetConfigMock(expectedConfig) // Arrange
+        val service = ConfigService(mockConnection) // Arrange
+        val result = service.getConfig() // Act
+        assertEquals(expectedConfig, result) // Assert
     }
 
     @Test
     fun `getConfig returns null when not found`() = runBlocking {
-        // Arrange
-        setupGetConfigToReturnNull()
-        val service = ConfigService(mockConnection)
-
-        // Act
-        val result = service.getConfig()
-
-        assertNull(result)
+        setupGetConfigToReturnNull() // Arrange
+        val service = ConfigService(mockConnection) // Arrange
+        val result = service.getConfig() // Act
+        assertNull(result) // Assert
     }
 
     @Test
     fun `updateConfig returns true on success`() = runBlocking {
-        // Arrange
-        val configToUpdate = Config(1, "New Name", "", "", "", "", byteArrayOf())
-        whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement)
-        whenever(mockStatement.executeUpdate()).thenReturn(1)
-        val service = ConfigService(mockConnection)
-
-        // Act
-        val result = service.updateConfig(configToUpdate)
-
-        assertTrue(result)
+        val configToUpdate = Config(1, "New Name", "", "", "", "", byteArrayOf()) // Arrange
+        whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+        whenever(mockStatement.executeUpdate()).thenReturn(1) // Arrange
+        val service = ConfigService(mockConnection) // Arrange
+        val result = service.updateConfig(configToUpdate) // Act
+        assertTrue(result) // Assert
     }
 }
