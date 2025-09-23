@@ -113,7 +113,7 @@ export default function WalletGuard({
         <ModalContent>
           <ModalHeader>{title}</ModalHeader>
           <ModalBody>
-            <Form onSubmit={handleSubmit}>
+            <Form onSubmit={handleSubmit} id="wallet-guard-form">
               <Input
                 label={passwordLabel}
                 type="password"
@@ -131,6 +131,7 @@ export default function WalletGuard({
             <Button
               color="primary"
               type="submit"
+              form="wallet-guard-form"
               isDisabled={!password}
               isLoading={submitting}
             >
