@@ -314,7 +314,6 @@ export default function Roles() {
                       input: "text-base",
                       label: "text-sm font-semibold text-deep",
                     }}
-                    required
                     disabled={isLoading}
                   />
 

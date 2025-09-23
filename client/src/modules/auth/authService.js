@@ -52,14 +52,14 @@ export async function getUsers() {
 export async function addUser(user) {
   return await apiClient("/users", {
     method: "POST",
-    body: { ...user, pin: parseInt(user.pin, 10) },
+    body: { ...user, pin: user.pin.toString() },
   });
 }
 
 export async function updateUser(user) {
   return await apiClient(`/users/${user.id}`, {
     method: "PUT",
-    body: { ...user, pin: parseInt(user.pin, 10) },
+    body: { ...user, pin: user.pin.toString() },
   });
 }
 
