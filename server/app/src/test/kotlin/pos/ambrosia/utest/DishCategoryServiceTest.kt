@@ -62,4 +62,12 @@ class DishCategoryServiceTest {
         assertNull(result) // Assert
     }
 
+    @Test
+    fun `addDishCategory is blank and returns null` () = runBlocking {
+        val blankCategory = DishCategory(id=null, name="") // Arrange
+        val service = DishCategoryService(mockConnection) // Arrange
+        val result = service.addDishCategory(blankCategory) // Act
+        assertNull(result) // Assert
+    }
+
 }
