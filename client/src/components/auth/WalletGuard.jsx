@@ -9,6 +9,7 @@ import {
   ModalFooter,
   Input,
   Button,
+  Form,
 } from "@heroui/react";
 import { AuthContext } from "../../modules/auth/AuthProvider";
 import {
@@ -71,7 +72,8 @@ export default function WalletGuard({
 
   // Do not proactively call wallet endpoints here; children handle their own data fetching
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!password) return;
     setSubmitting(true);
     try {
@@ -111,14 +113,16 @@ export default function WalletGuard({
         <ModalContent>
           <ModalHeader>{title}</ModalHeader>
           <ModalBody>
-            <Input
-              label={passwordLabel}
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              isDisabled={submitting}
-              autoFocus
-            />
+            <Form onSubmit={handleSubmit}>
+              <Input
+                label={passwordLabel}
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                isDisabled={submitting}
+                autoFocus
+              />
+            </Form>
           </ModalBody>
           <ModalFooter>
             <Button color="secondary" onPress={() => setIsOpen(false)}>
@@ -126,7 +130,7 @@ export default function WalletGuard({
             </Button>
             <Button
               color="primary"
-              onPress={handleSubmit}
+              type="submit"
               isDisabled={!password}
               isLoading={submitting}
             >
