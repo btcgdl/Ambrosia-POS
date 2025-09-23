@@ -1,6 +1,7 @@
 package pos.ambrosia.utest
 
 import kotlinx.coroutines.runBlocking
+import org.mockito.ArgumentMatchers.contains
 import org.mockito.kotlin.*
 import pos.ambrosia.models.DishCategory
 import pos.ambrosia.services.DishCategoryService
@@ -63,11 +64,54 @@ class DishCategoryServiceTest {
     }
 
     @Test
-    fun `addDishCategory is blank and returns null` () = runBlocking {
+    fun `addDishCategory returns null if name is blank` () = runBlocking {
         val blankCategory = DishCategory(id=null, name="") // Arrange
         val service = DishCategoryService(mockConnection) // Arrange
         val result = service.addDishCategory(blankCategory) // Act
         assertNull(result) // Assert
     }
 
+    @Test
+    fun `addDishCategory returns null if name already exists`() = runBlocking {
+        val existingCategory = DishCategory(id = null, name = "Existing Name") // Arrange
+        whenever(mockConnection.prepareStatement(contains("SELECT id FROM"))).thenReturn(mockStatement) // Arrange
+        whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+        whenever(mockResultSet.next()).thenReturn(true) // Arrange
+        val service = DishCategoryService(mockConnection) // Arrange
+        val result = service.addDishCategory(existingCategory) // Act
+        assertNull(result) // Assert
+    }
+
+    @Test
+    fun `addDishCategory returns new ID on success`() = runBlocking {
+        val newCategory = DishCategory(id = null, name = "New Unique Name") // Arrange
+        val checkNameStatement: PreparedStatement = mock() // Arrange
+        val addCategoryStatement: PreparedStatement = mock() // Arrange
+        whenever(mockConnection.prepareStatement(contains("SELECT id FROM"))).thenReturn(checkNameStatement) // Arrange
+        whenever(mockConnection.prepareStatement(contains("INSERT INTO"))).thenReturn(addCategoryStatement) // Arrange
+        val checkNameResultSet: ResultSet = mock() // Arrange
+        whenever(checkNameResultSet.next()).thenReturn(false) // Arrange
+        whenever(checkNameStatement.executeQuery()).thenReturn(checkNameResultSet) // Arrange
+        whenever(addCategoryStatement.executeUpdate()).thenReturn(1) // Arrange
+        val service = DishCategoryService(mockConnection) // Arrange
+        val result = service.addDishCategory(newCategory) // Act
+        assertNotNull(result) // Assert
+        assertTrue(result.isNotBlank()) // Assert
+    }
+
+    @Test
+    fun `addDishCategory returns null when database insert fails`() = runBlocking {
+        val newCategory = DishCategory(id = null, name = "Another Name") // Arrange
+        val checkNameStatement: PreparedStatement = mock() // Arrange
+        val addCategoryStatement: PreparedStatement = mock() // Arrange
+        whenever(mockConnection.prepareStatement(contains("SELECT id FROM"))).thenReturn(checkNameStatement) // Arrange
+        whenever(mockConnection.prepareStatement(contains("INSERT INTO"))).thenReturn(addCategoryStatement) // Arrange
+        val checkNameResultSet: ResultSet = mock() // Arrange
+        whenever(checkNameResultSet.next()).thenReturn(false) // Arrange
+        whenever(checkNameStatement.executeQuery()).thenReturn(checkNameResultSet) // Arrange
+        whenever(addCategoryStatement.executeUpdate()).thenReturn(0) // Arrange
+        val service = DishCategoryService(mockConnection) // Arrange
+        val result = service.addDishCategory(newCategory) // Act
+        assertNull(result) // Assert
+    }
 }
