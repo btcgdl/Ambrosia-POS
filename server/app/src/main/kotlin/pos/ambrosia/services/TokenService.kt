@@ -30,7 +30,7 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
     .withClaim("role", user.role)
     .withClaim("isAdmin", user.isAdmin)
     .withClaim("realm", "Ambrosia-Server")
-    .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(15)))
+    .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(60)))
     .sign(algorithm)
 
   fun generateRefreshToken(user: AuthResponse): String {
@@ -63,10 +63,9 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
     return try {
       val decodedJWT = verifier.verify(refreshToken)
       val tokenType = decodedJWT.getClaim("type")?.asString()
-      val userId = decodedJWT.getClaim("userId")?.asString()
 
-      // Verificar que el token existe en la base de datos
-      val isStoredInDb = isRefreshTokenInDatabase(userId, refreshToken)
+      // Verificar que el token existe en la base de datos, sin confiar en claims de usuario
+      val isStoredInDb = isRefreshTokenInDatabase(refreshToken)
 
       tokenType == "refresh" && !isTokenExpired(decodedJWT.expiresAt) && isStoredInDb
     } catch (e: JWTVerificationException) {
@@ -76,27 +75,21 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
 
   fun getUserFromRefreshToken(refreshToken: String): AuthResponse? {
     return try {
-      val decodedJWT = verifier.verify(refreshToken)
-      val userId = decodedJWT.getClaim("userId")?.asString() ?: return null
-      
-      // Verificar que el token en la base de datos coincide con el token proporcionado
-      if (!isRefreshTokenInDatabase(userId, refreshToken)) {
-        return null
-      }
-      
-      // Obtener la información actual del usuario desde la base de datos
+      // Verificar firma/expiración sin depender de claims de usuario
+      verifier.verify(refreshToken)
+
+      // Obtener la información del usuario desde la base de datos usando el refresh token
       val sql = """
-        SELECT u.id, u.name, r.role, r.isAdmin 
+        SELECT u.id, u.name, r.role, r.isAdmin
         FROM users u
         JOIN roles r ON u.role_id = r.id
-        WHERE u.id = ? AND u.refresh_token = ? AND u.is_deleted = 0
+        WHERE u.refresh_token = ? AND u.is_deleted = 0
       """
-      
+
       connection.prepareStatement(sql).use { statement ->
-        statement.setString(1, userId)
-        statement.setString(2, refreshToken)
+        statement.setString(1, refreshToken)
         val resultSet = statement.executeQuery()
-        
+
         if (resultSet.next()) {
           return AuthResponse(
             id = resultSet.getString("id"),
@@ -106,7 +99,7 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
           )
         }
       }
-      return null
+      null
     } catch (e: JWTVerificationException) {
       null
     }
@@ -134,13 +127,10 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
     }
   }
 
-  private fun isRefreshTokenInDatabase(userId: String?, refreshToken: String): Boolean {
-    if (userId == null) return false
-
-    val sql = "SELECT refresh_token FROM users WHERE id = ? AND refresh_token = ?"
+  private fun isRefreshTokenInDatabase(refreshToken: String): Boolean {
+    val sql = "SELECT 1 FROM users WHERE refresh_token = ?"
     connection.prepareStatement(sql).use { statement ->
-      statement.setString(1, userId)
-      statement.setString(2, refreshToken)
+      statement.setString(1, refreshToken)
       val resultSet = statement.executeQuery()
       return resultSet.next()
     }

@@ -35,6 +35,7 @@ export default function Roles() {
   const router = useRouter();
   const [roles, setRoles] = useState([]);
   const [editing, setEditing] = useState(null);
+  const [changePassword, setChangePassword] = useState(false);
   const [form, setForm] = useState({ role: "", password: "", isAdmin: false });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -74,7 +75,11 @@ export default function Roles() {
     setIsLoading(true);
     try {
       if (editing) {
-        await updateRole({ ...form, id: editing });
+        await updateRole({
+          ...form,
+          id: editing,
+          password: changePassword ? form.password : null,
+        });
         addToast({
           title: "Éxito",
           description: "Rol actualizado correctamente",
@@ -114,7 +119,7 @@ export default function Roles() {
     console.log("Editando rol", role);
     setForm({
       role: role.role,
-      password: role.password,
+      password: "",
       isAdmin: role.isAdmin,
     });
     setEditing(role.id);
@@ -285,38 +290,91 @@ export default function Roles() {
                     disabled={isLoading}
                   />
 
-                  <Input
-                    name="password"
-                    label="Contraseña"
-                    placeholder="Contraseña para este rol"
-                    type={showPassword ? "text" : "password"}
-                    value={form.password}
-                    onChange={handleChange}
-                    variant="bordered"
-                    size="lg"
-                    startContent={<Lock className="w-4 h-4 text-gray-400" />}
-                    endContent={
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onPress={toggleShowPassword}
+                  {editing && (
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        isSelected={changePassword}
+                        onValueChange={(checked) => {
+                          setChangePassword(checked);
+                        }}
                         disabled={isLoading}
-                        className="min-w-unit-8 w-unit-8 h-unit-8"
+                        color="primary"
                       >
-                        {showPassword ? (
-                          <EyeOff className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <Eye className="w-4 h-4 text-gray-400" />
-                        )}
-                      </Button>
-                    }
-                    classNames={{
-                      input: "text-base",
-                      label: "text-sm font-semibold text-deep",
-                    }}
-                    required
-                    disabled={isLoading}
-                  />
+                        <span className="text-sm font-medium text-deep">
+                          Cambiar Contraseña
+                        </span>
+                      </Checkbox>
+                    </div>
+                  )}
+                  {editing ? (
+                    changePassword && (
+                      <Input
+                        name="password"
+                        label="Contraseña"
+                        placeholder="Contraseña para este rol"
+                        type={showPassword ? "text" : "password"}
+                        value={form.password}
+                        onChange={handleChange}
+                        variant="bordered"
+                        size="lg"
+                        startContent={
+                          <Lock className="w-4 h-4 text-gray-400" />
+                        }
+                        endContent={
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onPress={toggleShowPassword}
+                            disabled={isLoading}
+                            className="min-w-unit-8 w-unit-8 h-unit-8"
+                          >
+                            {showPassword ? (
+                              <EyeOff className="w-4 h-4 text-gray-400" />
+                            ) : (
+                              <Eye className="w-4 h-4 text-gray-400" />
+                            )}
+                          </Button>
+                        }
+                        classNames={{
+                          input: "text-base",
+                          label: "text-sm font-semibold text-deep",
+                        }}
+                        disabled={!changePassword || isLoading}
+                      />
+                    )
+                  ) : (
+                    <Input
+                      name="password"
+                      label="Contraseña"
+                      placeholder="Contraseña para este rol"
+                      type={showPassword ? "text" : "password"}
+                      value={form.password}
+                      onChange={handleChange}
+                      variant="bordered"
+                      size="lg"
+                      startContent={<Lock className="w-4 h-4 text-gray-400" />}
+                      endContent={
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onPress={toggleShowPassword}
+                          disabled={isLoading}
+                          className="min-w-unit-8 w-unit-8 h-unit-8"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="w-4 h-4 text-gray-400" />
+                          ) : (
+                            <Eye className="w-4 h-4 text-gray-400" />
+                          )}
+                        </Button>
+                      }
+                      classNames={{
+                        input: "text-base",
+                        label: "text-sm font-semibold text-deep",
+                      }}
+                      disabled={isLoading}
+                    />
+                  )}
 
                   <div className="flex items-center space-x-2">
                     <Checkbox
