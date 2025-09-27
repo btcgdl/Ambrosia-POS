@@ -5,9 +5,11 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import pos.ambrosia.models.DefaultTemplates
 import pos.ambrosia.models.TicketTemplate
 
 val ticketTemplates = mutableMapOf<String, TicketTemplate>()
+    .apply { put(DefaultTemplates.defaultCustomerTicket.name, DefaultTemplates.defaultCustomerTicket) }
 
 fun Application.configureTicketTemplates() {
     routing { ticketTemplates() }

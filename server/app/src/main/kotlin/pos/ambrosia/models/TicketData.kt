@@ -16,5 +16,6 @@ data class TicketData(
 data class TicketDataItem(
     val quantity: Int,
     val name: String,
-    val price: Double
+    val price: Double,
+    val comments: List<String> = emptyList()
 )

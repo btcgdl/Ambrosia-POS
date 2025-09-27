@@ -3,6 +3,13 @@ package pos.ambrosia.models
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class PrintRequest(
+    val templateName: String,
+    val ticketData: TicketData,
+    val type: TicketType
+)
+
+@Serializable
 data class TicketTemplate(
     val name: String,
     val elements: List<TicketElement>
