@@ -23,7 +23,7 @@ import pos.ambrosia.utils.*
 
 fun Application.configureAuth() {
   val connection: Connection = DatabaseConnection.getConnection()
-  val authService = AuthService(connection)
+  val authService = AuthService(environment, connection)
   val tokenService = TokenService(environment, connection)
   routing { route("/auth") { auth(tokenService, authService) } }
 }

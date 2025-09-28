@@ -5,8 +5,9 @@ import java.sql.Connection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Role
 import pos.ambrosia.utils.SecurePinProcessor
+import io.ktor.server.application.ApplicationEnvironment
 
-class RolesService(private val connection: Connection) {
+class RolesService(private val env: ApplicationEnvironment, private val connection: Connection) {
   companion object {
     private const val ADD_ROLE =
             "INSERT INTO roles (id, role, password, isAdmin) VALUES (?, ?, ?, ?)"
@@ -31,7 +32,8 @@ class RolesService(private val connection: Connection) {
     val encryptedPin =
             SecurePinProcessor.hashPinForStorage(
                     pin = role.password?.toCharArray() ?: charArrayOf(),
-                    id = generatedId
+                    id = generatedId,
+                    env = env
             )
 
     statement.setString(1, generatedId)
@@ -110,7 +112,7 @@ class RolesService(private val connection: Connection) {
     statement.setString(1, role.role)
     statement.setBoolean(2, role.isAdmin ?: false)
     if (role.password != null) {
-      val encryptedPin = SecurePinProcessor.hashPinForStorage(role.password.toCharArray(), id)
+      val encryptedPin = SecurePinProcessor.hashPinForStorage(role.password.toCharArray(), id, env)
       statement.setString(3, SecurePinProcessor.byteArrayToBase64(encryptedPin))
     }
     statement.setString(role.password?.let { 4 } ?: 3, role.id)

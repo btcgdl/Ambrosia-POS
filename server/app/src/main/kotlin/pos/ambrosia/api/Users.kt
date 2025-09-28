@@ -17,7 +17,7 @@ import pos.ambrosia.services.UsersService
 
 fun Application.configureUsers() {
   val connection: Connection = DatabaseConnection.getConnection()
-  val userService = UsersService(connection)
+  val userService = UsersService(environment, connection)
   routing { route("/users") { users(userService) } }
 }
 

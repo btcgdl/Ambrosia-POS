@@ -30,7 +30,6 @@ class Ambrosia : CliktCommand() {
   private val confFile = Path(datadir, "ambrosia.conf")
 
   init {
-    AppConfig.loadConfig()
     SystemFileSystem.createDirectories(datadir)
     InjectLogs.ensureLogConfig(datadir.toString())
 
@@ -78,6 +77,7 @@ class Ambrosia : CliktCommand() {
       }
     val phoenixdPassword by
       option("--phoenixd-password", help = "http-password for phoenixd API").defaultLazy {
+        AppConfig.loadConfig()
         val value = AppConfig.getPhoenixProperty("http-password") ?: throw Exception("phoenixd http-password on found in phoenix.conf, please provide it with --phoenixd-password or in the phoenix.conf file")
         value
       }
