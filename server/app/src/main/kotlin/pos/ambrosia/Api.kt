@@ -26,14 +26,16 @@ public val logger = LoggerFactory.getLogger("Server")
 
 class Api() {
 
-  fun blockingAddUser() = runBlocking {
-    launch { DefaultCredentialsService(DatabaseConnection.getConnection()).addUser()}
+  fun blockingAddUser(environment: ApplicationEnvironment) = runBlocking {
+    launch { DefaultCredentialsService(environment, DatabaseConnection.getConnection()).addUser()}
   }
 
   fun Application.module() {
-    blockingAddUser() // Add default user if there are no users
-    // Configure the application
-    val config = this.environment.config
+    AppConfig.loadConfig() // Load the configuration
+    val config = environment.config // Configure the application 
+
+    blockingAddUser(environment) // Add default user if there are no users
+    
     Handler() // Install exception handlers
     install(ContentNegotiation) { json() }
     install(CORS) {

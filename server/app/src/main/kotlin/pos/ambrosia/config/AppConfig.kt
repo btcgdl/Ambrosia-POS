@@ -38,7 +38,7 @@ object AppConfig {
             logger.error("Error loading Phoenix configuration from {}", phoenixFile)
         }
     }
-
+    @Deprecated("Use app environment properties instead")
     fun getProperty(key: String, defaultValue: String? = null): String? {
         return properties.getProperty(key) ?: defaultValue
     }

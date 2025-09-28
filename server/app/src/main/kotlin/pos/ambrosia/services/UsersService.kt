@@ -5,8 +5,9 @@ import pos.ambrosia.logger
 import pos.ambrosia.models.AuthResponse
 import pos.ambrosia.models.User
 import pos.ambrosia.utils.SecurePinProcessor
+import io.ktor.server.application.ApplicationEnvironment
 
-class UsersService(private val connection: Connection) {
+class UsersService(private val env: ApplicationEnvironment, private val connection: Connection) {
   companion object {
     private const val ADD_USER =
             """
@@ -71,7 +72,7 @@ class UsersService(private val connection: Connection) {
     statement.setString(2, user.name)
 
     // Hashear el PIN correctamente
-    val encryptedPin = SecurePinProcessor.hashPinForStorage(user.pin.toCharArray(), generatedId)
+    val encryptedPin = SecurePinProcessor.hashPinForStorage(user.pin.toCharArray(), generatedId, env)
     statement.setString(3, SecurePinProcessor.byteArrayToBase64(encryptedPin))
     statement.setString(4, user.refreshToken)
     statement.setString(5, user.role) // Asumiendo que user.role contiene el role_id
@@ -140,7 +141,7 @@ class UsersService(private val connection: Connection) {
     statement.setString(1, updatedUser.name)
 
     // Corregir el hash del PIN - usar el ID del usuario, no el PIN como salt
-    val encryptedPin = SecurePinProcessor.hashPinForStorage(updatedUser.pin.toCharArray(), id)
+    val encryptedPin = SecurePinProcessor.hashPinForStorage(updatedUser.pin.toCharArray(), id, env)
     statement.setString(2, SecurePinProcessor.byteArrayToBase64(encryptedPin))
     statement.setString(3, updatedUser.refreshToken)
     statement.setString(4, updatedUser.role)
