@@ -26,7 +26,6 @@ object AppConfig {
             FileInputStream(configFile).use { fis ->
                 properties.load(fis)
             }
-            logger.info("Configuration loaded from {}", configFile)
         } catch (e: Exception) {
             logger.error("Error loading configuration from {}", configFile)
         }
@@ -35,7 +34,6 @@ object AppConfig {
             FileInputStream(phoenixFile).use { fis ->
                 phoenixProperties.load(fis)
             }
-            logger.info("Phoenix configuration loaded from {}", phoenixFile)
         } catch (e: Exception) {
             logger.error("Error loading Phoenix configuration from {}", phoenixFile)
         }
