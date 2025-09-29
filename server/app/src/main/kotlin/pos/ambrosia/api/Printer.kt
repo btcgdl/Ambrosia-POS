@@ -2,6 +2,7 @@ package pos.ambrosia.api
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -13,19 +14,19 @@ import pos.ambrosia.services.PrinterManager
 
 fun Application.configurePrinter() {
 
-  routing { printer() }
+  routing { route("/printers") { printer() } }
 }
 
 fun Route.printer() {
-  route("/printers") {
+  authenticate("auth-jwt") {
     get { call.respond(PrinterManager.getAvailablePrinters()) }
     post("/set") {
       val request = call.receive<SetPrinterRequest>()
 
       PrinterManager.setPrinter(request.type, request.printerName)
       call.respondText(
-        "Printer ${request.printerName} set for ${request.type}",
-        status = HttpStatusCode.OK
+              "Printer ${request.printerName} set for ${request.type}",
+              status = HttpStatusCode.OK
       )
     }
     post("/print") {
@@ -42,8 +43,8 @@ fun Route.printer() {
         call.respondText("Print job sent", status = HttpStatusCode.OK)
       } catch (e: Exception) {
         call.respondText(
-          "Error printing: ${e.message}",
-          status = HttpStatusCode.InternalServerError
+                "Error printing: ${e.message}",
+                status = HttpStatusCode.InternalServerError
         )
       }
     }
