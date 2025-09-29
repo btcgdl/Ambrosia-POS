@@ -230,4 +230,97 @@ class DishServiceTest {
             assertFalse(result) // Assert
         }
     }
+
+    @Test
+    fun `updateDish returns true on success`() {
+        runBlocking {
+            val dishToUpdate = Dish(id = "dish-1", name = "Updated Dish", price = 20.0, category_id = "cat-1") // Arrange
+            val categoryCheckStatement: PreparedStatement = mock() // Arrange
+            val updateDishStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM dish_categories"))).thenReturn(categoryCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE dishes"))).thenReturn(updateDishStatement) // Arrange
+            val categoryCheckResultSet: ResultSet = mock() // Arrange
+            whenever(categoryCheckResultSet.next()).thenReturn(true) // Arrange
+            whenever(categoryCheckStatement.executeQuery()).thenReturn(categoryCheckResultSet) // Arrange
+            whenever(updateDishStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = DishService(mockConnection) // Arrange
+            val result = service.updateDish(dishToUpdate) // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateDish returns false when database update fails`() {
+        runBlocking {
+            val dishToUpdate = Dish(id = "dish-1", name = "Updated Dish", price = 20.0, category_id = "cat-1") // Arrange
+            val categoryCheckStatement: PreparedStatement = mock() // Arrange
+            val updateDishStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM dish_categories"))).thenReturn(categoryCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE dishes"))).thenReturn(updateDishStatement) // Arrange
+            val categoryCheckResultSet: ResultSet = mock() // Arrange
+            whenever(categoryCheckResultSet.next()).thenReturn(true) // Arrange
+            whenever(categoryCheckStatement.executeQuery()).thenReturn(categoryCheckResultSet) // Arrange
+            whenever(updateDishStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = DishService(mockConnection) // Arrange
+            val result = service.updateDish(dishToUpdate) // Act
+            assertFalse(result) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteDish returns false if dish is in use`() {
+        runBlocking {
+            val dishId = "dish-1" // Arrange
+            val checkInUseStatement: PreparedStatement = mock() // Arrange
+            val deleteStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT COUNT(*)"))).thenReturn(checkInUseStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE dishes SET is_deleted"))).thenReturn(deleteStatement) // Arrange
+            val checkInUseResultSet: ResultSet = mock() // Arrange
+            whenever(checkInUseResultSet.next()).thenReturn(true) // Arrange
+            whenever(checkInUseResultSet.getInt("count")).thenReturn(1) // Arrange
+            whenever(checkInUseStatement.executeQuery()).thenReturn(checkInUseResultSet) // Arrange
+            val service = DishService(mockConnection) // Arrange
+            val result = service.deleteDish(dishId) // Act
+            assertFalse(result) // Assert
+            verify(mockConnection, never()).prepareStatement(contains("UPDATE dishes SET is_deleted")) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteDish returns true on success`() {
+        runBlocking {
+            val dishId = "dish-1" // Arrange
+            val checkInUseStatement: PreparedStatement = mock() // Arrange
+            val deleteStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT COUNT(*)"))).thenReturn(checkInUseStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE dishes SET is_deleted"))).thenReturn(deleteStatement) // Arrange
+            val checkInUseResultSet: ResultSet = mock() // Arrange
+            whenever(checkInUseResultSet.next()).thenReturn(true) // Arrange
+            whenever(checkInUseResultSet.getInt("count")).thenReturn(0) // Arrange
+            whenever(checkInUseStatement.executeQuery()).thenReturn(checkInUseResultSet) // Arrange
+            whenever(deleteStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = DishService(mockConnection) // Arrange
+            val result = service.deleteDish(dishId) // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteDish returns false if dish id does not exist`() {
+        runBlocking {
+            val dishId = "non-existent-id" // Arrange
+            val checkInUseStatement: PreparedStatement = mock() // Arrange
+            val deleteStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT COUNT(*)"))).thenReturn(checkInUseStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE dishes SET is_deleted"))).thenReturn(deleteStatement) // Arrange
+            val checkInUseResultSet: ResultSet = mock() // Arrange
+            whenever(checkInUseResultSet.next()).thenReturn(true) // Arrange
+            whenever(checkInUseResultSet.getInt("count")).thenReturn(0) // Arrange
+            whenever(checkInUseStatement.executeQuery()).thenReturn(checkInUseResultSet) // Arrange
+            whenever(deleteStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = DishService(mockConnection) // Arrange
+            val result = service.deleteDish(dishId) // Act
+            assertFalse(result) // Assert
+        }
+    }
 }
