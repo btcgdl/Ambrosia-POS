@@ -99,7 +99,7 @@ export default function Users() {
         throw new Error("El PIN debe tener al menos 4 dígitos");
       }
 
-      const userData = { ...form, pin: pinAsInt };
+      const userData = { ...form, pin: form.pin.toString() };
 
       if (editing) {
         await updateUser({ ...userData, id: editing });

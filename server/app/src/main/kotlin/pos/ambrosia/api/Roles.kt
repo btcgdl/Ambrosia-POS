@@ -18,7 +18,7 @@ import pos.ambrosia.utils.authenticateAdmin
 
 fun Application.configureRoles() {
   val connection: Connection = DatabaseConnection.getConnection()
-  val roleService = RolesService(connection)
+  val roleService = RolesService(environment, connection)
   routing { route("/roles") { roles(roleService) } }
 }
 

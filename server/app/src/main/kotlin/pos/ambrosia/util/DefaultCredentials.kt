@@ -5,13 +5,14 @@ import pos.ambrosia.models.Role
 import pos.ambrosia.models.User
 import pos.ambrosia.services.RolesService
 import pos.ambrosia.services.UsersService
+import io.ktor.server.application.ApplicationEnvironment
 
-class DefaultCredentialsService(private val connection: Connection) {
+class DefaultCredentialsService(private val enviroment: ApplicationEnvironment, private val connection: Connection) {
 
   suspend fun addUser(): String {
 
-    val roleService = RolesService(connection)
-    val userService = UsersService(connection)
+    val roleService = RolesService(enviroment, connection)
+    val userService = UsersService(enviroment, connection)
 
     val userCount = userService.getUserCount()
 

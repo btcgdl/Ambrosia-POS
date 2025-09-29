@@ -1,11 +1,13 @@
 package pos.ambrosia.services
 
+import java.lang.StringBuilder
 import java.sql.Connection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Role
 import pos.ambrosia.utils.SecurePinProcessor
+import io.ktor.server.application.ApplicationEnvironment
 
-class RolesService(private val connection: Connection) {
+class RolesService(private val env: ApplicationEnvironment, private val connection: Connection) {
   companion object {
     private const val ADD_ROLE =
             "INSERT INTO roles (id, role, password, isAdmin) VALUES (?, ?, ?, ?)"
@@ -13,8 +15,6 @@ class RolesService(private val connection: Connection) {
             "SELECT id, role, password, isAdmin FROM roles WHERE is_deleted = 0"
     private const val GET_ROLE_BY_ID =
             "SELECT id, role, password, isAdmin FROM roles WHERE id = ? AND is_deleted = 0"
-    private const val UPDATE_ROLE =
-            "UPDATE roles SET role = ?, password = ?, isAdmin = ? WHERE id = ?"
     private const val DELETE_ROLE = "UPDATE roles SET is_deleted = 1 WHERE id = ?"
     private const val CHECK_ROLE_NAME_EXISTS =
             "SELECT id FROM roles WHERE role = ? AND is_deleted = 0"
@@ -30,10 +30,11 @@ class RolesService(private val connection: Connection) {
     val statement = connection.prepareStatement(ADD_ROLE)
 
     val encryptedPin =
-      SecurePinProcessor.hashPinForStorage(
-        pin = role.password?.toCharArray() ?: charArrayOf(),
-        id = generatedId
-      )
+            SecurePinProcessor.hashPinForStorage(
+                    pin = role.password?.toCharArray() ?: charArrayOf(),
+                    id = generatedId,
+                    env = env
+            )
 
     statement.setString(1, generatedId)
     statement.setString(2, role.role)
@@ -64,12 +65,12 @@ class RolesService(private val connection: Connection) {
     val roles = mutableListOf<Role>()
     while (resultSet.next()) {
       val role =
-        Role(
-          id = resultSet.getString("id"),
-          role = resultSet.getString("role"),
-          password = resultSet.getString("password"),
-          isAdmin = resultSet.getBoolean("isAdmin")
-        )
+              Role(
+                      id = resultSet.getString("id"),
+                      role = resultSet.getString("role"),
+                      password = resultSet.getString("password"),
+                      isAdmin = resultSet.getBoolean("isAdmin")
+              )
       roles.add(role)
     }
     logger.info("Retrieved ${roles.size} roles")
@@ -94,6 +95,11 @@ class RolesService(private val connection: Connection) {
   }
 
   suspend fun updateRole(id: String?, role: Role): Boolean {
+    val sql = StringBuilder()
+    sql.append("UPDATE roles SET role = ?, isAdmin = ? ")
+    if (role.password != null) sql.append(", password = ? ")
+    sql.append("WHERE id = ?")
+
     if (id == null) return false
     // Verificar que el nombre del rol no exista ya (excluyendo el rol actual)
     if (role.id != null && roleNameExistsExcludingId(role.role, role.id)) {
@@ -101,18 +107,15 @@ class RolesService(private val connection: Connection) {
       return false
     }
 
-    val statement = connection.prepareStatement(UPDATE_ROLE)
-
-    val encryptedPin =
-      SecurePinProcessor.hashPinForStorage(
-        role.password?.toCharArray() ?: charArrayOf(),
-        id
-      )
+    val statement = connection.prepareStatement(sql.toString())
 
     statement.setString(1, role.role)
-    statement.setString(2, SecurePinProcessor.byteArrayToBase64(encryptedPin))
-    statement.setBoolean(3, role.isAdmin ?: false)
-    statement.setString(4, role.id)
+    statement.setBoolean(2, role.isAdmin ?: false)
+    if (role.password != null) {
+      val encryptedPin = SecurePinProcessor.hashPinForStorage(role.password.toCharArray(), id, env)
+      statement.setString(3, SecurePinProcessor.byteArrayToBase64(encryptedPin))
+    }
+    statement.setString(role.password?.let { 4 } ?: 3, role.id)
 
     val rowsUpdated = statement.executeUpdate()
     if (rowsUpdated > 0) {

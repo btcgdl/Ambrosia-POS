@@ -1,4 +1,4 @@
-version = "0.1.2-alpha"
+version = "0.2.0-beta"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.

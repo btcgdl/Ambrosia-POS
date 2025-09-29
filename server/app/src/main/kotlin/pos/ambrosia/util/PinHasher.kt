@@ -7,10 +7,11 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import pos.ambrosia.config.AppConfig
 import pos.ambrosia.logger
+import io.ktor.server.application.ApplicationEnvironment
 
 object SecurePinProcessor {
-  private fun getAppMasterKey(): ByteArray {
-    val keyString = AppConfig.getProperty("secret")
+  private fun getAppMasterKey(env: ApplicationEnvironment): ByteArray {
+    val keyString = env.config.property("secret").getString()
     if (keyString.isNullOrBlank()) {
       throw IllegalStateException(
               "SECRET_HASH (App Master Key) not found in configuration or is empty. Cannot proceed securely."
@@ -24,9 +25,9 @@ object SecurePinProcessor {
   private const val ITERATION_COUNT = 10000
   private const val KEY_LENGTH = 256
 
-  fun hashPinForStorage(pin: CharArray, id: String): ByteArray {
+  fun hashPinForStorage(pin: CharArray, id: String, env: ApplicationEnvironment): ByteArray {
     try {
-      val appMasterKey = getAppMasterKey()
+      val appMasterKey = getAppMasterKey(env)
       if (appMasterKey.isEmpty()) {
         throw IllegalStateException("App Master Key no cargada o está vacía.")
       }
@@ -43,8 +44,8 @@ object SecurePinProcessor {
       throw RuntimeException("Error al hashear el PIN con la clave maestra", e)
     }
   }
-  fun verifyPin(enteredPin: CharArray, id: String, storedHash: ByteArray): Boolean {
-    val newHash = hashPinForStorage(enteredPin, id)
+  fun verifyPin(enteredPin: CharArray, id: String, storedHash: ByteArray, env: ApplicationEnvironment): Boolean {
+    val newHash = hashPinForStorage(enteredPin, id, env)
     logger.info("Pins: " + newHash + " = " + storedHash)
     return MessageDigest.isEqual(newHash, storedHash)
   }

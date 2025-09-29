@@ -86,6 +86,7 @@ class Ambrosia : CliktCommand() {
 
   override fun run() {
     echo(green("Running Ambrosia POS Server v$AppVersion"))
+    logger.info("Using data directory: $datadir")
     Flyway.configure().dataSource("jdbc:sqlite:${datadir}/ambrosia.db", null , null)
       .mixed(true).load().migrate()
     try {

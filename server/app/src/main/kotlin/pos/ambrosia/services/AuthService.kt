@@ -4,8 +4,9 @@ import java.sql.Connection
 import pos.ambrosia.logger
 import pos.ambrosia.models.AuthResponse
 import pos.ambrosia.utils.SecurePinProcessor
+import io.ktor.server.application.ApplicationEnvironment
 
-class AuthService(private val connection: Connection) {
+class AuthService(private val env: ApplicationEnvironment, private val connection: Connection) {
   companion object {
     private const val GET_USER_FOR_AUTH_BY_NAME =
       """
@@ -34,7 +35,7 @@ class AuthService(private val connection: Connection) {
       logger.info("Authenticating user: $userIdString")
       val storedPinHash = SecurePinProcessor.base64ToByteArray(storedPinHashBase64)
 
-      val isValidPin = SecurePinProcessor.verifyPin(pin, userIdString, storedPinHash)
+      val isValidPin = SecurePinProcessor.verifyPin(pin, userIdString, storedPinHash, env)
       pin.fill('\u0000') // Limpiar PIN de memoria
 
       logger.info("Authentication result for user pin: $isValidPin")
@@ -61,7 +62,7 @@ class AuthService(private val connection: Connection) {
       val storedPasswordHash = SecurePinProcessor.base64ToByteArray(storedPasswordHashBase64)
 
       // The salt for role password is the role ID.
-      val isValidPassword = SecurePinProcessor.verifyPin(rolePassword, roleId, storedPasswordHash)
+      val isValidPassword = SecurePinProcessor.verifyPin(rolePassword, roleId, storedPasswordHash, env)
       rolePassword.fill('\u0000') // Clear password from memory
 
       logger.info("Authentication result for role password: $isValidPassword")

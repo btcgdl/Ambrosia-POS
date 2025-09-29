@@ -64,7 +64,7 @@ export default function ModuleNavigation({ children }) {
             {isAuthenticated ? (
               <>
                 <p className="text-white text-[13px] mt-1">
-                  {localStorage.getItem("username") || "Usuario"}
+                  {user?.name || localStorage.getItem("username") || "Usuario"}
                 </p>
                 <p className="text-white/80 text-[11px]">
                   {isAdmin ? "ADMINISTRADOR" : "USUARIO"}

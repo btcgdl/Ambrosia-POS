@@ -7,12 +7,23 @@ import io.ktor.server.routing.*
 import java.sql.Connection
 import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
-import pos.ambrosia.services.UsersService
+import pos.ambrosia.services.TokenService
 
 /** Extensión para verificar si el usuario actual es administrador */
 fun ApplicationCall.requireAdmin() {
-  val principal = principal<JWTPrincipal>()
-  val isAdmin = principal?.getClaim("isAdmin", Boolean::class) ?: false
+  // Obtener el refreshToken desde la cookie
+  val refreshToken = request.cookies["refreshToken"]
+
+  if (refreshToken.isNullOrBlank()) {
+    logger.warn("Admin check failed: missing refreshToken cookie")
+    throw AdminOnlyException()
+  }
+
+  // Consultar la BD para obtener isAdmin usando el refreshToken registrado
+  val connection: Connection = DatabaseConnection.getConnection()
+  val tokenService = TokenService(application.environment, connection)
+  val userFromToken = tokenService.getUserFromRefreshToken(refreshToken)
+  val isAdmin = userFromToken?.isAdmin == true
 
   if (!isAdmin) {
     logger.warn("Non-admin user attempted to access admin-only endpoint")
@@ -20,15 +31,14 @@ fun ApplicationCall.requireAdmin() {
   }
 }
 
-
 /** Extensión para obtener información del usuario actual desde el JWT */
 fun ApplicationCall.getCurrentUser(): UserInfo? {
   val principal = principal<JWTPrincipal>() ?: return null
 
   return UserInfo(
-    userId = principal.getClaim("userId", String::class) ?: return null,
-    role = principal.getClaim("role", String::class) ?: return null,
-    isAdmin = principal.getClaim("isAdmin", Boolean::class) ?: false
+          userId = principal.getClaim("userId", String::class) ?: return null,
+          role = principal.getClaim("role", String::class) ?: return null,
+          isAdmin = principal.getClaim("isAdmin", Boolean::class) ?: false
   )
 }
 
@@ -43,15 +53,14 @@ suspend fun ApplicationCall.requireWallet() {
   // Verificar que el principal tenga el scope correcto
   val principal = principal<JWTPrincipal>()
   val scope = principal?.getClaim("scope", String::class)
-  
+
   if (scope != "wallet_access") {
     logger.warn("Wallet access attempted with invalid scope: $scope")
     throw WalletOnlyException()
   }
-  
+
   logger.info("Wallet access granted successfully")
 }
-
 
 /**
  * Plugin de Ktor para verificar los privilegios de administrador. Este plugin se asegura de que
@@ -59,10 +68,10 @@ suspend fun ApplicationCall.requireWallet() {
  * `authenticate`.
  */
 val AdminAccess =
-  createRouteScopedPlugin(name = "AdminAccess") {
-    on(AuthenticationChecked) { call -> call.requireAdmin() }
-  }
-        
+        createRouteScopedPlugin(name = "AdminAccess") {
+          on(AuthenticationChecked) { call -> call.requireAdmin() }
+        }
+
 /**
  * Función de extensión para crear rutas que requieren autenticación y privilegios de administrador
  */

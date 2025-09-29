@@ -14,7 +14,7 @@ export async function POST(request) {
     if (!refreshToken) {
       return NextResponse.json(
         { message: "No refresh token found" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -32,7 +32,7 @@ export async function POST(request) {
       const errorData = await response.text();
       return NextResponse.json(
         { message: errorData || "Token refresh failed" },
-        { status: response.status },
+        { status: response.status }
       );
     }
 
@@ -41,7 +41,7 @@ export async function POST(request) {
     // Crear la respuesta exitosa
     const nextResponse = NextResponse.json(
       { message: "Token refreshed successfully" },
-      { status: 200 },
+      { status: 200 }
     );
 
     // Establecer las nuevas cookies si vienen en la respuesta
@@ -51,7 +51,7 @@ export async function POST(request) {
       const accessExp = decodedAccess?.exp;
       const accessMaxAge = accessExp ? Math.max(0, accessExp - nowSec) : 60; // fallback 60s
       nextResponse.cookies.set("accessToken", data.accessToken, {
-        httpOnly: false,
+        httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: accessMaxAge,
@@ -96,7 +96,7 @@ export async function POST(request) {
 
     const errorResponse = NextResponse.json(
       { message: "Internal server error during token refresh" },
-      { status: 500 },
+      { status: 500 }
     );
 
     // Limpiar cookies en caso de error
