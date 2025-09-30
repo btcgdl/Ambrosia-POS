@@ -4,6 +4,7 @@ import com.github.anastaciocintra.escpos.EscPos
 import com.github.anastaciocintra.escpos.EscPosConst
 import com.github.anastaciocintra.escpos.Style
 import pos.ambrosia.models.*
+import pos.ambrosia.util.formatTicketLine
 
 class TicketFactory(private val template: TicketTemplate) {
 
@@ -17,7 +18,9 @@ class TicketFactory(private val template: TicketTemplate) {
         ElementType.TABLE_HEADER -> escpos.writeLF(style, content)
         ElementType.TABLE_ROW -> {
           data.items.forEach {
-            val row = resolveValue(element.value, it)
+            val itemText = "${it.quantity}x ${it.name}"
+            val priceText = it.price.toString()
+            val row = formatTicketLine(itemText, priceText)
             escpos.writeLF(style, row)
             it.comments.forEach { comment ->
                 escpos.writeLF(style, "  - $comment")
