@@ -39,7 +39,7 @@ fun Application.Handler() {
     }
     exception<UnauthorizedApiException> { call, _ ->
       logger.warn("Unauthorized API access attempt")
-      call.respond(HttpStatusCode.Forbidden, Message("Unauthorized API access"))
+      call.respond(HttpStatusCode.Unauthorized, Message("Unauthorized API access"))
     }
     exception<AdminOnlyException> { call, _ ->
       logger.warn("Non-admin user attempted to access admin-only endpoint")

@@ -41,7 +41,7 @@ function HomepageHeader() {
             Sistema POS de código abierto que acepta Bitcoin y Lightning Network
           </p>
         </div>
-        {/* <div>
+        {<div>
           <Link
             className="button button--secondary button--lg margin-right--md"
             to="/blog"
@@ -50,13 +50,13 @@ function HomepageHeader() {
             Comenzar Ahora
           </Link>
           <Link
-            className="button button--outline button--lg"
+            className="button button--secondary button--lg"
             to="https://github.com/btcgdl/Ambrosia-POS"
           >
             <Github className="margin-right--sm" />
             Ver en GitHub
           </Link>
-        </div> */}
+        </div> }
       </div>
     </header>
   );
