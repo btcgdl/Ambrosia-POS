@@ -184,4 +184,57 @@ class IngredientCategoryServiceTest {
             assertFalse(result) // Assert
         }
     }
+
+    @Test
+    fun `updateIngredientCategory returns false if ID is null`() {
+        runBlocking {
+            val categoryWithNullId = IngredientCategory(id = null, name = "A Name") // Arrange
+            val service = IngredientCategoryService(mockConnection) // Arrange
+            val result = service.updateIngredientCategory(categoryWithNullId) // Act
+            assertFalse(result) // Assert
+            verify(mockConnection, never()).prepareStatement(any()) // Assert
+        }
+    }
+
+    @Test
+    fun `updateIngredientCategory returns false if name is blank`() {
+        runBlocking {
+            val categoryWithBlankName = IngredientCategory(id = "ing-cat-1", name = "  ") // Arrange
+            val service = IngredientCategoryService(mockConnection) // Arrange
+            val result = service.updateIngredientCategory(categoryWithBlankName) // Act
+            assertFalse(result) // Assert
+            verify(mockConnection, never()).prepareStatement(any()) // Assert
+        }
+    }
+
+    @Test
+    fun `updateIngredientCategory returns false if name already exists`() {
+        runBlocking {
+            val categoryToUpdate = IngredientCategory(id = "ing-cat-1", name = "Existing Name") // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM"))).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
+            val service = IngredientCategoryService(mockConnection) // Arrange
+            val result = service.updateIngredientCategory(categoryToUpdate) // Act
+            assertFalse(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateIngredientCategory returns true on success`() {
+        runBlocking {
+            val categoryToUpdate = IngredientCategory(id = "ing-cat-1", name = "New Valid Name") // Arrange
+            val checkNameStatement: PreparedStatement = mock() // Arrange
+            val updateStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM"))).thenReturn(checkNameStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE ingredient_categories"))).thenReturn(updateStatement) // Arrange
+            val checkNameResultSet: ResultSet = mock() // Arrange
+            whenever(checkNameResultSet.next()).thenReturn(false) // Arrange
+            whenever(checkNameStatement.executeQuery()).thenReturn(checkNameResultSet) // Arrange
+            whenever(updateStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = IngredientCategoryService(mockConnection) // Arrange
+            val result = service.updateIngredientCategory(categoryToUpdate) // Act
+            assertTrue(result) // Assert
+        }
+    }
 }
