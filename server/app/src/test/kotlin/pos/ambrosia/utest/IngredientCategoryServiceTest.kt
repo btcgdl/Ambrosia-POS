@@ -55,7 +55,7 @@ class IngredientCategoryServiceTest {
             val service = IngredientCategoryService(mockConnection) // Arrange
             val result = service.getIngredientCategoryById("cat-1") // Act
             assertNotNull(result) // Assert
-            assertEquals(expectedCategory, result) // Arrange
+            assertEquals(expectedCategory, result) // Assert
         }
     }
 
