@@ -79,4 +79,34 @@ class OrderDishServiceTest {
             assertNull(result) // Assert
         }
     }
+
+    @Test
+    fun `addOrderDish returns null if order id not found`() {
+        runBlocking {
+            val orderDish = OrderDish(id = "non-existing-id", order_id = "order123", dish_id = "dish1", price_at_order = 50.00, notes = "Extra spicy", status = "PENDING", should_prepare = true) // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM orders WHERE id = ?"))).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+            whenever(mockResultSet.next()).thenReturn(false) // Arrange
+            val service = OrderDishService(mockConnection) // Arrange
+            val result = service.addOrderDish(orderDish) // Act
+            assertNull(result) // Assert
+
+        }
+    }
+
+
+    @Test
+    fun `addOrderDish returns null if dish id not found`() {
+        runBlocking {
+            val orderDish = OrderDish(id = "od1", order_id = "order123", dish_id = "dish-not-found", price_at_order = 50.00, notes = "Extra spicy", status = "PENDING", should_prepare = true) // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM orders WHERE id = ?"))).thenReturn(mockStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM dishes WHERE id = ?"))).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+            whenever(mockResultSet.next()).thenReturn(false) // Arrange
+            val service = OrderDishService(mockConnection) // Arrange
+            val result = service.addOrderDish(orderDish) // Act
+            assertNull(result) // Assert
+        }
+    }
+
 }

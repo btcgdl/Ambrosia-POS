@@ -119,7 +119,7 @@ class IngredientServiceTest {
             val newIngredient = Ingredient(null, "Tomatoes", "non-existent-cat", 10.0, "kg", 1.0, 1.0) // Arrange
             whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
             whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
-            whenever(mockResultSet.next()).thenReturn(false) // Arrange: Simulate category not found
+            whenever(mockResultSet.next()).thenReturn(false) // Arrange
             val service = IngredientService(mockConnection) // Arrange
             val result = service.addIngredient(newIngredient) // Act
             assertNull(result) // Assert
@@ -133,7 +133,7 @@ class IngredientServiceTest {
             val ingredientWithBlankName = Ingredient(null, "  ", "cat-veg", 10.0, "kg", 1.0, 1.0) // Arrange
             whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
             whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
-            whenever(mockResultSet.next()).thenReturn(true) // Arrange: Simulate category exists
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
             val service = IngredientService(mockConnection) // Arrange
             val result = service.addIngredient(ingredientWithBlankName) // Act
             assertNull(result) // Assert
@@ -146,7 +146,7 @@ class IngredientServiceTest {
             val ingredientWithInvalidQuantity = Ingredient(null, "Tomatoes", "cat-veg", -5.0, "kg", 1.0, 1.0) // Arrange
             whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
             whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
-            whenever(mockResultSet.next()).thenReturn(true) // Arrange: Simulate category exists
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
             val service = IngredientService(mockConnection) // Arrange
             val result = service.addIngredient(ingredientWithInvalidQuantity) // Act
             assertNull(result) // Assert
@@ -159,7 +159,7 @@ class IngredientServiceTest {
             val ingredientWithInvalidThreshold = Ingredient(null, "Tomatoes", "cat-veg", 10.0, "kg", -1.0, 1.0) // Arrange
             whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
             whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
-            whenever(mockResultSet.next()).thenReturn(true) // Arrange: Simulate category exists
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
             val service = IngredientService(mockConnection) // Arrange
             val result = service.addIngredient(ingredientWithInvalidThreshold) // Act
             assertNull(result) // Assert
@@ -172,7 +172,7 @@ class IngredientServiceTest {
             val ingredientWithInvalidCost = Ingredient(null, "Tomatoes", "cat-veg", 10.0, "kg", 1.0, -1.0) // Arrange
             whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
             whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
-            whenever(mockResultSet.next()).thenReturn(true) // Arrange: Simulate category exists
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
             val service = IngredientService(mockConnection) // Arrange
             val result = service.addIngredient(ingredientWithInvalidCost) // Act
             assertNull(result) // Assert
@@ -233,7 +233,7 @@ class IngredientServiceTest {
             val ingredientToUpdate = Ingredient("ing-1", "A Name", "non-existent-cat", 10.0, "kg", 1.0, 1.0) // Arrange
             whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
             whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
-            whenever(mockResultSet.next()).thenReturn(false) // Arrange: Simulate category not found
+            whenever(mockResultSet.next()).thenReturn(false) // Arrange
             val service = IngredientService(mockConnection) // Arrange
             val result = service.updateIngredient(ingredientToUpdate) // Act
             assertFalse(result) // Assert
@@ -246,7 +246,7 @@ class IngredientServiceTest {
             val ingredientWithBlankName = Ingredient("ing-1", "  ", "cat-1", 10.0, "kg", 1.0, 1.0) // Arrange
             whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
             whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
-            whenever(mockResultSet.next()).thenReturn(true) // Arrange: Simulate category exists
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
             val service = IngredientService(mockConnection) // Arrange
             val result = service.updateIngredient(ingredientWithBlankName) // Act
             assertFalse(result) // Assert
@@ -259,7 +259,7 @@ class IngredientServiceTest {
             val ingredientWithInvalidQuantity = Ingredient("ing-1", "Tomatoes", "cat-veg", -5.0, "kg", 1.0, 1.0) // Arrange
             whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
             whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
-            whenever(mockResultSet.next()).thenReturn(true) // Arrange: Simulate category exists
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
             val service = IngredientService(mockConnection) // Arrange
             val result = service.updateIngredient(ingredientWithInvalidQuantity) // Act
             assertFalse(result) // Assert
@@ -272,7 +272,7 @@ class IngredientServiceTest {
             val ingredientWithInvalidThreshold = Ingredient("ing-1", "Tomatoes", "cat-veg", 10.0, "kg", -1.0, 1.0) // Arrange
             whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
             whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
-            whenever(mockResultSet.next()).thenReturn(true) // Arrange: Simulate category exists
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
             val service = IngredientService(mockConnection) // Arrange
             val result = service.updateIngredient(ingredientWithInvalidThreshold) // Act
             assertFalse(result) // Assert
@@ -285,7 +285,7 @@ class IngredientServiceTest {
             val ingredientWithInvalidCost = Ingredient("ing-1", "Tomatoes", "cat-veg", 10.0, "kg", 1.0, -1.0) // Arrange
             whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
             whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
-            whenever(mockResultSet.next()).thenReturn(true) // Arrange: Simulate category exists
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
             val service = IngredientService(mockConnection) // Arrange
             val result = service.updateIngredient(ingredientWithInvalidCost) // Act
             assertFalse(result) // Assert
@@ -335,7 +335,7 @@ class IngredientServiceTest {
             whenever(mockConnection.prepareStatement(contains("SELECT COUNT(*)"))).thenReturn(mockStatement) // Arrange
             whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
             whenever(mockResultSet.next()).thenReturn(true) // Arrange
-            whenever(mockResultSet.getInt("count")).thenReturn(1) // Arrange: Simulate ingredient is in use
+            whenever(mockResultSet.getInt("count")).thenReturn(1) // Arrange
             val service = IngredientService(mockConnection) // Arrange
             val result = service.deleteIngredient(ingredientId) // Act
             assertFalse(result) // Assert
