@@ -2,6 +2,7 @@
 FROM node:22-slim AS builder
 WORKDIR /app
 COPY . .
+RUN npm i
 RUN NO_ZIP=1 ./package-client.sh
 
 # Runtime stage
