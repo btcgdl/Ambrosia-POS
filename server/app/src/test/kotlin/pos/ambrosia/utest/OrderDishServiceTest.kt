@@ -159,4 +159,15 @@ class OrderDishServiceTest {
             assertNull(result) // Assert
         }
     }
+
+    @Test
+    fun `updateOrderDish returns false if ID is null`() {
+        runBlocking {
+            val orderDishWithNullId = OrderDish(order_id = "", dish_id = "dish1", price_at_order = 50.00, status = "PENDING", should_prepare = true) // Arrange
+            val service = OrderDishService(mockConnection) // Arrange
+            val result = service.updateOrderDish(orderDishWithNullId) // Act
+            assertFalse(result) // Assert
+            verify(mockConnection, never()).prepareStatement(any()) // Assert
+        }
+    }
 }
