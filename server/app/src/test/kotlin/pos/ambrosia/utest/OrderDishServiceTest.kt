@@ -94,19 +94,69 @@ class OrderDishServiceTest {
         }
     }
 
-
     @Test
     fun `addOrderDish returns null if dish id not found`() {
         runBlocking {
             val orderDish = OrderDish(id = "od1", order_id = "order123", dish_id = "dish-not-found", price_at_order = 50.00, notes = "Extra spicy", status = "PENDING", should_prepare = true) // Arrange
-            whenever(mockConnection.prepareStatement(contains("SELECT id FROM orders WHERE id = ?"))).thenReturn(mockStatement) // Arrange
-            whenever(mockConnection.prepareStatement(contains("SELECT id FROM dishes WHERE id = ?"))).thenReturn(mockStatement) // Arrange
-            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
-            whenever(mockResultSet.next()).thenReturn(false) // Arrange
+            val orderCheckStatement: PreparedStatement = mock() // Arrange
+            val dishCheckStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM orders"))).thenReturn(orderCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM dishes"))).thenReturn(dishCheckStatement) // Arrange
+            val orderResultSet: ResultSet = mock() // Arrange
+            whenever(orderResultSet.next()).thenReturn(true) // Arrange
+            whenever(orderCheckStatement.executeQuery()).thenReturn(orderResultSet) // Arrange
+            val dishResultSet: ResultSet = mock() // Arrange
+            whenever(dishResultSet.next()).thenReturn(false) // Arrange
+            whenever(dishCheckStatement.executeQuery()).thenReturn(dishResultSet) // Arrange
             val service = OrderDishService(mockConnection) // Arrange
             val result = service.addOrderDish(orderDish) // Act
             assertNull(result) // Assert
         }
     }
 
+    @Test
+    fun `addOrderDish returns new ID on success`() {
+        runBlocking {
+            val orderDish = OrderDish(id = "od1", order_id = "order123", dish_id = "dish1", price_at_order = 50.00, notes = "Extra spicy", status = "PENDING", should_prepare = true) // Arrange
+            val orderCheckStatement: PreparedStatement = mock() // Arrange
+            val dishCheckStatement: PreparedStatement = mock() // Arrange
+            val addOrderDishStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM orders"))).thenReturn(orderCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM dishes"))).thenReturn(dishCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("INSERT INTO"))).thenReturn(addOrderDishStatement) // Arrange
+            val orderResultSet: ResultSet = mock() // Arrange
+            whenever(orderResultSet.next()).thenReturn(true) // Arrange
+            whenever(orderCheckStatement.executeQuery()).thenReturn(orderResultSet) // Arrange
+            val dishResultSet: ResultSet = mock() // Arrange
+            whenever(dishResultSet.next()).thenReturn(true) // Arrange
+            whenever(dishCheckStatement.executeQuery()).thenReturn(dishResultSet) // Arrange
+            whenever(addOrderDishStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = OrderDishService(mockConnection) // Arrange
+            val result = service.addOrderDish(orderDish) // Act
+            assertNotNull(result) // Assert
+        }
+    }
+
+    @Test
+    fun `addOrderDish returns null when database insert fails`() {
+        runBlocking {
+            val orderDish = OrderDish(id = "od1", order_id = "order123", dish_id = "dish1", price_at_order = 50.00, notes = "Extra spicy", status = "PENDING", should_prepare = true) // Arrange
+            val orderCheckStatement: PreparedStatement = mock() // Arrange
+            val dishCheckStatement: PreparedStatement = mock() // Arrange
+            val addOrderDishStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM orders"))).thenReturn(orderCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM dishes"))).thenReturn(dishCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("INSERT INTO"))).thenReturn(addOrderDishStatement) // Arrange
+            val orderResultSet: ResultSet = mock() // Arrange
+            whenever(orderResultSet.next()).thenReturn(true) // Arrange
+            whenever(orderCheckStatement.executeQuery()).thenReturn(orderResultSet) // Arrange
+            val dishResultSet: ResultSet = mock() // Arrange
+            whenever(dishResultSet.next()).thenReturn(true) // Arrange
+            whenever(dishCheckStatement.executeQuery()).thenReturn(dishResultSet) // Arrange
+            whenever(addOrderDishStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = OrderDishService(mockConnection) // Arrange
+            val result = service.addOrderDish(orderDish) // Act
+            assertNull(result) // Assert
+        }
+    }
 }
