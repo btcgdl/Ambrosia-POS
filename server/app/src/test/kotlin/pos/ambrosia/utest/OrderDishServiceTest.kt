@@ -163,11 +163,92 @@ class OrderDishServiceTest {
     @Test
     fun `updateOrderDish returns false if ID is null`() {
         runBlocking {
-            val orderDishWithNullId = OrderDish(order_id = "", dish_id = "dish1", price_at_order = 50.00, status = "PENDING", should_prepare = true) // Arrange
+            val orderDish = OrderDish(id = null, order_id = "order123", dish_id = "dish1", price_at_order = 50.00, notes = "Extra spicy", status = "PENDING", should_prepare = true) // Arrange
             val service = OrderDishService(mockConnection) // Arrange
-            val result = service.updateOrderDish(orderDishWithNullId) // Act
+            val result = service.updateOrderDish(orderDish) // Act
             assertFalse(result) // Assert
             verify(mockConnection, never()).prepareStatement(any()) // Assert
+        }
+    }
+
+    @Test
+    fun `updateOrderDish returns true on success`() {
+        runBlocking {
+            val orderDish = OrderDish(id = "od1", order_id = "order123", dish_id = "dish1", price_at_order = 55.00, notes = "No spicy", status = "COOKING", should_prepare = false) // Arrange
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = OrderDishService(mockConnection) // Arrange
+            val result = service.updateOrderDish(orderDish) // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateOrderDish returns false when order dish not found`() {
+        runBlocking {
+            val orderDish = OrderDish(id = "not-found-od", order_id = "order123", dish_id = "dish1", price_at_order = 50.00, notes = "Extra spicy", status = "PENDING", should_prepare = true) // Arrange
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = OrderDishService(mockConnection) // Arrange
+            val result = service.updateOrderDish(orderDish) // Act
+            assertFalse(result) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteOrderDish returns true on success`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = OrderDishService(mockConnection) // Arrange
+            val result = service.deleteOrderDish("od1") // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteOrderDish returns false when order dish not found`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = OrderDishService(mockConnection) // Arrange
+            val result = service.deleteOrderDish("not-found-od") // Act
+            assertFalse(result) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteOrderDishesByOrderId returns true on success`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(3) // Arrange: Simulate 3 rows deleted
+            val service = OrderDishService(mockConnection) // Arrange
+            val result = service.deleteOrderDishesByOrderId("order-123") // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `checkOrderDishStatus returns true when status matches`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
+            val service = OrderDishService(mockConnection) // Arrange
+            val result = service.checkOrderDishStatus("od1", "PENDING") // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `checkOrderDishStatus returns false when status does not match`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+            whenever(mockResultSet.next()).thenReturn(false) // Arrange
+            val service = OrderDishService(mockConnection) // Arrange
+            val result = service.checkOrderDishStatus("od1", "COOKING") // Act
+            assertFalse(result) // Assert
         }
     }
 }

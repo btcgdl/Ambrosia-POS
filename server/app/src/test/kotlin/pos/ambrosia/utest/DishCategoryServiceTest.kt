@@ -236,4 +236,22 @@ class DishCategoryServiceTest {
             assertTrue(result) // Assert
         }
     }
+
+    @Test
+    fun `updateDishCategory returns false when database update fails`() {
+        runBlocking {
+            val categoryToUpdate = DishCategory(id = "cat-1", name = "New Valid Name") // Arrange
+            val checkNameStatement: PreparedStatement = mock() // Arrange
+            val updateStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM"))).thenReturn(checkNameStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE dish_categories"))).thenReturn(updateStatement) // Arrange
+            val checkNameResultSet: ResultSet = mock() // Arrange
+            whenever(checkNameResultSet.next()).thenReturn(false) // Arrange
+            whenever(checkNameStatement.executeQuery()).thenReturn(checkNameResultSet) // Arrange
+            whenever(updateStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = DishCategoryService(mockConnection) // Arrange
+            val result = service.updateDishCategory(categoryToUpdate) // Act
+            assertFalse(result) // Assert
+        }
+    }
 }
