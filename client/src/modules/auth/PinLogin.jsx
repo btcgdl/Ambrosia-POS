@@ -92,8 +92,13 @@ export default function PinLoginNew() {
 
     setTimeout(async () => {
       try {
-        await loginFromService({ name: employee.name, pin });
-
+        const loginResponse = await loginFromService({
+          name: employee.name,
+          pin,
+        });
+        if (!loginResponse) {
+          throw new Error("Invalid credentials");
+        }
         // Consultar usuario desde /api/auth/me (servidor) para datos derivados
         const meRes = await fetch("/api/auth/me", { credentials: "include" });
         if (meRes.ok) {
