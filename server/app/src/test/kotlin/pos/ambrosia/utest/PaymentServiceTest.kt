@@ -1,9 +1,11 @@
 package pos.ambrosia.utest
 
 import kotlinx.coroutines.runBlocking
+import org.mockito.ArgumentMatchers.contains
 import org.mockito.kotlin.*
 import pos.ambrosia.models.PaymentMethod
 import pos.ambrosia.models.Currency
+import pos.ambrosia.models.Payment
 import pos.ambrosia.services.PaymentService
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -121,6 +123,107 @@ class PaymentServiceTest {
             whenever(mockResultSet.next()).thenReturn(false) // Arrange
             val service = PaymentService(mockConnection) // Arrange
             val result = service.getCurrencyById("not-found") // Act
+            assertNull(result) // Assert
+        }
+    }
+
+    @Test
+    fun `addPayment returns null if method_id is blank`() {
+        runBlocking {
+            val payment = Payment(id = null, method_id = "", currency_id = "cur-1", transaction_id = "txn-1", amount = 100.0) // Arrange
+            val service = PaymentService(mockConnection) // Arrange
+            val result = service.addPayment(payment) // Act
+            assertNull(result) // Assert
+            verify(mockConnection, never()).prepareStatement(any()) // Assert
+        }
+    }
+
+    @Test
+    fun `addPayment returns null if currency_id is blank`() {
+        runBlocking {
+            val payment = Payment(id = null, method_id = "pm-1", currency_id = "", transaction_id = "txn-1", amount = 100.0) // Arrange
+            val service = PaymentService(mockConnection) // Arrange
+            val result = service.addPayment(payment) // Act
+            assertNull(result) // Assert
+            verify(mockConnection, never()).prepareStatement(any()) // Assert
+        }
+    }
+
+    @Test
+    fun `addPayment returns null if method_id does not exist`() {
+        runBlocking {
+            val payment = Payment(id = null, method_id = "non-existent-pm", currency_id = "cur-1", transaction_id = "txn-1", amount = 100.0) // Arrange
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+            whenever(mockResultSet.next()).thenReturn(false) // Arrange: Simulate method_id not found
+            val service = PaymentService(mockConnection) // Arrange
+            val result = service.addPayment(payment) // Act
+            assertNull(result) // Assert
+        }
+    }
+
+    @Test
+    fun `addPayment returns null if currency_id does not exist`() {
+        runBlocking {
+            val payment = Payment(id = null, method_id = "pm-1", currency_id = "non-existent-cur", transaction_id = "txn-1", amount = 100.0) // Arrange
+            val methodCheckStatement: PreparedStatement = mock() // Arrange
+            val currencyCheckStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("payment_methods"))).thenReturn(methodCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("currency"))).thenReturn(currencyCheckStatement) // Arrange
+            val methodResultSet: ResultSet = mock() // Arrange
+            whenever(methodResultSet.next()).thenReturn(true) // Arrange: Simulate method exists
+            whenever(methodCheckStatement.executeQuery()).thenReturn(methodResultSet) // Arrange
+            val currencyResultSet: ResultSet = mock() // Arrange
+            whenever(currencyResultSet.next()).thenReturn(false) // Arrange: Simulate currency not found
+            whenever(currencyCheckStatement.executeQuery()).thenReturn(currencyResultSet) // Arrange
+            val service = PaymentService(mockConnection) // Arrange
+            val result = service.addPayment(payment) // Act
+            assertNull(result) // Assert
+        }
+    }
+
+    @Test
+    fun `addPayment returns new ID on success`() {
+        runBlocking {
+            val payment = Payment(id = null, method_id = "pm-1", currency_id = "cur-1", transaction_id = "txn-1", amount = 100.0) // Arrange
+            val methodCheckStatement: PreparedStatement = mock() // Arrange
+            val currencyCheckStatement: PreparedStatement = mock() // Arrange
+            val addPaymentStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("payment_methods"))).thenReturn(methodCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("currency"))).thenReturn(currencyCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("INSERT INTO payments"))).thenReturn(addPaymentStatement) // Arrange
+            val methodResultSet: ResultSet = mock() // Arrange
+            whenever(methodResultSet.next()).thenReturn(true) // Arrange
+            whenever(methodCheckStatement.executeQuery()).thenReturn(methodResultSet) // Arrange
+            val currencyResultSet: ResultSet = mock() // Arrange
+            whenever(currencyResultSet.next()).thenReturn(true) // Arrange
+            whenever(currencyCheckStatement.executeQuery()).thenReturn(currencyResultSet) // Arrange
+            whenever(addPaymentStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = PaymentService(mockConnection) // Arrange
+            val result = service.addPayment(payment) // Act
+            assertNotNull(result) // Assert
+        }
+    }
+
+    @Test
+    fun `addPayment returns null when database insert fails`() {
+        runBlocking {
+            val payment = Payment(id = null, method_id = "pm-1", currency_id = "cur-1", transaction_id = "txn-1", amount = 100.0) // Arrange
+            val methodCheckStatement: PreparedStatement = mock() // Arrange
+            val currencyCheckStatement: PreparedStatement = mock() // Arrange
+            val addPaymentStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("payment_methods"))).thenReturn(methodCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("currency"))).thenReturn(currencyCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("INSERT INTO payments"))).thenReturn(addPaymentStatement) // Arrange
+            val methodResultSet: ResultSet = mock() // Arrange
+            whenever(methodResultSet.next()).thenReturn(true) // Arrange
+            whenever(methodCheckStatement.executeQuery()).thenReturn(methodResultSet) // Arrange
+            val currencyResultSet: ResultSet = mock() // Arrange
+            whenever(currencyResultSet.next()).thenReturn(true) // Arrange
+            whenever(currencyCheckStatement.executeQuery()).thenReturn(currencyResultSet) // Arrange
+            whenever(addPaymentStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = PaymentService(mockConnection) // Arrange
+            val result = service.addPayment(payment) // Act
             assertNull(result) // Assert
         }
     }
