@@ -14,6 +14,7 @@
   ```bash
   curl -X POST "http://127.0.0.1:9154/wallet/auth" \
     -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "password": "S3cur3P4ssw0rd!!"
@@ -32,7 +33,8 @@
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/wallet/logout" \
-    -H "Cookie: accessToken=$ACCESS_TOKEN"
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (200 OK):**
   ```json

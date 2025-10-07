@@ -7,7 +7,8 @@ Endpoints para gestionar las plantillas de tickets utilizadas para la impresión
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/ticket-templates" \
-    -H "Cookie: accessToken=$ACCESS_TOKEN"
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (200 OK):**
   ```json
@@ -26,6 +27,7 @@ Endpoints para gestionar las plantillas de tickets utilizadas para la impresión
   ```bash
   curl -X POST "http://127.0.0.1:9154/ticket-templates" \
     -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{ 
       "name": "My Custom Template",
@@ -50,7 +52,8 @@ Endpoints para gestionar las plantillas de tickets utilizadas para la impresión
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/ticket-templates/Default%20Customer%20Ticket" \
-    -H "Cookie: accessToken=$ACCESS_TOKEN"
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (200 OK):**
   ```json

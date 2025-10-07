@@ -7,7 +7,8 @@ Endpoints para gestionar las impresoras de tickets.
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/printers" \
-    -H "Cookie: accessToken=$ACCESS_TOKEN"
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (200 OK):**
   ```json
@@ -31,6 +32,7 @@ Endpoints para gestionar las impresoras de tickets.
   ```bash
   curl -X POST "http://127.0.0.1:9154/printers/set" \
     -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "type": "KITCHEN",
@@ -56,6 +58,7 @@ Endpoints para gestionar las impresoras de tickets.
   ```bash
   curl -X POST "http://127.0.0.1:9154/printers/print" \
     -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "templateName": "Default Customer Ticket",
