@@ -1,4 +1,46 @@
-### 16. Gestión de Wallet (Bitcoin Lightning)
+### Gestión de Wallet (Bitcoin Lightning)
+
+### Autenticación de Wallet
+
+- `POST /wallet/auth`: Autoriza el acceso a las funciones de la wallet para un administrador.
+  - **Authorization:** Requiere token de administrador.
+  - **Request Body:**
+  ```json
+  {
+    "password": "string"
+  }
+  ```
+  - **cURL Example:**
+  ```bash
+  curl -X POST "http://127.0.0.1:9154/wallet/auth" \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "password": "S3cur3P4ssw0rd!!"
+    }'
+  ```
+  - **Response Body (200 OK):**
+  ```json
+  {
+    "message": "Login successful"
+  }
+  ```
+  - **Response Headers:** Establece la cookie `walletAccessToken`.
+
+- `POST /wallet/logout`: Cierra la sesión de la wallet y elimina la cookie de acceso.
+  - **Authorization:** Requiere token de administrador.
+  - **cURL Example:**
+  ```bash
+  curl -X POST "http://127.0.0.1:9154/wallet/logout" \
+    -H "Cookie: accessToken=$ACCESS_TOKEN"
+  ```
+  - **Response Body (200 OK):**
+  ```json
+  {
+    "status": "ok"
+  }
+  ```
+  - **Response Headers:** Elimina la cookie `walletAccessToken`.
 
 Los endpoints de wallet permiten gestionar la billetera Bitcoin Lightning integrada en el sistema POS.
 

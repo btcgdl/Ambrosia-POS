@@ -253,6 +253,39 @@ Los endpoints de órdenes permiten gestionar los pedidos del restaurante, incluy
 - `DELETE /orders/{id}/dishes`: Elimina todos los platos de una orden.
   - **Authorization:** Requiere autenticación JWT (enviado automáticamente via cookies)
 
+### Filtros y Acciones Adicionales
+
+- `GET /orders/user/{userId}`: Obtiene todas las órdenes de un usuario específico.
+  - **Authorization:** Requiere autenticación JWT.
+  - **Path Parameters:**
+    - `userId` (string): ID del usuario.
+
+- `GET /orders/table/{tableId}`: Obtiene todas las órdenes de una mesa específica.
+  - **Authorization:** Requiere autenticación JWT.
+  - **Path Parameters:**
+    - `tableId` (string): ID de la mesa.
+
+- `GET /orders/status/{status}`: Obtiene todas las órdenes con un estado específico.
+  - **Authorization:** Requiere autenticación JWT.
+  - **Path Parameters:**
+    - `status` (string): Estado de la orden (`pending`, `completed`, etc.).
+
+- `GET /orders/date-range`: Obtiene órdenes dentro de un rango de fechas.
+  - **Authorization:** Requiere autenticación JWT.
+  - **Query Parameters:**
+    - `start_date` (string): Fecha de inicio (formato YYYY-MM-DD).
+    - `end_date` (string): Fecha de fin (formato YYYY-MM-DD).
+
+- `GET /orders/total-sales/{date}`: Obtiene el total de ventas para una fecha específica.
+  - **Authorization:** Requiere autenticación JWT.
+  - **Path Parameters:**
+    - `date` (string): Fecha (formato YYYY-MM-DD).
+
+- `PUT /orders/{id}/calculate-total`: Recalcula y actualiza el total de una orden.
+  - **Authorization:** Requiere autenticación JWT.
+  - **Path Parameters:**
+    - `id` (string): ID de la orden.
+
 ### Notas importantes:
 - Todos los endpoints de órdenes requieren autenticación JWT
 - Los IDs son UUID generados automáticamente
