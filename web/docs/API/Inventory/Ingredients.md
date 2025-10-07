@@ -7,8 +7,8 @@ Los endpoints de ingredientes permiten administrar el inventario de materias pri
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/ingredients" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -45,8 +45,8 @@ Los endpoints de ingredientes permiten administrar el inventario de materias pri
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/ingredients/abae1423-ba25-49c2-b54a-d0d55c727baf" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -60,14 +60,6 @@ Los endpoints de ingredientes permiten administrar el inventario de materias pri
     "cost_per_unit": 2.50
   }
   ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Ingredient not found"
-  ```
 
 - `GET /ingredients/low_stock/{threshold}`: Obtiene ingredientes con stock bajo según el umbral especificado.
   - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
@@ -76,8 +68,8 @@ Los endpoints de ingredientes permiten administrar el inventario de materias pri
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/ingredients/low_stock/15.0" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -97,10 +89,6 @@ Los endpoints de ingredientes permiten administrar el inventario de materias pri
   ```json
   "No low stock ingredients found"
   ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Invalid or missing threshold parameter"
-  ```
 
 - `POST /ingredients`: Crea un nuevo ingrediente.
   - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
@@ -118,8 +106,8 @@ Los endpoints de ingredientes permiten administrar el inventario de materias pri
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/ingredients" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "name": "Aceite de Oliva",
@@ -132,7 +120,10 @@ Los endpoints de ingredientes permiten administrar el inventario de materias pri
   ```
   - **Response Body (Éxito - 201 Created):**
   ```json
-  "Ingredient added successfully"
+  {
+    "id": "ab68898f-7f1a-4ecc-a7c4-40974727564c",
+    "message": "Ingredient added successfully"
+  }
   ```
 
 - `PUT /ingredients/{id}`: Actualiza un ingrediente existente.
@@ -153,8 +144,8 @@ Los endpoints de ingredientes permiten administrar el inventario de materias pri
   - **cURL Example:**
   ```bash
   curl -X PUT "http://127.0.0.1:9154/ingredients/11993e13-b748-4634-ab78-2080f212e98e" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \ 
     -H "Content-Type: application/json" \
     -d '{
       "name": "Arroz Bomba",
@@ -167,15 +158,10 @@ Los endpoints de ingredientes permiten administrar el inventario de materias pri
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
-  "Ingredient updated successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Ingredient not found"
+  {
+    "id": "ab68898f-7f1a-4ecc-a7c4-40974727564c",
+    "message": "Ingredient updated successfully"
+  }
   ```
 
 - `DELETE /ingredients/{id}`: Elimina un ingrediente del inventario.
@@ -185,20 +171,15 @@ Los endpoints de ingredientes permiten administrar el inventario de materias pri
   - **cURL Example:**
   ```bash
   curl -X DELETE "http://127.0.0.1:9154/ingredients/e13018bf-ffa3-4b22-aa35-6e782f29302a" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
-  "Ingredient deleted successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Ingredient not found"
+  {
+    "id": "ab68898f-7f1a-4ecc-a7c4-40974727564c",
+    "message": "Ingredient deleted successfully"
+  }
   ```
 
 ### Notas importantes:

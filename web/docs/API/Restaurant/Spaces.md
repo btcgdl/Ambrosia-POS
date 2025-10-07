@@ -7,8 +7,8 @@ Los endpoints de espacios permiten administrar las áreas físicas del estableci
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/spaces" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -35,8 +35,8 @@ Los endpoints de espacios permiten administrar las áreas físicas del estableci
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/spaces/34fe7489-74e9-4e7a-968a-66cd0cdc00d7" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -44,14 +44,6 @@ Los endpoints de espacios permiten administrar las áreas físicas del estableci
     "id": "34fe7489-74e9-4e7a-968a-66cd0cdc00d7",
     "name": "Terraza"
   }
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Space not found"
   ```
 
 - `POST /spaces`: Crea un nuevo espacio.
@@ -65,8 +57,8 @@ Los endpoints de espacios permiten administrar las áreas físicas del estableci
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/spaces" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "name": "Jardín Exterior"
@@ -74,7 +66,10 @@ Los endpoints de espacios permiten administrar las áreas físicas del estableci
   ```
   - **Response Body (Éxito - 201 Created):**
   ```json
-  "Space added successfully"
+  {
+    "id": "cadd2c99-3a87-4fb6-802d-9a57b4c05ba5",
+    "message": "Space added successfully"
+  }
   ```
 
 - `PUT /spaces/{id}`: Actualiza un espacio existente.
@@ -90,8 +85,8 @@ Los endpoints de espacios permiten administrar las áreas físicas del estableci
   - **cURL Example:**
   ```bash
   curl -X PUT "http://127.0.0.1:9154/spaces/9008646f-b24b-4e14-9c4a-00cec2d124da" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "name": "Terraza Renovada"
@@ -99,15 +94,10 @@ Los endpoints de espacios permiten administrar las áreas físicas del estableci
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
-  "Space updated successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Space not found"
+  {
+    "id": "9008646f-b24b-4e14-9c4a-00cec2d124da",
+    "message": "Space updated successfully"
+  }
   ```
 
 - `DELETE /spaces/{id}`: Elimina un espacio del sistema.
@@ -117,20 +107,15 @@ Los endpoints de espacios permiten administrar las áreas físicas del estableci
   - **cURL Example:**
   ```bash
   curl -X DELETE "http://127.0.0.1:9154/spaces/9008646f-b24b-4e14-9c4a-00cec2d124da" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
-  "Space deleted successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Space not found"
+  {
+    "id": "9008646f-b24b-4e14-9c4a-00cec2d124da",
+    "message": "Space deleted successfully"
+  }
   ```
 
 ### Notas importantes:

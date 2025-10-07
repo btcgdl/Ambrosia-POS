@@ -7,7 +7,8 @@ Los endpoints de proveedores permiten administrar la información de contacto de
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/suppliers" \
-    -H 'Cookie: accessToken=your_access_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -42,7 +43,8 @@ Los endpoints de proveedores permiten administrar la información de contacto de
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/suppliers/5f7037ea-a0cc-4820-9df4-90a80960d897" \
-    -H 'Cookie: accessToken=your_access_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -54,14 +56,6 @@ Los endpoints de proveedores permiten administrar la información de contacto de
     "email": "maria@distribuidora.com",
     "address": "Calle Mayor 123, Madrid"
   }
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Supplier not found"
   ```
 
 - `POST /suppliers`: Crea un nuevo proveedor.
@@ -79,7 +73,8 @@ Los endpoints de proveedores permiten administrar la información de contacto de
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/suppliers" \
-    -H 'Cookie: accessToken=your_access_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "name": "Frutas y Verduras Frescas",
@@ -91,7 +86,10 @@ Los endpoints de proveedores permiten administrar la información de contacto de
   ```
   - **Response Body (Éxito - 201 Created):**
   ```json
-  "Supplier added successfully"
+  {
+    "id": "10980f77-45fa-4a5c-bd3b-bb93d9b6ca0f",
+    "message": "Supplier added successfully"
+  }
   ```
 
 - `PUT /suppliers/{id}`: Actualiza un proveedor existente.
@@ -111,7 +109,8 @@ Los endpoints de proveedores permiten administrar la información de contacto de
   - **cURL Example:**
   ```bash
   curl -X PUT "http://127.0.0.1:9154/suppliers/a1bbc895-297f-42d8-bc92-e7dc61b81d6f" \
-    -H 'Cookie: accessToken=your_access_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "name": "Distribuidora Central S.L.",
@@ -123,15 +122,10 @@ Los endpoints de proveedores permiten administrar la información de contacto de
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
-  "Supplier updated successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Supplier not found"
+  {
+    "id": "10980f77-45fa-4a5c-bd3b-bb93d9b6ca0f",
+    "message": "Supplier updated successfully"
+  }
   ```
 
 - `DELETE /suppliers/{id}`: Elimina un proveedor del sistema.
@@ -141,19 +135,15 @@ Los endpoints de proveedores permiten administrar la información de contacto de
   - **cURL Example:**
   ```bash
   curl -X DELETE "http://127.0.0.1:9154/suppliers/supplier-uuid-1" \
-    -H 'Cookie: accessToken=your_access_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
-  "Supplier deleted successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Supplier not found"
+  {
+    "id": "10980f77-45fa-4a5c-bd3b-bb93d9b6ca0f",
+    "message": "Supplier deleted successfully"
+  }
   ```
 
 ### Notas importantes:

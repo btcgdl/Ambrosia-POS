@@ -7,8 +7,8 @@ Los endpoints de tickets permiten administrar las facturas y recibos del sistema
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/tickets" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -45,7 +45,8 @@ Los endpoints de tickets permiten administrar las facturas y recibos del sistema
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/tickets/64bec9ff-c8a2-47db-8f4b-f7d92b47dc1a" \
-    -H 'Cookie: accessToken=your_access_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -58,14 +59,6 @@ Los endpoints de tickets permiten administrar las facturas y recibos del sistema
     "total_amount": 45.50,
     "notes": "Pago en efectivo"
   }
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Ticket not found"
   ```
 
 - `POST /tickets`: Crea un nuevo ticket.
@@ -84,7 +77,8 @@ Los endpoints de tickets permiten administrar las facturas y recibos del sistema
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/tickets" \
-    -H 'Cookie: accessToken=your_access_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "order_id": "80506193-de42-4a5e-958f-9e6c9b59d19d",
@@ -120,7 +114,8 @@ Los endpoints de tickets permiten administrar las facturas y recibos del sistema
   - **cURL Example:**
   ```bash
   curl -X PUT "http://127.0.0.1:9154/tickets/2ce883f9-bd79-447c-b840-af418ca2223c" \
-    -H 'Cookie: accessToken=your_access_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "order_id": "2ce883f9-bd79-447c-b840-af418ca2223c",
@@ -135,14 +130,6 @@ Los endpoints de tickets permiten administrar las facturas y recibos del sistema
   ```json
   "Ticket updated successfully"
   ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Ticket not found"
-  ```
 
 - `DELETE /tickets/{id}`: Elimina un ticket del sistema.
   - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
@@ -151,19 +138,12 @@ Los endpoints de tickets permiten administrar las facturas y recibos del sistema
   - **cURL Example:**
   ```bash
   curl -X DELETE "http://127.0.0.1:9154/tickets/6eb9893a-8a48-419f-be2f-1353a5c0f43a" \
-    -H 'Cookie: accessToken=your_access_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
   "Ticket deleted successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Ticket not found"
   ```
 
 ### Notas importantes:

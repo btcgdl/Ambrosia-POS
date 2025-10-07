@@ -7,8 +7,8 @@ Los endpoints de categorías de ingredientes permiten organizar el inventario po
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/ingredient-categories" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -39,8 +39,8 @@ Los endpoints de categorías de ingredientes permiten organizar el inventario po
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/ingredient-categories/bcccc9ef-5466-415a-adda-c2e62e154aaf" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -48,14 +48,6 @@ Los endpoints de categorías de ingredientes permiten organizar el inventario po
     "id": "bcccc9ef-5466-415a-adda-c2e62e154aaf",
     "name": "Cereales"
   }
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Ingredient category not found"
   ```
 
 - `POST /ingredient-categories`: Crea una nueva categoría de ingredientes.
@@ -69,23 +61,19 @@ Los endpoints de categorías de ingredientes permiten organizar el inventario po
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/ingredient-categories" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
-    -d '{
+    -d '{ 
       "name": "Lácteos"
     }'
   ```
   - **Response Body (Éxito - 201 Created):**
   ```json
   {
-    "id": "09a2aead-7eaa-4b4a-b5e4-aa8e18fe6028",
+    "id": "644974e3-4067-41ac-92b4-8c33a2350e1c",
     "message": "Ingredient category added successfully"
   }
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Failed to create ingredient category"
   ```
 
 - `PUT /ingredient-categories/{id}`: Actualiza una categoría existente.
@@ -101,24 +89,19 @@ Los endpoints de categorías de ingredientes permiten organizar el inventario po
   - **cURL Example:**
   ```bash
   curl -X PUT "http://127.0.0.1:9154/ingredient-categories/5c339473-d10d-432f-9666-b79be0f1201a" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
-    -d '{
+    -d '{ 
       "name": "Cereales y Granos"
     }'
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
-  "Ingredient category updated successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Ingredient category not found or update failed"
+  {
+    "id": "644974e3-4067-41ac-92b4-8c33a2350e1c",
+    "message": "Ingredient category updated successfully"
+  }
   ```
 
 - `DELETE /ingredient-categories/{id}`: Elimina una categoría del sistema.
@@ -128,20 +111,15 @@ Los endpoints de categorías de ingredientes permiten organizar el inventario po
   - **cURL Example:**
   ```bash
   curl -X DELETE "http://127.0.0.1:9154/ingredient-categories/1121cbb8-741b-4e63-9d38-cbbdf3099ea4" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (Éxito - 204 No Content):**
   ```json
-  "Ingredient category deleted successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Cannot delete ingredient category - it may be in use or not found"
+  {
+    "id": "97ef9759-36d5-4263-94d0-aa9851fe1b4f",
+    "message": "Ingredient category deleted successfully"
+  }
   ```
 
 ### Notas importantes:

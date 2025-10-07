@@ -9,8 +9,8 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/payments" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -43,8 +43,8 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/payments/payment-uuid-1" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -55,14 +55,6 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
     "transaction_id": "txn-123456",
     "amount": 45.50
   }
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Payment not found"
   ```
 
 - `POST /payments`: Crea un nuevo pago.
@@ -79,8 +71,8 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/payments" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "method_id": "method-uuid-1",
@@ -95,10 +87,6 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
     "id": "generated-uuid",
     "message": "Payment added successfully"
   }
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Failed to create payment"
   ```
 
 - `PUT /payments/{id}`: Actualiza un pago existente.
@@ -118,10 +106,6 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
   ```json
   "Payment updated successfully"
   ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Failed to update payment"
-  ```
 
 - `DELETE /payments/{id}`: Elimina un pago del sistema.
   - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
@@ -139,8 +123,8 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/payments/methods" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -175,10 +159,6 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
     "name": "Efectivo"
   }
   ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Payment method not found"
-  ```
 
 ## Monedas
 
@@ -187,7 +167,8 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/payments/currencies" \
-    -H 'Cookie: accessToken=your_access_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -222,10 +203,6 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
     "acronym": "EUR"
   }
   ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Currency not found"
-  ```
 
 ## Relaciones Ticket-Pago
 
@@ -241,7 +218,8 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/payments/ticket-payments" \
-    -H 'Cookie: accessToken=your_access_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "payment_id": "payment-uuid-1",
@@ -260,7 +238,8 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/payments/ticket-payments/by-ticket/ticket-uuid-1" \
-    -H 'Cookie: accessToken=your_access_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
 
 - `GET /payments/ticket-payments/by-payment/{paymentId}`: Obtiene todos los tickets de un pago.
@@ -276,7 +255,8 @@ Los endpoints de pagos permiten administrar las transacciones, métodos de pago 
   - **cURL Example:**
   ```bash
   curl -X DELETE "http://127.0.0.1:9154/payments/ticket-payments?paymentId=payment-uuid-1&ticketId=ticket-uuid-1" \
-    -H 'Cookie: accessToken=your_access_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json

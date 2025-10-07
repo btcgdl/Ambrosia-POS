@@ -132,7 +132,7 @@ const config = {
             items: [
               {
                 label: "Api",
-                to: "/docs/API/Auth",
+                to: "/docs/API/Authentication/Auth",
               },
             ],
           },

@@ -3,25 +3,21 @@
 Los endpoints de roles permiten gestionar los diferentes roles de usuario en el sistema.
 
 - `GET /roles`: Obtiene todos los roles del sistema.
-  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Authorization:** Requiere access token válido (admin)
   - **cURL Example:**
   ```bash
-  curl -X GET http://127.0.0.1:9154/roles
+  curl -X GET http://127.0.0.1:9154/roles \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
   [
     {
-      "id": "76ee1086-b945-4170-b2e6-9fbeb95ae0be",
-      "name": "admin",
-      "password": "****",
+      "id": "e7349203-1bdf-4d8a-8a83-0f5dccb23e1b",
+      "role": "coolrolename",
+      "password": "******",
       "isAdmin": true
-    },
-    {
-      "id": "262006ea-8782-4b08-ac3b-b3f13270fec3", 
-      "name": "waiter",
-      "password": "****",
-      "isAdmin": false
     }
   ]
   ```
@@ -37,29 +33,21 @@ Los endpoints de roles permiten gestionar los diferentes roles de usuario en el 
   - **cURL Example:**
   ```bash
   curl -X GET http://127.0.0.1:9154/roles/76ee1086-b945-4170-b2e6-9fbeb95ae0be \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
-    {
-        "id": "76ee1086-b945-4170-b2e6-9fbeb95ae0be",
-        "role": "admin",
-        "password": "****",
-        "isAdmin": true
-    }
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Role not found"
+  {
+    "id": "e7349203-1bdf-4d8a-8a83-0f5dccb23e1b",
+    "role": "coolrolename",
+    "password": "******",
+    "isAdmin": true
+  }
   ```
 
 - `POST /roles`: Crea un nuevo rol en el sistema.
-  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Authorization:** Requiere access token válido (admin)
   - **Request Body:**
   ```json
     {
@@ -72,8 +60,8 @@ Los endpoints de roles permiten gestionar los diferentes roles de usuario en el 
   ```bash
   curl -X POST http://127.0.0.1:9154/roles \
     -H 'Content-Type: application/json' \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -d '{
         "role" : "admin",
         "password": "S3cur3P4ssw0rd!!",
@@ -82,11 +70,14 @@ Los endpoints de roles permiten gestionar los diferentes roles de usuario en el 
   ```
   - **Response Body (Éxito - 201 Created):**
   ```json
-  "Role added successfully"
+  {
+    "id": "5f80cf01-9448-4332-a981-0140cba12279",
+    "message": "Role added successfully"
+  }
   ```
 
 - `PUT /roles/{id}`: Actualiza un rol existente.
-  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Authorization:** Requiere access token válido (admin)
   - **Path Parameters:**
     - `id` (string): ID del rol a actualizar
   - **Request Body:**
@@ -101,8 +92,8 @@ Los endpoints de roles permiten gestionar los diferentes roles de usuario en el 
   ```bash
   curl -X PUT http://127.0.0.1:9154/roles/76ee1086-b945-4170-b2e6-9fbeb95ae0be \
     -H 'Content-Type: application/json' \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -d '{
         "role" : "admin",
         "password": "S3cur3P4ssw0rd123!!",
@@ -113,36 +104,20 @@ Los endpoints de roles permiten gestionar los diferentes roles de usuario en el 
   ```json
   "Role updated successfully"
   ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Role with ID: {id} not found"
-  ```
 
 - `DELETE /roles/{id}`: Elimina un rol del sistema.
-  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Authorization:** Requiere access token válido (admin)
   - **Path Parameters:**
     - `id` (string): ID del rol a eliminar
   - **cURL Example:**
   ```bash
   curl -X DELETE http://127.0.0.1:9154/roles/76ee1086-b945-4170-b2e6-9fbeb95ae0be \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 204 No Content):**
   ```json
   "Role deleted successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Role with ID: {id} not found"
   ```
 
 ### Notas importantes:

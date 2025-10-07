@@ -3,29 +3,23 @@
 Los endpoints de usuarios permiten gestionar las cuentas de usuario en el sistema Ambrosia POS.
 
 - `GET /users`: Obtiene todos los usuarios del sistema.
-  - **Authorization:** Requiere autenticación básica
+  - **Authorization:** Requiere access token válido
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/users" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
   [
     {
-      "id": "76ee1086-b945-4170-b2e6-9fbeb95ae0be",
-      "name": "admin",
+      "id": "e911705c-e1b4-4997-ab02-ef7460491ac0",
+      "name": "cooluser1",
       "pin": "****",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-      "role": "262006ea-8782-4b08-ac3b-b3f13270fec3"
-    },
-    {
-      "id": "262006ea-8782-4b08-ac3b-b3f13270fec3",
-      "name": "waiter01",
-      "pin": "****",
-      "refreshToken": null,
-      "role": "76ee1086-b945-4170-b2e6-9fbeb95ae0be"
+      "refreshToken": "****",
+      "role": "e7349203-1bdf-4d8a-8a83-0f5dccb23e1b",
+      "isAdmin": false
     }
   ]
   ```
@@ -35,14 +29,14 @@ Los endpoints de usuarios permiten gestionar las cuentas de usuario en el sistem
   ```
 
 - `GET /users/{id}`: Obtiene un usuario específico por su ID.
-  - **Authorization:** Requiere autenticación básica
+  - **Authorization:** Requiere access token válido (admin)
   - **Path Parameters:**
     - `id` (string): ID del usuario a obtener
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/users/76ee1086-b945-4170-b2e6-9fbeb95ae0be" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -54,17 +48,9 @@ Los endpoints de usuarios permiten gestionar las cuentas de usuario en el sistem
     "role": "262006ea-8782-4b08-ac3b-b3f13270fec3"
   }
   ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "User not found"
-  ```
 
 - `POST /users`: Crea un nuevo usuario en el sistema.
-  - **Authorization:** Requiere autenticación básica
+  - **Authorization:** Requiere access token válido (admin)
   - **Request Body:**
   ```json
   {
@@ -77,8 +63,8 @@ Los endpoints de usuarios permiten gestionar las cuentas de usuario en el sistem
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/users" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "name": "newuser",
@@ -93,7 +79,7 @@ Los endpoints de usuarios permiten gestionar las cuentas de usuario en el sistem
   ```
 
 - `PUT /users/{id}`: Actualiza un usuario existente.
-  - **Authorization:** Requiere autenticación básica
+  - **Authorization:** Requiere access token válido (admin)
   - **Path Parameters:**
     - `id` (string): ID del usuario a actualizar
   - **Request Body:**
@@ -108,8 +94,8 @@ Los endpoints de usuarios permiten gestionar las cuentas de usuario en el sistem
   - **cURL Example:**
   ```bash
   curl -X PUT "http://197.0.0.1:9154/users/76ee1086-b945-4170-b2e6-9fbeb95ae0be" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "name": "updateduser",
@@ -122,36 +108,20 @@ Los endpoints de usuarios permiten gestionar las cuentas de usuario en el sistem
   ```json
   "User updated successfully"
   ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "User with ID: {id} not found"
-  ```
 
 - `DELETE /users/{id}`: Elimina un usuario del sistema.
-  - **Authorization:** Requiere autenticación básica
+  - **Authorization:** Requiere access token válido (admin)
   - **Path Parameters:**
     - `id` (string): ID del usuario a eliminar
   - **cURL Example:**
   ```bash
   curl -X DELETE "http://197.0.0.1:9154/users/76ee1086-b945-4170-b2e6-9fbeb95ae0be" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
   ```
   - **Response Body (Éxito - 204 No Content):**
   ```json
   "User deleted successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "User with ID: {id} not found"
   ```
 
 ### Notas importantes:

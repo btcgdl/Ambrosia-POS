@@ -6,9 +6,9 @@ Los endpoints de mesas permiten administrar las mesas dentro de cada espacio.
   - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
   - **cURL Example:**
   ```bash
-  curl -X GET "http://197.0.0.1:9154/tables" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here'
+  curl -X GET "http://127.0.0.1:9154/tables" \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -41,8 +41,8 @@ Los endpoints de mesas permiten administrar las mesas dentro de cada espacio.
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/tables/by-space/9c9064f5-f389-4e32-b037-805a86827777" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -68,8 +68,8 @@ Los endpoints de mesas permiten administrar las mesas dentro de cada espacio.
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/tables/8dacb80d-0694-4a11-bab0-01a877fea66d" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -80,14 +80,6 @@ Los endpoints de mesas permiten administrar las mesas dentro de cada espacio.
     "space_id": "ded606ff-2d0b-4f89-8352-9d34355043be",
     "order_id": null
   }
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Table not found"
   ```
 
 - `POST /tables`: Crea una nueva mesa.
@@ -104,8 +96,8 @@ Los endpoints de mesas permiten administrar las mesas dentro de cada espacio.
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/tables" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "name": "Mesa 5",
@@ -116,7 +108,10 @@ Los endpoints de mesas permiten administrar las mesas dentro de cada espacio.
   ```
   - **Response Body (Éxito - 201 Created):**
   ```json
-  "Table added successfully"
+  {
+    "id": "a77d20d1-49d2-4f6a-af3c-96eb89c5cfcb",
+    "message": "Table added successfully"
+  }
   ```
 
 - `PUT /tables/{id}`: Actualiza una mesa existente.
@@ -135,8 +130,8 @@ Los endpoints de mesas permiten administrar las mesas dentro de cada espacio.
   - **cURL Example:**
   ```bash
   curl -X PUT "http://127.0.0.1:9154/tables/7088369e-ad06-4ec6-8cc0-68465a395877" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "name": "Mesa 1 VIP",
@@ -147,15 +142,10 @@ Los endpoints de mesas permiten administrar las mesas dentro de cada espacio.
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
-  "Table updated successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Table not found"
+  {
+    "id": "a77d20d1-49d2-4f6a-af3c-96eb89c5cfcb",
+    "message": "Table updated successfully"
+  }
   ```
 
 - `DELETE /tables/{id}`: Elimina una mesa del sistema.
@@ -165,20 +155,15 @@ Los endpoints de mesas permiten administrar las mesas dentro de cada espacio.
   - **cURL Example:**
   ```bash
   curl -X DELETE "http://192.0.0.1:9154/tables/fc5566ef-6e4c-465f-a1ad-d9ff5dfbb92a" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
-  "Table deleted successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Table not found"
+  {
+    "id": "a77d20d1-49d2-4f6a-af3c-96eb89c5cfcb",
+    "message": "Table deleted successfully"
+  }
   ```
 
 ### Notas importantes:

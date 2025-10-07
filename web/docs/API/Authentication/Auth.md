@@ -10,14 +10,24 @@
   ``` 
   - **cURL Example:**
   
+  El siguiente ejemplo muestra cómo autenticarse y guardar las cookies de sesión en variables de entorno para su uso posterior.
+
   ```Bash
-  curl -v -X POST http://127.0.0.1:9154/auth/login \
+  headers=$(curl -i -X POST http://127.0.0.1:9154/auth/login \
     -H 'Content-Type: application/json' \
     -d '{
-      "name": "admin",
-      "pin": "1234"
-    }'
+      "name": "cooluser1",
+      "pin": "0000"
+    }')
+
+  access_token=$(echo "$headers" | grep -o 'accessToken=[^;]*' | cut -s -d= -f2)
+  refresh_token=$(echo "$headers" | grep -o 'refreshToken=[^;]*' | cut -s -d= -f2)
+
+  export ACCESS_TOKEN="$access_token"
+  export REFRESH_TOKEN="$refresh_token"
   ```
+
+  Una vez que las variables de entorno `ACCESS_TOKEN` y `REFRESH_TOKEN` están establecidas, puedes usarlas en las cabeceras `Cookie` para las siguientes peticiones a endpoints protegidos.
   - **Response Body (Éxito - 200 OK):**
   ```JSON
   {
@@ -25,44 +35,28 @@
   }
   ```
   - **Response Headers:** Se establecen cookies `accessToken` (15 min) y `refreshToken` (30 días)
-  
-  - **Response Body (Error - 401 Unauthorized):**
-  ```JSON
-  {
-    "message": "Invalid credentials"
-  }
-  ```
 
 - `POST /auth/refresh`: Renueva el access token usando el refresh token almacenado en cookies.
  - **Request:** El refresh token debe estar presente en las cookies
  - **cURL Example:**
   ```Bash
   curl -v -X POST http://127.0.0.1:9154/auth/refresh \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```JSON
-  {
-    "message": "Access token refreshed successfully"
-  }
+  {"message":"Access token refreshed successfully","accessToken":"..."}
   ```
   - **Response Headers:** Se actualiza la cookie `accessToken`
-  
-  - **Response Body (Error - 401 Unauthorized):**
-  ```JSON
-  {
-    "message": "Invalid refresh token"
-  }
-  ```
 
 - `POST /auth/logout`: Cierra la sesión del usuario, revoca el refresh token y elimina las cookies de autenticación.
  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
  - **cURL Example:** 
   ```Bash
   curl -X POST http://127.0.0.1:9154/auth/logout \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```JSON
@@ -71,17 +65,10 @@
   }
   ```
   - **Response Headers:** Se eliminan las cookies `accessToken` y `refreshToken`
-  
-  - **Response Body (Error - 401 Unauthorized):**
-  ```JSON
-  {
-    "message": "Unauthorized"
-  }
-  ```
 
 ### Notas importantes:
 - La autenticación se maneja mediante cookies HTTP con tokens JWT
-- El `accessToken` tiene una duración de 15 minutos
+- El `accessToken` tiene una duración de 1 minuto
 - El `refreshToken` tiene una duración de 30 días
 - Para endpoints protegidos, el access token se envía automáticamente via cookies
 - Cuando el access token expira, usar `/auth/refresh` para obtener uno nuevo

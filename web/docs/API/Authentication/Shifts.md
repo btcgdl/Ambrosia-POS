@@ -6,8 +6,8 @@ Los endpoints de turnos permiten administrar los horarios de trabajo del persona
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/shifts" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" 
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -42,8 +42,8 @@ Los endpoints de turnos permiten administrar los horarios de trabajo del persona
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/shifts/0e5805f1-ff25-4c9d-823b-cacc81eb31db" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here'
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
@@ -56,17 +56,9 @@ Los endpoints de turnos permiten administrar los horarios de trabajo del persona
     "notes": "Turno de mañana"
   }
   ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Shift not found"
-  ```
 
 - `POST /shifts`: Crea un nuevo turno.
-  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Authorization:** Requiere access token válido (admin)
   - **Request Body:**
   ```json
   {
@@ -80,11 +72,10 @@ Los endpoints de turnos permiten administrar los horarios de trabajo del persona
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/shifts" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
-      "id": "0e5805f1-ff25-4c9d-823b-cacc81eb31db",
       "user_id": "ac5f7527-3c9a-4d89-9133-ee5d8fde631e",
       "shift_date": "1753523565371",
       "start_time": "1753523565371",
@@ -93,9 +84,15 @@ Los endpoints de turnos permiten administrar los horarios de trabajo del persona
     }'
   ```
   - **Response Body (Éxito - 201 Created):**
+  ```json
+  {
+    "id": "3bbaee46-57f7-461b-9df5-bd40c61823ee",
+    "message": "Shift added successfully"
+  }
+  ```
 
 - `PUT /shifts/{id}`: Actualiza un turno existente.
-  - **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
+  - **Authorization:** Requiere access token válido (admin)
   - **Path Parameters:**
     - `id` (string): ID del turno a actualizar
   - **Request Body:**
@@ -111,8 +108,8 @@ Los endpoints de turnos permiten administrar los horarios de trabajo del persona
   - **cURL Example:**
   ```bash
   curl -X PUT "http://127.0.0.1:9154/shifts/0e5805f1-ff25-4c9d-823b-cacc81eb31db" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "user_id": "03978988-42ff-4cb9-a790-c51aceb39b2b",
@@ -124,15 +121,10 @@ Los endpoints de turnos permiten administrar los horarios de trabajo del persona
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
-  "Shift updated successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Shift not found"
+  {
+    "id": "0e5805f1-ff25-4c9d-823b-cacc81eb31db",
+    "message": "Shift updated successfully"
+  }
   ```
 
 - `DELETE /shifts/{id}`: Elimina un turno del sistema.
@@ -142,20 +134,15 @@ Los endpoints de turnos permiten administrar los horarios de trabajo del persona
   - **cURL Example:**
   ```bash
   curl -X DELETE "http://127.0.0.1:9154/shifts/03978988-42ff-4cb9-a790-c51aceb39b2b" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cokkie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
   ```
   - **Response Body (Éxito - 200 OK):**
   ```json
-  "Shift deleted successfully"
-  ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Shift not found"
+  {
+    "id": "03978988-42ff-4cb9-a790-c51aceb39b2b",
+    "message": "Shift deleted successfully"
+  }
   ```
 
 ### Notas importantes:

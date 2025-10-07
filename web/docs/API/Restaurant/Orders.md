@@ -7,8 +7,8 @@ Los endpoints de órdenes permiten gestionar los pedidos del restaurante, incluy
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/orders" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \ 
     -H "Content-Type: application/json"
   ```
   - **Response Body (Éxito - 200 OK):**
@@ -37,8 +37,8 @@ Los endpoints de órdenes permiten gestionar los pedidos del restaurante, incluy
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/orders/76ee1086-b945-4170-b2e6-9fbeb95ae0be" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json"
   ```
   - **Response Body (Éxito - 200 OK):**
@@ -53,14 +53,6 @@ Los endpoints de órdenes permiten gestionar los pedidos del restaurante, incluy
     "created_at": "2025-01-15T14:30:00Z"
   }
   ```
-  - **Response Body (Error - 400 Bad Request):**
-  ```json
-  "Missing or malformed ID"
-  ```
-  - **Response Body (Error - 404 Not Found):**
-  ```json
-  "Order not found"
-  ```
 
 - `GET /orders/{id}/complete`: Obtiene una orden completa con todos sus platos.
   - **Authorization:** Requiere autenticación JWT (enviado automáticamente via cookies)
@@ -69,8 +61,8 @@ Los endpoints de órdenes permiten gestionar los pedidos del restaurante, incluy
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/orders/76ee1086-b945-4170-b2e6-9fbeb95ae0be/complete" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json"
   ```
   - **Response Body (Éxito - 200 OK):**
@@ -112,8 +104,8 @@ Los endpoints de órdenes permiten gestionar los pedidos del restaurante, incluy
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/orders" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \ 
     -H "Content-Type: application/json" \
     -d '{
       "user_id": "262006ea-8782-4b08-ac3b-b3f13270fec3",
@@ -155,8 +147,8 @@ Los endpoints de órdenes permiten gestionar los pedidos del restaurante, incluy
   - **cURL Example:**
   ```bash
   curl -X POST "http://127.0.0.1:9154/orders/with-dishes" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
       "order": {
@@ -193,8 +185,8 @@ Los endpoints de órdenes permiten gestionar los pedidos del restaurante, incluy
   - **cURL Example:**
   ```bash
   curl -X PUT "http://127.0.0.1:9154/orders/76ee1086-b945-4170-b2e6-9fbeb95ae0be" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \ 
     -H "Content-Type: application/json" \
     -d '{
       "user_id": "262006ea-8782-4b08-ac3b-b3f13270fec3",
@@ -218,8 +210,8 @@ Los endpoints de órdenes permiten gestionar los pedidos del restaurante, incluy
   - **cURL Example:**
   ```bash
   curl -X DELETE "http://127.0.0.1:9154/orders/76ee1086-b945-4170-b2e6-9fbeb95ae0be" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' 
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \ 
     -H "Content-Type: application/json"
   ```
   - **Response Body (Éxito - 200 OK):**
@@ -236,8 +228,8 @@ Los endpoints de órdenes permiten gestionar los pedidos del restaurante, incluy
   - **cURL Example:**
   ```bash
   curl -X GET "http://127.0.0.1:9154/orders/76ee1086-b945-4170-b2e6-9fbeb95ae0be/dishes" \
-    -H 'Cookie: accessToken=your_access_token_here' \
-    -H 'Cookie: refreshToken=your_refresh_token_here' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
     -H "Content-Type: application/json"
   ```
 
@@ -260,6 +252,39 @@ Los endpoints de órdenes permiten gestionar los pedidos del restaurante, incluy
   - **Authorization:** Requiere autenticación JWT (enviado automáticamente via cookies)
 - `DELETE /orders/{id}/dishes`: Elimina todos los platos de una orden.
   - **Authorization:** Requiere autenticación JWT (enviado automáticamente via cookies)
+
+### Filtros y Acciones Adicionales
+
+- `GET /orders/user/{userId}`: Obtiene todas las órdenes de un usuario específico.
+  - **Authorization:** Requiere autenticación JWT.
+  - **Path Parameters:**
+    - `userId` (string): ID del usuario.
+
+- `GET /orders/table/{tableId}`: Obtiene todas las órdenes de una mesa específica.
+  - **Authorization:** Requiere autenticación JWT.
+  - **Path Parameters:**
+    - `tableId` (string): ID de la mesa.
+
+- `GET /orders/status/{status}`: Obtiene todas las órdenes con un estado específico.
+  - **Authorization:** Requiere autenticación JWT.
+  - **Path Parameters:**
+    - `status` (string): Estado de la orden (`pending`, `completed`, etc.).
+
+- `GET /orders/date-range`: Obtiene órdenes dentro de un rango de fechas.
+  - **Authorization:** Requiere autenticación JWT.
+  - **Query Parameters:**
+    - `start_date` (string): Fecha de inicio (formato YYYY-MM-DD).
+    - `end_date` (string): Fecha de fin (formato YYYY-MM-DD).
+
+- `GET /orders/total-sales/{date}`: Obtiene el total de ventas para una fecha específica.
+  - **Authorization:** Requiere autenticación JWT.
+  - **Path Parameters:**
+    - `date` (string): Fecha (formato YYYY-MM-DD).
+
+- `PUT /orders/{id}/calculate-total`: Recalcula y actualiza el total de una orden.
+  - **Authorization:** Requiere autenticación JWT.
+  - **Path Parameters:**
+    - `id` (string): ID de la orden.
 
 ### Notas importantes:
 - Todos los endpoints de órdenes requieren autenticación JWT

@@ -75,6 +75,8 @@
     150px 150px,
     200px 200px;
   animation: floatingParticles 20s linear infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
 @keyframes floatingParticles {
@@ -164,6 +166,8 @@
   flex-wrap: wrap;
   opacity: 0;
   animation: fadeInUp 1s ease-out 0.8s forwards;
+  position: relative;
+  z-index: 1;
 }
 
 /* Animaciones de botones mejoradas */

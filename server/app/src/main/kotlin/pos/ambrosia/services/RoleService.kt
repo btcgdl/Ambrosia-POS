@@ -68,7 +68,7 @@ class RolesService(private val env: ApplicationEnvironment, private val connecti
               Role(
                       id = resultSet.getString("id"),
                       role = resultSet.getString("role"),
-                      password = resultSet.getString("password"),
+                      password = "********", // Masked for security
                       isAdmin = resultSet.getBoolean("isAdmin")
               )
       roles.add(role)
@@ -85,7 +85,7 @@ class RolesService(private val env: ApplicationEnvironment, private val connecti
       Role(
               id = resultSet.getString("id"),
               role = resultSet.getString("role"),
-              password = resultSet.getString("password"),
+              password = "********", // Masked for security
               isAdmin = resultSet.getBoolean("isAdmin")
       )
     } else {
