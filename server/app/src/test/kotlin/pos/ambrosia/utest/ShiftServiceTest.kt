@@ -79,4 +79,26 @@ class ShiftServiceTest {
             assertNull(result) // Assert
         }
     }
+
+    @Test
+    fun `deleteShift returns true on success`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = ShiftService(mockConnection) // Arrange
+            val result = service.deleteShift("shift-1") // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteShift returns false when shift not found`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = ShiftService(mockConnection) // Arrange
+            val result = service.deleteShift("not-found-shift") // Act
+            assertFalse(result) // Assert
+        }
+    }
 }
