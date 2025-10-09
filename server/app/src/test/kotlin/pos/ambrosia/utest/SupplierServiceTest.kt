@@ -1,6 +1,7 @@
 package pos.ambrosia.utest
 
 import kotlinx.coroutines.runBlocking
+import org.mockito.ArgumentMatchers.contains
 import org.mockito.kotlin.*
 import pos.ambrosia.models.Supplier
 import pos.ambrosia.services.SupplierService
@@ -74,6 +75,116 @@ class SupplierServiceTest {
             val service = SupplierService(mockConnection) // Arrange
             val result = service.getSupplierById("not-found") // Act
             assertNull(result) // Assert
+        }
+    }
+
+    @Test
+    fun `addSupplier returns null if name already exists`() {
+        runBlocking {
+            val newSupplier = Supplier(null, "Existing Supplier", "", "", "", "") // Arrange
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
+            val service = SupplierService(mockConnection) // Arrange
+            val result = service.addSupplier(newSupplier) // Act
+            assertNull(result) // Assert
+        }
+    }
+
+    @Test
+    fun `addSupplier returns new ID on success`() {
+        runBlocking {
+            val newSupplier = Supplier(null, "New Supplier", "", "", "", "") // Arrange
+            val nameCheckStatement: PreparedStatement = mock() // Arrange
+            val addStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM suppliers"))).thenReturn(nameCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("INSERT INTO suppliers"))).thenReturn(addStatement) // Arrange
+            val nameCheckResultSet: ResultSet = mock() // Arrange
+            whenever(nameCheckResultSet.next()).thenReturn(false) // Arrange
+            whenever(nameCheckStatement.executeQuery()).thenReturn(nameCheckResultSet) // Arrange
+            whenever(addStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = SupplierService(mockConnection) // Arrange
+            val result = service.addSupplier(newSupplier) // Act
+            assertNotNull(result) // Assert
+            assertTrue(result.isNotBlank()) // Assert
+        }
+    }
+
+    @Test
+    fun `addSupplier returns null when database insert fails`() {
+        runBlocking {
+            val newSupplier = Supplier(null, "New Supplier", "", "", "", "") // Arrange
+            val nameCheckStatement: PreparedStatement = mock() // Arrange
+            val addStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM suppliers"))).thenReturn(nameCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("INSERT INTO suppliers"))).thenReturn(addStatement) // Arrange
+            val nameCheckResultSet: ResultSet = mock() // Arrange
+            whenever(nameCheckResultSet.next()).thenReturn(false) // Arrange
+            whenever(nameCheckStatement.executeQuery()).thenReturn(nameCheckResultSet) // Arrange
+            whenever(addStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = SupplierService(mockConnection) // Arrange
+            val result = service.addSupplier(newSupplier) // Act
+            assertNull(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateSupplier returns false if ID is null`() {
+        runBlocking {
+            val supplierWithNullId = Supplier(id = null, name = "A Name", "", "", "", "") // Arrange
+            val service = SupplierService(mockConnection) // Arrange
+            val result = service.updateSupplier(supplierWithNullId) // Act
+            assertFalse(result) // Assert
+            verify(mockConnection, never()).prepareStatement(any()) // Assert
+        }
+    }
+
+    @Test
+    fun `updateSupplier returns false if name already exists`() {
+        runBlocking {
+            val supplierToUpdate = Supplier(id = "sup-1", name = "Existing Name", "", "", "", "") // Arrange
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
+            val service = SupplierService(mockConnection) // Arrange
+            val result = service.updateSupplier(supplierToUpdate) // Act
+            assertFalse(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateSupplier returns true on success`() {
+        runBlocking {
+            val supplierToUpdate = Supplier(id = "sup-1", name = "New Valid Name", "", "", "", "") // Arrange
+            val nameCheckStatement: PreparedStatement = mock() // Arrange
+            val updateStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM suppliers WHERE name = ? AND id != ?"))).thenReturn(nameCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE suppliers"))).thenReturn(updateStatement) // Arrange
+            val nameCheckResultSet: ResultSet = mock() // Arrange
+            whenever(nameCheckResultSet.next()).thenReturn(false) // Arrange
+            whenever(nameCheckStatement.executeQuery()).thenReturn(nameCheckResultSet) // Arrange
+            whenever(updateStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = SupplierService(mockConnection) // Arrange
+            val result = service.updateSupplier(supplierToUpdate) // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateSupplier returns false when database update fails`() {
+        runBlocking {
+            val supplierToUpdate = Supplier(id = "sup-1", name = "New Valid Name", "", "", "", "") // Arrange
+            val nameCheckStatement: PreparedStatement = mock() // Arrange
+            val updateStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM suppliers WHERE name = ? AND id != ?"))).thenReturn(nameCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE suppliers"))).thenReturn(updateStatement) // Arrange
+            val nameCheckResultSet: ResultSet = mock() // Arrange
+            whenever(nameCheckResultSet.next()).thenReturn(false) // Arrange
+            whenever(nameCheckStatement.executeQuery()).thenReturn(nameCheckResultSet) // Arrange
+            whenever(updateStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = SupplierService(mockConnection) // Arrange
+            val result = service.updateSupplier(supplierToUpdate) // Act
+            assertFalse(result) // Assert
         }
     }
 }
