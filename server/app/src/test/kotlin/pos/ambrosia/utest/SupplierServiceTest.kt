@@ -187,4 +187,57 @@ class SupplierServiceTest {
             assertFalse(result) // Assert
         }
     }
+
+    @Test
+    fun `deleteSupplier returns false if supplier is in use`() {
+        runBlocking {
+            val supplierId = "sup-1" // Arrange
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+            whenever(mockResultSet.next()).thenReturn(true) // Arrange
+            whenever(mockResultSet.getInt("count")).thenReturn(1) // Arrange
+            val service = SupplierService(mockConnection) // Arrange
+            val result = service.deleteSupplier(supplierId) // Act
+            assertFalse(result) // Assert
+            verify(mockConnection, never()).prepareStatement(contains("UPDATE suppliers SET is_deleted")) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteSupplier returns true on success`() {
+        runBlocking {
+            val supplierId = "sup-1" // Arrange
+            val checkInUseStatement: PreparedStatement = mock() // Arrange
+            val deleteStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT COUNT(*)"))).thenReturn(checkInUseStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE suppliers SET is_deleted"))).thenReturn(deleteStatement) // Arrange
+            val checkInUseResultSet: ResultSet = mock() // Arrange
+            whenever(checkInUseResultSet.next()).thenReturn(true) // Arrange
+            whenever(checkInUseResultSet.getInt("count")).thenReturn(0) // Arrange
+            whenever(checkInUseStatement.executeQuery()).thenReturn(checkInUseResultSet) // Arrange
+            whenever(deleteStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = SupplierService(mockConnection) // Arrange
+            val result = service.deleteSupplier(supplierId) // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteSupplier returns false when supplier not found`() {
+        runBlocking {
+            val supplierId = "not-found-sup" // Arrange
+            val checkInUseStatement: PreparedStatement = mock() // Arrange
+            val deleteStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT COUNT(*)"))).thenReturn(checkInUseStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE suppliers SET is_deleted"))).thenReturn(deleteStatement) // Arrange
+            val checkInUseResultSet: ResultSet = mock() // Arrange
+            whenever(checkInUseResultSet.next()).thenReturn(true) // Arrange
+            whenever(checkInUseResultSet.getInt("count")).thenReturn(0) // Arrange
+            whenever(checkInUseStatement.executeQuery()).thenReturn(checkInUseResultSet) // Arrange
+            whenever(deleteStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = SupplierService(mockConnection) // Arrange
+            val result = service.deleteSupplier(supplierId) // Act
+            assertFalse(result) // Assert
+        }
+    }
 }
