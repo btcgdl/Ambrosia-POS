@@ -1,0 +1,14 @@
+{
+  "title": {
+    "message": "Nuestro Equipo",
+    "description": "The title for the blog used in SEO"
+  },
+  "description": {
+    "message": "Conoce a nuestro increíble equipo",
+    "description": "The description for the blog used in SEO"
+  },
+  "sidebar.title": {
+    "message": "Recent posts",
+    "description": "The label for the left sidebar"
+  }
+}

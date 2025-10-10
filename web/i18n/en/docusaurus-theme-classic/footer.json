@@ -1,0 +1,46 @@
+{
+  "link.title.Documentacion": {
+    "message": "Documentacion",
+    "description": "The title of the footer links column with title=Documentacion in the footer"
+  },
+  "link.title.Comunidad": {
+    "message": "Comunidad",
+    "description": "The title of the footer links column with title=Comunidad in the footer"
+  },
+  "link.title.Mas sobre nosotros": {
+    "message": "Mas sobre nosotros",
+    "description": "The title of the footer links column with title=Mas sobre nosotros in the footer"
+  },
+  "link.item.label.Api": {
+    "message": "Api",
+    "description": "The label of footer link with label=Api linking to /docs/API/Authentication/Auth"
+  },
+  "link.item.label.BTCGDL": {
+    "message": "BTCGDL",
+    "description": "The label of footer link with label=BTCGDL linking to https://btcgdl.com/"
+  },
+  "link.item.label.Instagram": {
+    "message": "Instagram",
+    "description": "The label of footer link with label=Instagram linking to https://www.instagram.com/btc.gdl/"
+  },
+  "link.item.label.X": {
+    "message": "X",
+    "description": "The label of footer link with label=X linking to https://x.com/btc_ln_gdl"
+  },
+  "link.item.label.Blog": {
+    "message": "Blog",
+    "description": "The label of footer link with label=Blog linking to /blog"
+  },
+  "link.item.label.GitHub": {
+    "message": "GitHub",
+    "description": "The label of footer link with label=GitHub linking to https://github.com/btcgdl"
+  },
+  "copyright": {
+    "message": "Apóyanos",
+    "description": "The footer copyright"
+  },
+  "logo.alt": {
+    "message": "Apóyanos",
+    "description": "The alt text of footer logo"
+  }
+}

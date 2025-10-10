@@ -37,7 +37,24 @@ const config = {
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: "es",
-    locales: ["es"],
+    locales: ["es", "en"],
+    path: 'i18n',
+    localeConfigs: {
+      es: {
+        label: 'Español',
+        direction: 'ltr',
+        htmlLang: 'es-ES',
+        calendar: 'gregory',
+        path: 'es',
+      },
+      en: {
+        label: 'English',
+        direction: 'ltr',
+        htmlLang: 'en-US',
+        calendar: 'gregory',
+        path: 'en',
+      },
+    },
   },
 
   presets: [
@@ -113,6 +130,7 @@ const config = {
           },
           { to: "/blog", label: "Blog", position: "left" },
           { to: "/team", label: "Equipo", position: "left" },
+          { type: 'localeDropdown', position: 'right' },
           {
             href: "https://github.com/btcgdl/Ambrosia-POS",
             label: "GitHub",
