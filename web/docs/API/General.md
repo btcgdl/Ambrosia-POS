@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+---
+
 ### Endpoints Generales
 
 Endpoints generales del sistema Ambrosia POS que proporcionan información básica y configuración.

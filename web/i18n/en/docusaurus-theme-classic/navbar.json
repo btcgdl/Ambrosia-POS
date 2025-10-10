@@ -16,8 +16,8 @@
     "description": "Navbar item with label Blog"
   },
   "item.label.Equipo": {
-    "message": "Equipo",
-    "description": "Navbar item with label Equipo"
+    "message": "Team",
+    "description": "Navbar item with label Team"
   },
   "item.label.GitHub": {
     "message": "GitHub",

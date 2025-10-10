@@ -38,21 +38,12 @@ const config = {
   i18n: {
     defaultLocale: "es",
     locales: ["es", "en"],
-    path: 'i18n',
     localeConfigs: {
-      es: {
-        label: 'Español',
-        direction: 'ltr',
-        htmlLang: 'es-ES',
-        calendar: 'gregory',
-        path: 'es',
-      },
       en: {
         label: 'English',
         direction: 'ltr',
         htmlLang: 'en-US',
         calendar: 'gregory',
-        path: 'en',
       },
     },
   },
