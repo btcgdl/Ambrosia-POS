@@ -1,6 +1,7 @@
 package pos.ambrosia.utest
 
 import kotlinx.coroutines.runBlocking
+import org.mockito.ArgumentMatchers.contains
 import org.mockito.kotlin.*
 import pos.ambrosia.models.Table
 import pos.ambrosia.services.TableService
@@ -102,6 +103,62 @@ class TableServiceTest {
             val service = TableService(mockConnection) // Arrange
             val result = service.getTablesBySpace("space-2") // Act
             assertTrue(result.isEmpty()) // Assert
+        }
+    }
+
+    @Test
+    fun `addTable returns null if space does not exist`() {
+        runBlocking {
+            val newTable = Table(null, "T3", "non-existent-space", "", "available") // Arrange
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+            whenever(mockResultSet.next()).thenReturn(false) // Arrange
+            val service = TableService(mockConnection) // Arrange
+            val result = service.addTable(newTable) // Act
+            assertNull(result) // Assert
+        }
+    }
+
+    @Test
+    fun `addTable returns null if table name already exists in space`() {
+        runBlocking {
+            val newTable = Table(null, "T1", "space-1", "", "available") // Arrange
+            val spaceCheckStatement: PreparedStatement = mock() // Arrange
+            val nameCheckStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM spaces"))).thenReturn(spaceCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM tables"))).thenReturn(nameCheckStatement) // Arrange
+            val spaceResultSet: ResultSet = mock() // Arrange
+            whenever(spaceResultSet.next()).thenReturn(true) // Arrange
+            whenever(spaceCheckStatement.executeQuery()).thenReturn(spaceResultSet) // Arrange
+            val nameResultSet: ResultSet = mock() // Arrange
+            whenever(nameResultSet.next()).thenReturn(true) // Arrange
+            whenever(nameCheckStatement.executeQuery()).thenReturn(nameResultSet) // Arrange
+            val service = TableService(mockConnection) // Arrange
+            val result = service.addTable(newTable) // Act
+            assertNull(result) // Assert
+        }
+    }
+
+    @Test
+    fun `addTable returns null when database insert fails`() {
+        runBlocking {
+            val newTable = Table(null, "T4", "space-1", "", "available") // Arrange
+            val spaceCheckStatement: PreparedStatement = mock() // Arrange
+            val nameCheckStatement: PreparedStatement = mock() // Arrange
+            val addStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM spaces"))).thenReturn(spaceCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM tables"))).thenReturn(nameCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("INSERT INTO tables"))).thenReturn(addStatement) // Arrange
+            val spaceResultSet: ResultSet = mock() // Arrange
+            whenever(spaceResultSet.next()).thenReturn(true) // Arrange
+            whenever(spaceCheckStatement.executeQuery()).thenReturn(spaceResultSet) // Arrange
+            val nameResultSet: ResultSet = mock() // Arrange
+            whenever(nameResultSet.next()).thenReturn(false) // Arrange
+            whenever(nameCheckStatement.executeQuery()).thenReturn(nameResultSet) // Arrange
+            whenever(addStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = TableService(mockConnection) // Arrange
+            val result = service.addTable(newTable) // Act
+            assertNull(result) // Assert
         }
     }
 }
