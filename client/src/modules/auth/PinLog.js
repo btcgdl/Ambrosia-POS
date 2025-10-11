@@ -16,7 +16,7 @@ export default function PinLogin() {
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const { login, logout } = useAuth();
+  const { login } = useAuth();
 
   useEffect(() => {
     async function getUsersFromService() {
@@ -24,6 +24,7 @@ export default function PinLogin() {
         const users = await getUsers();
         setUsers(users);
       } catch (error) {
+        console.error(error.message);
       } finally {
         setIsLoading(false);
       }
@@ -64,6 +65,7 @@ export default function PinLogin() {
       login();
       navigate("/");
     } catch (error) {
+      console.error(error.message);
     } finally {
       setIsLoading(false);
     }

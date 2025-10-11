@@ -9,12 +9,10 @@ import {
 import { generateReportFromData } from "./cashierService";
 import { useRouter } from "next/navigation";
 import {
-  ChefHat,
   BarChart3,
   Calendar,
   DollarSign,
   TrendingUp,
-  Clock,
   Users,
   CreditCard,
   Bitcoin,
@@ -24,7 +22,6 @@ import {
   Home,
   Lock,
   AlertCircle,
-  CheckCircle,
   FileText,
 } from "lucide-react";
 import {
@@ -35,7 +32,6 @@ import {
   Input,
   Spinner,
   Divider,
-  Progress,
   Modal,
   ModalContent,
   ModalHeader,
@@ -121,7 +117,8 @@ export default function Reports() {
         variant: "solid",
         color: "success",
       });
-    } catch (err) {
+    } catch (error) {
+      console.error(error.message);
       setError("Error al generar el reporte");
       addToast({
         title: "Error",

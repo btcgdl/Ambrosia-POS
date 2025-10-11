@@ -31,7 +31,8 @@ export function useJwtAuth() {
       setUser(null);
       setIsAuthenticated(false);
       return false;
-    } catch (e) {
+    } catch (error) {
+      console.error(error.message);
       setUser(null);
       setIsAuthenticated(false);
       return false;

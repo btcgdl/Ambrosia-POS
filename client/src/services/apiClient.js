@@ -29,7 +29,9 @@ export async function apiClient(
         if (refreshRes.ok) {
           res = await doFetch();
         }
-      } catch (_) {}
+      } catch (error) {
+        console.error(error.message);
+      }
     }
 
     const contentType = res.headers.get("content-type");
@@ -45,7 +47,9 @@ export async function apiClient(
             // Silenciar toast para wallet y permitir que el guard maneje la UX
             return;
           }
-        } catch (_) {}
+        } catch (error) {
+          console.error(error.message);
+        }
         addToast({
           color: "danger",
           title: "Error",

@@ -40,7 +40,8 @@ export default function Tables({ dynamicParams }) {
         if (tablesResponse.length > 0 && tablesResponse[0].room_name) {
           setRoomName(tablesResponse[0].room_name);
         }
-      } catch (err) {
+      } catch (error) {
+        console.error(error.message);
         setError("Error al cargar las mesas");
         addToast({
           title: "Error",
@@ -84,6 +85,7 @@ export default function Tables({ dynamicParams }) {
           router.push(`/modify-order/${orderResponse.id}?isNew=true`);
         }
       } catch (error) {
+        console.error(error.message)
         addToast({
           title: "Error",
           description: "No se pudo abrir la mesa",

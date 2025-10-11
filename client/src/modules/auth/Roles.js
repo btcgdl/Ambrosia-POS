@@ -49,7 +49,8 @@ export default function Roles() {
         setIsLoading(true);
         const response = await getRoles();
         setRoles(response);
-      } catch (err) {
+      } catch (error) {
+        console.error(error.message);
         setError("Error al cargar los roles");
         addToast({
           title: "Error",

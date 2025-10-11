@@ -29,8 +29,8 @@ export async function GET() {
     };
 
     return NextResponse.json(user, { status: 200 });
-  } catch (e) {
-    return NextResponse.json({}, { status: 401 });
+  } catch (error) {
+    return NextResponse.json({ message: error }, { status: 401 });
   }
 }
 
