@@ -1,4 +1,152 @@
 {
+  "homepage.hero.subtitle": {
+    "message": "Open-source POS system accepting Bitcoin and Lightning Network",
+    "description": "The subtitle of the homepage hero"
+  },
+  "homepage.getStarted": {
+    "message": "Get Started",
+    "description": "The label of the button to get started on the homepage"
+  },
+  "homepage.viewOnGithub": {
+    "message": "View on GitHub",
+    "description": "The label of the button to view the project on GitHub on the homepage"
+  },
+  "feature.bitcoinPayments": {
+    "message": "Bitcoin Payments",
+    "description": "The title of the Bitcoin Payments feature on the homepage"
+  },
+  "feature.bitcoinPayments.description": {
+    "message": "Accept direct Bitcoin payments with real-time confirmations and automatic address management.",
+    "description": "The description of the Bitcoin Payments feature on the homepage"
+  },
+  "feature.bitcoinPOS.title": {
+    "message": "Why Choose Our Bitcoin POS?",
+    "description": "The title of the section explaining why to choose the Bitcoin POS on the homepage"
+  },
+  "feature.bitcoinPOS.description": {
+    "message": "The next generation of point-of-sale systems built on Bitcoin",
+    "description": "The description of the section explaining why to choose the Bitcoin POS on the homepage"
+  },
+  "feature.lightningNetwork.title": {
+    "message": "Lightning Network",
+    "description": "The title of the Lightning Network feature on the homepage"
+  },
+  "feature.lightningNetwork.description": {
+    "message": "Instant, low-cost payments via the Lightning Network for micropayments and fast transactions.",
+    "description": "The description of the Lightning Network feature on the homepage"
+  },
+  "feature.openSource.title": {
+    "message": "Open Source",
+    "description": "The title of the Open Source feature on the homepage"
+  },
+  "feature.openSource.description": {
+    "message": "Fully open source, auditable, and customizable to your business needs.",
+    "description": "The description of the Open Source feature on the homepage"
+  },
+  "feature.selfCustody.title": {
+    "message": "Self-Custody",
+    "description": "The title of the Self-Custody feature on the homepage"
+  },
+  "feature.selfCustody.description": {
+    "message": "Maintain full control of your funds without relying on third parties or intermediaries.",
+    "description": "The description of the Self-Custody feature on the homepage"
+  },
+  "feature.borderless.title": {
+    "message": "Borderless",
+    "description": "The title of the Borderless feature on the homepage"
+  },
+  "feature.borderless.description": {
+    "message": "Accept payments from anywhere in the world without geographical or banking restrictions.",
+    "description": "The description of the Borderless feature on the homepage"
+  },
+  "feature.advancedAnalytics.title": {
+    "message": "Advanced Analytics",
+    "description": "The title of the Advanced Analytics feature on the homepage"
+  },
+  "feature.advancedAnalytics.description": {
+    "message": "Detailed sales reports, BTC/fiat conversions, and market trend analysis.",
+    "description": "The description of the Advanced Analytics feature on the homepage"
+  },
+  "benefit.lowFees": {
+    "message": "Ultra-low fees compared to traditional processors",
+    "description": "A benefit of using the Bitcoin POS"
+  },
+  "benefit.instantSettlement": {
+    "message": "Instant settlement with Lightning Network",
+    "description": "A benefit of using the Bitcoin POS"
+  },
+  "benefit.noChargebacks": {
+    "message": "No chargebacks or fraudulent disputes",
+    "description": "A benefit of using the Bitcoin POS"
+  },
+  "benefit.globalAccess": {
+    "message": "Access to global markets without restrictions",
+    "description": "A benefit of using the Bitcoin POS"
+  },
+  "benefit.fullTransparency": {
+    "message": "Full transparency with public blockchain",
+    "description": "A benefit of using the Bitcoin POS"
+  },
+  "benefit.censorshipResistance": {
+    "message": "Censorship-resistant and government control",
+    "description": "A benefit of using the Bitcoin POS"
+  },
+  "benefit.walletIntegration": {
+    "message": "Integration with popular wallets (Electrum, Phoenix, etc.)",
+    "description": "A benefit of using the Bitcoin POS"
+  },
+  "benefit.multipleFiatSupport": {
+    "message": "Support for multiple fiat currencies for conversion",
+    "description": "A benefit of using the Bitcoin POS"
+  },
+  "stat.averageFees": {
+    "message": "Average Fees",
+    "description": "The average fees statistic on the homepage"
+  },
+  "stat.lightningConfirmation": {
+    "message": "Lightning Confirmation Time",
+    "description": "The Lightning confirmation time statistic on the homepage"
+  },
+  "stat.globalAvailability": {
+    "message": "Global Availability",
+    "description": "The global availability statistic on the homepage"
+  },
+  "stat.openSource": {
+    "message": "Open Source",
+    "description": "The open source statistic on the homepage"
+  },
+  "theme.techStack.title": {
+    "message": "Tech Stack",
+    "description": "The title of the tech stack section on the homepage"
+  },
+  "theme.techStack.description": {
+    "message": "Built with modern, reliable technologies",
+    "description": "The description of the tech stack section on the homepage"
+  },
+  "theme.techStack.ktor": {
+    "message": "Backend Framework for Kotlin",
+    "description": "The Ktor framework for building asynchronous servers and clients in connected systems"
+  },
+  "theme.techStack.lightningNetwork": {
+    "message": "Instant, Low-Cost Payments",
+    "description": "A second layer solution for instant and low-cost Bitcoin transactions"
+  },
+  "theme.techStack.reactElectron": {
+    "message": "Modern, Cross-Platform Interface",
+    "description": "A modern, cross-platform interface built with React and Electron"
+  },
+  "theme.techStack.kotlin": {
+    "message": "Robust and Scalable Backend",
+    "description": "Robust and scalable backend"
+  },
+  "theme.techStack.sqlite": {
+    "message": "Local Database",
+    "description": "A lightweight, disk-based database"
+  },
+  "theme.techStack.restApi": {
+    "message": "Easy Integration with Other Services",
+    "description": "Easy integration with other services"
+  },
   "theme.ErrorPageContent.title": {
     "message": "This page crashed.",
     "description": "The title of the fallback page when the page crashed"

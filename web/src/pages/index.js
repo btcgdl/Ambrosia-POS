@@ -3,6 +3,7 @@ import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
 import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
 import {
   ShoppingCart,
   CreditCard,
@@ -38,7 +39,7 @@ function HomepageHeader() {
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div>
           <p>
-            Sistema POS de código abierto que acepta Bitcoin y Lightning Network
+            <Translate id="homepage.hero.subtitle">Sistema POS de código abierto que acepta Bitcoin y Lightning Network</Translate>
           </p>
         </div>
         {<div>
@@ -47,14 +48,14 @@ function HomepageHeader() {
             to="/blog"
           >
             <Download className="margin-right--sm" />
-            Comenzar Ahora
+            <Translate id="homepage.getStarted">Comenzar Ahora</Translate>
           </Link>
           <Link
             className="button button--secondary button--lg"
             to="https://github.com/btcgdl/Ambrosia-POS"
           >
             <Github className="margin-right--sm" />
-            Ver en GitHub
+            <Translate id="homepage.viewOnGithub">Ver en GitHub</Translate>
           </Link>
         </div> }
       </div>
@@ -66,39 +67,51 @@ function FeaturesSection() {
   const features = [
     {
       icon: <Bitcoin size={32} className="text--warning" />,
-      title: "Pagos en Bitcoin",
+      title: <Translate id="feature.bitcoinPayments">Pagos en Bitcoin</Translate>,
       description:
-        "Acepta pagos directos en Bitcoin con confirmaciones en tiempo real y gestión automática de direcciones.",
+        <Translate id="feature.bitcoinPayments.description">
+          "Acepta pagos directos en Bitcoin con confirmaciones en tiempo real y gestión automática de direcciones."
+        </Translate>,
     },
     {
       icon: <Zap size={32} className="text--info" />,
-      title: "Lightning Network",
-      description:
-        "Pagos instantáneos y de bajo costo a través de Lightning Network para micropagos y transacciones rápidas.",
+      title: <Translate id="feature.lightningNetwork.title">Red Lightning</Translate>,
+      description: 
+        <Translate id="feature.lightningNetwork.description">
+          "Pagos instantáneos y de bajo costo a través de Red Lightning para micropagos y transacciones rápidas."
+        </Translate>,
     },
     {
       icon: <Code size={32} className="text--success" />,
-      title: "Código Abierto",
+      title: <Translate id="feature.openSource.title">Código Abierto</Translate>,
       description:
-        "Totalmente open source, auditable y personalizable según las necesidades de tu negocio.",
+        <Translate id="feature.openSource.description">
+          "Totalmente open source, auditable y personalizable según las necesidades de tu negocio."
+        </Translate>,
     },
     {
       icon: <Shield size={32} className="text--danger" />,
-      title: "Auto-Custodia",
+      title: <Translate id="feature.selfCustody.title">Auto-Custodia</Translate>,
       description:
-        "Mantén el control total de tus fondos sin depender de terceros o intermediarios.",
+        <Translate id="feature.selfCustody.description">
+          "Mantén el control total de tus fondos sin depender de terceros o intermediarios."
+        </Translate>,
     },
     {
       icon: <Globe size={32} className="text--primary" />,
-      title: "Sin Fronteras",
+      title: <Translate id="feature.borderless.title">Sin Fronteras</Translate>,
       description:
-        "Acepta pagos de cualquier parte del mundo sin restricciones geográficas o bancarias.",
+        <Translate id="feature.borderless.description">
+          "Acepta pagos de cualquier parte del mundo sin restricciones geográficas o bancarias."
+        </Translate>,
     },
     {
       icon: <BarChart3 size={32} className="text--secondary" />,
-      title: "Analytics Avanzados",
+      title: <Translate id="feature.advancedAnalytics.title">Analytics Avanzados</Translate>,
       description:
-        "Reportes detallados de ventas, conversiones BTC/fiat y análisis de tendencias de mercado.",
+        <Translate id="feature.advancedAnalytics.description">
+          "Reportes detallados de ventas, conversiones BTC/fiat y análisis de tendencias de mercado."
+        </Translate>,
     },
   ];
 
@@ -106,10 +119,11 @@ function FeaturesSection() {
     <section className="padding--lg">
       <div className="container">
         <div className="text--center margin-bottom--xl">
-          <h2>¿Por qué elegir nuestro POS Bitcoin?</h2>
+          <h2>
+            <Translate id="feature.bitcoinPOS.title">¿Por qué elegir nuestro POS Bitcoin?</Translate>
+          </h2>
           <p className="text--muted">
-            La próxima generación de sistemas de punto de venta construida sobre
-            Bitcoin
+            <Translate id="feature.bitcoinPOS.description">La próxima generación de sistemas de punto de venta construida sobre Bitcoin</Translate>
           </p>
         </div>
         <div className="row">
@@ -135,14 +149,14 @@ function FeaturesSection() {
 
 function BenefitsSection() {
   const benefits = [
-    "Comisiones ultra bajas comparado con procesadores tradicionales",
-    "Liquidación instantánea con Lightning Network",
-    "Sin chargebacks ni disputas fraudulentas",
-    "Acceso a mercados globales sin restricciones",
-    "Transparencia total con blockchain público",
-    "Resistente a censura y control gubernamental",
-    "Integración con wallets populares (Electrum, Phoenix, etc.)",
-    "Soporte para múltiples monedas fiat para conversión",
+    <Translate id="benefit.lowFees">Comisiones ultra bajas comparado con procesadores tradicionales</Translate>,
+    <Translate id="benefit.instantSettlement">Liquidación instantánea con Lightning Network</Translate>,
+    <Translate id="benefit.noChargebacks">Sin chargebacks ni disputas fraudulentas</Translate>,
+    <Translate id="benefit.globalAccess">Acceso a mercados globales sin restricciones</Translate>,
+    <Translate id="benefit.fullTransparency">Transparencia total con blockchain público</Translate>,
+    <Translate id="benefit.censorshipResistance">Resistente a censura y control gubernamental</Translate>,
+    <Translate id="benefit.walletIntegration">Integración con wallets populares (Electrum, Phoenix, etc.)</Translate>,
+    <Translate id="benefit.multipleFiatSupport">Soporte para múltiples monedas fiat para conversión</Translate>,
   ];
 
   return (
@@ -167,19 +181,19 @@ function BenefitsSection() {
             <div className={styles.statsContainer}>
               <div className={styles.statCard}>
                 <h3 className="text--primary">~0.1%</h3>
-                <p>Comisiones promedio</p>
+                <p><Translate id="stat.averageFees">Comisiones promedio</Translate></p>
               </div>
               <div className={styles.statCard}>
-                <h3 className="text--success">{"<1s"}</h3>
-                <p>Tiempo de confirmación Lightning</p>
+                <h3 className="text--success">{"~1s"}</h3>
+                <p><Translate id="stat.lightningConfirmation">Tiempo de confirmación Lightning</Translate></p>
               </div>
               <div className={styles.statCard}>
                 <h3 className="text--warning">24/7</h3>
-                <p>Disponibilidad global</p>
+                <p><Translate id="stat.globalAvailability">Disponibilidad global</Translate></p>
               </div>
               <div className={styles.statCard}>
                 <h3 className="text--info">100%</h3>
-                <p>Código abierto</p>
+                <p><Translate id="stat.openSource">Código abierto</Translate></p>
               </div>
             </div>
           </div>
@@ -261,21 +275,21 @@ function TechStackSection() {
   const technologies = [
     {
       name: "Ktor",
-      description: "Framework backend para Kotlin",
+      description: <Translate id="theme.techStack.ktor">Framework backend para Kotlin</Translate>,
     },
     {
       name: "Lightning Network",
-      description: "Pagos instantáneos y de bajo costo",
+      description: <Translate id="theme.techStack.lightningNetwork">Pagos instantáneos y de bajo costo</Translate>,
     },
     {
       name: "React/Electron",
-      description: "Interfaz moderna y multiplataforma",
+      description: <Translate id="theme.techStack.reactElectron">Interfaz moderna y multiplataforma</Translate>,
     },
-    { name: "Kotlin", description: "Backend robusto y escalable" },
-    { name: "SQLite", description: "Base de datos local" },
+    { name: "Kotlin", description: <Translate id="theme.techStack.kotlin">Backend robusto y escalable</Translate> },
+    { name: "SQLite", description: <Translate id="theme.techStack.sqlite">Base de datos local</Translate> },
     {
       name: "REST API",
-      description: "Integración sencilla con otros servicios",
+      description: <Translate id="theme.techStack.restApi">Integración sencilla con otros servicios</Translate>,
     },
   ];
 
@@ -283,9 +297,11 @@ function TechStackSection() {
     <section className="padding--lg bg--light">
       <div className="container">
         <div className="text--center margin-bottom--xl">
-          <h2>Stack Tecnológico</h2>
+          <h2><Translate id="theme.techStack.title">Stack Tecnológico</Translate></h2>
           <p className="text--muted">
-            Construido con las mejores tecnologías Bitcoin y web modernas
+            <Translate id="theme.techStack.description">
+              Construido con las mejores tecnologías Bitcoin y web modernas
+            </Translate>
           </p>
         </div>
         <div className="row">
