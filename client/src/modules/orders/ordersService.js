@@ -31,7 +31,7 @@ export async function getTables() {
   return response ? response : [];
 }
 
-export async function createOrderInTable(tableId) {
+export async function createOrderInTable() {
   return await createOrder();
 }
 

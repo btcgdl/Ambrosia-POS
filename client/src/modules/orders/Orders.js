@@ -57,7 +57,7 @@ export default function Orders() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   
   // Hook personalizado para manejar monedas
-  const { systemCurrency, loading: currencyLoading, formatAmount } = useCurrency();
+  const { systemCurrency, formatAmount } = useCurrency();
 
   useEffect(() => {
     async function fetchData() {
@@ -184,7 +184,7 @@ export default function Orders() {
         }
       }
       formatPrice();
-    }, [amount, formatAmount, systemCurrency]);
+    }, [amount]);
 
     return (
       <span className={`font-semibold ${amount > 0 ? "text-green-600" : "text-gray-400"}`}>

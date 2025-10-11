@@ -1,4 +1,5 @@
 ﻿import React from "react";
+import Image from "next/image";
 
 const PrintableTicket = React.forwardRef(({ order, qrCodeUrl = null }, ref) => {
   return (
@@ -22,7 +23,7 @@ const PrintableTicket = React.forwardRef(({ order, qrCodeUrl = null }, ref) => {
         <>
           <hr className="my-2 border-black" />
           <p className="text-center font-bold">💥 Paga con Lightning</p>
-          <img src={qrCodeUrl} alt="QR Lightning" className="w-40 h-40 mx-auto my-2" />
+          <Image src={qrCodeUrl} alt="QR Lightning" className="w-40 h-40 mx-auto my-2" />
         </>
       )}
       <hr className="my-2 border-black" />
@@ -31,4 +32,5 @@ const PrintableTicket = React.forwardRef(({ order, qrCodeUrl = null }, ref) => {
   );
 });
 
+PrintableTicket.displayName = "PrintableTicket";
 export default PrintableTicket;

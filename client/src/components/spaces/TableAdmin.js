@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   addTable,
   updateTable,
@@ -50,26 +50,27 @@ export default function TableAdmin({ room }) {
 
   useEffect(() => {
     fetchTables();
-  }, [room]);
+  }, [room, fetchTables]);
 
-  const fetchTables = async () => {
-    try {
-      setIsLoading(true);
-      const response = await getTablesByRoomId(room.id);
-      setTables(Array.isArray(response) ? response : []);
-    } catch (err) {
-      console.error(err.message);
-      setError("Error al cargar las mesas");
-      addToast({
-        title: "Error",
-        description: "No se pudieron cargar las mesas",
-        variant: "solid",
-        color: "danger",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const fetchTables = useCallback(
+    async () => {
+      try {
+        setIsLoading(true);
+        const response = await getTablesByRoomId(room.id);
+        setTables(Array.isArray(response) ? response : []);
+      } catch (err) {
+        console.error(err.message);
+        setError("Error al cargar las mesas");
+        addToast({
+          title: "Error",
+          description: "No se pudieron cargar las mesas",
+          variant: "solid",
+          color: "danger",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }, [room]);
 
   const handleAddTable = async () => {
     if (!tableForm.name.trim()) {

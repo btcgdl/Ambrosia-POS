@@ -190,7 +190,7 @@ export default function Reports() {
     };
 
     fetchData();
-  }, []);
+  }, [endDate, startDate]);
 
   function getPaymentIcon(method) {
     const m = method?.toLowerCase();

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import WalletGuard from "../../components/auth/WalletGuard";
 import {
   createInvoice,
@@ -66,7 +66,7 @@ function WalletInner() {
 
   useEffect(() => {
     fetchTransactions();
-  }, [filter]);
+  }, [filter, fetchTransactions]);
 
   const fetchInfo = async () => {
     try {
@@ -85,36 +85,37 @@ function WalletInner() {
     }
   };
 
-  const fetchTransactions = async () => {
-    try {
-      setLoading(true);
-      let incoming = [];
-      let outgoing = [];
+  const fetchTransactions = useCallback(
+    async () => {
+      try {
+        setLoading(true);
+        let incoming = [];
+        let outgoing = [];
 
-      if (filter === "incoming" || filter === "all") {
-        incoming = await getIncomingTransactions();
-      }
-      if (filter === "outgoing" || filter === "all") {
-        outgoing = await getOutgoingTransactions();
-      }
+        if (filter === "incoming" || filter === "all") {
+          incoming = await getIncomingTransactions();
+        }
+        if (filter === "outgoing" || filter === "all") {
+          outgoing = await getOutgoingTransactions();
+        }
 
-      const allTx = [...incoming, ...outgoing].sort(
-        (a, b) => b.completedAt - a.completedAt,
-      );
-      setTransactions(allTx);
-    } catch (err) {
-      console.error("Error al obtener transacciones:", err);
-      setError("Error al cargar historial");
-      addToast({
-        title: "Error",
-        description: "No se pudo cargar el historial de transacciones",
-        variant: "solid",
-        color: "danger",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+        const allTx = [...incoming, ...outgoing].sort(
+          (a, b) => b.completedAt - a.completedAt,
+        );
+        setTransactions(allTx);
+      } catch (err) {
+        console.error("Error al obtener transacciones:", err);
+        setError("Error al cargar historial");
+        addToast({
+          title: "Error",
+          description: "No se pudo cargar el historial de transacciones",
+          variant: "solid",
+          color: "danger",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }, [filter]);
 
   const handleCreateInvoice = async () => {
     if (!invoiceAmount) {
