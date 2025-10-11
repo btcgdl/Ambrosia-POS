@@ -245,4 +245,72 @@ class TableServiceTest {
             assertFalse(result) // Assert
         }
     }
+
+    @Test
+    fun `updateTable returns true on success`() {
+        runBlocking {
+            val tableToUpdate = Table(id = "table-1", name = "Updated Name", space_id = "space-1", order_id = "order-1", status = "occupied") // Arrange
+            val spaceCheckStatement: PreparedStatement = mock() // Arrange
+            val nameCheckStatement: PreparedStatement = mock() // Arrange
+            val updateStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM spaces"))).thenReturn(spaceCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM tables WHERE name = ? AND space_id = ? AND id != ?"))).thenReturn(nameCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE tables"))).thenReturn(updateStatement) // Arrange
+            val spaceResultSet: ResultSet = mock() // Arrange
+            whenever(spaceResultSet.next()).thenReturn(true) // Arrange
+            whenever(spaceCheckStatement.executeQuery()).thenReturn(spaceResultSet) // Arrange
+            val nameResultSet: ResultSet = mock() // Arrange
+            whenever(nameResultSet.next()).thenReturn(false) // Arrange
+            whenever(nameCheckStatement.executeQuery()).thenReturn(nameResultSet) // Arrange
+            whenever(updateStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = TableService(mockConnection) // Arrange
+            val result = service.updateTable(tableToUpdate) // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateTable returns false when database update fails`() {
+        runBlocking {
+            val tableToUpdate = Table(id = "table-1", name = "Updated Name", space_id = "space-1", order_id = "order-1", status = "occupied") // Arrange
+            val spaceCheckStatement: PreparedStatement = mock() // Arrange
+            val nameCheckStatement: PreparedStatement = mock() // Arrange
+            val updateStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM spaces"))).thenReturn(spaceCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM tables WHERE name = ? AND space_id = ? AND id != ?"))).thenReturn(nameCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE tables"))).thenReturn(updateStatement) // Arrange
+            val spaceResultSet: ResultSet = mock() // Arrange
+            whenever(spaceResultSet.next()).thenReturn(true) // Arrange
+            whenever(spaceCheckStatement.executeQuery()).thenReturn(spaceResultSet) // Arrange
+            val nameResultSet: ResultSet = mock() // Arrange
+            whenever(nameResultSet.next()).thenReturn(false) // Arrange
+            whenever(nameCheckStatement.executeQuery()).thenReturn(nameResultSet) // Arrange
+            whenever(updateStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = TableService(mockConnection) // Arrange
+            val result = service.updateTable(tableToUpdate) // Act
+            assertFalse(result) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteTable returns true on success`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = TableService(mockConnection) // Arrange
+            val result = service.deleteTable("table-1") // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteTable returns false when table not found`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = TableService(mockConnection) // Arrange
+            val result = service.deleteTable("not-found-table") // Act
+            assertFalse(result) // Assert
+        }
+    }
 }
