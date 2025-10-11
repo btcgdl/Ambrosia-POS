@@ -28,6 +28,7 @@
   --ifm-color-primary-light: #35cafb;
   --ifm-color-primary-lighter: #7bdcfe;
   --ifm-color-primary-lightest: #b9eafe;
+  --ifm-background-color: #f1f1f1;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(10, 175, 230, 0.1);
 }
@@ -41,6 +42,7 @@
   --ifm-color-primary-light: #7bdcfe;
   --ifm-color-primary-lighter: #b9eafe;
   --ifm-color-primary-lightest: #dff4ff;
+  --ifm-background-color: #1b1b1d;
   --docusaurus-highlighted-code-line-bg: rgba(53, 202, 251, 0.3);
 }
 
@@ -133,8 +135,8 @@
 
 /* Estilo para la navbar con la paleta Picton Blue */
 .navbar {
-  background-color: var(--picton-blue-50);
-  border-bottom: 1px solid var(--picton-blue-200);
+  background-color: var(--picton-blue-800);
+  border-bottom: 1px solid var(--picton-blue-850);
 }
 
 [data-theme="dark"] .navbar {
@@ -143,7 +145,7 @@
 }
 
 .navbar__title {
-  color: var(--picton-blue-800) !important;
+  color: var(--picton-blue-200) !important;
 }
 
 [data-theme="dark"] .navbar__title {
@@ -151,18 +153,10 @@
 }
 
 .navbar__link {
-  color: var(--picton-blue-700) !important;
+  color: var(--picton-blue-100) !important;
 }
 
 .navbar__link:hover {
-  color: var(--picton-blue-600) !important;
-}
-
-[data-theme="dark"] .navbar__link {
-  color: var(--picton-blue-300) !important;
-}
-
-[data-theme="dark"] .navbar__link:hover {
   color: var(--picton-blue-400) !important;
 }
 
