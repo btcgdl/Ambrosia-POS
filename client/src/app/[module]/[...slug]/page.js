@@ -1,4 +1,4 @@
-import { findRouteConfig, modules } from "../../../lib/modules";
+import { findRouteConfig } from "../../../lib/modules";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 import LoadingCard from "../../../components/LoadingCard";

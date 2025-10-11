@@ -61,7 +61,8 @@ export default function Users() {
         ]);
         setUsers(usersResponse);
         setRoles(rolesResponse);
-      } catch (err) {
+      } catch (error) {
+        console.error(error.message);
         setError("Error al cargar los datos");
         addToast({
           title: "Error",

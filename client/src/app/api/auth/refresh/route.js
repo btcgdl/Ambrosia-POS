@@ -6,7 +6,7 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   `http://${process.env.HOST}:${process.env.NEXT_PUBLIC_PORT_API}`;
 
-export async function POST(request) {
+export async function POST() {
   try {
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get("refreshToken")?.value;

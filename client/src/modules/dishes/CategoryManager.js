@@ -12,7 +12,6 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Divider,
 } from "@heroui/react";
 
 export default function CategoryManager({
@@ -270,7 +269,7 @@ export default function CategoryManager({
           <ModalBody>
             <p className="text-deep">
               ¿Estás seguro de que quieres eliminar la categoría{" "}
-              <span className="font-bold">"{categoryToDelete?.name}"</span>?
+              <span className="font-bold">{`"${categoryToDelete?.name}"`}</span>?
             </p>
             <p className="text-sm text-gray-500 mt-2">
               Esta acción no se puede deshacer y puede afectar los platillos

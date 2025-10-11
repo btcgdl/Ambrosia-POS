@@ -1,9 +1,8 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   addDishToOrder,
   addPaymentToTicket,
-  addTicket,
   createPayment,
   createTicket,
   getDishesByOrder,
@@ -11,13 +10,10 @@ import {
   getPaymentCurrencies,
   getPaymentMethods,
   getTables,
-  getUserById,
   removeDishToOrder,
   updateOrder,
   updateOrderDish,
   updateTable,
-  updateTicket,
-  sendOrderDishes,
 } from "./ordersService";
 
 const STATUS_CONFIG = {
@@ -66,12 +62,10 @@ import {
   Users,
   Utensils,
   Bitcoin,
-  DollarSign,
   Receipt,
   CheckCircle,
   Send,
   FileText,
-  Pencil,
   Trash2,
   Lock,
 } from "lucide-react";
@@ -80,10 +74,7 @@ import {
   CardBody,
   CardHeader,
   Button,
-  Badge,
   Spinner,
-  Select,
-  SelectItem,
   Divider,
   Chip,
   Input,

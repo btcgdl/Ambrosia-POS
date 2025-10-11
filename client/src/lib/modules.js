@@ -214,7 +214,7 @@ export const modules = {
 // Funciones helper (como tu moduleRegistry original)
 export function getActiveModules() {
   return Object.entries(modules)
-    .filter(([_, config]) => config.enabled)
+    .filter(([, config]) => config.enabled)
     .map(([key, config]) => ({ key, ...config }));
 }
 

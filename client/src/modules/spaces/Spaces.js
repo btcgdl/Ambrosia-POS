@@ -2,14 +2,12 @@
 import { useState, useEffect } from "react";
 import { getRooms, addRoom, updateRoom, deleteRoom } from "./spacesService";
 import {
-  ChefHat,
   Building,
   Plus,
   Edit,
   Trash2,
   Eye,
   Home,
-  Settings,
   Table,
   Users,
   MapPin,
@@ -61,7 +59,8 @@ export default function Spaces() {
       setIsLoading(true);
       const response = await getRooms();
       setRooms(response);
-    } catch (err) {
+    } catch (error) {
+      console.error(error.message);
       setError("Error al cargar las salas");
       addToast({
         title: "Error",
@@ -389,7 +388,7 @@ export default function Spaces() {
                                 variant="outline"
                                 color="primary"
                                 size="sm"
-                                onPress={(e) => {
+                                onPress={() => {
                                   openEditModal(room);
                                 }}
                                 disabled={isLoading}
@@ -609,7 +608,7 @@ export default function Spaces() {
             <ModalBody>
               <p className="text-deep">
                 ¿Estás seguro de que quieres eliminar la sala{" "}
-                <span className="font-bold">"{roomToDelete?.name}"</span>?
+                <span className="font-bold">{`"${roomToDelete?.name}"`}</span>?
               </p>
               <p className="text-sm text-gray-500 mt-2">
                 Esta acción no se puede deshacer y también eliminará todas las

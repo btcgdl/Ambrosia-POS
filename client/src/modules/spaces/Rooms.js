@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { getRooms } from "./spacesService";
-import { ChefHat, Home, Users, Plus, ArrowRight } from "lucide-react";
+import { ChefHat, Home, Users, ArrowRight } from "lucide-react";
 import {
   Card,
   CardBody,
@@ -28,7 +28,8 @@ export default function Rooms() {
           response = 0;
         }
         setRooms(response);
-      } catch (err) {
+      } catch (error) {
+        console.error(error.message);
         setError("Error al cargar las salas");
         addToast({
           title: "Error",

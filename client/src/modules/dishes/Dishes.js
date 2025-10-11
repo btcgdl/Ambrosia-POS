@@ -15,9 +15,6 @@ import {
 import {
   ChefHat,
   Utensils,
-  Plus,
-  Edit,
-  Trash2,
   Home,
   Cookie,
   Tags,
@@ -27,14 +24,7 @@ import {
   CardBody,
   CardHeader,
   Button,
-  Input,
   Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Divider,
   Tabs,
   Tab,
 } from "@heroui/react";
@@ -59,7 +49,8 @@ export default function Dishes() {
         ]);
         setDishes(dishesResponse);
         setCategories(categoriesResponse);
-      } catch (err) {
+      } catch (error) {
+        console.error(error.message);
         setError("Error al cargar los datos");
         addToast({
           title: "Error",

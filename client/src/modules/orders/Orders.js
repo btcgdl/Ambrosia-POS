@@ -1,17 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createOrder, getAllOrders, getUserById } from "./ordersService";
-import { formatCurrency, useCurrency } from "../../lib/currencyUtils";
+import { createOrder, getAllOrders } from "./ordersService";
+import { useCurrency } from "../../lib/currencyUtils";
 import formatDate from "../../lib/formatDate";
 import { useRouter } from "next/navigation";
 import {
-  ChefHat,
   ClipboardList,
   Plus,
   Eye,
   Clock,
   CheckCircle,
-  DollarSign,
   Users,
   Calendar,
   Home,
@@ -99,6 +97,7 @@ export default function Orders() {
       });
       router.push(`/modify-order/${createdOrderId.id}?isNew=true`);
     } catch (error) {
+      console.error(error.message);
       addToast({
         title: "Error",
         description: "No se pudo crear la orden",

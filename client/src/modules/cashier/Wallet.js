@@ -10,8 +10,6 @@ import {
 } from "./cashierService";
 import { QRCode } from "react-qr-code";
 import {
-  ChefHat,
-  Wallet as WalletIcon,
   Zap,
   ArrowDownLeft,
   ArrowUpRight,

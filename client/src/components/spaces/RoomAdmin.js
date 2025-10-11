@@ -25,7 +25,8 @@ export default function RoomAdmin() {
         setIsLoading(true);
         const response = await getRooms();
         setRooms(response);
-      } catch (err) {
+      } catch (error) {
+        console.error(error.message);
         setError("Error al cargar las salas");
       } finally {
         setIsLoading(false);

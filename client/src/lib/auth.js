@@ -4,6 +4,7 @@ export function verifyToken(token, secret) {
   try {
     return jwt.verify(token, secret);
   } catch (error) {
+    console.error(error.message)
     return null;
   }
 }
@@ -12,6 +13,7 @@ export function decodeToken(token) {
   try {
     return jwt.decode(token);
   } catch (error) {
+    console.error(error.message)
     return null;
   }
 }

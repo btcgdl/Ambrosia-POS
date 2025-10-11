@@ -2,7 +2,6 @@
 import React, { createContext, useEffect, useRef } from "react";
 import { logoutFromService, RefreshToken } from "./authService";
 import { useJwtAuth } from "../../hooks/useJwtAuth";
-import { apiClient } from "../../services/apiClient";
 
 export const AuthContext = createContext();
 

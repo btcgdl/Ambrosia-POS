@@ -401,7 +401,7 @@ export default function DishManager({
           <ModalBody>
             <p className="text-deep">
               ¿Estás seguro de que quieres eliminar el platillo{" "}
-              <span className="font-bold">"{dishToDelete?.name}"</span>?
+              <span className="font-bold">{`"${dishToDelete?.name}"`}</span>?
             </p>
             <p className="text-sm text-gray-500 mt-2">
               Esta acción no se puede deshacer y el platillo desaparecerá del
