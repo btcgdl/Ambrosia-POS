@@ -161,4 +161,88 @@ class TableServiceTest {
             assertNull(result) // Assert
         }
     }
+
+    @Test
+    fun `addTable returns null if status is invalid`() {
+        runBlocking {
+            val newTable = Table(null, "T3", "space-1", "", "invalid-status") // Arrange
+            val spaceCheckStatement: PreparedStatement = mock() // Arrange
+            val nameCheckStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM spaces"))).thenReturn(spaceCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM tables"))).thenReturn(nameCheckStatement) // Arrange
+            val spaceResultSet: ResultSet = mock() // Arrange
+            whenever(spaceResultSet.next()).thenReturn(true) // Arrange
+            whenever(spaceCheckStatement.executeQuery()).thenReturn(spaceResultSet) // Arrange
+            val nameResultSet: ResultSet = mock() // Arrange
+            whenever(nameResultSet.next()).thenReturn(false) // Arrange
+            whenever(nameCheckStatement.executeQuery()).thenReturn(nameResultSet) // Arrange
+            val service = TableService(mockConnection) // Arrange
+            val result = service.addTable(newTable) // Act
+            assertNull(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateTable returns false if ID is null`() {
+        runBlocking {
+            val tableWithNullId = Table(id = null, name = "A Name", space_id = "space-1", order_id = "", status = "available") // Arrange
+            val service = TableService(mockConnection) // Arrange
+            val result = service.updateTable(tableWithNullId) // Act
+            assertFalse(result) // Assert
+            verify(mockConnection, never()).prepareStatement(any()) // Assert
+        }
+    }
+
+    @Test
+    fun `updateTable returns false if space does not exist`() {
+        runBlocking {
+            val tableToUpdate = Table(id = "table-1", name = "A Name", space_id = "non-existent-space", order_id = "", status = "available") // Arrange
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+            whenever(mockResultSet.next()).thenReturn(false) // Arrange
+            val service = TableService(mockConnection) // Arrange
+            val result = service.updateTable(tableToUpdate) // Act
+            assertFalse(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateTable returns false if name already exists in space`() {
+        runBlocking {
+            val tableToUpdate = Table(id = "table-1", name = "Existing Name", space_id = "space-1", order_id = "", status = "available") // Arrange
+            val spaceCheckStatement: PreparedStatement = mock() // Arrange
+            val nameCheckStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM spaces"))).thenReturn(spaceCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM tables WHERE name = ? AND space_id = ? AND id != ?"))).thenReturn(nameCheckStatement) // Arrange
+            val spaceResultSet: ResultSet = mock() // Arrange
+            whenever(spaceResultSet.next()).thenReturn(true) // Arrange
+            whenever(spaceCheckStatement.executeQuery()).thenReturn(spaceResultSet) // Arrange
+            val nameResultSet: ResultSet = mock() // Arrange
+            whenever(nameResultSet.next()).thenReturn(true) // Arrange
+            whenever(nameCheckStatement.executeQuery()).thenReturn(nameResultSet) // Arrange
+            val service = TableService(mockConnection) // Arrange
+            val result = service.updateTable(tableToUpdate) // Act
+            assertFalse(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateTable returns false if status is invalid`() {
+        runBlocking {
+            val tableToUpdate = Table(id = "table-1", name = "A Name", space_id = "space-1", order_id = "", status = "invalid-status") // Arrange
+            val spaceCheckStatement: PreparedStatement = mock() // Arrange
+            val nameCheckStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM spaces"))).thenReturn(spaceCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("FROM tables WHERE name = ? AND space_id = ? AND id != ?"))).thenReturn(nameCheckStatement) // Arrange
+            val spaceResultSet: ResultSet = mock() // Arrange
+            whenever(spaceResultSet.next()).thenReturn(true) // Arrange
+            whenever(spaceCheckStatement.executeQuery()).thenReturn(spaceResultSet) // Arrange
+            val nameResultSet: ResultSet = mock() // Arrange
+            whenever(nameResultSet.next()).thenReturn(false) // Arrange
+            whenever(nameCheckStatement.executeQuery()).thenReturn(nameResultSet) // Arrange
+            val service = TableService(mockConnection) // Arrange
+            val result = service.updateTable(tableToUpdate) // Act
+            assertFalse(result) // Assert
+        }
+    }
 }
