@@ -4,7 +4,6 @@ import {
   getCookieValue,
   getRoleName,
   getUsers,
-  loginFromService,
 } from "./authService";
 import { useAuth } from "./useAuth";
 import { useRouter } from "next/navigation";
@@ -16,7 +15,7 @@ export default function PinLogin() {
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const { login, logout } = useAuth();
+  const { login } = useAuth();
 
   useEffect(() => {
     async function getUsersFromService() {
@@ -24,6 +23,7 @@ export default function PinLogin() {
         const users = await getUsers();
         setUsers(users);
       } catch (error) {
+        console.error(error.message);
       } finally {
         setIsLoading(false);
       }
@@ -53,7 +53,7 @@ export default function PinLogin() {
     setIsLoading(true);
     setError("");
     try {
-      const response = await loginFromService({ name: selectedUser, pin });
+      // const response = await loginFromService({ name: selectedUser, pin });
       const accessToken = getCookieValue("accessToken");
       const tokenData = await jwtDecode(accessToken);
       const roleName = await getRoleName(tokenData.role);
@@ -64,6 +64,7 @@ export default function PinLogin() {
       login();
       navigate("/");
     } catch (error) {
+      console.error(error.message);
     } finally {
       setIsLoading(false);
     }

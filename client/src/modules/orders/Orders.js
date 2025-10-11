@@ -1,17 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createOrder, getAllOrders, getUserById } from "./ordersService";
-import { formatCurrency, useCurrency } from "../../lib/currencyUtils";
+import { createOrder, getAllOrders } from "./ordersService";
+import { useCurrency } from "../../lib/currencyUtils";
 import formatDate from "../../lib/formatDate";
 import { useRouter } from "next/navigation";
 import {
-  ChefHat,
   ClipboardList,
   Plus,
   Eye,
   Clock,
   CheckCircle,
-  DollarSign,
   Users,
   Calendar,
   Home,
@@ -59,7 +57,7 @@ export default function Orders() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   
   // Hook personalizado para manejar monedas
-  const { systemCurrency, loading: currencyLoading, formatAmount } = useCurrency();
+  const { systemCurrency, formatAmount } = useCurrency();
 
   useEffect(() => {
     async function fetchData() {
@@ -99,6 +97,7 @@ export default function Orders() {
       });
       router.push(`/modify-order/${createdOrderId.id}?isNew=true`);
     } catch (error) {
+      console.error(error.message);
       addToast({
         title: "Error",
         description: "No se pudo crear la orden",
@@ -185,7 +184,7 @@ export default function Orders() {
         }
       }
       formatPrice();
-    }, [amount, formatAmount, systemCurrency]);
+    }, [amount]);
 
     return (
       <span className={`font-semibold ${amount > 0 ? "text-green-600" : "text-gray-400"}`}>

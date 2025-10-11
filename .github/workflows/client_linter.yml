@@ -1,0 +1,20 @@
+name: Client ESlint Test
+on:
+  pull_request:
+    branches: '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm --prefix ./client install
+      - run: npm run lint
+        working-directory: ./client

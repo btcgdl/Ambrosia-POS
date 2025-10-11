@@ -1,8 +1,7 @@
 ﻿"use client";
 import React, { createContext, useEffect, useRef } from "react";
-import { logoutFromService, RefreshToken } from "./authService";
+import { logoutFromService } from "./authService";
 import { useJwtAuth } from "../../hooks/useJwtAuth";
-import { apiClient } from "../../services/apiClient";
 
 export const AuthContext = createContext();
 
@@ -12,7 +11,7 @@ export function AuthProvider({ children }) {
 
   const refreshToken = async () => {
     try {
-      const response = await RefreshToken();
+      // const response = await RefreshToken();
     } catch (err) {
       console.error("Error en la petición de refresh:", err);
       logout();
