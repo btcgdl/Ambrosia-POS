@@ -67,4 +67,26 @@ class TicketPaymentServiceTest {
             assertTrue(result.isEmpty()) // Assert
         }
     }
+
+    @Test
+    fun `addTicketPayment returns false if payment_id is blank`() {
+        runBlocking {
+            val ticketPayment = TicketPayment(payment_id = "", ticket_id = "ticket-1") // Arrange
+            val service = TicketPaymentService(mockConnection) // Arrange
+            val result = service.addTicketPayment(ticketPayment) // Act
+            assertFalse(result) // Assert
+            verify(mockConnection, never()).prepareStatement(any()) // Assert
+        }
+    }
+
+    @Test
+    fun `addTicketPayment returns false if ticket_id is blank`() {
+        runBlocking {
+            val ticketPayment = TicketPayment(payment_id = "pay-1", ticket_id = "") // Arrange
+            val service = TicketPaymentService(mockConnection) // Arrange
+            val result = service.addTicketPayment(ticketPayment) // Act
+            assertFalse(result) // Assert
+            verify(mockConnection, never()).prepareStatement(any()) // Assert
+        }
+    }
 }
