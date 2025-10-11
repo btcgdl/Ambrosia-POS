@@ -50,9 +50,9 @@ export default function CloseTurn() {
     }
   };
 
-  const addQuickAmount = (amount) => {
-    setFinalAmount(amount.toString());
-  };
+  // const addQuickAmount = (amount) => {
+  //  setFinalAmount(amount.toString());
+  // };
 
   return (
     <main className="h-[90%] w-full flex items-center justify-center">

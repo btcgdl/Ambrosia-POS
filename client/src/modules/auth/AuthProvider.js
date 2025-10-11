@@ -11,7 +11,7 @@ export function AuthProvider({ children }) {
 
   const refreshToken = async () => {
     try {
-      const response = await RefreshToken();
+      await RefreshToken();
     } catch (err) {
       console.error("Error en la petición de refresh:", err);
       logout();

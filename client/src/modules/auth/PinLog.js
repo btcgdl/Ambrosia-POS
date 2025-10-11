@@ -54,7 +54,7 @@ export default function PinLogin() {
     setIsLoading(true);
     setError("");
     try {
-      const response = await loginFromService({ name: selectedUser, pin });
+      await loginFromService({ name: selectedUser, pin });
       const accessToken = getCookieValue("accessToken");
       const tokenData = await jwtDecode(accessToken);
       const roleName = await getRoleName(tokenData.role);

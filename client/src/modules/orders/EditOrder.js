@@ -168,6 +168,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                     setSelectedCurrency(ticketResponse.data.paymentMethod === "Efectivo" ? "Pesos" : "Bitcoin");
                 }*/
       } catch (err) {
+        console.error(err);
         setError("Error al cargar el pedido");
       } finally {
         setIsLoading(false);
@@ -216,12 +217,12 @@ export default function EditOrder({ dynamicParams, searchParams }) {
       });
       return;
     }
-    const newDishes = (order.dishes || []).filter(
-      (item) => item.instanceId !== instanceId,
-    );
+    // const newDishes = (order.dishes || []).filter(
+    //   (item) => item.instanceId !== instanceId,
+    // );
     setIsLoading(true);
     try {
-      const response = await removeDishToOrder(pedidoId, instanceId);
+      await removeDishToOrder(pedidoId, instanceId);
       const orderResponse = await getOrderById(pedidoId);
       const orderDishesResponse = await getDishesByOrder(pedidoId);
       setOrderDishes(orderDishesResponse);

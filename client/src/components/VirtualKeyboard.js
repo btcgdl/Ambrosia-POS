@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { 
   Button, 
   Modal, 
@@ -27,15 +27,15 @@ const VirtualKeyboard = ({ isOpen, value, onChange, onClose }) => {
     }
   };
 
-  const handleAccept = () => {
+  const handleAccept = useCallback(() => {
     onChange(currentText);
     onClose(currentText); // Pasar el texto final al cerrar
-  };
+  }, [currentText, onChange, onClose]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setCurrentText(value || "");
     onClose();
-  };
+  }, [value, onClose]);
 
   // Manejar teclado físico
   useEffect(() => {

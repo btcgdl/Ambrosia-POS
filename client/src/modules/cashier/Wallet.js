@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import WalletGuard from "../../components/auth/WalletGuard";
 import {
   createInvoice,
@@ -66,7 +66,7 @@ function WalletInner() {
 
   useEffect(() => {
     fetchTransactions();
-  }, [filter]);
+  }, [fetchTransactions, filter]);
 
   const fetchInfo = async () => {
     try {
@@ -85,7 +85,7 @@ function WalletInner() {
     }
   };
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       setLoading(true);
       let incoming = [];
@@ -114,7 +114,7 @@ function WalletInner() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
 
   const handleCreateInvoice = async () => {
     if (!invoiceAmount) {

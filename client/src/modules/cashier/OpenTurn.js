@@ -11,10 +11,10 @@ export default function OpenTurn() {
 
   const navigate = useRouter();
   const { updateTurn } = useTurn();
-  const report = {
-    date: "1/1/2023",
-    balance: "400",
-  };
+  // const report = {
+  //   date: "1/1/2023",
+  //   balance: "400",
+  // };
 
   const handleAmountChange = (e) => {
     const value = e.target.value;
@@ -50,9 +50,9 @@ export default function OpenTurn() {
     }
   };
 
-  const addQuickAmount = (amount) => {
-    setInitialAmount(amount.toString());
-  };
+  // const addQuickAmount = (amount) => {
+  //   setInitialAmount(amount.toString());
+  // };
 
   return (
     <main className="h-[90%] w-full flex items-center justify-center">
