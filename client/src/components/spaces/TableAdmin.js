@@ -48,10 +48,6 @@ export default function TableAdmin({ room }) {
     capacity: "",
   });
 
-  useEffect(() => {
-    fetchTables();
-  }, [room, fetchTables]);
-
   const fetchTables = useCallback(
     async () => {
       try {
@@ -71,6 +67,10 @@ export default function TableAdmin({ room }) {
         setIsLoading(false);
       }
     }, [room]);
+
+  useEffect(() => {
+    fetchTables();
+  }, [fetchTables]);
 
   const handleAddTable = async () => {
     if (!tableForm.name.trim()) {

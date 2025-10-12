@@ -60,14 +60,6 @@ function WalletInner() {
   const [activeTab, setActiveTab] = useState("receive");
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
-  useEffect(() => {
-    fetchInfo();
-  }, []);
-
-  useEffect(() => {
-    fetchTransactions();
-  }, [filter, fetchTransactions]);
-
   const fetchInfo = async () => {
     try {
       const res = await getInfo();
@@ -116,6 +108,14 @@ function WalletInner() {
         setLoading(false);
       }
     }, [filter]);
+
+  useEffect(() => {
+    fetchInfo();
+  }, []);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
 
   const handleCreateInvoice = async () => {
     if (!invoiceAmount) {
