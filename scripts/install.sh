@@ -69,5 +69,7 @@ install_phoenixd
 install_ambrosia
 install_client
 
+# Remove the script itself after execution
+rm -- "$0"
 
 echo "🎉 Installation complete!"
