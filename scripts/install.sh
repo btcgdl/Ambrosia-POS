@@ -69,5 +69,9 @@ install_phoenixd
 install_ambrosia
 install_client
 
+# Remove the script itself only if it was executed as a file (not via pipe)
+if [ "$0" != "-" ] && [ -f "$0" ]; then
+    rm -- "$0"
+fi
 
 echo "🎉 Installation complete!"
