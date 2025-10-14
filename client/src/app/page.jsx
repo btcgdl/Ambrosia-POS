@@ -13,10 +13,8 @@ export default function HomePage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
-        // Si no está autenticado, redirigir a login
         router.replace("/auth");
       } else {
-        // Si está autenticado, redirigir a su página home personalizada
         const homeRoute = getHomeRoute(user);
         console.log(`🏠 Redirigiendo usuario a: ${homeRoute}`);
         router.replace(homeRoute);
@@ -24,7 +22,6 @@ export default function HomePage() {
     }
   }, [isAuthenticated, user, isLoading, router]);
 
-  // Mostrar loading mientras se determina la redirección
   return (
     <LoadingCard 
       message={isLoading ? "Verificando autenticación..." : "Redirigiendo..."} 
