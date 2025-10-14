@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   addDishToOrder,
   addPaymentToTicket,
@@ -90,31 +90,27 @@ import { addToast } from "@heroui/react";
 
 const priceService = new BitcoinPriceService();
 
-export default function EditOrder({ dynamicParams, searchParams }) {
+export default function EditOrder({ dynamicParams }) {
   const pedidoId = dynamicParams?.pedidoId;
   const router = useRouter();
-  const isNew = searchParams?.isNew === "true";
   const [order, setOrder] = useState(null);
   const [dishes, setDishes] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [undoStack, setUndoStack] = useState([]);
+  //const [undoStack, setUndoStack] = useState([]);
   const [createdInvoice, setCreatedInvoice] = useState(null);
   const [generatedCashInfo, setGeneratedCashInfo] = useState(null);
   const [cashReceived, setCashReceived] = useState('');
-  const [showCurrencyDialog, setShowCurrencyDialog] = useState(false);
+  //const [showCurrencyDialog, setShowCurrencyDialog] = useState(false);
   const [showPaymentMethodDialog, setShowPaymentMethodDialog] = useState(false);
-  const [showGenerateInvoiceDialog, setShowGenerateInvoiceDialog] =
-    useState(false);
-  const [selectedCurrency, setSelectedCurrency] = useState("");
+  //const [selectedCurrency, setSelectedCurrency] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
-  const [ticketId, setTicketId] = useState(null);
+  //const [ticketId, setTicketId] = useState(null);
   const [orderDishes, setOrderDishes] = useState([]);
-  //const [generateInvoice, setGenerateInvoice] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [paymentCurrencies, setPaymentCurrencies] = useState([]);
+  //const [paymentCurrencies, setPaymentCurrencies] = useState([]);
   const [selectedDishForEdit, setSelectedDishForEdit] = useState(null);
   const [dishNotes, setDishNotes] = useState("");
   const [dishShouldPrepare, setDishShouldPrepare] = useState(true);
@@ -122,7 +118,6 @@ export default function EditOrder({ dynamicParams, searchParams }) {
   const [dishQuantities, setDishQuantities] = useState({});
   const {
     isOpen: isEditDishOpen,
-    onOpen: onEditDishOpen,
     onClose: onEditDishClose,
   } = useDisclosure();
 
@@ -134,6 +129,15 @@ export default function EditOrder({ dynamicParams, searchParams }) {
     return "💰";
   };
 
+  const fetchOrderDishes = useCallback(async () => {
+    try {
+      await getDishesByOrder(pedidoId);
+    } catch (err) {
+      console.error(err);
+    } finally {
+    }
+  }, [pedidoId])
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -144,7 +148,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
           categoriesResponse,
           orderDishesResponse,
           paymentMethodsResponse,
-          paymentCurrenciesResponse,
+          //paymentCurrenciesResponse,
         ] = await Promise.all([
           getOrderById(pedidoId),
           getDishes(),
@@ -159,15 +163,9 @@ export default function EditOrder({ dynamicParams, searchParams }) {
         setSelectedCategory(categoriesResponse[0] || "");
         setOrderDishes(orderDishesResponse || []);
         setPaymentMethods(paymentMethodsResponse);
-        setPaymentCurrencies(paymentCurrenciesResponse);
-        /*if (orderResponse.status === 'closed'){
-                    const ticketResponse = await getTicketByOrderId(orderResponse.data.id);
-                    console.log(ticketResponse);
-                    setTicketId(ticketResponse.data.id);
-                    console.log(ticketResponse.data.paymentMethod);
-                    setSelectedCurrency(ticketResponse.data.paymentMethod === "Efectivo" ? "Pesos" : "Bitcoin");
-                }*/
+        //setPaymentCurrencies(paymentCurrenciesResponse);
       } catch (err) {
+        console.log(err)
         setError("Error al cargar el pedido");
       } finally {
         setIsLoading(false);
@@ -175,26 +173,18 @@ export default function EditOrder({ dynamicParams, searchParams }) {
     }
     fetchData();
     fetchOrderDishes();
-  }, [pedidoId]);
+  }, [pedidoId, fetchOrderDishes]);
 
   useEffect(() => {
     if (order) fetchOrderDishes();
-  }, [order]);
+  }, [order, fetchOrderDishes]);
 
-  async function fetchOrderDishes() {
-    try {
-      const response = await getDishesByOrder(pedidoId);
-    } catch (err) {
-      console.error(err);
-    } finally {
-    }
-  }
 
-  const handleAddDish = async (dish) => {
+  /*const handleAddDish = async (dish) => {
     if (order.status !== "open") return;
     setIsLoading(true);
     try {
-      const response = await addDishToOrder(pedidoId, dish.id, dish.price);
+      await addDishToOrder(pedidoId, dish.id, dish.price);
       const orderResponse = await getOrderById(order.id);
       const dishesResponse = await getDishesByOrder(pedidoId);
       setOrderDishes(dishesResponse);
@@ -204,7 +194,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  };*/
 
   const handleRemoveDish = async (instance) => {
     const instanceId = instance.id;
@@ -216,24 +206,23 @@ export default function EditOrder({ dynamicParams, searchParams }) {
       });
       return;
     }
-    const newDishes = (order.dishes || []).filter(
-      (item) => item.instanceId !== instanceId,
-    );
+
     setIsLoading(true);
     try {
-      const response = await removeDishToOrder(pedidoId, instanceId);
+      await removeDishToOrder(pedidoId, instanceId);
       const orderResponse = await getOrderById(pedidoId);
       const orderDishesResponse = await getDishesByOrder(pedidoId);
       setOrderDishes(orderDishesResponse);
       setOrder(orderResponse);
     } catch (err) {
+      console.log(err)
       setError("Error al eliminar el platillo");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleUndo = async () => {
+  /*const handleUndo = async () => {
     if (undoStack.length === 0) return;
     const previousDishes = undoStack[undoStack.length - 1];
     setUndoStack(undoStack.slice(0, -1));
@@ -246,7 +235,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  };*/
 
   const handleSendDishes = async () => {
     const pendingDishes = orderDishes.filter(
@@ -280,6 +269,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
         description: `${pendingDishes.length} platillos enviados a cocina`,
       });
     } catch (err) {
+      console.log(err)
       setError("Error al enviar platillos");
       addToast({
         color: "danger",
@@ -290,12 +280,12 @@ export default function EditOrder({ dynamicParams, searchParams }) {
     }
   };
 
-  const handleOpenEditDish = (dish) => {
+  /*const handleOpenEditDish = (dish) => {
     setSelectedDishForEdit(dish);
     setDishNotes(dish.notes || "");
     setDishShouldPrepare(dish.should_prepare !== false);
     onEditDishOpen();
-  };
+  };*/
 
   const handleOpenKeyboard = (dish) => {
     if (dish.status !== "pending") {
@@ -356,6 +346,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
         description: `${quantity} ${dish.name} agregados al pedido`,
       });
     } catch (err) {
+      console.log(err)
       setError("Error al agregar platillos");
       addToast({
         color: "danger",
@@ -372,7 +363,6 @@ export default function EditOrder({ dynamicParams, searchParams }) {
     shouldPrepare,
     closeModal = true,
   ) => {
-    // Verificar que el platillo esté en estado pending
     const currentDish = orderDishes.find((d) => d.id === dishId);
     if (!currentDish) {
       addToast({
@@ -392,7 +382,6 @@ export default function EditOrder({ dynamicParams, searchParams }) {
 
     setIsLoading(true);
     try {
-      // Create complete OrderDish object matching server model
       const orderDishUpdate = {
         id: currentDish.id,
         order_id: currentDish.order_id,
@@ -416,6 +405,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
         description: "Platillo actualizado correctamente",
       });
     } catch (err) {
+      console.log(err)
       setError("Error al actualizar el platillo");
       addToast({
         color: "danger",
@@ -453,6 +443,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
         router.push("/all-orders");
       }
     } catch (err) {
+      console.log(err)
       setError("Error al cambiar el estado del pedido");
     } finally {
       setIsLoading(false);
@@ -472,8 +463,6 @@ export default function EditOrder({ dynamicParams, searchParams }) {
       const total = order.total;
       const currencyBase = await apiClient(`/base-currency`);
       console.log("Selected Currency ID:", currencyBase.currency_id);
-
-      // Crear ticket
       const ticket = {
         order_id: order.id,
         user_id: order.user_id,
@@ -484,9 +473,6 @@ export default function EditOrder({ dynamicParams, searchParams }) {
       };
 
       const ticketResponse = await createTicket(ticket);
-      setTicketId(ticketResponse.id);
-
-      // Crear payment
       const payment = {
         method_id: selectedPaymentMethod,
         currency_id: currencyBase.currency_id,
@@ -495,7 +481,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
       };
 
       const paymentResponse = await createPayment(payment);
-      const paymentTicketResponse = await addPaymentToTicket(
+      await addPaymentToTicket(
         ticketResponse.id,
         paymentResponse.id,
       );
@@ -506,7 +492,6 @@ export default function EditOrder({ dynamicParams, searchParams }) {
       console.log("Currency Data:", paymentMethodData);
 
       if (paymentMethodData.name === "Efectivo") {
-        // Generar información para el pago en efectivo
         const cashInfo = {
           order_id: order.id,
           total_amount: total,
@@ -522,8 +507,7 @@ export default function EditOrder({ dynamicParams, searchParams }) {
         );
         console.log("Currency Data:", currencyBaseData);
 
-        // CONVERTIR A SATOSHIS
-        const currencyAcronym = currencyBaseData.acronym.toLowerCase(); // ej: 'mxn', 'usd'
+        const currencyAcronym = currencyBaseData.acronym.toLowerCase();
         console.log("Currency Acronym:", currencyAcronym);
 
         const priceConverted = await priceService.fiatToSatoshis(
@@ -546,7 +530,6 @@ export default function EditOrder({ dynamicParams, searchParams }) {
       await handleChangeOrderStatus("paid");
       setShowPaymentMethodDialog(false);
 
-      // OBTENER DATOS DE LA MONEDA
     } catch (err) {
       console.error("Error en handleConfirmPaymentMethod:", err);
       setError("Error al cerrar el pedido: " + err.message);
@@ -556,18 +539,14 @@ export default function EditOrder({ dynamicParams, searchParams }) {
   };
 
   const handlePaymentConfirm = async () => {
-    // Lógica cuando el cliente pagó
     console.log("Cliente confirmó el pago");
     await handleChangeOrderStatus("paid");
-    // Tu lógica aquí...
-    setCreatedInvoice(null); // o lo que necesites hacer
+    setCreatedInvoice(null);
   };
 
   const handlePaymentCancel = () => {
-    // Lógica cuando el cliente no pagó
     console.log("Cliente no pagó");
-    // Tu lógica aquí...
-    setCreatedInvoice(null); // o lo que necesites hacer
+    setCreatedInvoice(null);
   };
 
   const handleCancelDialog = () => {
@@ -611,11 +590,11 @@ export default function EditOrder({ dynamicParams, searchParams }) {
     );
   }
 
-  const handleCurrencySelect = (currencyId) => {
+  /*const handleCurrencySelect = (currencyId) => {
     setSelectedCurrency(currencyId);
     setShowCurrencyDialog(false);
     setShowPaymentMethodDialog(true);
-  };
+  };*/
 
   const handlePaymentMethodSelect = (methodId) => {
     setSelectedPaymentMethod(methodId);
@@ -938,17 +917,17 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                       {orderDishes.some(
                         (dish) => dish.status === "pending",
                       ) && (
-                        <Button
-                          variant="bordered"
-                          color="warning"
-                          size="lg"
-                          onPress={handleSendDishes}
-                          className="h-14"
-                          startContent={<Send className="w-6 h-6" />}
-                        >
-                          Enviar a Cocina
-                        </Button>
-                      )}
+                          <Button
+                            variant="bordered"
+                            color="warning"
+                            size="lg"
+                            onPress={handleSendDishes}
+                            className="h-14"
+                            startContent={<Send className="w-6 h-6" />}
+                          >
+                            Enviar a Cocina
+                          </Button>
+                        )}
                     </div>
                   )}
 
@@ -983,13 +962,12 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                   <Divider />
                   <div className="text-center">
                     <div
-                      className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
-                        order?.status === "open"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : order?.status === "closed"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-green-100 text-green-800"
-                      }`}
+                      className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${order?.status === "open"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : order?.status === "closed"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-green-100 text-green-800"
+                        }`}
                     >
                       Estado:{" "}
                       {order?.status === "open"
@@ -1018,29 +996,26 @@ export default function EditOrder({ dynamicParams, searchParams }) {
                 {paymentMethods.map((method) => (
                   <button
                     key={method.id}
-                    className={`group relative py-6 px-6 rounded-xl border-2 transition-all duration-200 touch-manipulation ${
-                      selectedPaymentMethod === method.id
-                        ? "border-green-500 bg-green-50 shadow-lg scale-105"
-                        : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md hover:scale-102"
-                    }`}
+                    className={`group relative py-6 px-6 rounded-xl border-2 transition-all duration-200 touch-manipulation ${selectedPaymentMethod === method.id
+                      ? "border-green-500 bg-green-50 shadow-lg scale-105"
+                      : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md hover:scale-102"
+                      }`}
                     onClick={() => handlePaymentMethodSelect(method.id)}
                   >
                     <div className="flex flex-col items-center gap-3">
                       <div
-                        className={`text-3xl transition-transform group-hover:scale-110 ${
-                          selectedPaymentMethod === method.id
-                            ? "transform scale-110"
-                            : ""
-                        }`}
+                        className={`text-3xl transition-transform group-hover:scale-110 ${selectedPaymentMethod === method.id
+                          ? "transform scale-110"
+                          : ""
+                          }`}
                       >
                         {getPaymentIcon(method.name)}
                       </div>
                       <span
-                        className={`font-semibold text-lg ${
-                          selectedPaymentMethod === method.id
-                            ? "text-green-700"
-                            : "text-gray-700"
-                        }`}
+                        className={`font-semibold text-lg ${selectedPaymentMethod === method.id
+                          ? "text-green-700"
+                          : "text-gray-700"
+                          }`}
                       >
                         {method.name}
                       </span>
@@ -1085,94 +1060,94 @@ export default function EditOrder({ dynamicParams, searchParams }) {
         />
         {/* Modal de Pago Efectivo */}
         {/* Modal de Pago Efectivo */}
-{generatedCashInfo && (
-  <ConfirmationPopup
-    isOpen={!!generatedCashInfo}
-    title="Pago en Efectivo"
-    hideDefaultButtons={true}
-    type="info"
-    customBody={
-      <div className="flex flex-col items-center space-y-6">
-        {/* Header */}
-        <div className="text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">💵</span>
-          </div>
-          <h4 className="text-lg font-semibold text-gray-800 mb-2">
-            Ingresa el monto recibido en efectivo
-          </h4>
-          <p className="text-gray-600 text-sm">
-            Calcularemos el cambio a devolver al cliente
-          </p>
-        </div>
+        {generatedCashInfo && (
+          <ConfirmationPopup
+            isOpen={!!generatedCashInfo}
+            title="Pago en Efectivo"
+            hideDefaultButtons={true}
+            type="info"
+            customBody={
+              <div className="flex flex-col items-center space-y-6">
+                {/* Header */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl">💵</span>
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                    Ingresa el monto recibido en efectivo
+                  </h4>
+                  <p className="text-gray-600 text-sm">
+                    Calcularemos el cambio a devolver al cliente
+                  </p>
+                </div>
 
-        {/* Información del monto */}
-        <div className="bg-gray-50 rounded-lg p-4 w-full text-center">
-          <p className="text-sm text-gray-600">Monto total del pedido</p>
-          <p className="text-2xl font-bold text-gray-800">
-            ${order?.total?.toFixed(2) || "0.00"}
-          </p>
-        </div>
+                {/* Información del monto */}
+                <div className="bg-gray-50 rounded-lg p-4 w-full text-center">
+                  <p className="text-sm text-gray-600">Monto total del pedido</p>
+                  <p className="text-2xl font-bold text-gray-800">
+                    ${order?.total?.toFixed(2) || "0.00"}
+                  </p>
+                </div>
 
-        {/* Input para el efectivo recibido */}
-        <div className="w-full">
-          <label className="block text-sm text-gray-600 mb-2">
-            Efectivo recibido
-          </label>
-          <input
-            type="text"
-            value={cashReceived}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (/^\d*\.?\d*$/.test(value)) {
-                setCashReceived(value);
-              }
-            }}
-            placeholder="0.00"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
+                {/* Input para el efectivo recibido */}
+                <div className="w-full">
+                  <label className="block text-sm text-gray-600 mb-2">
+                    Efectivo recibido
+                  </label>
+                  <input
+                    type="text"
+                    value={cashReceived}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^\d*\.?\d*$/.test(value)) {
+                        setCashReceived(value);
+                      }
+                    }}
+                    placeholder="0.00"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
+                  />
+                  {cashReceived && (
+                    <p className="text-sm text-gray-600 mt-2">
+                      Cambio a devolver: <span className="font-bold">
+                        ${(cashReceived ? (parseFloat(cashReceived) - order.total).toFixed(2) : '0.00')}
+                      </span>
+                    </p>
+                  )}
+                </div>
+
+                {/* Botones de acción */}
+                <div className="flex gap-4 w-full pt-2">
+                  <button
+                    className="flex-1 py-4 px-6 border-2 border-red-200 text-red-600 rounded-xl hover:bg-red-50 hover:border-red-300 active:bg-red-100 transition-all font-semibold touch-manipulation"
+                    onClick={handlePaymentCancel}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <span>❌</span>
+                      <span>Cancelar</span>
+                    </div>
+                  </button>
+                  <button
+                    className="flex-1 py-4 px-6 bg-green-500 text-white rounded-xl hover:bg-green-600 active:bg-green-700 transition-all font-semibold touch-manipulation"
+                    onClick={() => {
+                      if (parseFloat(cashReceived) >= order.total) {
+                        alert(`Payment confirmed! Change to give: $${(parseFloat(cashReceived) - order.total).toFixed(2)}`);
+                        handlePaymentConfirm();
+                      } else {
+                        alert('Insufficient cash received!');
+                      }
+                    }}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      <span>Confirmar Pago</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            }
+            onClose={handleCancelDialog}
           />
-          {cashReceived && (
-            <p className="text-sm text-gray-600 mt-2">
-              Cambio a devolver: <span className="font-bold">
-                ${(cashReceived ? (parseFloat(cashReceived) - order.total).toFixed(2) : '0.00')}
-              </span>
-            </p>
-          )}
-        </div>
-
-        {/* Botones de acción */}
-        <div className="flex gap-4 w-full pt-2">
-          <button
-            className="flex-1 py-4 px-6 border-2 border-red-200 text-red-600 rounded-xl hover:bg-red-50 hover:border-red-300 active:bg-red-100 transition-all font-semibold touch-manipulation"
-            onClick={handlePaymentCancel}
-          >
-            <div className="flex items-center justify-center gap-2">
-              <span>❌</span>
-              <span>Cancelar</span>
-            </div>
-          </button>
-          <button
-            className="flex-1 py-4 px-6 bg-green-500 text-white rounded-xl hover:bg-green-600 active:bg-green-700 transition-all font-semibold touch-manipulation"
-            onClick={() => {
-              if (parseFloat(cashReceived) >= order.total) {
-                alert(`Payment confirmed! Change to give: $${(parseFloat(cashReceived) - order.total).toFixed(2)}`);
-                handlePaymentConfirm();
-              } else {
-                alert('Insufficient cash received!');
-              }
-            }}
-          >
-            <div className="flex items-center justify-center gap-2">
-              <CheckCircle className="w-5 h-5" />
-              <span>Confirmar Pago</span>
-            </div>
-          </button>
-        </div>
-      </div>
-    }
-    onClose={handleCancelDialog}
-  />
-)}
+        )}
 
         {/* Modal de Pago Bitcoin */}
         {createdInvoice && (
