@@ -352,4 +352,26 @@ class TicketServiceTest {
             assertFalse(result) // Assert
         }
     }
+
+    @Test
+    fun `deleteTicket returns true on success`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = TicketService(mockConnection) // Arrange
+            val result = service.deleteTicket("ticket-1") // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteTicket returns false when ticket not found`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = TicketService(mockConnection) // Arrange
+            val result = service.deleteTicket("not-found-ticket") // Act
+            assertFalse(result) // Assert
+        }
+    }
 }
