@@ -75,6 +75,10 @@ fun Route.wallet(phoenixService: PhoenixService, tokenService: TokenService, aut
       val balance = phoenixService.getBalance()
       call.respond(HttpStatusCode.OK, balance)
     }
+    get("/seed") {
+      val seed = phoenixService.getSeed()
+      call.respond(HttpStatusCode.OK, seed)
+    }
     post("/payinvoice") {
       val request = call.receive<PayInvoiceRequest>()
       val result = phoenixService.payInvoice(request)
