@@ -341,4 +341,136 @@ class OrderServiceTest {
             assertNull(result) // Assert
         }
     }
+
+    @Test
+    fun `updateOrder returns false if ID is null`() {
+        runBlocking {
+            val order = Order(id = null, user_id = "user-1", table_id = "table-1", waiter = "waiter-1", status = "open", total = 100.0, created_at = "date-1") // Arrange
+            val service = OrderService(mockConnection) // Arrange
+            val result = service.updateOrder(order) // Act
+            assertFalse(result) // Assert
+            verify(mockConnection, never()).prepareStatement(any()) // Assert
+        }
+    }
+
+    @Test
+    fun `updateOrder returns false if user does not exist`() {
+        runBlocking {
+            val order = Order(id = "order-1", user_id = "non-existent-user", table_id = "table-1", waiter = "waiter-1", status = "open", total = 100.0, created_at = "date-1") // Arrange
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
+            whenever(mockResultSet.next()).thenReturn(false) // Arrange
+            val service = OrderService(mockConnection) // Arrange
+            val result = service.updateOrder(order) // Act
+            assertFalse(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateOrder returns false if table does not exist`() {
+        runBlocking {
+            val order = Order(id = "order-1", user_id = "user-1", table_id = "non-existent-table", waiter = "waiter-1", status = "open", total = 100.0, created_at = "date-1") // Arrange
+            val userCheckStatement: PreparedStatement = mock() // Arrange
+            val tableCheckStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("users"))).thenReturn(userCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("tables"))).thenReturn(tableCheckStatement) // Arrange
+            val userResultSet: ResultSet = mock() // Arrange
+            whenever(userResultSet.next()).thenReturn(true) // Arrange
+            whenever(userCheckStatement.executeQuery()).thenReturn(userResultSet) // Arrange
+            val tableResultSet: ResultSet = mock() // Arrange
+            whenever(tableResultSet.next()).thenReturn(false) // Arrange
+            whenever(tableCheckStatement.executeQuery()).thenReturn(tableResultSet) // Arrange
+            val service = OrderService(mockConnection) // Arrange
+            val result = service.updateOrder(order) // Act
+            assertFalse(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateOrder returns false if status is invalid`() {
+        runBlocking {
+            val order = Order(id = "order-1", user_id = "user-1", table_id = "table-1", waiter = "waiter-1", status = "invalid-status", total = 100.0, created_at = "date-1") // Arrange
+            val userCheckStatement: PreparedStatement = mock() // Arrange
+            val tableCheckStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("users"))).thenReturn(userCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("tables"))).thenReturn(tableCheckStatement) // Arrange
+            val userResultSet: ResultSet = mock() // Arrange
+            whenever(userResultSet.next()).thenReturn(true) // Arrange
+            whenever(userCheckStatement.executeQuery()).thenReturn(userResultSet) // Arrange
+            val tableResultSet: ResultSet = mock() // Arrange
+            whenever(tableResultSet.next()).thenReturn(true) // Arrange
+            whenever(tableCheckStatement.executeQuery()).thenReturn(tableResultSet) // Arrange
+            val service = OrderService(mockConnection) // Arrange
+            val result = service.updateOrder(order) // Act
+            assertFalse(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateOrder returns true on success`() {
+        runBlocking {
+            val order = Order(id = "order-1", user_id = "user-1", table_id = "table-1", waiter = "waiter-1", status = "open", total = 150.0, created_at = "date-1") // Arrange
+            val userCheckStatement: PreparedStatement = mock() // Arrange
+            val tableCheckStatement: PreparedStatement = mock() // Arrange
+            val updateStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("users"))).thenReturn(userCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("tables"))).thenReturn(tableCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE orders"))).thenReturn(updateStatement) // Arrange
+            val userResultSet: ResultSet = mock() // Arrange
+            whenever(userResultSet.next()).thenReturn(true) // Arrange
+            whenever(userCheckStatement.executeQuery()).thenReturn(userResultSet) // Arrange
+            val tableResultSet: ResultSet = mock() // Arrange
+            whenever(tableResultSet.next()).thenReturn(true) // Arrange
+            whenever(tableCheckStatement.executeQuery()).thenReturn(tableResultSet) // Arrange
+            whenever(updateStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = OrderService(mockConnection) // Arrange
+            val result = service.updateOrder(order) // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `updateOrder returns false when database update fails`() {
+        runBlocking {
+            val order = Order(id = "order-1", user_id = "user-1", table_id = "table-1", waiter = "waiter-1", status = "open", total = 150.0, created_at = "date-1") // Arrange
+            val userCheckStatement: PreparedStatement = mock() // Arrange
+            val tableCheckStatement: PreparedStatement = mock() // Arrange
+            val updateStatement: PreparedStatement = mock() // Arrange
+            whenever(mockConnection.prepareStatement(contains("users"))).thenReturn(userCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("tables"))).thenReturn(tableCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE orders"))).thenReturn(updateStatement) // Arrange
+            val userResultSet: ResultSet = mock() // Arrange
+            whenever(userResultSet.next()).thenReturn(true) // Arrange
+            whenever(userCheckStatement.executeQuery()).thenReturn(userResultSet) // Arrange
+            val tableResultSet: ResultSet = mock() // Arrange
+            whenever(tableResultSet.next()).thenReturn(true) // Arrange
+            whenever(tableCheckStatement.executeQuery()).thenReturn(tableResultSet) // Arrange
+            whenever(updateStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = OrderService(mockConnection) // Arrange
+            val result = service.updateOrder(order) // Act
+            assertFalse(result) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteOrder returns true on success`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(1) // Arrange
+            val service = OrderService(mockConnection) // Arrange
+            val result = service.deleteOrder("order-1") // Act
+            assertTrue(result) // Assert
+        }
+    }
+
+    @Test
+    fun `deleteOrder returns false when order not found`() {
+        runBlocking {
+            whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+            whenever(mockStatement.executeUpdate()).thenReturn(0) // Arrange
+            val service = OrderService(mockConnection) // Arrange
+            val result = service.deleteOrder("not-found-order") // Act
+            assertFalse(result) // Assert
+        }
+    }
 }
