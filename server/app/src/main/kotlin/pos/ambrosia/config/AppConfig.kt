@@ -15,7 +15,8 @@ object AppConfig {
     private val properties = Properties()
     private val phoenixProperties = Properties()
     private const val CONFIG_FILE_PATH = ".Ambrosia-POS/ambrosia.conf"
-    private const val PHOENIX_PATH = ".phoenix/phoenix.conf" 
+    private const val PHOENIX_PATH = ".phoenix/phoenix.conf"
+    private const val PHOENIX_SEED_PATH = ".phoenix/seed.dat"
 
     fun loadConfig() {
         val userHome = System.getProperty("user.home")
@@ -38,6 +39,21 @@ object AppConfig {
             logger.error("Error loading Phoenix configuration from {}", phoenixFile)
         }
     }
+
+    fun loadPhoenixSeed(): String {
+        val userHome = System.getProperty("user.home")
+        val seedFile = File(userHome, PHOENIX_SEED_PATH)
+        var seed = ""
+
+        try {
+            seed = seedFile.readText()
+        } catch (e: Exception) {
+            logger.error("Error loading Phoenix seed from {}", seedFile)
+        }
+        return seed
+    }
+
+
     @Deprecated("Use app environment properties instead")
     fun getProperty(key: String, defaultValue: String? = null): String? {
         return properties.getProperty(key) ?: defaultValue

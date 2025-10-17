@@ -78,6 +78,11 @@ class PhoenixService(app: ApplicationEnvironment) {
     }
   }
 
+  /** Get seed from Phoenix */
+  suspend fun getSeed(): String {
+      return AppConfig.loadPhoenixSeed()
+  }
+
   /** Create a new Bolt11 invoice on Phoenix */
   suspend fun createInvoice(request: CreateInvoiceRequest): CreateInvoiceResponse {
     try {
