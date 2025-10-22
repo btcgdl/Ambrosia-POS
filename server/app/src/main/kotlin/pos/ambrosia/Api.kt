@@ -109,6 +109,7 @@ class Api() {
     configureAuth()
     configureUsers()
     configureRoles()
+    configurePermissions()
     configureDishes()
     configureDishCategories()
     configureSpaces()

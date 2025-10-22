@@ -9,6 +9,7 @@ import java.sql.SQLException
 import pos.ambrosia.logger
 import pos.ambrosia.models.Message
 import pos.ambrosia.utils.AdminOnlyException
+import pos.ambrosia.utils.PermissionDeniedException
 import pos.ambrosia.utils.InvalidCredentialsException
 import pos.ambrosia.utils.PhoenixBalanceException
 import pos.ambrosia.utils.PhoenixConnectionException
@@ -44,6 +45,10 @@ fun Application.Handler() {
     exception<AdminOnlyException> { call, _ ->
       logger.warn("Non-admin user attempted to access admin-only endpoint")
       call.respond(HttpStatusCode.Forbidden, Message("Admin privileges required"))
+    }
+    exception<PermissionDeniedException> { call, _ ->
+      logger.warn("User attempted to access endpoint without required permission")
+      call.respond(HttpStatusCode.Forbidden, Message("Permission required"))
     }
     exception<PhoenixConnectionException> { call, cause ->
       logger.error("Phoenix Lightning node connection error: ${cause.message}")
