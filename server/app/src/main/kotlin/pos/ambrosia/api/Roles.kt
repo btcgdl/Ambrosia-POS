@@ -16,6 +16,7 @@ import pos.ambrosia.models.Role
 import pos.ambrosia.services.RolesService
 import pos.ambrosia.services.PermissionsService
 import pos.ambrosia.models.RolePermissionsUpdateRequest
+import pos.ambrosia.models.RolePermissionsUpdateResult
 import pos.ambrosia.utils.authenticateAdmin
 
 fun Application.configureRoles() {
@@ -112,7 +113,7 @@ fun Route.roles(roleService: RolesService, permissionsService: PermissionsServic
 
       val payload = call.receive<RolePermissionsUpdateRequest>()
       val count = permissionsService.replaceRolePermissions(id, payload.permissions.distinct())
-      call.respond(HttpStatusCode.OK, mapOf("roleId" to id, "assigned" to count))
+      call.respond(HttpStatusCode.OK, RolePermissionsUpdateResult(roleId = id, assigned = count))
     }
   }
 }

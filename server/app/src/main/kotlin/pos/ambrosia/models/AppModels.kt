@@ -173,6 +173,12 @@ data class RolePermissionsUpdateRequest(
     val permissions: List<String>
 )
 
+@Serializable
+data class RolePermissionsUpdateResult(
+    val roleId: String,
+    val assigned: Int
+)
+
 enum class TicketType {
   KITCHEN,
   CUSTOMER
