@@ -19,6 +19,7 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
       "generate-env.cjs",
+      "postcss.config.cjs"
     ],
   },
 ];
