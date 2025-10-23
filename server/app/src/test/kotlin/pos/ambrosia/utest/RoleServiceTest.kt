@@ -50,13 +50,12 @@ class RoleServiceTest {
     @Test
     fun `getRoleById returns role when found`() {
         runBlocking {
-            val expectedRole = Role(id = "role-1", role = "Admin", password = "pass-hash-1", isAdmin = true) // Arrange
+            val expectedRole = Role(id = "role-1", role = "Admin", isAdmin = true) // Arrange
             whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
             whenever(mockStatement.executeQuery()).thenReturn(mockResultSet) // Arrange
             whenever(mockResultSet.next()).thenReturn(true) // Arrange
             whenever(mockResultSet.getString("id")).thenReturn(expectedRole.id) // Arrange
             whenever(mockResultSet.getString("role")).thenReturn(expectedRole.role) // Arrange
-            whenever(mockResultSet.getString("password")).thenReturn(expectedRole.password) // Arrange
             whenever(mockResultSet.getBoolean("isAdmin")).thenReturn(expectedRole.isAdmin) // Arrange
             val service = RolesService(mockEnv, mockConnection) // Arrange
             val result = service.getRoleById("role-1") // Act
