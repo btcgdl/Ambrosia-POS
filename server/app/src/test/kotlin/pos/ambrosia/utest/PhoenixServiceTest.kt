@@ -420,4 +420,259 @@ class PhoenixServiceTest {
             }
         }
     }
+
+    @Test
+    fun `payOffer returns PaymentResponse on success`() {
+        runBlocking {
+            // Arrange
+            val mockJson = """
+                {
+                    "recipientAmountSat": 1000,
+                    "routingFeeSat": 10,
+                    "paymentId": "payment-id",
+                    "paymentHash": "payment-hash",
+                    "paymentPreimage": "payment-preimage"
+                }
+            """.trimIndent()
+
+            val mockEngine = MockEngine { request ->
+                respond(
+                    content = ByteReadChannel(mockJson.toByteArray(Charsets.UTF_8)),
+                    status = HttpStatusCode.OK,
+                    headers = headersOf(HttpHeaders.ContentType, "application/json")
+                )
+            }
+
+            val httpClient = HttpClient(mockEngine) {
+                install(ContentNegotiation) {
+                    json(Json {
+                        ignoreUnknownKeys = true
+                    })
+                }
+            }
+
+            // Act
+            val response = httpClient.submitForm("/payoffer", formParameters = Parameters.build { append("offer", "lno1...") })
+            val paymentResponse = response.body<pos.ambrosia.models.Phoenix.PaymentResponse>()
+
+            // Assert
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertEquals(1000, paymentResponse.recipientAmountSat)
+        }
+    }
+
+    @Test
+    fun `payOffer throws PhoenixServiceException on non-200 response`() {
+        runBlocking {
+            // Arrange
+            val mockEngine = MockEngine { request ->
+                respond(
+                    content = ByteReadChannel(""),
+                    status = HttpStatusCode.InternalServerError
+                )
+            }
+
+            val httpClient = HttpClient(mockEngine)
+
+            // Act & Assert
+            assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+                val response = httpClient.submitForm("/payoffer", formParameters = Parameters.build { append("offer", "lno1...") })
+                if (response.status.value != 200) {
+                    throw pos.ambrosia.utils.PhoenixServiceException("Phoenix node returned ${response.status.value}")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `payOffer throws PhoenixServiceException on network error`() {
+        runBlocking {
+            // Arrange
+            val mockEngine = MockEngine { request ->
+                throw IOException("Network error")
+            }
+
+            val httpClient = HttpClient(mockEngine)
+
+            // Act & Assert
+            assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+                try {
+                    httpClient.submitForm("/payoffer", formParameters = Parameters.build { append("offer", "lno1...") })
+                } catch (e: Exception) {
+                    throw pos.ambrosia.utils.PhoenixServiceException("Failed to pay offer on Phoenix: ${e.message}")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `payOnchain returns PaymentResponse on success`() {
+        runBlocking {
+            // Arrange
+            val mockJson = """
+                {
+                    "recipientAmountSat": 1000,
+                    "routingFeeSat": 10,
+                    "paymentId": "payment-id",
+                    "paymentHash": "payment-hash",
+                    "paymentPreimage": "payment-preimage"
+                }
+            """.trimIndent()
+
+            val mockEngine = MockEngine { request ->
+                respond(
+                    content = ByteReadChannel(mockJson.toByteArray(Charsets.UTF_8)),
+                    status = HttpStatusCode.OK,
+                    headers = headersOf(HttpHeaders.ContentType, "application/json")
+                )
+            }
+
+            val httpClient = HttpClient(mockEngine) {
+                install(ContentNegotiation) {
+                    json(Json {
+                        ignoreUnknownKeys = true
+                    })
+                }
+            }
+
+            // Act
+            val response = httpClient.submitForm("/payonchain", formParameters = Parameters.build { 
+                append("address", "bc1q...")
+                append("amountSat", "1000")
+                append("feerateSatByte", "10")
+            })
+            val paymentResponse = response.body<pos.ambrosia.models.Phoenix.PaymentResponse>()
+
+            // Assert
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertEquals(1000, paymentResponse.recipientAmountSat)
+        }
+    }
+
+    @Test
+    fun `payOnchain throws PhoenixServiceException on non-200 response`() {
+        runBlocking {
+            // Arrange
+            val mockEngine = MockEngine { request ->
+                respond(
+                    content = ByteReadChannel(""),
+                    status = HttpStatusCode.InternalServerError
+                )
+            }
+
+            val httpClient = HttpClient(mockEngine)
+
+            // Act & Assert
+            assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+                val response = httpClient.submitForm("/payonchain", formParameters = Parameters.build { 
+                    append("address", "bc1q...")
+                    append("amountSat", "1000")
+                    append("feerateSatByte", "10")
+                })
+                if (response.status.value != 200) {
+                    throw pos.ambrosia.utils.PhoenixServiceException("Phoenix node returned ${response.status.value}")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `payOnchain throws PhoenixServiceException on network error`() {
+        runBlocking {
+            // Arrange
+            val mockEngine = MockEngine { request ->
+                throw IOException("Network error")
+            }
+
+            val httpClient = HttpClient(mockEngine)
+
+            // Act & Assert
+            assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+                try {
+                    httpClient.submitForm("/payonchain", formParameters = Parameters.build { 
+                        append("address", "bc1q...")
+                        append("amountSat", "1000")
+                        append("feerateSatByte", "10")
+                    })
+                } catch (e: Exception) {
+                    throw pos.ambrosia.utils.PhoenixServiceException("Failed to pay onchain transaction on Phoenix: ${e.message}")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `bumpOnchainFees returns String on success`() {
+        runBlocking {
+            // Arrange
+            val mockResponse = "Fees bumped"
+            val mockEngine = MockEngine { request ->
+                respond(
+                    content = ByteReadChannel(mockResponse.toByteArray(Charsets.UTF_8)),
+                    status = HttpStatusCode.OK,
+                    headers = headersOf(HttpHeaders.ContentType, "text/plain")
+                )
+            }
+
+            val httpClient = HttpClient(mockEngine)
+
+            // Act
+            val response = httpClient.submitForm("/bumpfee", formParameters = Parameters.build { 
+                append("feerateSatByte", "10")
+            })
+            val responseBody = response.bodyAsText()
+
+            // Assert
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertEquals(mockResponse, responseBody)
+        }
+    }
+
+    @Test
+    fun `bumpOnchainFees throws PhoenixServiceException on non-200 response`() {
+        runBlocking {
+            // Arrange
+            val mockEngine = MockEngine { request ->
+                respond(
+                    content = ByteReadChannel(""),
+                    status = HttpStatusCode.InternalServerError
+                )
+            }
+
+            val httpClient = HttpClient(mockEngine)
+
+            // Act & Assert
+            assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+                val response = httpClient.submitForm("/bumpfee", formParameters = Parameters.build { 
+                    append("feerateSatByte", "10")
+                })
+                if (response.status.value != 200) {
+                    throw pos.ambrosia.utils.PhoenixServiceException("Phoenix node returned ${response.status.value}")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `bumpOnchainFees throws PhoenixServiceException on network error`() {
+        runBlocking {
+            // Arrange
+            val mockEngine = MockEngine { request ->
+                throw IOException("Network error")
+            }
+
+            val httpClient = HttpClient(mockEngine)
+
+            // Act & Assert
+            assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+                try {
+                    httpClient.submitForm("/bumpfee", formParameters = Parameters.build { 
+                        append("feerateSatByte", "10")
+                    })
+                } catch (e: Exception) {
+                    throw pos.ambrosia.utils.PhoenixServiceException("Failed to bump onchain fees on Phoenix: ${e.message}")
+                }
+            }
+        }
+    }
 }
