@@ -160,6 +160,25 @@ data class RolePassword(
 	val password: String
 )
 
+@Serializable
+data class Permission(
+    val id: String? = null,
+    val name: String,
+    val description: String? = null,
+    val enabled: Boolean = true
+)
+
+@Serializable
+data class RolePermissionsUpdateRequest(
+    val permissions: List<String>
+)
+
+@Serializable
+data class RolePermissionsUpdateResult(
+    val roleId: String,
+    val assigned: Int
+)
+
 enum class TicketType {
   KITCHEN,
   CUSTOMER

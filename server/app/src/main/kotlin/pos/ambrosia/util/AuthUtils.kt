@@ -3,11 +3,13 @@ package pos.ambrosia.utils
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.routing.*
 import java.sql.Connection
 import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.services.TokenService
+import pos.ambrosia.utils.PermissionDeniedException
 
 /** Extensión para verificar si el usuario actual es administrador */
 fun ApplicationCall.requireAdmin() {
@@ -84,3 +86,39 @@ fun Route.authenticateAdmin(name: String = "auth-jwt", build: Route.() -> Unit):
 
 /** Data class para representar información básica del usuario */
 data class UserInfo(val userId: String, val role: String, val isAdmin: Boolean)
+
+suspend fun ApplicationCall.requirePermission(key: String) {
+  val principal = principal<JWTPrincipal>() ?: throw PermissionDeniedException()
+  val userId = principal.getClaim("userId", String::class) ?: throw PermissionDeniedException()
+  val sql = """
+    SELECT 1
+    FROM users u
+    JOIN roles r ON u.role_id = r.id
+    JOIN role_permissions rp ON rp.role_id = r.id
+    JOIN permissions p ON p.id = rp.permission_id
+    WHERE u.id = ? AND p.key = ? AND p.enabled = 1 AND u.is_deleted = 0
+  """
+  val connection: Connection = DatabaseConnection.getConnection()
+  connection.prepareStatement(sql).use { st ->
+    st.setString(1, userId)
+    st.setString(2, key)
+    val rs = st.executeQuery()
+    if (!rs.next()) throw PermissionDeniedException()
+  }
+}
+
+fun Route.authorizePermission(key: String, name: String = "auth-jwt", build: Route.() -> Unit): Route {
+  return authenticate(name) {
+    install(RequirePermission) { this.key = key }
+    build()
+  }
+}
+
+class PermissionPluginConfig { lateinit var key: String }
+
+val RequirePermission = createRouteScopedPlugin(name = "RequirePermission", createConfiguration = ::PermissionPluginConfig) {
+  val permissionKey = pluginConfig.key
+  on(AuthenticationChecked) { call ->
+    call.requirePermission(permissionKey)
+  }
+}

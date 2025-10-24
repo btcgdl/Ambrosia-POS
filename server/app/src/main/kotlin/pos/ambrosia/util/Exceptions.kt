@@ -28,3 +28,5 @@ class PhoenixServiceException(message: String = "Phoenix Lightning node service 
 class InvalidTokenException(message: String = "Invalid token") : Exception(message)
 
 class WalletOnlyException(message: String = "Wallet access required") : SecurityException(message)
+
+class PermissionDeniedException(message: String = "Permission required") : SecurityException(message)

@@ -14,15 +14,19 @@ import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Role
 import pos.ambrosia.services.RolesService
+import pos.ambrosia.services.PermissionsService
+import pos.ambrosia.models.RolePermissionsUpdateRequest
+import pos.ambrosia.models.RolePermissionsUpdateResult
 import pos.ambrosia.utils.authenticateAdmin
 
 fun Application.configureRoles() {
   val connection: Connection = DatabaseConnection.getConnection()
   val roleService = RolesService(environment, connection)
-  routing { route("/roles") { roles(roleService) } }
+  val permissionsService = PermissionsService(environment, connection)
+  routing { route("/roles") { roles(roleService, permissionsService) } }
 }
 
-fun Route.roles(roleService: RolesService) {
+fun Route.roles(roleService: RolesService, permissionsService: PermissionsService) {
   get("/{id}") {
     val id = call.parameters["id"]
     if (id == null) {
@@ -84,6 +88,32 @@ fun Route.roles(roleService: RolesService) {
       }
 
       call.respond(HttpStatusCode.NoContent, mapOf("id" to id, "message" to "Role deleted successfully"))
+    }
+
+    get("/{id}/permissions") {
+      val id = call.parameters["id"]
+      if (id == null) {
+        call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+        return@get
+      }
+      val perms = permissionsService.getByRole(id)
+      if (perms.isEmpty()) {
+        call.respond(HttpStatusCode.NoContent)
+        return@get
+      }
+      call.respond(HttpStatusCode.OK, perms)
+    }
+
+    put("/{id}/permissions") {
+      val id = call.parameters["id"]
+      if (id == null) {
+        call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+        return@put
+      }
+
+      val payload = call.receive<RolePermissionsUpdateRequest>()
+      val count = permissionsService.replaceRolePermissions(id, payload.permissions.distinct())
+      call.respond(HttpStatusCode.OK, RolePermissionsUpdateResult(roleId = id, assigned = count))
     }
   }
 }
