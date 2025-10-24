@@ -23,7 +23,7 @@ class PermissionsServiceTest {
         whenever(st.executeQuery()).thenReturn(rs)
         whenever(rs.next()).thenReturn(true).thenReturn(true).thenReturn(false)
         whenever(rs.getString("id")).thenReturn("p1").thenReturn("p2")
-        whenever(rs.getString("key")).thenReturn("perm.read").thenReturn("perm.write")
+        whenever(rs.getString("name")).thenReturn("perm.read").thenReturn("perm.write")
         whenever(rs.getString("description")).thenReturn("Read").thenReturn("Write")
         whenever(rs.getBoolean("enabled")).thenReturn(true).thenReturn(true)
         val service = PermissionsService(env, conn)
@@ -31,7 +31,7 @@ class PermissionsServiceTest {
         val list = service.getAll()
         // Assert
         assertEquals(2, list.size)
-        assertEquals("perm.read", list[0].key)
+        assertEquals("perm.read", list[0].name)
         assertTrue(list.all { it.enabled })
     }
 
@@ -59,7 +59,7 @@ class PermissionsServiceTest {
         whenever(st.executeQuery()).thenReturn(rs)
         whenever(rs.next()).thenReturn(true).thenReturn(false)
         whenever(rs.getString("id")).thenReturn("p1")
-        whenever(rs.getString("key")).thenReturn("perm.read")
+        whenever(rs.getString("name")).thenReturn("perm.read")
         whenever(rs.getString("description")).thenReturn("Read")
         whenever(rs.getBoolean("enabled")).thenReturn(true)
         val service = PermissionsService(env, conn)
@@ -67,7 +67,7 @@ class PermissionsServiceTest {
         val list = service.getByRole("role-1")
         // Assert
         assertEquals(1, list.size)
-        assertEquals("perm.read", list[0].key)
+        assertEquals("perm.read", list[0].name)
     }
 
     @Test
