@@ -18,31 +18,33 @@ import pos.ambrosia.utils.*
 import io.ktor.server.application.ApplicationEnvironment
 
 /** Service for interacting with Phoenix Lightning node */
-class PhoenixService(app: ApplicationEnvironment) {
+class PhoenixService(app: ApplicationEnvironment, private val httpClient: HttpClient) {
   private val config = app.config
   private val phoenixdUrl = config.property("phoenixd-url").getString()
   private val phoenixdPassword = config.property("phoenixd-password").getString()
-  private val httpClient =
-          HttpClient(CIO) {
-            install(Auth) {
-              basic {
-                credentials {
-                  BasicAuthCredentials(
-                          username = "",
-                          password = config.property("phoenixd-password").getString()
-                  )
-                }
-              }
-            }
-            install(ContentNegotiation) {
-              json(
-                      Json {
-                        ignoreUnknownKeys = true
-                        prettyPrint = true
-                      }
+  constructor(app: ApplicationEnvironment) : this(
+    app,
+    HttpClient(CIO) {
+        install(Auth) {
+          basic {
+            credentials {
+              BasicAuthCredentials(
+                      username = "",
+                      password = app.config.property("phoenixd-password").getString()
               )
             }
           }
+        }
+        install(ContentNegotiation) {
+          json(
+                  Json {
+                    ignoreUnknownKeys = true
+                    prettyPrint = true
+                  }
+          )
+        }
+    }
+  )    
 
   /** Get node information from Phoenix */
   suspend fun getNodeInfo(): NodeInfo {

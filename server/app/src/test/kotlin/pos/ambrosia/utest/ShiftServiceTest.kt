@@ -15,7 +15,6 @@ class ShiftServiceTest {
     private val mockConnection: Connection = mock()
     private val mockStatement: PreparedStatement = mock()
     private val mockResultSet: ResultSet = mock()
-    private val mockEnv: ApplicationEnvironment = mock()
 
     @Test
     fun `getShifts returns list of shifts when found`() {
