@@ -16,6 +16,7 @@ class PermissionsServiceTest {
 
     @Test
     fun `getAll returns list when found`() {
+        // Arrange
         val st: PreparedStatement = mock()
         val rs: ResultSet = mock()
         whenever(conn.prepareStatement(any())).thenReturn(st)
@@ -26,7 +27,9 @@ class PermissionsServiceTest {
         whenever(rs.getString("description")).thenReturn("Read").thenReturn("Write")
         whenever(rs.getBoolean("enabled")).thenReturn(true).thenReturn(true)
         val service = PermissionsService(env, conn)
+        // Act
         val list = service.getAll()
+        // Assert
         assertEquals(2, list.size)
         assertEquals("perm.read", list[0].key)
         assertTrue(list.all { it.enabled })
@@ -34,18 +37,22 @@ class PermissionsServiceTest {
 
     @Test
     fun `getAll returns empty when none`() {
+        // Arrange
         val st: PreparedStatement = mock()
         val rs: ResultSet = mock()
         whenever(conn.prepareStatement(any())).thenReturn(st)
         whenever(st.executeQuery()).thenReturn(rs)
         whenever(rs.next()).thenReturn(false)
         val service = PermissionsService(env, conn)
+        // Act
         val list = service.getAll()
+        // Assert
         assertTrue(list.isEmpty())
     }
 
     @Test
     fun `getByRole returns list when found`() {
+        // Arrange
         val st: PreparedStatement = mock()
         val rs: ResultSet = mock()
         whenever(conn.prepareStatement(contains("FROM role_permissions"))).thenReturn(st)
@@ -56,26 +63,32 @@ class PermissionsServiceTest {
         whenever(rs.getString("description")).thenReturn("Read")
         whenever(rs.getBoolean("enabled")).thenReturn(true)
         val service = PermissionsService(env, conn)
+        // Act
         val list = service.getByRole("role-1")
+        // Assert
         assertEquals(1, list.size)
         assertEquals("perm.read", list[0].key)
     }
 
     @Test
     fun `replaceRolePermissions returns 0 when role does not exist`() {
+        // Arrange
         val stRole: PreparedStatement = mock()
         val rsRole: ResultSet = mock()
         whenever(conn.prepareStatement(contains("FROM roles"))).thenReturn(stRole)
         whenever(stRole.executeQuery()).thenReturn(rsRole)
         whenever(rsRole.next()).thenReturn(false)
         val service = PermissionsService(env, conn)
+        // Act
         val count = service.replaceRolePermissions("role-x", listOf("perm.read"))
+        // Assert
         assertEquals(0, count)
         verify(conn, never()).prepareStatement(contains("DELETE FROM role_permissions"))
     }
 
     @Test
     fun `replaceRolePermissions deletes only when empty keys`() {
+        // Arrange
         val stRole: PreparedStatement = mock()
         val rsRole: ResultSet = mock()
         val stDelete: PreparedStatement = mock()
@@ -86,7 +99,9 @@ class PermissionsServiceTest {
         whenever(stDelete.executeUpdate()).thenReturn(1)
         doNothing().whenever(conn).commit()
         val service = PermissionsService(env, conn)
+        // Act
         val count = service.replaceRolePermissions("role-1", emptyList())
+        // Assert
         assertEquals(0, count)
         verify(conn).prepareStatement(contains("DELETE FROM role_permissions"))
         verify(conn).commit()
@@ -94,6 +109,7 @@ class PermissionsServiceTest {
 
     @Test
     fun `replaceRolePermissions inserts resolved permission ids`() {
+        // Arrange
         val stRole: PreparedStatement = mock()
         val rsRole: ResultSet = mock()
         val stDelete: PreparedStatement = mock()
@@ -113,13 +129,16 @@ class PermissionsServiceTest {
         whenever(stInsert.executeUpdate()).thenReturn(1).thenReturn(1)
         doNothing().whenever(conn).commit()
         val service = PermissionsService(env, conn)
+        // Act
         val count = service.replaceRolePermissions("role-1", listOf("perm.read", "perm.write"))
+        // Assert
         assertEquals(2, count)
         verify(conn).commit()
     }
 
     @Test
     fun `replaceRolePermissions rolls back on failure`() {
+        // Arrange
         val stRole: PreparedStatement = mock()
         val rsRole: ResultSet = mock()
         whenever(conn.prepareStatement(contains("FROM roles"))).thenReturn(stRole)
@@ -128,9 +147,10 @@ class PermissionsServiceTest {
         whenever(conn.prepareStatement(contains("DELETE FROM role_permissions"))).thenThrow(RuntimeException("boom"))
         doNothing().whenever(conn).rollback()
         val service = PermissionsService(env, conn)
+        // Act
         val count = service.replaceRolePermissions("role-1", listOf("perm.read"))
+        // Assert
         assertEquals(0, count)
         verify(conn).rollback()
     }
 }
-
