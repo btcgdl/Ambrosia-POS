@@ -1,9 +1,8 @@
-# .github/workflows/ci.yml
-name: CI for Server
+name: Server Tests
 
 on:
-  push:
-    branches: ["main"]
+  pull_request:
+    branches: '**'
 
   workflow_dispatch:
 

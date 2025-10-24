@@ -61,4 +61,14 @@ class ConfigServiceTest {
         val result = service.updateConfig(configToUpdate) // Act
         assertTrue(result) // Assert
     }
+
+    @Test
+    fun `updateConfig returns false when database update fails`() = runBlocking {
+        val configToUpdate = Config(1, "New Name", "", "", "", "", byteArrayOf()) // Arrange
+        whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
+        whenever(mockStatement.executeUpdate()).thenReturn(0) // Arrange
+        val service = ConfigService(mockConnection) // Arrange
+        val result = service.updateConfig(configToUpdate) // Act
+        assertFalse(result) // Assert
+    }
 }

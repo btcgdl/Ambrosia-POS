@@ -22,6 +22,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.2.20")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
     testImplementation("org.mockito:mockito-core:4.0.0")
+    testImplementation("io.ktor:ktor-client-mock:$ktor-version")
     // ktor dependencies
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.serialization.kotlinx.json)
