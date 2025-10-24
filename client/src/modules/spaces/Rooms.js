@@ -23,7 +23,7 @@ export default function Rooms() {
     async function fetchRooms() {
       try {
         setIsLoading(true);
-        const response = await getRooms();
+        let response = await getRooms();
         if (response === undefined) {
           response = 0;
         }
