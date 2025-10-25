@@ -8,17 +8,17 @@ import pos.ambrosia.models.Permission
 class PermissionsService(private val env: ApplicationEnvironment, private val connection: Connection) {
 
     companion object {
-        private const val SELECT_ALL = "SELECT id, key, description, enabled FROM permissions ORDER BY key"
+        private const val SELECT_ALL = "SELECT id, name, description, enabled FROM permissions ORDER BY name"
         private const val SELECT_BY_ROLE =
             """
-            SELECT p.id, p.key, p.description, p.enabled
+            SELECT p.id, p.name, p.description, p.enabled
             FROM role_permissions rp
             JOIN permissions p ON p.id = rp.permission_id
             WHERE rp.role_id = ?
-            ORDER BY p.key
+            ORDER BY p.name
             """
-        private const val SELECT_BY_KEYS =
-            "SELECT id FROM permissions WHERE key IN (%s) AND enabled = 1"
+        private const val SELECT_BY_NAMES =
+            "SELECT id FROM permissions WHERE name IN (%s) AND enabled = 1"
         private const val ROLE_EXISTS =
             "SELECT id FROM roles WHERE id = ? AND is_deleted = 0"
         private const val DELETE_ROLE_PERMS =
@@ -35,7 +35,7 @@ class PermissionsService(private val env: ApplicationEnvironment, private val co
             list.add(
                 Permission(
                     id = rs.getString("id"),
-                    key = rs.getString("key"),
+                    name = rs.getString("name"),
                     description = rs.getString("description"),
                     enabled = rs.getBoolean("enabled")
                 )
@@ -53,7 +53,7 @@ class PermissionsService(private val env: ApplicationEnvironment, private val co
             list.add(
                 Permission(
                     id = rs.getString("id"),
-                    key = rs.getString("key"),
+                    name = rs.getString("name"),
                     description = rs.getString("description"),
                     enabled = rs.getBoolean("enabled")
                 )
@@ -84,7 +84,7 @@ class PermissionsService(private val env: ApplicationEnvironment, private val co
             }
 
             val placeholders = permissionKeys.joinToString(",") { "?" }
-            val sql = String.format(SELECT_BY_KEYS, placeholders)
+            val sql = String.format(SELECT_BY_NAMES, placeholders)
             val ids = mutableListOf<String>()
             connection.prepareStatement(sql).use { st ->
                 permissionKeys.forEachIndexed { idx, key -> st.setString(idx + 1, key) }

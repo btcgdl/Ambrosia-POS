@@ -163,7 +163,7 @@ data class RolePassword(
 @Serializable
 data class Permission(
     val id: String? = null,
-    val key: String,
+    val name: String,
     val description: String? = null,
     val enabled: Boolean = true
 )
