@@ -8,7 +8,7 @@ import {
   decodeToken,
 } from "./lib/auth";
 
-export async function middleware(request) {
+export async function proxy(request) {
   const pathname = request.nextUrl.pathname;
 
   console.log("🛡️ Middleware ejecutándose para:", pathname);
