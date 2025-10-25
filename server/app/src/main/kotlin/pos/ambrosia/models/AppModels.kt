@@ -197,3 +197,19 @@ data class Config(
     val taxId: String?,
     val logo: ByteArray?
 )
+
+@Serializable
+data class Product(
+    val id: String? = null,
+    val SKU: String,
+    val name: String,
+    val description: String? = null,
+    val image_url: String? = null,
+    val cost_cents: Int,
+    val category_id: String,
+    val quantity: Int,
+    val price_cents: Int
+)
+
+@Serializable
+data class ProductCategory(val id: String? = null, val name: String)
