@@ -6,16 +6,16 @@ import pos.ambrosia.models.DishCategory
 
 class DishCategoryService(private val connection: Connection) {
   companion object {
-    private const val ADD_CATEGORY = "INSERT INTO dish_categories (id, name) VALUES (?, ?)"
-    private const val GET_CATEGORIES = "SELECT id, name FROM dish_categories WHERE is_deleted = 0"
+    private const val ADD_CATEGORY = "INSERT INTO categories (id, name, type, is_deleted) VALUES (?, ?, 'dish', 0)"
+    private const val GET_CATEGORIES = "SELECT id, name FROM categories WHERE type = 'dish' AND is_deleted = 0"
     private const val GET_CATEGORY_BY_ID =
-            "SELECT id, name FROM dish_categories WHERE id = ? AND is_deleted = 0"
-    private const val UPDATE_CATEGORY = "UPDATE dish_categories SET name = ? WHERE id = ?"
-    private const val DELETE_CATEGORY = "UPDATE dish_categories SET is_deleted = 1 WHERE id = ?"
+            "SELECT id, name FROM categories WHERE id = ? AND type = 'dish' AND is_deleted = 0"
+    private const val UPDATE_CATEGORY = "UPDATE categories SET name = ? WHERE id = ? AND type = 'dish'"
+    private const val DELETE_CATEGORY = "UPDATE categories SET is_deleted = 1 WHERE id = ? AND type = 'dish'"
     private const val CHECK_CATEGORY_IN_USE =
             "SELECT COUNT(*) as count FROM dishes WHERE category_id = ? AND is_deleted = 0"
     private const val CHECK_NAME_EXISTS =
-            "SELECT id FROM dish_categories WHERE name = ? AND is_deleted = 0 AND id != ?"
+            "SELECT id FROM categories WHERE name = ? AND type = 'dish' AND is_deleted = 0 AND id != ?"
   }
 
   private fun categoryInUse(categoryId: String): Boolean {

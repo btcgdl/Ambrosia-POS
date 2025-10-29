@@ -142,7 +142,7 @@ class IngredientCategoryServiceTest {
             val service = IngredientCategoryService(mockConnection) // Arrange
             val result = service.deleteIngredientCategory(categoryId) // Act
             assertFalse(result) // Assert
-            verify(mockConnection, never()).prepareStatement(contains("UPDATE ingredient_categories SET is_deleted")) // Assert
+            verify(mockConnection, never()).prepareStatement(contains("UPDATE categories SET is_deleted")) // Assert
         }
     }
 
@@ -153,7 +153,7 @@ class IngredientCategoryServiceTest {
             val checkInUseStatement: PreparedStatement = mock() // Arrange
             val deleteStatement: PreparedStatement = mock() // Arrange
             whenever(mockConnection.prepareStatement(contains("SELECT COUNT(*)"))).thenReturn(checkInUseStatement) // Arrange
-            whenever(mockConnection.prepareStatement(contains("UPDATE ingredient_categories SET is_deleted"))).thenReturn(deleteStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE categories SET is_deleted"))).thenReturn(deleteStatement) // Arrange
             val checkInUseResultSet: ResultSet = mock() // Arrange
             whenever(checkInUseResultSet.next()).thenReturn(true) // Arrange
             whenever(checkInUseResultSet.getInt("count")).thenReturn(0) // Arrange
@@ -173,7 +173,7 @@ class IngredientCategoryServiceTest {
             val checkInUseStatement: PreparedStatement = mock() // Arrange
             val deleteStatement: PreparedStatement = mock() // Arrange
             whenever(mockConnection.prepareStatement(contains("SELECT COUNT(*)"))).thenReturn(checkInUseStatement) // Arrange
-            whenever(mockConnection.prepareStatement(contains("UPDATE ingredient_categories SET is_deleted"))).thenReturn(deleteStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE categories SET is_deleted"))).thenReturn(deleteStatement) // Arrange
             val checkInUseResultSet: ResultSet = mock() // Arrange
             whenever(checkInUseResultSet.next()).thenReturn(true) // Arrange
             whenever(checkInUseResultSet.getInt("count")).thenReturn(0) // Arrange
@@ -227,7 +227,7 @@ class IngredientCategoryServiceTest {
             val checkNameStatement: PreparedStatement = mock() // Arrange
             val updateStatement: PreparedStatement = mock() // Arrange
             whenever(mockConnection.prepareStatement(contains("SELECT id FROM"))).thenReturn(checkNameStatement) // Arrange
-            whenever(mockConnection.prepareStatement(contains("UPDATE ingredient_categories"))).thenReturn(updateStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE categories"))).thenReturn(updateStatement) // Arrange
             val checkNameResultSet: ResultSet = mock() // Arrange
             whenever(checkNameResultSet.next()).thenReturn(false) // Arrange
             whenever(checkNameStatement.executeQuery()).thenReturn(checkNameResultSet) // Arrange
@@ -245,7 +245,7 @@ class IngredientCategoryServiceTest {
             val checkNameStatement: PreparedStatement = mock() // Arrange
             val updateStatement: PreparedStatement = mock() // Arrange
             whenever(mockConnection.prepareStatement(contains("SELECT id FROM"))).thenReturn(checkNameStatement) // Arrange
-            whenever(mockConnection.prepareStatement(contains("UPDATE ingredient_categories"))).thenReturn(updateStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("UPDATE categories"))).thenReturn(updateStatement) // Arrange
             val checkNameResultSet: ResultSet = mock() // Arrange
             whenever(checkNameResultSet.next()).thenReturn(false) // Arrange
             whenever(checkNameStatement.executeQuery()).thenReturn(checkNameResultSet) // Arrange

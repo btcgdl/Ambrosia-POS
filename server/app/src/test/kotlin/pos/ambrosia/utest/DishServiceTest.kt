@@ -150,7 +150,7 @@ class DishServiceTest {
             val newDish = Dish(id = null, name = "New Dish", price = 15.0, category_id = "cat-1") // Arrange
             val categoryCheckStatement: PreparedStatement = mock() // Arrange
             val addDishStatement: PreparedStatement = mock() // Arrange
-            whenever(mockConnection.prepareStatement(contains("SELECT id FROM dish_categories"))).thenReturn(categoryCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM categories WHERE id = ? AND type = 'dish'"))).thenReturn(categoryCheckStatement) // Arrange
             whenever(mockConnection.prepareStatement(contains("INSERT INTO dishes"))).thenReturn(addDishStatement) // Arrange
             val categoryCheckResultSet: ResultSet = mock() // Arrange
             whenever(categoryCheckResultSet.next()).thenReturn(true) // Arrange
@@ -169,7 +169,7 @@ class DishServiceTest {
             val newDish = Dish(id = null, name = "New Dish", price = 15.0, category_id = "cat-1") // Arrange
             val categoryCheckStatement: PreparedStatement = mock() // Arrange
             val addDishStatement: PreparedStatement = mock() // Arrange
-            whenever(mockConnection.prepareStatement(contains("SELECT id FROM dish_categories"))).thenReturn(categoryCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM categories WHERE id = ? AND type = 'dish'"))).thenReturn(categoryCheckStatement) // Arrange
             whenever(mockConnection.prepareStatement(contains("INSERT INTO dishes"))).thenReturn(addDishStatement) // Arrange
             val categoryCheckResultSet: ResultSet = mock() // Arrange
             whenever(categoryCheckResultSet.next()).thenReturn(true) // Arrange
@@ -237,7 +237,7 @@ class DishServiceTest {
             val dishToUpdate = Dish(id = "dish-1", name = "Updated Dish", price = 20.0, category_id = "cat-1") // Arrange
             val categoryCheckStatement: PreparedStatement = mock() // Arrange
             val updateDishStatement: PreparedStatement = mock() // Arrange
-            whenever(mockConnection.prepareStatement(contains("SELECT id FROM dish_categories"))).thenReturn(categoryCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM categories WHERE id = ? AND type = 'dish'"))).thenReturn(categoryCheckStatement) // Arrange
             whenever(mockConnection.prepareStatement(contains("UPDATE dishes"))).thenReturn(updateDishStatement) // Arrange
             val categoryCheckResultSet: ResultSet = mock() // Arrange
             whenever(categoryCheckResultSet.next()).thenReturn(true) // Arrange
@@ -255,7 +255,7 @@ class DishServiceTest {
             val dishToUpdate = Dish(id = "dish-1", name = "Updated Dish", price = 20.0, category_id = "cat-1") // Arrange
             val categoryCheckStatement: PreparedStatement = mock() // Arrange
             val updateDishStatement: PreparedStatement = mock() // Arrange
-            whenever(mockConnection.prepareStatement(contains("SELECT id FROM dish_categories"))).thenReturn(categoryCheckStatement) // Arrange
+            whenever(mockConnection.prepareStatement(contains("SELECT id FROM categories WHERE id = ? AND type = 'dish'"))).thenReturn(categoryCheckStatement) // Arrange
             whenever(mockConnection.prepareStatement(contains("UPDATE dishes"))).thenReturn(updateDishStatement) // Arrange
             val categoryCheckResultSet: ResultSet = mock() // Arrange
             whenever(categoryCheckResultSet.next()).thenReturn(true) // Arrange

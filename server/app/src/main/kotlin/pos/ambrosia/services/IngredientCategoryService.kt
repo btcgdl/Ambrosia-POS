@@ -6,18 +6,18 @@ import pos.ambrosia.models.IngredientCategory
 
 class IngredientCategoryService(private val connection: Connection) {
   companion object {
-    private const val ADD_CATEGORY = "INSERT INTO ingredient_categories (id, name) VALUES (?, ?)"
+    private const val ADD_CATEGORY = "INSERT INTO categories (id, name, type, is_deleted) VALUES (?, ?, 'ingredient', 0)"
     private const val GET_CATEGORIES =
-            "SELECT id, name FROM ingredient_categories WHERE is_deleted = 0"
+            "SELECT id, name FROM categories WHERE type = 'ingredient' AND is_deleted = 0"
     private const val GET_CATEGORY_BY_ID =
-            "SELECT id, name FROM ingredient_categories WHERE id = ? AND is_deleted = 0"
-    private const val UPDATE_CATEGORY = "UPDATE ingredient_categories SET name = ? WHERE id = ?"
+            "SELECT id, name FROM categories WHERE id = ? AND type = 'ingredient' AND is_deleted = 0"
+    private const val UPDATE_CATEGORY = "UPDATE categories SET name = ? WHERE id = ? AND type = 'ingredient'"
     private const val DELETE_CATEGORY =
-            "UPDATE ingredient_categories SET is_deleted = 1 WHERE id = ?"
+            "UPDATE categories SET is_deleted = 1 WHERE id = ? AND type = 'ingredient'"
     private const val CHECK_CATEGORY_IN_USE =
             "SELECT COUNT(*) as count FROM ingredients WHERE category_id = ? AND is_deleted = 0"
     private const val CHECK_NAME_EXISTS =
-            "SELECT id FROM ingredient_categories WHERE name = ? AND is_deleted = 0 AND id != ?"
+            "SELECT id FROM categories WHERE name = ? AND type = 'ingredient' AND is_deleted = 0 AND id != ?"
   }
 
   private fun categoryInUse(categoryId: String): Boolean {

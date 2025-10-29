@@ -16,7 +16,7 @@ class IngredientService(private val connection: Connection) {
             "UPDATE ingredients SET name = ?, category_id = ?, quantity = ?, unit = ?, low_stock_threshold = ?, cost_per_unit = ? WHERE id = ?"
     private const val DELETE_INGREDIENT = "UPDATE ingredients SET is_deleted = 1 WHERE id = ?"
     private const val CHECK_CATEGORY_EXISTS =
-            "SELECT id FROM ingredient_categories WHERE id = ? AND is_deleted = 0"
+            "SELECT id FROM categories WHERE id = ? AND type = 'ingredient' AND is_deleted = 0"
     private const val CHECK_INGREDIENT_IN_USE =
             "SELECT COUNT(*) as count FROM dishes_ingredient WHERE id_ingredient = ?"
     private const val GET_LOW_STOCK_INGREDIENTS =
