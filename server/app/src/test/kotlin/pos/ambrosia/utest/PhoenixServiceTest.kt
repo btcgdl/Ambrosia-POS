@@ -376,10 +376,52 @@ class PhoenixServiceTest {
         }
     }
 
+    @Test
+    fun `payInvoice returns PaymentResponse on success`() {
+        // Arrange
+        val mockJsonResponse = """
+            {
+                "recipientAmountSat": 1000,
+                "routingFeeSat": 10,
+                "paymentId": "payment-id",
+                "paymentHash": "payment-hash",
+                "paymentPreimage": "payment-preimage"
+            }
+        """.trimIndent()
+        val mockEngine = MockEngine { request ->
+            respond(
+                content = ByteReadChannel(mockJsonResponse.toByteArray(Charsets.UTF_8)),
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        val mockHttpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act
+        val request = pos.ambrosia.models.Phoenix.PayInvoiceRequest(invoice = "lnbc10...")
+        val paymentResponse = runBlocking { phoenixService.payInvoice(request) }
+
+        // Assert
+        assertEquals(1000, paymentResponse.recipientAmountSat)
+        assertEquals("payment-id", paymentResponse.paymentId)
+    }
 
 
 
 
-    
+
+
 
 }
