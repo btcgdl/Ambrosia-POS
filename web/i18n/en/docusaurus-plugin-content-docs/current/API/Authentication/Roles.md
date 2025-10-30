@@ -120,6 +120,58 @@ The role endpoints allow you to manage the different user roles in the system.
   "Role deleted successfully"
   ```
 
+---
+
+### Role Permissions
+
+- `GET /roles/{id}/permissions`: Lists the permissions assigned to a role.
+  - **Authorization:** Requires a valid access token (admin)
+  - **Path Parameters:**
+    - `id` (string): Role ID
+  - **cURL Example:**
+  ```bash
+  curl -X GET http://127.0.0.1:9154/roles/76ee1086-b945-4170-b2e6-9fbeb95ae0be/permissions \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
+  ```
+  - **Response Body (Success - 200 OK):**
+  ```json
+  [
+    { "id": "0f3c...", "name": "products_read", "description": "List and view products", "enabled": true },
+    { "id": "1a2b...", "name": "orders_create", "description": "Create new orders", "enabled": true }
+  ]
+  ```
+  - **Response Body (No Content - 204 No Content):** no body
+
+- `PUT /roles/{id}/permissions`: Replaces the permissions assigned to a role.
+  - **Authorization:** Requires a valid access token (admin)
+  - **Path Parameters:**
+    - `id` (string): Role ID
+  - **Request Body:**
+  ```json
+  {
+    "permissions": ["products_read", "orders_create", "orders_read"]
+  }
+  ```
+  - The values in `permissions` are the permission `name` keys (e.g., `products_read`, `products_update`, `orders_export`).
+  - **cURL Example:**
+  ```bash
+  curl -X PUT http://127.0.0.1:9154/roles/76ee1086-b945-4170-b2e6-9fbeb95ae0be/permissions \
+    -H 'Content-Type: application/json' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
+    -d '{
+      "permissions": ["products_read", "orders_create", "orders_read"]
+    }'
+  ```
+  - **Response Body (Success - 200 OK):**
+  ```json
+  {
+    "roleId": "76ee1086-b945-4170-b2e6-9fbeb95ae0be",
+    "assigned": 3
+  }
+  ```
+
 ### Important notes:
 - All role endpoints require authentication via access token
 - Role IDs must be unique in the system

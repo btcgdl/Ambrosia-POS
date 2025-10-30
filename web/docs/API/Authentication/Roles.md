@@ -120,6 +120,58 @@ Los endpoints de roles permiten gestionar los diferentes roles de usuario en el 
   "Role deleted successfully"
   ```
 
+---
+
+### Permisos por Rol
+
+- `GET /roles/{id}/permissions`: Lista los permisos asignados a un rol.
+  - **Authorization:** Requiere access token válido (admin)
+  - **Path Parameters:**
+    - `id` (string): ID del rol
+  - **cURL Example:**
+  ```bash
+  curl -X GET http://127.0.0.1:9154/roles/76ee1086-b945-4170-b2e6-9fbeb95ae0be/permissions \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN"
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  [
+    { "id": "0f3c...", "name": "products_read", "description": "List and view products", "enabled": true },
+    { "id": "1a2b...", "name": "orders_create", "description": "Create new orders", "enabled": true }
+  ]
+  ```
+  - **Response Body (Sin contenido - 204 No Content):** sin cuerpo
+
+- `PUT /roles/{id}/permissions`: Reemplaza completamente los permisos asignados a un rol.
+  - **Authorization:** Requiere access token válido (admin)
+  - **Path Parameters:**
+    - `id` (string): ID del rol
+  - **Request Body:**
+  ```json
+  {
+    "permissions": ["products_read", "orders_create", "orders_read"]
+  }
+  ```
+  - Las claves en `permissions` corresponden al campo `name` de cada permiso (por ejemplo: `products_read`, `products_update`, `orders_export`).
+  - **cURL Example:**
+  ```bash
+  curl -X PUT http://127.0.0.1:9154/roles/76ee1086-b945-4170-b2e6-9fbeb95ae0be/permissions \
+    -H 'Content-Type: application/json' \
+    -H "Cookie: accessToken=$ACCESS_TOKEN" \
+    -H "Cookie: refreshToken=$REFRESH_TOKEN" \
+    -d '{
+      "permissions": ["products_read", "orders_create", "orders_read"]
+    }'
+  ```
+  - **Response Body (Éxito - 200 OK):**
+  ```json
+  {
+    "roleId": "76ee1086-b945-4170-b2e6-9fbeb95ae0be",
+    "assigned": 3
+  }
+  ```
+
 ### Notas importantes:
 - Todos los endpoints de roles requieren autenticación via access token
 - Los IDs de roles deben ser únicos en el sistema
