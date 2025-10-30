@@ -125,5 +125,7 @@ class Api() {
     configurePrinter()
     configureConfig()
     configureTicketTemplates()
+    configureProducts()
+    configureProductCategories()
   }
 }
