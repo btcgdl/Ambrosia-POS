@@ -557,4 +557,219 @@ class PhoenixServiceTest {
             runBlocking { phoenixService.payOffer(request) }
         }
     }
+
+    @Test
+    fun `payOnchain returns PaymentResponse on success`() {
+        // Arrange
+        val mockJsonResponse = """
+            {
+                "recipientAmountSat": 50000,
+                "routingFeeSat": 0,
+                "paymentId": "onchain-payment-id",
+                "paymentHash": "onchain-payment-hash",
+                "paymentPreimage": "onchain-payment-preimage"
+            }
+        """.trimIndent()
+        val mockEngine = MockEngine { request ->
+            respond(
+                content = ByteReadChannel(mockJsonResponse.toByteArray(Charsets.UTF_8)),
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        val mockHttpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act
+        val request = pos.ambrosia.models.Phoenix.PayOnchainRequest(address = "bc1q...", amountSat = 50000, feerateSatByte = 10)
+        val paymentResponse = runBlocking { phoenixService.payOnchain(request) }
+
+        // Assert
+        assertEquals(50000, paymentResponse.recipientAmountSat)
+        assertEquals("onchain-payment-id", paymentResponse.paymentId)
+    }
+
+    @Test
+    fun `payOnchain throws PhoenixServiceException on non-200 response`() {
+        // Arrange
+        val mockEngine = MockEngine { request ->
+            respond(
+                content = ByteReadChannel(""),
+                status = HttpStatusCode.InternalServerError
+            )
+        }
+        val mockHttpClient = HttpClient(mockEngine)
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act & Assert
+        val request = pos.ambrosia.models.Phoenix.PayOnchainRequest(address = "bc1q...", amountSat = 50000, feerateSatByte = 10)
+        assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+            runBlocking { phoenixService.payOnchain(request) }
+        }
+    }
+
+    @Test
+    fun `payOnchain throws PhoenixServiceException on network error`() {
+        // Arrange
+        val mockEngine = MockEngine { request ->
+            throw IOException("Network error")
+        }
+        val mockHttpClient = HttpClient(mockEngine)
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act & Assert
+        val request = pos.ambrosia.models.Phoenix.PayOnchainRequest(address = "bc1q...", amountSat = 50000, feerateSatByte = 10)
+        assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+            runBlocking { phoenixService.payOnchain(request) }
+        }
+    }
+
+    @Test
+    fun `bumpOnchainFees returns String on success`() {
+        // Arrange
+        val mockStringResponse = "Fees bumped"
+        val mockEngine = MockEngine { request ->
+            respond(
+                content = mockStringResponse,
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "text/plain")
+            )
+        }
+        val mockHttpClient = HttpClient(mockEngine)
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act
+        val response = runBlocking { phoenixService.bumpOnchainFees(10) }
+
+        // Assert
+        assertEquals("Fees bumped", response)
+    }
+
+    @Test
+    fun `bumpOnchainFees throws PhoenixServiceException on non-200 response` () {
+        //Arrange
+        val mockEngine = MockEngine { request ->
+            respond(
+                content = ByteReadChannel(""),
+                status = HttpStatusCode.InternalServerError
+            )
+        }
+        val mockHttpClient = HttpClient(mockEngine)
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act & Assert
+        assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+                runBlocking { phoenixService.bumpOnchainFees(10)}
+        }
+    }
+
+    @Test
+    fun `bumpOnchainFees throws PhoenixServiceException on network error`() {
+        // Arrange
+        val mockEngine = MockEngine { request ->
+            throw IOException("Network error")
+        }
+        val mockHttpClient = HttpClient(mockEngine)
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act & Assert
+        assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+            runBlocking { phoenixService.bumpOnchainFees(10) }
+        }
+    }
+
+    @Test
+    fun `listIncomingPayments returns List of IncomingPayment on success`() {
+        // Arrange
+        val mockJsonResponse = """
+            [
+                {
+                    "type": "incoming",
+                    "subType": "ln",
+                    "paymentHash": "hash1",
+                    "preimage": "preimage1",
+                    "externalId": "ext1",
+                    "description": "desc1",
+                    "invoice": "lnbc1...",
+                    "isPaid": true,
+                    "receivedSat": 1000,
+                    "fees": 10,
+                    "createdAt": 1620000000
+                }
+            ]
+        """.trimIndent()
+        val mockEngine = MockEngine { request ->
+            respond(
+                content = ByteReadChannel(mockJsonResponse.toByteArray(Charsets.UTF_8)),
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        val mockHttpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act
+        val payments = runBlocking { phoenixService.listIncomingPayments() }
+
+        // Assert
+        assertEquals(1, payments.size)
+        assertEquals("hash1", payments[0].paymentHash)
+    }
 }
