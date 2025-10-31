@@ -772,4 +772,145 @@ class PhoenixServiceTest {
         assertEquals(1, payments.size)
         assertEquals("hash1", payments[0].paymentHash)
     }
+
+    @Test
+    fun `listIncomingPayments throws PhoenixServiceException on non-200 response`() {
+        // Arrange
+        val mockEngine = MockEngine { request ->
+            respond(
+                content = ByteReadChannel(""),
+                status = HttpStatusCode.InternalServerError
+            )
+        }
+        val mockHttpClient = HttpClient(mockEngine)
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act & Assert
+        assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+            runBlocking { phoenixService.listIncomingPayments() }
+        }
+    }
+
+    @Test
+    fun `listIncomingPayments throws PhoenixServiceException on network error`() {
+        // Arrange
+        val mockEngine = MockEngine { request ->
+            throw IOException("Network error")
+        }
+        val mockHttpClient = HttpClient(mockEngine)
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act & Assert
+        assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+            runBlocking { phoenixService.listIncomingPayments() }
+        }
+    }
+
+    @Test
+    fun `getIncomingPayment returns IncomingPayment on success`() {
+        // Arrange
+        val mockJsonResponse = """
+            {
+                "type": "incoming",
+                "subType": "ln",
+                "paymentHash": "hash-single",
+                "preimage": "preimage-single",
+                "externalId": "ext-single",
+                "description": "desc-single",
+                "invoice": "lnbc2...",
+                "isPaid": true,
+                "receivedSat": 2000,
+                "fees": 20,
+                "createdAt": 1620000200
+            }
+        """.trimIndent()
+        val mockEngine = MockEngine { request ->
+            respond(
+                content = ByteReadChannel(mockJsonResponse.toByteArray(Charsets.UTF_8)),
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        val mockHttpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act
+        val payment = runBlocking { phoenixService.getIncomingPayment("hash-single") }
+
+        // Assert
+        assertEquals("hash-single", payment.paymentHash)
+        assertEquals(2000, payment.receivedSat)
+    }
+
+    @Test
+    fun `getIncomingPayment throws PhoenixServiceException on non-200 response`() {
+        // Arrange
+        val mockEngine = MockEngine { request ->
+            respond(
+                content = ByteReadChannel(""),
+                status = HttpStatusCode.InternalServerError
+            )
+        }
+        val mockHttpClient = HttpClient(mockEngine)
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act & Assert
+        assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+            runBlocking { phoenixService.getIncomingPayment("hash-single") }
+        }
+    }
+
+    @Test
+    fun `getIncomingPayment throws PhoenixServiceException on network error`() {
+        // Arrange
+        val mockEngine = MockEngine { request ->
+            throw IOException("Network error")
+        }
+        val mockHttpClient = HttpClient(mockEngine)
+        val mockUrlValue: ApplicationConfigValue = mock()
+        whenever(mockUrlValue.getString()).thenReturn("http://dummy-url")
+        whenever(mockConfig.property("phoenixd-url")).thenReturn(mockUrlValue)
+        val mockPasswordValue: ApplicationConfigValue = mock()
+        whenever(mockPasswordValue.getString()).thenReturn("dummy-password")
+        whenever(mockConfig.property("phoenixd-password")).thenReturn(mockPasswordValue)
+
+        val phoenixService = PhoenixService(mockEnv, mockHttpClient)
+
+        // Act & Assert
+        assertFailsWith<pos.ambrosia.utils.PhoenixServiceException> {
+            runBlocking { phoenixService.getIncomingPayment("hash-single") }
+        }
+    }
 }
