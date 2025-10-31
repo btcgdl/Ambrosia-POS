@@ -17,7 +17,7 @@ class OrderService(private val connection: Connection) {
     private const val UPDATE_ORDER =
             "UPDATE orders SET user_id = ?, table_id = ?, waiter = ?, status = ?, total = ? WHERE id = ?"
     private const val DELETE_ORDER = "UPDATE orders SET is_deleted = 1 WHERE id = ?"
-    private const val CHECK_USER_EXISTS = "SELECT id FROM users WHERE id = ? AND is_deleted = 0"
+    private const val CHECK_USER_EXISTS = "SELECT id FROM users WHERE id = ? "
     private const val CHECK_TABLE_EXISTS = "SELECT id FROM tables WHERE id = ? AND is_deleted = 0"
     private const val GET_ORDERS_BY_TABLE =
             "SELECT id, user_id, table_id, waiter, status, total, created_at FROM orders WHERE table_id = ? AND is_deleted = 0"

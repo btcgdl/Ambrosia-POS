@@ -89,7 +89,8 @@ import {
 import { addToast } from "@heroui/react";
 
 const priceService = new BitcoinPriceService();
-
+const user_id = localStorage.getItem("userId");
+console.log(user_id)
 export default function EditOrder({ dynamicParams }) {
   const pedidoId = dynamicParams?.pedidoId;
   const router = useRouter();
@@ -465,12 +466,13 @@ export default function EditOrder({ dynamicParams }) {
       console.log("Selected Currency ID:", currencyBase.currency_id);
       const ticket = {
         order_id: order.id,
-        user_id: order.user_id,
+        user_id: user_id,
         ticket_date: Date.now().toString(),
         status: 1,
         total_amount: total,
         notes: "Sin Notas",
       };
+      console.log(ticket)
 
       const ticketResponse = await createTicket(ticket);
       const payment = {
