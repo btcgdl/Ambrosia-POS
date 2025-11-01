@@ -111,11 +111,9 @@ class Api() {
     configureRoles()
     configurePermissions()
     configureDishes()
-    configureDishCategories()
     configureSpaces()
     configureTables()
     configureIngredients()
-    configureIngredientCategories()
     configureSuppliers()
     configureOrders()
     configurePayments()
@@ -126,6 +124,6 @@ class Api() {
     configureConfig()
     configureTicketTemplates()
     configureProducts()
-    configureProductCategories()
+    configureCategories()
   }
 }
