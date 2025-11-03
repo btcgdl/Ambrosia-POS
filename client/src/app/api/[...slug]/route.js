@@ -4,7 +4,8 @@ const apiUrl =
 
 export async function GET(request, { params }) {
   const resolvedParams = await params;
-  const url = `${apiUrl}/${resolvedParams.slug.join("/")}`;
+  const { search } = new URL(request.url);
+  const url = `${apiUrl}/${resolvedParams.slug.join("/")}${search}`;
 
   // Copiar headers del request original incluyendo cookies
   const headers = {};
@@ -88,7 +89,8 @@ export async function GET(request, { params }) {
 
 export async function POST(request, { params }) {
   const resolvedParams = await params;
-  const url = `${apiUrl}/${resolvedParams.slug.join("/")}`;
+  const { search } = new URL(request.url);
+  const url = `${apiUrl}/${resolvedParams.slug.join("/")}${search}`;
   const body = await request.text();
 
   // Copiar headers del request original incluyendo cookies
@@ -177,7 +179,8 @@ export async function POST(request, { params }) {
 
 export async function PUT(request, { params }) {
   const resolvedParams = await params;
-  const url = `${apiUrl}/${resolvedParams.slug.join("/")}`;
+  const { search } = new URL(request.url);
+  const url = `${apiUrl}/${resolvedParams.slug.join("/")}${search}`;
   const body = await request.text();
 
   // Copiar headers del request original incluyendo cookies
@@ -264,7 +267,8 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   const resolvedParams = await params;
-  const url = `${apiUrl}/${resolvedParams.slug.join("/")}`;
+  const { search } = new URL(request.url);
+  const url = `${apiUrl}/${resolvedParams.slug.join("/")}${search}`;
 
   // Copiar headers del request original incluyendo cookies
   const headers = {};

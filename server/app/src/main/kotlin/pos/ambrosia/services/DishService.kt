@@ -16,7 +16,7 @@ class DishService(private val connection: Connection) {
             "UPDATE dishes SET name = ?, price = ?, category_id = ? WHERE id = ?"
     private const val DELETE_DISH = "UPDATE dishes SET is_deleted = 1 WHERE id = ?"
     private const val CHECK_CATEGORY_EXISTS =
-            "SELECT id FROM dish_categories WHERE id = ? AND is_deleted = 0"
+            "SELECT id FROM categories WHERE id = ? AND type = 'dish' AND is_deleted = 0"
     private const val CHECK_DISH_IN_USE =
             "SELECT COUNT(*) as count FROM orders_dishes WHERE dish_id = ?"
     private const val GET_DISHES_BY_CATEGORY =
