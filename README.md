@@ -34,6 +34,19 @@ Consult the mentioned files for more details about the project.
 
 To install Ambrosia POS, refer to the [Installation Guide](INSTALLATION.md) where you will find all available options and detailed instructions for setting up the system.
 
+## Testing
+
+The project includes end-to-end (E2E) tests for the server API. For detailed information on running the tests, see the [E2E Tests README](server/e2e_tests_py/README.md).
+
+### Quick Start
+
+```bash
+cd server/e2e_tests_py
+uv venv && source .venv/bin/activate
+uv pip install -e .
+pytest
+```
+
 ---
 
 ## Want to contribute?
