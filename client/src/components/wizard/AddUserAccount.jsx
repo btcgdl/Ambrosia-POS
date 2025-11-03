@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { Input } from "@heroui/react"
 import { Eye, EyeOff } from "lucide-react"
 
 export function UserAccountStep({ data, onChange }) {
@@ -42,28 +43,22 @@ export function UserAccountStep({ data, onChange }) {
 
       <div className="space-y-6">
         {/* Username */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">Nombre de usuario</label>
-          <input
-            type="text"
-            value={data.userName}
-            onChange={(e) => onChange({ ...data, userName: e.target.value })}
-            placeholder="Ingresa tu nombre de usuario"
-            className="w-full px-4 py-2 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
+        <Input
+          label="Nombre de Usuario"
+          type="text"
+          placeholder="Ingresa tu nombre de usuario"
+          value={data.userName}
+          onChange={(e) => onChange({ ...data, userName: e.target.value })}
+        />
 
         {/* Password */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">Contraseña</label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              value={data.userPassword}
-              onChange={(e) => handlePasswordChange(e.target.value)}
-              placeholder="Ingresa una contraseña segura"
-              className="w-full px-4 py-2 pr-10 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            />
+        <Input
+          label="Contraseña"
+          type={showPassword ? "text" : "password"}
+          placeholder="Ingresa una contraseña segura"
+          value={data.userPassword}
+          onChange={(e) => handlePasswordChange(e.target.value)}
+          endContent={
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
@@ -71,8 +66,9 @@ export function UserAccountStep({ data, onChange }) {
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
-          </div>
-
+          }
+        />
+        <div>
           {/* Password Strength */}
           {data.userPassword && (
             <div className="mt-3">
