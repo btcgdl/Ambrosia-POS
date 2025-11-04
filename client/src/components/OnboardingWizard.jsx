@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { Button, Progress, Divider } from "@heroui/react";
-import { BusinessTypeStep } from "./wizard/SelectBussiness"
+import { BusinessTypeStep } from "./wizard/SelectBusiness"
 import { UserAccountStep } from "./wizard/AddUserAccount"
-import { StoreDetailsStep } from "./wizard/AddBussinessData"
+import { BusinessDetailsStep } from "./wizard/AddBusinessData"
 import { WizardSummary } from "./wizard/StepsSummary"
 
 export function OnboardingWizard() {
@@ -13,10 +13,13 @@ export function OnboardingWizard() {
     businessType: "store",
     userName: "",
     userPassword: "",
-    storeName: "",
-    storeAddress: "",
-    storeRFC: "",
-    storeLogo: null,
+    businessName: "",
+    businessAddress: "",
+    businessPhone: "",
+    businessEmail: "",
+    businessRFC: "",
+    businessCurrency: "MXN",
+    businessLogo: null,
   })
 
   const handleNext = () => {
@@ -81,14 +84,18 @@ export function OnboardingWizard() {
           )}
 
           {step === 3 && (
-            <StoreDetailsStep
+            <BusinessDetailsStep
               data={{
-                storeName: data.storeName,
-                storeAddress: data.storeAddress,
-                storeRFC: data.storeRFC,
-                storeLogo: data.storeLogo,
+                businessType: data.businessType,
+                businessName: data.businessName,
+                businessAddress: data.businessAddress,
+                businessPhone: data.businessPhone,
+                businessEmail: data.businessEmail,
+                businessRFC: data.businessRFC,
+                businessCurrency: data.businessCurrency,
+                businessLogo: data.businessLogo,
               }}
-              onChange={(storeData) => handleDataChange(storeData)}
+              onChange={(businessData) => handleDataChange(businessData)}
             />
           )}
 
@@ -96,7 +103,6 @@ export function OnboardingWizard() {
 
           <Divider className="my-8 bg-gray-400" />
 
-          {/* Navigation Buttons */}
           <div className="flex justify-between">
             <Button
               variant="bordered"
@@ -114,7 +120,7 @@ export function OnboardingWizard() {
                 isDisabled={
                   (step === 1 && !data.businessType) ||
                   (step === 2 && (!data.userName || !data.userPassword)) ||
-                  (step === 3 && (!data.storeName || !data.storeAddress || !data.storeRFC))
+                  (step === 3 && (!data.businessName || !data.businessAddress || !data.businessRFC))
                 }
                 className="gradient-forest text-white"
               >

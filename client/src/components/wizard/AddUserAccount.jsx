@@ -42,7 +42,6 @@ export function UserAccountStep({ data, onChange }) {
       <p className="text-muted-foreground mb-8">Estos datos serán utilizados para acceder a tu sistema PoS</p>
 
       <div className="space-y-6">
-        {/* Username */}
         <Input
           label="Nombre de Usuario"
           type="text"
@@ -51,7 +50,6 @@ export function UserAccountStep({ data, onChange }) {
           onChange={(e) => onChange({ ...data, userName: e.target.value })}
         />
 
-        {/* Password */}
         <Input
           label="Contraseña"
           type={showPassword ? "text" : "password"}
@@ -69,7 +67,6 @@ export function UserAccountStep({ data, onChange }) {
           }
         />
         <div>
-          {/* Password Strength */}
           {data.userPassword && (
             <div className="mt-3">
               <div className="flex gap-1 mb-1">
@@ -87,7 +84,6 @@ export function UserAccountStep({ data, onChange }) {
               </p>
             </div>
           )}
-
           <p className="text-xs text-muted-foreground mt-2">
             La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres
             especiales.
