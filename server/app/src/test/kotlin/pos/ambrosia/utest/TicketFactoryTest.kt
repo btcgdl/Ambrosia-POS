@@ -178,47 +178,4 @@ class TicketFactoryTest {
         // Assert
         verify(mockEscpos).writeLF(any<Style>(), eq("Item             Qty     Price"))
     }
-
-//     @Test
-//     fun `build should apply bold style correctly`() {
-//         // Arrange
-//         val mockEscpos: EscPos = mock()
-//         val styleCaptor = argumentCaptor<Style>()
-//         val template = TicketTemplate(
-//             name = "Bold Text Template",
-//             elements = listOf(
-//                 TicketElement(
-//                     type = ElementType.TEXT,
-//                     value = "Bold Text",
-//                     style = ElementStyle(bold = true)
-//                 )
-//             )
-//         )
-//         val ticketData = TicketData(
-//             ticketId = "102",
-//             tableName = "Table 5",
-//             roomName = "Dining",
-//             date = "2025-10-31",
-//             items = emptyList(),
-//             total = 0.0
-//         )
-//         val config = Config(
-//             restaurantName = "Ambrosia",
-//             address = null,
-//             phone = null,
-//             email = null,
-//             taxId = null,
-//             logo = null
-//         )
-
-//         val ticketFactory = TicketFactory(template)
-
-//         // Act
-//         ticketFactory.build(mockEscpos, ticketData, config)
-
-//         // Assert
-//         verify(mockEscpos).writeLF(styleCaptor.capture(), eq("Bold Text"))
-//         val capturedStyle = styleCaptor.firstValue
-//         assertEquals(true, capturedStyle.isBold)
-//     }
 }
