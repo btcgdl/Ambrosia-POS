@@ -22,13 +22,13 @@ export function DynamicNavigation() {
     <nav className="p-4">
       <div className="mb-4">
         <p className="text-sm text-gray-600">
-          Usuario: {isAdmin ? 'Administrador' : 'Usuario'} 
+          Usuario: {isAdmin ? 'Administrador' : 'Usuario'}
           <span className="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
             {isAdmin ? 'Admin' : 'User'}
           </span>
         </p>
       </div>
-      
+
       <ul className="space-y-2">
         {availableNavigation.map((navItem) => (
           <li key={navItem.path}>

@@ -50,6 +50,10 @@ export async function apiClient(
         } catch (error) {
           console.error(error.message);
         }
+        await fetch(`${API_BASE_URL}/auth/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
         addToast({
           color: "danger",
           title: "Error",
@@ -68,7 +72,6 @@ export async function apiClient(
       throw new Error(errorMsg);
     }
 
-    //if (showLog) showLog("success", "Operación exitosa");
     return data;
   } catch (err) {
     addToast({

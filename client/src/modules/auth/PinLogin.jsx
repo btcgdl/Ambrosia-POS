@@ -31,7 +31,6 @@ export default function PinLoginNew() {
       avatar: "MG",
     },
   ]);
-  const { login, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -99,14 +98,11 @@ export default function PinLoginNew() {
         if (!loginResponse) {
           throw new Error("Invalid credentials");
         }
-        // Consultar usuario desde /api/auth/me (servidor) para datos derivados
         const meRes = await fetch("/api/auth/me", { credentials: "include" });
         if (meRes.ok) {
           const me = await meRes.json();
-          // Mantener compatibilidad con módulos que leen localStorage
           if (me?.userId) localStorage.setItem("userId", me.userId);
           if (me?.role) localStorage.setItem("roleId", me.role);
-          // Nombre visible (no sensible) desde selección
           localStorage.setItem("username", employee.name);
         }
 
@@ -117,10 +113,10 @@ export default function PinLoginNew() {
         });
         setPin("");
         setSelectedUser("");
-        login();
         router.push("/");
         setIsLoading(false);
       } catch (error) {
+        console.log(error)
         setError("PIN incorrecto para el empleado seleccionado.");
         setIsLoading(false);
       }
@@ -272,11 +268,10 @@ export default function PinLoginNew() {
                 key={index}
                 variant={number ? "outline" : "ghost"}
                 size="md"
-                className={`h-14 text-xl font-bold transition-all duration-200 ${
-                  number
-                    ? "border-2 border-mint bg-cream/50 hover:bg-mint hover:text-deep hover:border-forest active:scale-95 shadow-md"
-                    : "invisible"
-                }`}
+                className={`h-14 text-xl font-bold transition-all duration-200 ${number
+                  ? "border-2 border-mint bg-cream/50 hover:bg-mint hover:text-deep hover:border-forest active:scale-95 shadow-md"
+                  : "invisible"
+                  }`}
                 onPress={() => number && handleNumberClick(number)}
                 disabled={isLoading || !number}
               >

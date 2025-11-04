@@ -27,9 +27,8 @@ function NavBarButton({ text, icon, onClick, isActive }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full px-6 py-3 flex items-center gap-3 text-white hover:bg-white/10 transition-colors ${
-        isActive ? "bg-white/20" : ""
-      }`}
+      className={`w-full px-6 py-3 flex items-center gap-3 text-white hover:bg-white/10 transition-colors ${isActive ? "bg-white/20" : ""
+        }`}
     >
       <Icon name={icon} className="w-6 h-6" />
       <span className="text-base">{text}</span>
