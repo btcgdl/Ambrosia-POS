@@ -43,9 +43,9 @@ export function OnboardingWizard() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen gradient-fresh p-4">
+    <div className="flex items-center justify-center items-start min-h-screen gradient-fresh p-4">
       <div className="w-full max-w-2xl">
-        {/* Progress Bar */}
+
         <div className="mb-8 relative">
           <div className="flex justify-between mb-2 relative z-10">
             {[1, 2, 3, 4].map((num) => (
@@ -64,7 +64,6 @@ export function OnboardingWizard() {
           </div>
         </div>
 
-        {/* Steps */}
         <div className="bg-white rounded-lg shadow-lg p-8">
           {step === 1 && (
             <BusinessTypeStep

@@ -97,7 +97,6 @@ export function BusinessDetailsStep({ data, onChange }) {
     if (file) {
       onChange({ storeLogo: file })
 
-      // Crear preview
       const reader = new FileReader()
       reader.onloadend = () => {
         setLogoPreview(reader.result)
