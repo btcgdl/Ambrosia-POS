@@ -1,15 +1,15 @@
 package pos.ambrosia.services
 
+import io.ktor.server.application.ApplicationEnvironment
 import java.sql.Connection
 import pos.ambrosia.logger
 import pos.ambrosia.models.AuthResponse
 import pos.ambrosia.utils.SecurePinProcessor
-import io.ktor.server.application.ApplicationEnvironment
 
 class AuthService(private val env: ApplicationEnvironment, private val connection: Connection) {
   companion object {
     private const val GET_USER_FOR_AUTH_BY_NAME =
-      """
+            """
       SELECT u.id, u.name, u.pin, u.role_id as role_id, r.role, r.isAdmin as isAdmin
       FROM users u
       JOIN roles r ON u.role_id = r.id
@@ -17,7 +17,7 @@ class AuthService(private val env: ApplicationEnvironment, private val connectio
       """
 
     private const val GET_USER_AND_ROLE_FOR_AUTH_BY_USERID =
-      """
+            """
       SELECT u.id, r.password as role_password, r.id as role_id
       FROM users u
       JOIN roles r ON u.role_id = r.id
@@ -41,10 +41,11 @@ class AuthService(private val env: ApplicationEnvironment, private val connectio
       logger.info("Authentication result for user pin: $isValidPin")
       if (isValidPin) {
         return AuthResponse(
-          id = userIdString,
-          name = resultSet.getString("name"),
-          role = resultSet.getString("role"),
-          isAdmin = resultSet.getBoolean("isAdmin")
+                id = userIdString,
+                name = resultSet.getString("name"),
+                role = resultSet.getString("role"),
+                role_id = resultSet.getString("role_id"),
+                isAdmin = resultSet.getBoolean("isAdmin")
         )
       }
     }
@@ -62,7 +63,8 @@ class AuthService(private val env: ApplicationEnvironment, private val connectio
       val storedPasswordHash = SecurePinProcessor.base64ToByteArray(storedPasswordHashBase64)
 
       // The salt for role password is the role ID.
-      val isValidPassword = SecurePinProcessor.verifyPin(rolePassword, roleId, storedPasswordHash, env)
+      val isValidPassword =
+              SecurePinProcessor.verifyPin(rolePassword, roleId, storedPasswordHash, env)
       rolePassword.fill('\u0000') // Clear password from memory
 
       logger.info("Authentication result for role password: $isValidPassword")

@@ -20,29 +20,29 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
   private val algorithm = Algorithm.HMAC256(secret)
 
   val verifier: JWTVerifier =
-    JWT.require(algorithm).withAudience(audience).withIssuer(issuer).build()
+          JWT.require(algorithm).withAudience(audience).withIssuer(issuer).build()
 
   fun generateAccessToken(user: AuthResponse): String =
-    JWT.create()
-    .withAudience(audience)
-    .withIssuer(issuer)
-    .withClaim("userId", user.id.toString())
-    .withClaim("role", user.role)
-    .withClaim("isAdmin", user.isAdmin)
-    .withClaim("realm", "Ambrosia-Server")
-    .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(60)))
-    .sign(algorithm)
+          JWT.create()
+                  .withAudience(audience)
+                  .withIssuer(issuer)
+                  .withClaim("userId", user.id.toString())
+                  .withClaim("role", user.role)
+                  .withClaim("isAdmin", user.isAdmin)
+                  .withClaim("realm", "Ambrosia-Server")
+                  .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(60)))
+                  .sign(algorithm)
 
   fun generateRefreshToken(user: AuthResponse): String {
     val refreshToken =
-      JWT.create()
-      .withAudience(audience)
-      .withIssuer(issuer)
-      .withClaim("userId", user.id.toString())
-      .withClaim("type", "refresh")
-      .withClaim("realm", "Ambrosia-Server")
-      .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)))
-      .sign(algorithm)
+            JWT.create()
+                    .withAudience(audience)
+                    .withIssuer(issuer)
+                    .withClaim("userId", user.id.toString())
+                    .withClaim("type", "refresh")
+                    .withClaim("realm", "Ambrosia-Server")
+                    .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)))
+                    .sign(algorithm)
 
     // Almacenar el refresh token en la base de datos
     user.id?.let { saveRefreshTokenToDatabase(it, refreshToken) }
@@ -50,14 +50,14 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
   }
 
   fun generateWalletAccessToken(userId: String): String =
-      JWT.create()
-      .withAudience(audience)
-      .withIssuer(issuer)
-      .withClaim("scope", "wallet_access")
-      .withClaim("userId", userId)
-      .withClaim("realm", "Ambrosia-Server")
-      .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(2)))
-      .sign(algorithm)
+          JWT.create()
+                  .withAudience(audience)
+                  .withIssuer(issuer)
+                  .withClaim("scope", "wallet_access")
+                  .withClaim("userId", userId)
+                  .withClaim("realm", "Ambrosia-Server")
+                  .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(2)))
+                  .sign(algorithm)
 
   fun validateRefreshToken(refreshToken: String): Boolean {
     return try {
@@ -79,8 +79,9 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
       verifier.verify(refreshToken)
 
       // Obtener la información del usuario desde la base de datos usando el refresh token
-      val sql = """
-        SELECT u.id, u.name, r.role, r.isAdmin
+      val sql =
+              """
+        SELECT u.id, u.name, r.role, r.isAdmin, u.role_id
         FROM users u
         JOIN roles r ON u.role_id = r.id
         WHERE u.refresh_token = ? AND u.is_deleted = 0
@@ -92,10 +93,11 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
 
         if (resultSet.next()) {
           return AuthResponse(
-            id = resultSet.getString("id"),
-            name = resultSet.getString("name"),
-            role = resultSet.getString("role"),
-            isAdmin = resultSet.getBoolean("isAdmin")
+                  id = resultSet.getString("id"),
+                  name = resultSet.getString("name"),
+                  role_id = resultSet.getString("role_id"),
+                  role = resultSet.getString("role"),
+                  isAdmin = resultSet.getBoolean("isAdmin")
           )
         }
       }

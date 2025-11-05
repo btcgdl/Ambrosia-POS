@@ -13,7 +13,9 @@ import java.sql.Connection
 import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.User
+import pos.ambrosia.models.UserMeResponse
 import pos.ambrosia.models.UserResponse
+import pos.ambrosia.services.PermissionsService
 import pos.ambrosia.services.TokenService
 import pos.ambrosia.services.UsersService
 
@@ -21,10 +23,15 @@ fun Application.configureUsers() {
   val connection: Connection = DatabaseConnection.getConnection()
   val userService = UsersService(environment, connection)
   val tokenService = TokenService(environment, connection)
-  routing { route("/users") { users(userService, tokenService) } }
+  val permissionsService = PermissionsService(environment, connection)
+  routing { route("/users") { users(userService, tokenService, permissionsService) } }
 }
 
-fun Route.users(userService: UsersService, tokenService: TokenService) {
+fun Route.users(
+        userService: UsersService,
+        tokenService: TokenService,
+        permissionsService: PermissionsService
+) {
   get("") {
     val users = userService.getUsers()
     if (users.isEmpty()) {
@@ -73,15 +80,23 @@ fun Route.users(userService: UsersService, tokenService: TokenService) {
         return@get
       }
 
+      val perms = permissionsService.getByRole(userInfo.role_id)
+      if (perms.isEmpty()) {
+        logger.info("The user doesn't have a permissions")
+        call.respond(HttpStatusCode.Forbidden)
+        return@get
+      }
+
       val userResponse =
               UserResponse(
                       user_id = userInfo.id,
                       name = userInfo.name,
+                      role = userInfo.role,
                       role_id = userInfo.role,
                       isAdmin = userInfo.isAdmin
               )
 
-      call.respond(HttpStatusCode.OK, userResponse)
+      call.respond(UserMeResponse(userResponse, perms))
     }
     post("") {
       val user = call.receive<User>()

@@ -10,6 +10,7 @@ data class AuthResponse(
         val name: String,
         val refreshToken: String? = null,
         val role: String,
+        val role_id: String? = null,
         val isAdmin: Boolean
 )
 
@@ -19,11 +20,15 @@ data class AuthResponse(
 data class UserResponse(
         val user_id: String,
         val name: String,
-        val role_id: String,
+        val role: String,
+        val role_id: String? = null,
         val isAdmin: Boolean
 )
 
-@Serializable data class LoginResponse(val message: String, val user: UserResponse)
+@Serializable
+data class LoginResponse(val message: String, val user: UserResponse, val perms: List<Permission>)
+
+@Serializable data class UserMeResponse(val user: UserResponse, val perms: List<Permission>)
 
 @Serializable data class Message(val message: String)
 
@@ -34,6 +39,7 @@ data class User(
         val pin: String,
         val refreshToken: String? = null,
         val role: String? = null,
+        val role_id: String? = null,
         val isAdmin: Boolean? = false
 )
 
