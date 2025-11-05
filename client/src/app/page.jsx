@@ -11,20 +11,14 @@ export default function HomePage() {
   const { isAuthenticated, user, isLoading } = useContext(AuthContext);
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated) {
-        router.replace("/auth");
-      } else {
-        const homeRoute = getHomeRoute(user);
-        console.log(`🏠 Redirigiendo usuario a: ${homeRoute}`);
-        router.replace(homeRoute);
-      }
-    }
-  }, [isAuthenticated, user, isLoading, router]);
+    const homeRoute = getHomeRoute(user);
+    console.log(`🏠 Redirigiendo usuario a: ${homeRoute}`);
+    router.replace(homeRoute);
+  }, [router]);
 
   return (
-    <LoadingCard 
-      message={isLoading ? "Verificando autenticación..." : "Redirigiendo..."} 
+    <LoadingCard
+      message={isLoading ? "Verificando autenticación..." : "Redirigiendo..."}
     />
   );
 }

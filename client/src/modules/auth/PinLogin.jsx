@@ -6,7 +6,6 @@ import { ChefHat, Delete, LogIn, Users, Trash2 } from "lucide-react";
 import {
   addToast,
   Avatar,
-  Badge,
   Button,
   Card,
   CardBody,
@@ -32,6 +31,7 @@ export default function PinLoginNew() {
     },
   ]);
   const router = useRouter();
+  const { login } = useAuth();
 
   useEffect(() => {
     async function getUsersFromService() {
@@ -91,21 +91,15 @@ export default function PinLoginNew() {
 
     setTimeout(async () => {
       try {
-        const loginResponse = await loginFromService({
+
+        const loginResponse = await login({
           name: employee.name,
           pin,
         });
+        console.log(loginResponse);
         if (!loginResponse) {
           throw new Error("Invalid credentials");
         }
-        const meRes = await fetch("/api/auth/me", { credentials: "include" });
-        if (meRes.ok) {
-          const me = await meRes.json();
-          if (me?.userId) localStorage.setItem("userId", me.userId);
-          if (me?.role) localStorage.setItem("roleId", me.role);
-          localStorage.setItem("username", employee.name);
-        }
-
         addToast({
           title: "Inicio de sesión exitoso",
           description: `¡Bienvenido ${employee.name}! Acceso concedido como ${employee.role}.`,
@@ -113,8 +107,8 @@ export default function PinLoginNew() {
         });
         setPin("");
         setSelectedUser("");
-        router.push("/");
         setIsLoading(false);
+        router.push("/");
       } catch (error) {
         console.log(error)
         setError("PIN incorrecto para el empleado seleccionado.");

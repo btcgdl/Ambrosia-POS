@@ -16,7 +16,9 @@ import java.util.*
 import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.AuthRequest
+import pos.ambrosia.models.LoginResponse
 import pos.ambrosia.models.Message
+import pos.ambrosia.models.UserResponse
 import pos.ambrosia.services.AuthService
 import pos.ambrosia.services.TokenService
 import pos.ambrosia.utils.*
@@ -64,7 +66,15 @@ fun Route.auth(tokenService: TokenService, authService: AuthService) {
             )
     )
 
-    call.respond(Message(message = "Login successful"))
+    val userResponse =
+            UserResponse(
+                    user_id = userInfo.id,
+                    name = userInfo.name,
+                    role_id = userInfo.role,
+                    isAdmin = userInfo.isAdmin
+            )
+
+    call.respond(LoginResponse("Login successful", userResponse))
   }
 
   post("/refresh") {
