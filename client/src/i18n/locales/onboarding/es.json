@@ -1,0 +1,12 @@
+{
+  "buttons": {
+    "next": "Siguiente",
+    "back": "Atrás",
+    "finish": "Finalizar"
+  },
+  "step1": {
+    "title": "¿Qué tipo de negocio tienes?",
+    "subtitle":"Selecciona el tipo de negocio para personalizar tu experiencia."
+  }
+  
+}

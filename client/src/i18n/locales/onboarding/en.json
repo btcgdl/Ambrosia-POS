@@ -1,0 +1,12 @@
+{
+  "buttons": {
+    "next": "Next",
+    "back": "Back",
+    "finish": "Finish"
+  },
+  "step1": {
+    "title": "What type of business do you have?",
+    "subtitle":"Select your business type to personalize your experience."
+  }
+
+}

@@ -1,13 +1,16 @@
 "use client"
 
-import { Store, UtensilsCrossed } from "lucide-react"
+import { Store, UtensilsCrossed } from "lucide-react";
 import {Card, CardHeader, CardBody } from "@heroui/card";
+import { useTranslations } from "next-intl";
+
 
 export function BusinessTypeStep({ value, onChange }) {
-  console.log(value)
+  const t = useTranslations("onboarding");
+  console.log("Translation function:", t("wizard.step1.title"));
   return (
     <div>
-      <h2 className="text-2xl font-bold text-foreground mb-2">¿Qué tipo de negocio tienes?</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-2">{t("wizard.step1.title")}</h2>
       <p className="text-muted-foreground mb-8">Selecciona el tipo de negocio para personalizar tu experiencia</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

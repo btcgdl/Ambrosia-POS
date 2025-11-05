@@ -2,12 +2,12 @@
 
 import { useState } from "react"
 import { Button, Progress, Divider } from "@heroui/react";
-import { BusinessTypeStep } from "./wizard/SelectBusiness"
-import { UserAccountStep } from "./wizard/AddUserAccount"
-import { BusinessDetailsStep } from "./wizard/AddBusinessData"
-import { WizardSummary } from "./wizard/StepsSummary"
+import { BusinessTypeStep } from "./onboarding/SelectBusiness";
+import { UserAccountStep } from "./onboarding/AddUserAccount";
+import { BusinessDetailsStep } from "./onboarding/AddBusinessData";
+import { WizardSummary } from "./onboarding/StepsSummary";
 
-export function OnboardingWizard() {
+export function Onboarding() {
   const [step, setStep] = useState(1)
   const [data, setData] = useState({
     businessType: "store",
@@ -43,7 +43,7 @@ export function OnboardingWizard() {
   }
 
   return (
-    <div className="flex items-center justify-center items-start min-h-screen gradient-fresh p-4">
+    <div className="flex items-start justify-center min-h-screen gradient-fresh p-4">
       <div className="w-full max-w-2xl">
 
         <div className="mb-8 relative">
