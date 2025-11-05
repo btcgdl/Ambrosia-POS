@@ -13,15 +13,18 @@ import java.sql.Connection
 import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.User
+import pos.ambrosia.models.UserResponse
+import pos.ambrosia.services.TokenService
 import pos.ambrosia.services.UsersService
 
 fun Application.configureUsers() {
   val connection: Connection = DatabaseConnection.getConnection()
   val userService = UsersService(environment, connection)
-  routing { route("/users") { users(userService) } }
+  val tokenService = TokenService(environment, connection)
+  routing { route("/users") { users(userService, tokenService) } }
 }
 
-fun Route.users(userService: UsersService) {
+fun Route.users(userService: UsersService, tokenService: TokenService) {
   get("") {
     val users = userService.getUsers()
     if (users.isEmpty()) {
@@ -46,6 +49,40 @@ fun Route.users(userService: UsersService) {
 
       call.respond(HttpStatusCode.OK, user)
     }
+
+    get("/me") {
+      val refreshToken =
+              call.request.cookies["refreshToken"]
+                      ?: run {
+                        call.respond(
+                                HttpStatusCode.Unauthorized,
+                                mapOf("error" to "Refresh token no encontrado")
+                        )
+                        return@get
+                      }
+      val isValidRefreshToken = tokenService.validateRefreshToken(refreshToken)
+      if (!isValidRefreshToken) {
+        call.respond(HttpStatusCode.Unauthorized)
+        return@get
+      }
+
+      val userInfo = tokenService.getUserFromRefreshToken(refreshToken)
+
+      if (userInfo == null) {
+        call.respond(HttpStatusCode.NotFound, "User not found")
+        return@get
+      }
+
+      val userResponse =
+              UserResponse(
+                      user_id = userInfo.id,
+                      name = userInfo.name,
+                      role_id = userInfo.role,
+                      isAdmin = userInfo.isAdmin
+              )
+
+      call.respond(HttpStatusCode.OK, userResponse)
+    }
     post("") {
       val user = call.receive<User>()
       val result = userService.addUser(user)
@@ -53,7 +90,10 @@ fun Route.users(userService: UsersService) {
         call.respond(HttpStatusCode.BadRequest, "Failed to add user")
         return@post
       }
-      call.respond(HttpStatusCode.Created, mapOf("id" to result, "message" to "User added successfully"))
+      call.respond(
+              HttpStatusCode.Created,
+              mapOf("id" to result, "message" to "User added successfully")
+      )
     }
     put("/{id}") {
       val id = call.parameters["id"]
@@ -86,7 +126,10 @@ fun Route.users(userService: UsersService) {
         return@delete
       }
 
-      call.respond(HttpStatusCode.NoContent, mapOf("id" to id, "message" to "User deleted successfully"))
+      call.respond(
+              HttpStatusCode.NoContent,
+              mapOf("id" to id, "message" to "User deleted successfully")
+      )
     }
   }
 }

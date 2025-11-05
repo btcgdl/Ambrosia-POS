@@ -2,12 +2,13 @@
 import { addToast } from "@heroui/react";
 
 const API_BASE_URL = "/api";
+
 export async function apiClient(
   endpoint,
   { method = "GET", headers = {}, body, credentials = "include" } = {},
 ) {
-  try {
-    const doFetch = () => fetch(`${API_BASE_URL}${endpoint}`, {
+  const makeRequest = async () => {
+    return fetch(`${API_BASE_URL}${endpoint}`, {
       method,
       credentials,
       headers: {
@@ -16,69 +17,109 @@ export async function apiClient(
       },
       body: body ? JSON.stringify(body) : undefined,
     });
+  };
 
-    let res = await doFetch();
+  try {
+    let response = await makeRequest();
 
-    // Auto-intento de refresh en 401 una sola vez
-    if (res.status === 401 && !String(endpoint).startsWith("/auth/refresh")) {
-      try {
-        const refreshRes = await fetch(`${API_BASE_URL}/auth/refresh`, {
-          method: "POST",
-          credentials: "include",
-        });
-        if (refreshRes.ok) {
-          res = await doFetch();
-        }
-      } catch (error) {
-        console.error(error.message);
+    if (response.status === 401 && !endpoint.startsWith("/auth/refresh")) {
+      const refreshed = await handleTokenRefresh();
+
+      if (refreshed) {
+        response = await makeRequest();
+      } else {
+        throw new Error("AUTH_EXPIRED");
       }
     }
 
-    const contentType = res.headers.get("content-type");
+    const contentType = response.headers.get("content-type");
     const data = contentType?.includes("application/json")
-      ? await res.json()
-      : await res.text();
+      ? await response.json()
+      : await response.text();
 
-    if (!res.ok) {
-      if (res.status === 403 || res.status === 401) {
-        try {
-          if (typeof window !== "undefined" && String(endpoint).startsWith("/wallet")) {
-            window.dispatchEvent(new CustomEvent("wallet:unauthorized"));
-            // Silenciar toast para wallet y permitir que el guard maneje la UX
-            return;
-          }
-        } catch (error) {
-          console.error(error.message);
-        }
-        await fetch(`${API_BASE_URL}/auth/logout`, {
-          method: "POST",
-          credentials: "include",
-        });
-        addToast({
-          color: "danger",
-          title: "Error",
-          description: res.status === 401 ? "No autenticado" : "Usuario no autorizado",
-        });
-        return;
-      }
-      const errorMsg =
-        typeof data === "string" ? data : data?.message || "Error desconocido";
-      console.log(errorMsg);
-      addToast({
-        color: "danger",
-        title: "Error",
-        description: errorMsg,
-      });
-      throw new Error(errorMsg);
+    if (!response.ok) {
+      await handleHttpError(response.status, endpoint, data);
     }
 
     return data;
-  } catch (err) {
-    addToast({
-      title: "Error",
-      description: err.message,
-      color: "danger",
+
+  } catch (error) {
+    if (error.message !== "AUTH_EXPIRED" && error.message !== "UNAUTHORIZED") {
+      addToast({
+        title: "Error",
+        description: error.message || "Error de conexión",
+        color: "danger",
+      });
+    }
+    throw error;
+  }
+}
+
+async function handleTokenRefresh() {
+  try {
+    const refreshRes = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
     });
-    throw err;
+
+    if (!refreshRes.ok) {
+      await performLogout();
+      dispatchAuthEvent("auth:expired");
+      addToast({
+        color: "warning",
+        title: "Sesión expirada",
+        description: "Vuelve a iniciar sesión.",
+      });
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function handleHttpError(status, endpoint, data) {
+  if (status === 401 || status === 403) {
+    if (typeof window !== "undefined" && endpoint.startsWith("/wallet")) {
+      dispatchAuthEvent("wallet:unauthorized");
+      throw new Error("UNAUTHORIZED"); // Error silencioso
+    }
+
+    await performLogout();
+    dispatchAuthEvent("auth:expired");
+
+    addToast({
+      color: "danger",
+      title: "Error",
+      description: status === 401 ? "No autenticado" : "No autorizado",
+    });
+
+    throw new Error("UNAUTHORIZED");
+  }
+
+  const errorMsg = typeof data === "string"
+    ? data
+    : data?.message || `Error ${status}`;
+
+  throw new Error(errorMsg);
+}
+
+async function performLogout() {
+  try {
+    await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch {
+  }
+}
+
+function dispatchAuthEvent(eventName, detail = null) {
+  if (typeof window !== "undefined") {
+    const event = detail
+      ? new CustomEvent(eventName, { detail })
+      : new Event(eventName);
+    window.dispatchEvent(event);
   }
 }

@@ -8,13 +8,13 @@ import LoadingCard from "../components/LoadingCard";
 
 export default function HomePage() {
   const router = useRouter();
-  const { isAuthenticated, user, isLoading } = useContext(AuthContext);
+  const { userInfo, isLoading } = useContext(AuthContext);
 
   useEffect(() => {
-    const homeRoute = getHomeRoute(user);
+    const homeRoute = getHomeRoute(userInfo);
     console.log(`🏠 Redirigiendo usuario a: ${homeRoute}`);
     router.replace(homeRoute);
-  }, [router]);
+  }, [userInfo, router]);
 
   return (
     <LoadingCard

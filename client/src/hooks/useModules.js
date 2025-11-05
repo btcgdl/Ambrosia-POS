@@ -1,10 +1,10 @@
 "use client";
-import { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../modules/auth/AuthProvider';
+import { useState, useEffect } from 'react';
+import { useAuth } from "./../modules/auth/useAuth.js"
 import { getAvailableModules, getAvailableNavigation, hasAccessToRoute } from '../lib/modules';
 
 export function useModules() {
-  const { isAuth, userInfo, logout, isLoading } = useContext(AuthContext);
+  const { isAuth, userInfo, logout, isLoading } = useAuth();
   const [availableModules, setAvailableModules] = useState({});
   const [availableNavigation, setAvailableNavigation] = useState([]);
 
@@ -20,6 +20,8 @@ export function useModules() {
 
       console.log('📦 Módulos disponibles:', Object.keys(modules));
       console.log('🧭 Navegación disponible:', navigation.map(nav => nav.path));
+
+      console.log(isAuth, userInfo)
     }
   }, [isAuth, isAdmin, isLoading]);
 
