@@ -8,7 +8,7 @@ import { CURRENCIES_EN } from "./utils/currencies_en";
 import { CURRENCIES_ES } from "./utils/currencies_es";
 
 export function BusinessDetailsStep({ data, onChange }) {
-  const t = useTranslations("onboarding");
+  const t = useTranslations();
   const locale = useLocale();
 
   const [logoPreview, setLogoPreview] = useState(null)

@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Edit2 } from "lucide-react"
 
 export function WizardSummary({ data, onEdit }) {
-  const t = useTranslations("onboarding");
+  const t = useTranslations();
 
   return (
     <div>

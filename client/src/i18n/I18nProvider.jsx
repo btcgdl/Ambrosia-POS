@@ -1,53 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { NextIntlClientProvider } from "next-intl";
 
-const context = require.context("./locales", true, /\.json$/);
+import onboarding_es from "./locales/onboarding/es.js";
+import onboarding_en from "./locales/onboarding/en.js";
 
-function loadLocales() {
-  const locales = { en: {}, es: {} };
-
-  context.keys().forEach((key) => {
-    const parts = key.split("/");
-    const feature = parts[1]; 
-    const fileName = parts[2]; 
-
-    if (fileName.startsWith("en")) locales.en[feature] = context(key);
-    if (fileName.startsWith("es")) locales.es[feature] = context(key);
-  });
-
-  return locales;
+const translations = {
+  en: {
+    onboarding: onboarding_en
+  },
+  es: {
+    onboarding: onboarding_es
+  },
 }
 
-const dictionaries = loadLocales();
-
-function mergeMessages(locale) {
-  const messages = {};
-  for (const [namespace, data] of Object.entries(dictionaries[locale])) {
-    messages[namespace] = data;
-  }
-  return messages;
+function mergeLocales(locale) {
+  const groups = translations[locale] || {};
+  return Object.values(groups).reduce(
+    (acc, mod) => ({ ...acc, ...mod }),
+    {}
+  );
 }
 
 export function I18nProvider({ children }) {
   const [locale, setLocale] = useState("es");
-  const [messages, setMessages] = useState(mergeMessages("es"));
+  const messages = useMemo(() => mergeLocales(locale), [locale]);
 
   useEffect(() => {
     const stored = localStorage.getItem("locale");
-    if (stored && dictionaries[stored]) {
+    if (stored && translations[stored]) {
       setLocale(stored);
-      setMessages(mergeMessages(stored));
     }
   }, []);
 
   const changeLocale = (newLocale) => {
-    if (dictionaries[newLocale]) {
-      setLocale(newLocale);
-      setMessages(mergeMessages(newLocale));
-      localStorage.setItem("locale", newLocale);
-    }
+    if (!translations[newLocale]) return;
+    setLocale(newLocale);
+    localStorage.setItem("locale", newLocale);
   };
 
   return (

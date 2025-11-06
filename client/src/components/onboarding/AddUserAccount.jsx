@@ -6,7 +6,7 @@ import { Input } from "@heroui/react"
 import { Eye, EyeOff } from "lucide-react"
 
 export function UserAccountStep({ data, onChange }) {
-  const t = useTranslations("onboarding");
+  const t = useTranslations();
   const [showPassword, setShowPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState(0)
 

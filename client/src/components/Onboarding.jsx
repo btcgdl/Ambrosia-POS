@@ -9,7 +9,7 @@ import { BusinessDetailsStep } from "./onboarding/AddBusinessData";
 import { WizardSummary } from "./onboarding/StepsSummary";
 
 export function Onboarding() {
-  const t = useTranslations("onboarding");
+  const t = useTranslations();
   const [step, setStep] = useState(1)
   const [data, setData] = useState({
     businessType: "store",

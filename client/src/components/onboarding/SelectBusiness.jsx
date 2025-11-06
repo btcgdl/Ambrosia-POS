@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 
 
 export function BusinessTypeStep({ value, onChange }) {
-  const t = useTranslations("onboarding");
+  const t = useTranslations();
   console.log("Translation function:", t("step1.title"));
   return (
     <div>
