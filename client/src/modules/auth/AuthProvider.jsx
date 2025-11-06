@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [userInfo, setUserInfo] = useState(null);
+  const [user, setUser] = useState(null);
+  const [permissions, setPermissions] = useState(null);
   const [isAuth, setIsAuth] = useState(false);
   const [isLoading, setIsLoading] = useState(true)
 
@@ -19,11 +20,12 @@ export function AuthProvider({ children }) {
 
       const data = await apiClient("/users/me")
 
-      setUserInfo(data);
+      setPermissions(data.perms);
+      setUser(data.user);
       setIsAuth(true)
-      console.log(data)
+      console.log(data.user)
     } catch (error) {
-      setUserInfo(null)
+      setUser(null)
     } finally {
       setIsLoading(false)
     }
@@ -36,7 +38,9 @@ export function AuthProvider({ children }) {
         { name, pin }
       )
 
-      setUserInfo(loginResponse.user);
+      setPermissions(loginResponse.perms);
+      setUser(loginResponse.user);
+      console.log(loginResponse.user)
       setIsAuth(true)
       setIsLoading(false)
 
@@ -47,14 +51,16 @@ export function AuthProvider({ children }) {
   }
   const logout = async () => {
     await logoutFromService();
-    setUserInfo(null);
+    setUser(null);
+    setPermissions(null)
     setIsAuth(false);
   };
 
   useEffect(() => {
     fetchUser();
     const handleExpired = () => {
-      setUserInfo(null)
+      setUser(null)
+      setPermissions(null)
       setIsAuth(false);
       router.push("/")
     };
@@ -85,7 +91,8 @@ export function AuthProvider({ children }) {
   }, [isAuth]);
 
   const value = {
-    userInfo,
+    user,
+    permissions,
     isAuth,
     login,
     logout,

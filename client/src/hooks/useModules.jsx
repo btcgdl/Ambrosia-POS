@@ -4,16 +4,16 @@ import { useAuth } from "./../modules/auth/useAuth.js"
 import { getAvailableModules, getAvailableNavigation, hasAccessToRoute } from '../lib/modules';
 
 export function useModules() {
-  const { isAuth, userInfo, logout, isLoading } = useAuth();
+  const { isAuth, user, permissions, logout, isLoading } = useAuth();
   const [availableModules, setAvailableModules] = useState({});
   const [availableNavigation, setAvailableNavigation] = useState([]);
 
-  const isAdmin = userInfo?.isAdmin || false;
+  const isAdmin = user?.isAdmin || false;
 
   useEffect(() => {
     if (!isLoading) {
-      const modules = getAvailableModules(isAuth, isAdmin);
-      const navigation = getAvailableNavigation(isAuth, isAdmin);
+      const modules = getAvailableModules(isAuth, isAdmin, permissions);
+      const navigation = getAvailableNavigation(isAuth, isAdmin, permissions);
 
       setAvailableModules(modules);
       setAvailableNavigation(navigation);
@@ -21,12 +21,11 @@ export function useModules() {
       console.log('📦 Módulos disponibles:', Object.keys(modules));
       console.log('🧭 Navegación disponible:', navigation.map(nav => nav.path));
 
-      console.log(isAuth, userInfo)
     }
-  }, [isAuth, isAdmin, isLoading]);
+  }, [isAuth, isAdmin, isLoading, permissions]);
 
   const checkRouteAccess = (pathname) => {
-    return hasAccessToRoute(pathname, isAuth, isAdmin);
+    return hasAccessToRoute(pathname, isAuth, isAdmin, permissions);
   };
 
   return {
@@ -36,7 +35,7 @@ export function useModules() {
     isAuth,
     isAdmin,
     isLoading,
-    userInfo,
+    user,
     logout
   };
 }

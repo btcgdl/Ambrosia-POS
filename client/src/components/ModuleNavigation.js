@@ -37,7 +37,7 @@ function NavBarButton({ text, icon, onClick, isActive }) {
 export default function ModuleNavigation({ children }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { availableNavigation, isAuth, isAdmin, userInfo, logout, isLoading } =
+  const { availableNavigation, isAuth, isAdmin, user, logout, isLoading } =
     useModules();
 
   // Si está cargando, mostrar spinner
@@ -50,7 +50,7 @@ export default function ModuleNavigation({ children }) {
       <aside className="w-1/6 h-full bg-[#1c7c54] flex flex-col">
         <div className="h-[25%] flex flex-col items-center justify-end pb-4">
           <Link
-            href={isAuth ? getHomeRoute(userInfo) : "/auth"}
+            href={isAuth ? getHomeRoute(user) : "/auth"}
             className="group"
           >
             <LucideIcons.Home className="w-24 h-24 text-white cursor-pointer group-hover:scale-110 transition-transform" />
@@ -59,7 +59,7 @@ export default function ModuleNavigation({ children }) {
             {isAuth ? (
               <>
                 <p className="text-white text-[13px] mt-1">
-                  {userInfo?.name || localStorage.getItem("username") || "Usuario"}
+                  {user?.name || localStorage.getItem("username") || "Usuario"}
                 </p>
                 <p className="text-white/80 text-[11px]">
                   {isAdmin ? "ADMINISTRADOR" : "USUARIO"}
