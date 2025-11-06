@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
     try {
       setIsLoading(true)
 
-      const data = await apiClient("/users/me")
+      const data = await apiClient("/users/me", { skipRefresh: true, silentAuth: true })
 
       setPermissions(data.perms);
       setUser(data.user);
@@ -26,6 +26,8 @@ export function AuthProvider({ children }) {
       console.log(data.user)
     } catch (error) {
       setUser(null)
+      setPermissions(null)
+      setIsAuth(false)
     } finally {
       setIsLoading(false)
     }
@@ -33,19 +35,16 @@ export function AuthProvider({ children }) {
 
   const login = async ({ name, pin }) => {
     try {
-      setIsLoading(true)
       const loginResponse = await loginFromService(
         { name, pin }
       )
 
       setPermissions(loginResponse.perms);
       setUser(loginResponse.user);
-      console.log(loginResponse.user)
       setIsAuth(true)
-      setIsLoading(false)
 
     } catch (error) {
-      console.log("Login Error", error)
+      setIsAuth(false)
       throw error;
     }
   }
@@ -54,6 +53,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setPermissions(null)
     setIsAuth(false);
+    setIsLoading(false)
   };
 
   useEffect(() => {
@@ -62,7 +62,8 @@ export function AuthProvider({ children }) {
       setUser(null)
       setPermissions(null)
       setIsAuth(false);
-      router.push("/")
+      setIsLoading(false)
+      router.push("/auth")
     };
 
     window.addEventListener("auth:expired", handleExpired);
@@ -73,7 +74,7 @@ export function AuthProvider({ children }) {
     if (!isAuth) return;
 
     const revalidate = () => {
-      apiClient("/users/me").catch(() => { });
+      apiClient("/users/me", { silentAuth: false }).catch(() => { });
     };
 
     const onFocus = () => revalidate();

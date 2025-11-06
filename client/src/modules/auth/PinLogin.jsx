@@ -89,28 +89,25 @@ export default function PinLoginNew() {
 
     const employee = employees.find((emp) => emp.id === selectedUser);
 
-    setTimeout(async () => {
-      try {
-        await login({
-          name: employee.name,
-          pin,
-        });
-        addToast({
-          title: "Inicio de sesión exitoso",
-          description: `¡Bienvenido ${employee.name}! Acceso concedido como ${employee.role}.`,
-          color: "success",
-        });
-        setPin("");
-        setSelectedUser("");
-        setIsLoading(false);
-        // Navegar al home; Home decidirá la ruta final según el usuario
-        router.replace("/");
-      } catch (error) {
-        console.log(error);
-        setError("PIN incorrecto para el empleado seleccionado.");
-        setIsLoading(false);
-      }
-    }, 1000);
+    try {
+      await login({
+        name: employee.name,
+        pin,
+      });
+      addToast({
+        title: "Inicio de sesión exitoso",
+        description: `¡Bienvenido ${employee.name}! Acceso concedido como ${employee.role}.`,
+        color: "success",
+      });
+      setPin("");
+      setSelectedUser("");
+      router.replace("/");
+    } catch (error) {
+      setError("PIN incorrecto para el empleado seleccionado.");
+      setPin("");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const numbers = [
