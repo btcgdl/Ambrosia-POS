@@ -2,12 +2,14 @@
 
 import { useState } from "react"
 import { Button, Progress, Divider } from "@heroui/react";
+import { useTranslations } from "next-intl";
 import { BusinessTypeStep } from "./onboarding/SelectBusiness";
 import { UserAccountStep } from "./onboarding/AddUserAccount";
 import { BusinessDetailsStep } from "./onboarding/AddBusinessData";
 import { WizardSummary } from "./onboarding/StepsSummary";
 
 export function Onboarding() {
+  const t = useTranslations("onboarding");
   const [step, setStep] = useState(1)
   const [data, setData] = useState({
     businessType: "store",
@@ -109,7 +111,7 @@ export function Onboarding() {
               isDisabled={step === 1}
               className="px-6 py-2 border border-border text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Anterior
+              {t("buttons.back")}
             </Button>
 
             {step < 4 ? (
@@ -123,7 +125,7 @@ export function Onboarding() {
                 }
                 className="gradient-forest text-white"
               >
-                Siguiente
+                {t("buttons.next")}
               </Button>
             ) : (
               <Button
@@ -131,7 +133,7 @@ export function Onboarding() {
                 onPress={handleComplete}
                 className="gradient-forest text-white"
               >
-                Completar
+                {t("buttons.finish")}
               </Button>
             )}
           </div>

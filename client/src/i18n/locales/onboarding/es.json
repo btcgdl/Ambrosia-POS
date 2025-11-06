@@ -2,11 +2,78 @@
   "buttons": {
     "next": "Siguiente",
     "back": "Atrás",
-    "finish": "Finalizar"
+    "finish": "Completar"
   },
   "step1": {
     "title": "¿Qué tipo de negocio tienes?",
-    "subtitle":"Selecciona el tipo de negocio para personalizar tu experiencia."
+    "subtitle":"Selecciona el tipo de negocio para personalizar tu experiencia.",
+    "businessType": {
+      "store": "Tienda",
+      "restaurant": "Restaurante"
+    },
+    "descriptions": {
+      "store": "Venta de productos al por menor. Ideal para tiendas de ropa, electrónica, etc.",
+      "restaurant": "Servicio de alimentos y bebidas. Incluye gestión de mesas y pedidos."
+    }
+  },
+  "step2": {
+    "title": "Cuenta de administrador",
+    "subtitle":"Estos datos serán utilizados para acceder a tu sistema PoS",
+    "fields": {
+      "userNameLabel": "Nombre de Usuario",
+      "userNamePlaceholder": "Ingresa tu nombre de usuario",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Ingresa una contraseña segura"
+    },
+    "passwordSecure": "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres especiales."
+  },
+  "step3": {
+    "titleStore": "Datos de la tienda",
+    "titleRestaurant": "Datos del restaurante",
+    "subtitle":"Completa la información de tu negocio",
+    "fields": {
+      "businessrNameLabelStore": "Nombre de la tienda",
+      "businessrNameLabelRestaurant": "Nombre del restaurante",
+      "businessNamePlaceholder": "El Delicioso Negocio",
+      "businessAddress": "Dirección",
+      "businessAddressPlaceholder": "Ej: Calle Principal 123, Apartado 4, Ciudad",
+      "businessPhone": "Teléfono",
+      "businessPhonePlaceholder": "Ej: 3312345678",
+      "businessEmail": "Correo electrónico",
+      "businessEmailPlaceholder": "contacto@deliciosonegocio.com",
+      "businessRFC": "RFC",
+      "businessRFCPlaceholder": "Ej: ABC123456XYZ",
+      "businessRFCMessage": "Formato: 13 caracteres (letras y números)",
+      "businessCurrency": "Moneda",
+      "businessLogoLabelStore": "Logo de la tienda",
+      "businessLogoLabelRestaurant": "Logo del restaurante",
+      "businessLogoUpload": "Sube tu logo",
+      "businessLogoUploadMessage": "PNG, JPG o GIF (máx. 5MB)"
+    }
+  },
+  "step4": {
+    "title": "Resumen de tu configuración",
+    "subtitle":"Verifica que todos los datos sean correctos antes de completar",
+    "sections": {
+      "businessType": {
+        "title": "Tipo de negocio",
+        "store": "Tienda",
+        "restaurant": "Restaurante"
+      },
+      "adminAccount": {
+        "title": "Cuenta de administrador",
+        "userName": "Nombre de usuario",
+        "password": "Contraseña"
+      },
+      "businessDetails": {
+        "title": "Detalles del negocio",
+        "businessName": "Nombre del negocio",
+        "businessAddress": "Dirección",
+        "businessPhone": "Teléfono",
+        "businessEmail": "Correo electrónico",
+        "businessRFC": "RFC",
+        "businessCurrency": "Moneda"
+      }
+    }
   }
-  
 }

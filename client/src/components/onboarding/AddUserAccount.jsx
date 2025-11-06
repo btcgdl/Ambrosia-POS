@@ -1,10 +1,12 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl";
 import { Input } from "@heroui/react"
 import { Eye, EyeOff } from "lucide-react"
 
 export function UserAccountStep({ data, onChange }) {
+  const t = useTranslations("onboarding");
   const [showPassword, setShowPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState(0)
 
@@ -38,22 +40,22 @@ export function UserAccountStep({ data, onChange }) {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-foreground mb-2">Crear cuenta de usuario</h2>
-      <p className="text-muted-foreground mb-8">Estos datos serán utilizados para acceder a tu sistema PoS</p>
+      <h2 className="text-2xl font-bold text-foreground mb-2">{t("step2.title")}</h2>
+      <p className="text-muted-foreground mb-8">{t("step2.subtitle")}</p>
 
       <div className="space-y-6">
         <Input
-          label="Nombre de Usuario"
+          label={t("step2.fields.userNameLabel")}
           type="text"
-          placeholder="Ingresa tu nombre de usuario"
+          placeholder={t("step2.fields.userNamePlaceholder")}
           value={data.userName}
           onChange={(e) => onChange({ ...data, userName: e.target.value })}
         />
 
         <Input
-          label="Contraseña"
+          label={t("step2.fields.passwordLabel")}
           type={showPassword ? "text" : "password"}
-          placeholder="Ingresa una contraseña segura"
+          placeholder={t("step2.fields.passwordPlaceholder")}
           value={data.userPassword}
           onChange={(e) => handlePasswordChange(e.target.value)}
           endContent={
@@ -85,8 +87,7 @@ export function UserAccountStep({ data, onChange }) {
             </div>
           )}
           <p className="text-xs text-muted-foreground mt-2">
-            La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres
-            especiales.
+            {t("step2.passwordSecure")}
           </p>
         </div>
       </div>
