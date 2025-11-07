@@ -1,4 +1,4 @@
-export default {
+const onboarding_es = {
   buttons: {
     next: "Siguiente",
     back: "Atrás",
@@ -77,3 +77,5 @@ export default {
     }
   }
 }
+
+export default onboarding_es;

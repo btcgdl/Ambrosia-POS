@@ -7,6 +7,7 @@ const config = {
   moduleNameMapper: {
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
     "^@/(.*)$": "<rootDir>/$1",
+    "^next-intl$": "<rootDir>/__tests__/__mocks__/next/next-intl.js",
   },
   transform: {
     "^.+\\.(js|jsx|ts|tsx)$": [
@@ -14,6 +15,9 @@ const config = {
       { configFile: "./.babel-jest.config.js" }
     ],
   },
+  transformIgnorePatterns: [
+    "/node_modules/(?!next-intl|@formatjs|react-intl|intl-messageformat)/",
+  ],
 };
 
 export default config;
