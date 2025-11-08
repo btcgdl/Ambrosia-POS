@@ -15,8 +15,8 @@ export const modules = {
         path: "/users",
         component: "Users",
         requiresAuth: true,
-        requiresAdmin: true,
-        permissions: ["users_get"]
+        requiresAdmin: false,
+        permissions: ["users_read"]
       },
     ],
     services: () => import("../modules/auth/authService"),
@@ -264,7 +264,13 @@ export function getNavigationItems(userRoles = [], permissions = [], isAdmin = f
     config.navItems?.forEach((item) => {
       if (item.showInNavbar === false) return;
 
-      const passesPerms = !item.permissions || item.permissions.every((k) => permNames.has(k));
+      // Determinar permisos y admin requeridos usando la ruta correspondiente si existe
+      const route = (config.routes || []).find((r) => r.path === item.path) || {};
+      const requiresAdmin = item.requiresAdmin || route.requiresAdmin || false;
+      if (requiresAdmin && !isAdmin) return;
+
+      const requiredPerms = item.permissions || route.permissions;
+      const passesPerms = !requiredPerms || requiredPerms.every((k) => permNames.has(k));
 
       if (passesPerms) {
         navItems.push({
@@ -295,6 +301,8 @@ export function getAvailableModules(
 
       if (route.requiresAuth && !isAuthenticated) return false;
 
+      if (route.requiresAdmin && !isAdmin) return false;
+
       if (route.permissions && route.permissions.length > 0) {
         return route.permissions.every((k) => permNames.has(k));
       }
@@ -305,8 +313,13 @@ export function getAvailableModules(
     const availableNavItems = (moduleConfig.navItems || []).filter((navItem) => {
       if (!isAuthenticated) return false;
       if (navItem.showInNavbar === false) return false;
-      if (navItem.permissions && navItem.permissions.length > 0) {
-        return navItem.permissions.every((k) => permNames.has(k));
+      // Empatar con la ruta para heredar requiresAdmin/permisos si el navItem no los define
+      const route = (moduleConfig.routes || []).find((r) => r.path === navItem.path) || {};
+      const requiresAdmin = navItem.requiresAdmin || route.requiresAdmin || false;
+      if (requiresAdmin && !isAdmin) return false;
+      const requiredPerms = navItem.permissions || route.permissions;
+      if (requiredPerms && requiredPerms.length > 0) {
+        return requiredPerms.every((k) => permNames.has(k));
       }
       return true;
     });
@@ -362,6 +375,8 @@ export function hasAccessToRoute(
   if (!route.requiresAuth) return true;
 
   if (route.requiresAuth && !isAuthenticated) return false;
+
+  if (route.requiresAdmin && !isAdmin) return false;
 
   if (route.permissions && route.permissions.length > 0) {
     return route.permissions.every((k) => permNames.has(k));

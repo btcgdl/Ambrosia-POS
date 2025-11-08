@@ -65,9 +65,17 @@ export function AuthProvider({ children }) {
       setIsLoading(false)
       router.push("/auth")
     };
+    const handleForbidden = () => {
+      // No cerramos sesión; solo redirigimos a unauthorized
+      router.push("/unauthorized");
+    };
 
     window.addEventListener("auth:expired", handleExpired);
-    return () => window.removeEventListener("auth:expired", handleExpired)
+    window.addEventListener("auth:forbidden", handleForbidden);
+    return () => {
+      window.removeEventListener("auth:expired", handleExpired);
+      window.removeEventListener("auth:forbidden", handleForbidden);
+    }
   }, []);
 
   useEffect(() => {

@@ -145,7 +145,8 @@ async function performTokenRefresh() {
 async function handleHttpError(status, endpoint, data, silentAuth = false) {
   const isAuthEndpoint = endpoint.startsWith("/auth");
 
-  if (status === 401 || status === 403) {
+  // 401: No autenticado -> intentar refresh (ya hecho antes) o cerrar sesión
+  if (status === 401) {
     if (isAuthEndpoint) {
       const msg = typeof data === "string" ? data : data?.message || "Credenciales inválidas";
       const error = new Error(msg);
@@ -168,8 +169,34 @@ async function handleHttpError(status, endpoint, data, silentAuth = false) {
     addToast({
       color: "danger",
       title: "Error de autenticación",
-      description: status === 401 ? "No autenticado" : "No autorizado",
+      description: "No autenticado",
     });
+
+    throw new Error("UNAUTHORIZED");
+  }
+
+  // 403: Prohibido (sin permisos) -> NO cerrar sesión; navegar a /unauthorized
+  if (status === 403) {
+    if (isAuthEndpoint) {
+      const msg = typeof data === "string" ? data : data?.message || "No autorizado";
+      const error = new Error(msg);
+      error.status = status;
+      throw error;
+    }
+
+    if (typeof window !== "undefined" && endpoint.startsWith("/wallet")) {
+      dispatchAuthEvent("wallet:unauthorized");
+      throw new Error("UNAUTHORIZED");
+    }
+
+    if (!silentAuth) {
+      dispatchAuthEvent("auth:forbidden");
+      addToast({
+        color: "warning",
+        title: "Acceso denegado",
+        description: "No autorizado",
+      });
+    }
 
     throw new Error("UNAUTHORIZED");
   }
