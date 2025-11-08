@@ -18,6 +18,7 @@ import pos.ambrosia.models.UserResponse
 import pos.ambrosia.services.PermissionsService
 import pos.ambrosia.services.TokenService
 import pos.ambrosia.services.UsersService
+import pos.ambrosia.utils.authorizePermission
 
 fun Application.configureUsers() {
   val connection: Connection = DatabaseConnection.getConnection()
@@ -40,23 +41,23 @@ fun Route.users(
     }
     call.respond(HttpStatusCode.OK, users)
   }
-  authenticate("auth-jwt") {
-    get("/{id}") {
-      val id = call.parameters["id"]
-      if (id == null) {
-        call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
-        return@get
-      }
-
-      val user = userService.getUserById(id)
-      if (user == null) {
-        call.respond(HttpStatusCode.NotFound, "User not found")
-        return@get
-      }
-
-      call.respond(HttpStatusCode.OK, user)
+  get("/{id}") {
+    val id = call.parameters["id"]
+    if (id == null) {
+      call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+      return@get
     }
 
+    val user = userService.getUserById(id)
+    if (user == null) {
+      call.respond(HttpStatusCode.NotFound, "User not found")
+      return@get
+    }
+
+    call.respond(HttpStatusCode.OK, user)
+  }
+
+  authenticate("auth-jwt") {
     get("/me") {
       val refreshToken =
               call.request.cookies["refreshToken"]
@@ -98,6 +99,8 @@ fun Route.users(
 
       call.respond(UserMeResponse(userResponse, perms))
     }
+  }
+  authorizePermission("users_create") {
     post("") {
       val user = call.receive<User>()
       val result = userService.addUser(user)
@@ -110,6 +113,8 @@ fun Route.users(
               mapOf("id" to result, "message" to "User added successfully")
       )
     }
+  }
+  authorizePermission("users_update") {
     put("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {
@@ -128,6 +133,8 @@ fun Route.users(
 
       call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "User updated successfully"))
     }
+  }
+  authorizePermission("users_delete") {
     delete("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {

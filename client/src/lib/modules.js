@@ -16,6 +16,7 @@ export const modules = {
         component: "Users",
         requiresAuth: true,
         requiresAdmin: true,
+        permissions: ["users_get"]
       },
     ],
     services: () => import("../modules/auth/authService"),
@@ -256,6 +257,7 @@ export function getNavigationItems(userRoles = [], permissions = [], isAdmin = f
   const navItems = [];
   const permNames = new Set((permissions || []).map((p) => p.name));
 
+  console.log(permNames)
   Object.entries(modules).forEach(([moduleKey, config]) => {
     if (!config.enabled) return;
 
@@ -282,6 +284,7 @@ export function getAvailableModules(
   permissions = [],
 ) {
   const permNames = new Set((permissions || []).map((p) => p.name));
+  console.log("permisos en getava", permNames)
   const availableModules = {};
 
   Object.entries(modules).forEach(([moduleKey, moduleConfig]) => {
