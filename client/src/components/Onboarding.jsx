@@ -24,6 +24,14 @@ export function Onboarding() {
     businessLogo: null,
   })
 
+  function isPasswordStrong(password) {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
+  }
+
+  function isRFCValid(rfc) {
+    return /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i.test(rfc);
+  }
+
   const handleNext = () => {
     if (step < 4) {
       setStep(step + 1)
@@ -120,8 +128,8 @@ export function Onboarding() {
                 onPress={handleNext}
                 isDisabled={
                   (step === 1 && !data.businessType) ||
-                  (step === 2 && (!data.userName || !data.userPassword)) ||
-                  (step === 3 && (!data.businessName || !data.businessAddress || !data.businessRFC))
+                  (step === 2 && (!data.userName || !data.userPassword || isPasswordStrong(data.userPassword) === false)) ||
+                  (step === 3 && (!data.businessName || !data.businessAddress || !data.businessRFC || !isRFCValid(data.businessRFC)))
                 }
                 className="gradient-forest text-white"
               >

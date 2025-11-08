@@ -32,10 +32,10 @@ export function UserAccountStep({ data, onChange }) {
 
   const getPasswordStrengthText = () => {
     if (passwordStrength === 0) return ""
-    if (passwordStrength === 1) return "Débil"
-    if (passwordStrength === 2) return "Regular"
-    if (passwordStrength === 3) return "Buena"
-    return "Muy fuerte"
+    if (passwordStrength === 1) return t("step2.strength.weak")
+    if (passwordStrength === 2) return t("step2.strength.regular")
+    if (passwordStrength === 3) return t("step2.strength.good")
+    return t("step2.strength.strong")
   }
 
   return (
@@ -82,7 +82,7 @@ export function UserAccountStep({ data, onChange }) {
                 ))}
               </div>
               <p className="text-xs text-muted-foreground">
-                Fortaleza: <span className="font-medium">{getPasswordStrengthText()}</span>
+                {t("step2.strength.title")}: <span className="font-medium">{getPasswordStrengthText()}</span>
               </p>
             </div>
           )}

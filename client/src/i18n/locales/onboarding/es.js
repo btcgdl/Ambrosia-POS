@@ -25,6 +25,13 @@ const onboarding_es = {
       passwordLabel: "Contraseña",
       passwordPlaceholder: "Ingresa una contraseña segura"
     },
+     strength: {
+      title: "Fortaleza",
+      weak: "Debil",
+      regular: "Regular",
+      good: "Buena",
+      strong: "Fuerte"
+    },
     passwordSecure: "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres especiales."
   },
   step3: {
@@ -44,6 +51,7 @@ const onboarding_es = {
       businessRFC: "RFC",
       businessRFCPlaceholder: "Ej: ABC123456XYZ",
       businessRFCMessage: "Formato: 13 caracteres (letras y números)",
+      businessRFCInvalid: "RFC inválido",
       businessCurrency: "Moneda",
       businessLogoLabelStore: "Logo de la tienda",
       businessLogoLabelRestaurant: "Logo del restaurante",

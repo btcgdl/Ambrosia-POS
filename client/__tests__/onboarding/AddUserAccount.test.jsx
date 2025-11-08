@@ -52,8 +52,8 @@ describe("Step 2 User Account", () => {
     userPassword: "abc123!!",
   });
 
-  expect(screen.getByText(/Fortaleza:/)).toBeInTheDocument();
-  expect(screen.getByText(/Regular|Buena|Muy fuerte|Débil/)).toBeInTheDocument();
+  expect(screen.getByText(/step2.strength.title:/)).toBeInTheDocument();
+  expect(screen.getByText(/step2.strength.weak|step2.strength.regular|step2.strength.good|step2.strength.strong/)).toBeInTheDocument();
 });
 
   it("toggles password visibility when clicking the eye icon", () => {

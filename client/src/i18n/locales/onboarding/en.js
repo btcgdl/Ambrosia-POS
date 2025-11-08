@@ -25,7 +25,14 @@ const onboarding_en = {
       passwordLabel: "Password",
       passwordPlaceholder: "Enter a secure password"
     },
-    passwordSecure: "The password must be at least 8 characters long, include uppercase, lowercase, numbers, and special characters."
+    strength: {
+      title: "Password Strength",
+      weak: "Weak",
+      regular: "Regular",
+      good: "Good",
+      strong: "Strong"
+    },
+    passwordSecure: "The password must be at least 8 characters long, include uppercase, lowercase, numbers, and special characters.",
   },
   step3: {
     titleStore: "Store Details",
@@ -44,6 +51,7 @@ const onboarding_en = {
       businessRFC: "RFC",
       businessRFCPlaceholder: "Ej: ABC123456XYZ",
       businessRFCMessage: "13 character format (letters and numbers)",
+      businessRFCInvalid: "Invalid RFC format",
       businessCurrency: "Currency",
       businessLogoLabelStore: "Store logo",
       businessLogoLabelRestaurant: "Restaurant logo",

@@ -75,4 +75,84 @@ describe("Onboarding Wizard", () => {
     });
     expect(screen.getByText("buttons.back")).toBeDisabled();
   });
+
+  it("disables the Next button if password does not meet requirements in step 2", async () => {
+    await act(async () => {
+      renderOnboarding();
+    });
+
+    const nextButton = screen.getByText("buttons.next");
+    await act(async () => {
+      fireEvent.click(nextButton);
+    });
+
+    const userNameInput = screen.getByPlaceholderText("step2.fields.userNamePlaceholder");
+    await act(async () => {
+      fireEvent.change(userNameInput, { target: { value: "testuser" } });
+    });
+
+    const passwordInput = screen.getByPlaceholderText("step2.fields.passwordPlaceholder");
+
+    await act(async () => {
+      fireEvent.change(passwordInput, { target: { value: "abc123" } });
+    });
+    expect(nextButton).toBeDisabled();
+
+    await act(async () => {
+      fireEvent.change(passwordInput, { target: { value: "Abcdef12" } });
+    });
+    expect(nextButton).toBeDisabled();
+
+    await act(async () => {
+      fireEvent.change(passwordInput, { target: { value: "Abcd123$" } });
+    });
+    expect(nextButton).not.toBeDisabled();
+  });
+
+  it("disables the Next button if RFC are invalid in step 3", async () => {
+    await act(async () => {
+      renderOnboarding();
+    });
+
+    const nextButton = screen.getByText("buttons.next");
+    await act(async () => {
+      fireEvent.click(nextButton);
+    });
+
+    await act(async () => {
+      const userNameInput = screen.getByPlaceholderText("step2.fields.userNamePlaceholder");
+      const passwordInput = screen.getByPlaceholderText("step2.fields.passwordPlaceholder");
+
+      fireEvent.change(userNameInput, { target: { value: "testuser" } });
+      fireEvent.change(passwordInput, { target: { value: "Abcd123$" } });
+
+      fireEvent.click(nextButton);
+    });
+
+    const phoneInput = screen.getByPlaceholderText("step3.fields.businessPhonePlaceholder");
+    const rfcInput = screen.getByPlaceholderText("step3.fields.businessRFCPlaceholder");
+    const businessNameInput = screen.getByPlaceholderText("step3.fields.businessNamePlaceholder");
+    const businessAddressInput = screen.getByPlaceholderText("step3.fields.businessAddressPlaceholder");
+
+    await act(async () => {
+      fireEvent.change(businessNameInput, { target: { value: "My Business" } });
+      fireEvent.change(businessAddressInput, { target: { value: "123 Main St" } });
+    });
+
+    await act(async () => {
+      fireEvent.change(phoneInput, { target: { value: "12345" } });
+    });
+    expect(nextButton).toBeDisabled();
+
+    await act(async () => {
+      fireEvent.change(phoneInput, { target: { value: "5511223344" } });
+      fireEvent.change(rfcInput, { target: { value: "ABC123" } });
+    });
+    expect(nextButton).toBeDisabled();
+
+    await act(async () => {
+      fireEvent.change(rfcInput, { target: { value: "GODE561231GR8" } });
+    });
+    expect(nextButton).not.toBeDisabled();
+  });
 });

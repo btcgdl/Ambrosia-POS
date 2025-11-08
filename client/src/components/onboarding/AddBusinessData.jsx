@@ -1,5 +1,5 @@
 "use client"
-import { useState, useRef, useEffect, use } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useTranslations, useLocale } from "next-intl";
 import { Input, Select, SelectItem } from "@heroui/react"
 import { Upload, X } from "lucide-react"
@@ -11,9 +11,26 @@ export function BusinessDetailsStep({ data, onChange }) {
   const t = useTranslations();
   const locale = useLocale();
 
-  const [logoPreview, setLogoPreview] = useState(null)
+  const [rfcError, setRfcError] = useState("");
+  const [logoPreview, setLogoPreview] = useState(null);
   const [CURRENCIES, setCURRENCIES] = useState(CURRENCIES_ES);
-  const fileInputRef = useRef(null)
+  const fileInputRef = useRef(null);
+
+
+  const validateRFC = (value) => {
+    const upperValue = value.toUpperCase();
+    const rfcRegex = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
+
+    if (!upperValue) {
+      setRfcError("");
+    } else if (upperValue.length === 13 && !rfcRegex.test(upperValue)) {
+      setRfcError(t("step3.fields.businessRFCInvalid") || "RFC inválido. Debe tener formato correcto.");
+    } else {
+      setRfcError("");
+    }
+
+    onChange({ ...data, businessRFC: upperValue });
+  };
 
   const handleLogoChange = (e) => {
     const file = e.target.files?.[0]
@@ -74,7 +91,10 @@ export function BusinessDetailsStep({ data, onChange }) {
           placeholder={t("step3.fields.businessPhonePlaceholder")}
           maxLength={10}
           value={data.businessPhone}
-          onChange={(e) => onChange({ ...data, businessPhone: e.target.value })}
+          onChange={(e) => {
+            const onlyNumbers = e.target.value.replace(/\D/g, "");
+            onChange({ ...data, businessPhone: onlyNumbers });
+          }}
         />
 
         <Input
@@ -92,7 +112,9 @@ export function BusinessDetailsStep({ data, onChange }) {
           maxLength={13}
           description={t("step3.fields.businessRFCMessage")}
           value={data.businessRFC}
-          onChange={(e) => onChange({ ...data, businessRFC: e.target.value.toUpperCase() })}
+          onChange={(e) => validateRFC(e.target.value)}
+          isInvalid={!!rfcError}
+          errorMessage={rfcError}
         />
 
         <Select
