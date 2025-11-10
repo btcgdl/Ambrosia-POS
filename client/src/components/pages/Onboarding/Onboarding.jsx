@@ -53,7 +53,7 @@ export function Onboarding() {
   }
 
   return (
-    <div className="flex items-start justify-center min-h-screen gradient-fresh p-4">
+    <div className="flex items-start justify-center min-h-screen gradient-fresh px-4 pb-4 pt-16">
       <div className="w-full max-w-2xl">
 
         <div className="mb-8 relative">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { NextIntlClientProvider } from "next-intl";
+import { Languages } from "lucide-react"
 
 import onboarding_es from "../components/pages/Onboarding/locales/es.js";
 import onboarding_en from "../components/pages/Onboarding/locales/en.js";
@@ -48,10 +49,10 @@ export function I18nProvider({ children }) {
   );
 }
 
-function LanguageSwitcher({ locale, onChange, visible }) {
+export function LanguageSwitcher({ locale, onChange, visible }) {
   if (visible === "none") return null;
   return (
-    <div style={{ position: "fixed", top: 10, right: 10, zIndex: 1000 }}>
+    <div className="absolute top-4 right-4 z-50">
       <button
         onClick={() => onChange(locale === "es" ? "en" : "es")}
         style={{
@@ -62,7 +63,10 @@ function LanguageSwitcher({ locale, onChange, visible }) {
           cursor: "pointer",
         }}
       >
-        {locale === "es" ? "Switch to English" : "Cambiar a Español"}
+        <div className="flex">
+          <Languages className="mr-2"/>
+          {locale === "es" ? "Switch to English" : "Cambiar a Español"}
+        </div>
       </button>
     </div>
   );
