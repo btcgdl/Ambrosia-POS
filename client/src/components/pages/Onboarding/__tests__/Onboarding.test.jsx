@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import { I18nProvider } from "../../src/i18n/I18nProvider";
-import { Onboarding } from "../../src/components/Onboarding";
+import { I18nProvider } from "../../../../i18n/I18nProvider";
+import { Onboarding } from "../Onboarding";
 
 function renderOnboarding() {
   return render(

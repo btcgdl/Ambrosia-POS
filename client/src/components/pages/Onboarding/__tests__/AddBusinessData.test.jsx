@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { BusinessDetailsStep } from "../../src/components/onboarding/AddBusinessData";
-import { I18nProvider } from "../../src/i18n/I18nProvider";
+import { BusinessDetailsStep } from "../AddBusinessData";
+import { I18nProvider } from "../../../../i18n/I18nProvider";
 
 describe("Step 3 Business Details", () => {
   const mockChange = jest.fn();

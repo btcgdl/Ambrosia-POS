@@ -3,8 +3,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { NextIntlClientProvider } from "next-intl";
 
-import onboarding_es from "./locales/onboarding/es.js";
-import onboarding_en from "./locales/onboarding/en.js";
+import onboarding_es from "../components/pages/Onboarding/locales/es.js";
+import onboarding_en from "../components/pages/Onboarding/locales/en.js";
 
 const translations = {
   en: {

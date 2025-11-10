@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { AuthContext } from "../modules/auth/AuthProvider";
 import { getHomeRoute } from "../lib/getHomeRoute";
 import LoadingCard from "../components/LoadingCard";
-import { Onboarding } from "../components/Onboarding";
+import { Onboarding } from "../components/pages/Onboarding";
 
 export default function HomePage() {
   // const router = useRouter();

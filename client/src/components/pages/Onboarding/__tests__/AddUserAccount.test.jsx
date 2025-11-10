@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { UserAccountStep } from "../../src/components/onboarding/AddUserAccount";
+import { UserAccountStep } from "../AddUserAccount";
 
 describe("Step 2 User Account", () => {
   const mockChange = jest.fn();

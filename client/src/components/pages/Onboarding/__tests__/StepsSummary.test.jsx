@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import { WizardSummary } from "../../src/components/onboarding/StepsSummary";
+import { WizardSummary } from "../StepsSummary";
 
 global.URL.createObjectURL = jest.fn(() => "blob:mock-url");
 

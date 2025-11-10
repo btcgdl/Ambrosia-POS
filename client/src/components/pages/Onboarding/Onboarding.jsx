@@ -3,10 +3,10 @@
 import { useState } from "react"
 import { Button, Progress, Divider } from "@heroui/react";
 import { useTranslations } from "next-intl";
-import { BusinessTypeStep } from "./onboarding/SelectBusiness";
-import { UserAccountStep } from "./onboarding/AddUserAccount";
-import { BusinessDetailsStep } from "./onboarding/AddBusinessData";
-import { WizardSummary } from "./onboarding/StepsSummary";
+import { BusinessTypeStep } from "./SelectBusiness";
+import { UserAccountStep } from "./AddUserAccount";
+import { BusinessDetailsStep } from "./AddBusinessData";
+import { WizardSummary } from "./StepsSummary";
 
 export function Onboarding() {
   const t = useTranslations();
