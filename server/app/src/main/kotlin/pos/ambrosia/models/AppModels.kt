@@ -1,4 +1,3 @@
-14:29:30.908 [main] INFO com.pinterest.ktlint.cli.internal.KtlintCommandLine -- Enable default patterns [**/*.kt, **/*.kts]
 package pos.ambrosia.models
 
 import kotlinx.serialization.Serializable

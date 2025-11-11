@@ -1,4 +1,3 @@
-14:29:41.063 [main] INFO com.pinterest.ktlint.cli.internal.KtlintCommandLine -- Enable default patterns [**/*.kt, **/*.kts]
 package pos.ambrosia.services
 
 import io.ktor.server.application.ApplicationEnvironment
