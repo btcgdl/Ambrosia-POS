@@ -10,7 +10,7 @@ import java.sql.Connection
 import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.models.Config
 import pos.ambrosia.services.ConfigService
-import pos.ambrosia.utils.authenticateAdmin
+import pos.ambrosia.utils.authorizePermission
 
 fun Application.configureConfig() {
   val connection: Connection = DatabaseConnection.getConnection()
@@ -19,7 +19,7 @@ fun Application.configureConfig() {
 }
 
 fun Route.config(configService: ConfigService) {
-  authenticateAdmin() {
+  authorizePermission("settings_read") {
     get("") {
       val config = configService.getConfig()
       if (config == null) {
@@ -28,7 +28,8 @@ fun Route.config(configService: ConfigService) {
       }
       call.respond(HttpStatusCode.OK, config)
     }
-
+  }
+  authorizePermission("settings_update") {
     put("") {
       val config = call.receive<Config>()
       val isUpdated = configService.updateConfig(config)

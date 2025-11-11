@@ -14,6 +14,7 @@ import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Space
 import pos.ambrosia.services.SpaceService
+import pos.ambrosia.utils.authorizePermission
 
 fun Application.configureSpaces() {
   val connection: Connection = DatabaseConnection.getConnection()
@@ -22,7 +23,7 @@ fun Application.configureSpaces() {
 }
 
 fun Route.spaces(spaceService: SpaceService) {
-  authenticate("auth-jwt") {
+  authorizePermission("spaces_read") {
     get("") {
       val spaces = spaceService.getSpaces()
       if (spaces.isEmpty()) {
@@ -46,11 +47,18 @@ fun Route.spaces(spaceService: SpaceService) {
 
       call.respond(HttpStatusCode.OK, space)
     }
+  }
+  authorizePermission("spaces_create") {
     post("") {
       val space = call.receive<Space>()
       val createdId = spaceService.addSpace(space)
-      call.respond(HttpStatusCode.Created, mapOf("id" to createdId, "message" to "Space added successfully"))
+      call.respond(
+              HttpStatusCode.Created,
+              mapOf("id" to createdId, "message" to "Space added successfully")
+      )
     }
+  }
+  authorizePermission("spaces_update") {
     put("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {
@@ -69,6 +77,9 @@ fun Route.spaces(spaceService: SpaceService) {
 
       call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Space updated successfully"))
     }
+  }
+
+  authorizePermission("spaces_delete") {
     delete("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {

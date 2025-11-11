@@ -14,6 +14,7 @@ import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Ingredient
 import pos.ambrosia.services.IngredientService
+import pos.ambrosia.utils.authorizePermission
 
 fun Application.configureIngredients() {
   val connection: Connection = DatabaseConnection.getConnection()
@@ -22,7 +23,7 @@ fun Application.configureIngredients() {
 }
 
 fun Route.ingredients(ingredientService: IngredientService) {
-  authenticate("auth-jwt") {
+  authorizePermission("ingredients_read") {
     get("") {
       val ingredients = ingredientService.getIngredients()
       if (ingredients.isEmpty()) {
@@ -46,11 +47,31 @@ fun Route.ingredients(ingredientService: IngredientService) {
 
       call.respond(HttpStatusCode.OK, ingredient)
     }
+    get("/low_stock/{threshold}") {
+      val threshold = call.parameters["threshold"]?.toFloatOrNull()
+      if (threshold == null) {
+        call.respond(HttpStatusCode.BadRequest, "Invalid or missing threshold parameter")
+        return@get
+      }
+      val lowStockIngredients = ingredientService.getLowStockIngredients() // Example threshold
+      if (lowStockIngredients.isEmpty()) {
+        call.respond(HttpStatusCode.NoContent, "No low stock ingredients found")
+        return@get
+      }
+      call.respond(HttpStatusCode.OK, lowStockIngredients)
+    }
+  }
+  authorizePermission("ingredients_create") {
     post("") {
       val ingredient = call.receive<Ingredient>()
       val createdId = ingredientService.addIngredient(ingredient)
-      call.respond(HttpStatusCode.Created, mapOf("id" to createdId, "message" to "Ingredient added successfully"))
+      call.respond(
+              HttpStatusCode.Created,
+              mapOf("id" to createdId, "message" to "Ingredient added successfully")
+      )
     }
+  }
+  authorizePermission("ingredients_update") {
     put("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {
@@ -67,8 +88,13 @@ fun Route.ingredients(ingredientService: IngredientService) {
         return@put
       }
 
-      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Ingredient updated successfully"))
+      call.respond(
+              HttpStatusCode.OK,
+              mapOf("id" to id, "message" to "Ingredient updated successfully")
+      )
     }
+  }
+  authorizePermission("ingredients_delete") {
     delete("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {
@@ -82,20 +108,10 @@ fun Route.ingredients(ingredientService: IngredientService) {
         return@delete
       }
 
-      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Ingredient deleted successfully"))
-    }
-    get("/low_stock/{threshold}") {
-      val threshold = call.parameters["threshold"]?.toFloatOrNull()
-      if (threshold == null) {
-        call.respond(HttpStatusCode.BadRequest, "Invalid or missing threshold parameter")
-        return@get
-      }
-      val lowStockIngredients = ingredientService.getLowStockIngredients() // Example threshold
-      if (lowStockIngredients.isEmpty()) {
-        call.respond(HttpStatusCode.NoContent, "No low stock ingredients found")
-        return@get
-      }
-      call.respond(HttpStatusCode.OK, lowStockIngredients)
+      call.respond(
+              HttpStatusCode.OK,
+              mapOf("id" to id, "message" to "Ingredient deleted successfully")
+      )
     }
   }
 }

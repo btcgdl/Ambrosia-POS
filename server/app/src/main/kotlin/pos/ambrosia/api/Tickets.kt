@@ -14,6 +14,7 @@ import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Ticket
 import pos.ambrosia.services.TicketService
+import pos.ambrosia.utils.authorizePermission
 
 fun Application.configureTickets() {
   val connection: Connection = DatabaseConnection.getConnection()
@@ -22,7 +23,7 @@ fun Application.configureTickets() {
 }
 
 fun Route.tickets(ticketService: TicketService) {
-  authenticate("auth-jwt") {
+  authorizePermission("tickets_read") {
     get("") {
       val tickets = ticketService.getTickets()
       if (tickets.isEmpty()) {
@@ -46,11 +47,18 @@ fun Route.tickets(ticketService: TicketService) {
 
       call.respond(HttpStatusCode.OK, ticket)
     }
+  }
+  authorizePermission("tickets_create") {
     post("") {
       val ticket = call.receive<Ticket>()
       val generatedId = ticketService.addTicket(ticket)
-      call.respond(HttpStatusCode.Created, mapOf("id" to generatedId, "message" to "Ticket added successfully"))
+      call.respond(
+              HttpStatusCode.Created,
+              mapOf("id" to generatedId, "message" to "Ticket added successfully")
+      )
     }
+  }
+  authorizePermission("tickets_update") {
     put("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {
@@ -69,6 +77,8 @@ fun Route.tickets(ticketService: TicketService) {
 
       call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Ticket updated successfully"))
     }
+  }
+  authorizePermission("tickets_delete") {
     delete("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {
