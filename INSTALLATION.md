@@ -56,7 +56,7 @@ chmod +x install.sh
 ./install.sh
 ```
 
-The phoenixd installation script installs phoenixd automatically. The script downloads phoenixd v0.6.2, verifies the package integrity using GPG and checksums, installs it in `/usr/local/bin`, and optionally configures a systemd service for automatic startup.
+The phoenixd installation script installs phoenixd automatically. The script downloads phoenixd v0.7.1, verifies the package integrity using GPG and checksums, installs it in `/usr/local/bin`, and optionally configures a systemd service for automatic startup.
 
 Check [Mastering Phoenixd](https://btcgdl.github.io/Mastering-phoenixd/) for more details.
 

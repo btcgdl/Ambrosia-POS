@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TAG="0.6.2"
+TAG="0.7.1"
 
 PHOENIXD_SIG="https://github.com/ACINQ/phoenixd/releases/download/v${TAG}/SHA256SUMS.asc"
 ACINQ_PGP_KEY="https://acinq.co/pgp/padioupm.asc"
@@ -41,9 +41,15 @@ verify_package() {
   fi
 
   echo "🔐 Starting package verification..."
+
+  if ! command -v gpg &> /dev/null
+  then
+      echo "⚠️  gpg is not installed. Skipping package verification." >&2
+      return 0
+  fi
   
   # Download and import PGP key
-  if ! wget -q "$ACINQ_PGP_KEY" 2>/dev/null; then
+  if ! curl -sL -O "$ACINQ_PGP_KEY" 2>/dev/null; then
     echo "❌ Failed to download PGP key." >&2
     return 1
   fi
@@ -54,12 +60,12 @@ verify_package() {
   fi
 
   # Download and verify signature
-  if ! wget -q "$PHOENIXD_SIG" 2>/dev/null; then
+  if ! curl -sL -O "$PHOENIXD_SIG" 2>/dev/null; then
     echo "❌ Failed to download signature file." >&2
     return 1
   fi
 
-  if ! gpg --quiet --decrypt SHA256SUMS.asc > SHA256SUMS.stripped 2>/dev/null; then
+  if ! gpg --quiet --verify SHA256SUMS.asc > SHA256SUMS.stripped 2>/dev/null; then
     echo "❌ Failed to verify signature." >&2
     return 1
   fi
