@@ -67,8 +67,8 @@ fun Route.tables(tableService: TableService) {
       val table = call.receive<Table>()
       val createdId = tableService.addTable(table)
       call.respond(
-              HttpStatusCode.Created,
-              mapOf("id" to createdId, "message" to "Table added successfully")
+        HttpStatusCode.Created,
+        mapOf("id" to createdId, "message" to "Table added successfully")
       )
     }
   }

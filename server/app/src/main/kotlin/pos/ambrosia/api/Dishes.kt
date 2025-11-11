@@ -53,8 +53,8 @@ fun Route.dishes(dishService: DishService) {
       val dish = call.receive<Dish>()
       val id = dishService.addDish(dish)
       call.respond(
-              HttpStatusCode.Created,
-              mapOf("id" to id, "message" to "Dish added successfully")
+        HttpStatusCode.Created,
+        mapOf("id" to id, "message" to "Dish added successfully")
       )
     }
   }
@@ -88,8 +88,8 @@ fun Route.dishes(dishService: DishService) {
 
       dishService.deleteDish(id)
       call.respond(
-              HttpStatusCode.NoContent,
-              mapOf("id" to id, "message" to "Dish deleted successfully")
+        HttpStatusCode.NoContent,
+        mapOf("id" to id, "message" to "Dish deleted successfully")
       )
     }
   }

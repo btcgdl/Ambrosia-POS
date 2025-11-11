@@ -70,8 +70,8 @@ fun Route.roles(roleService: RolesService, permissionsService: PermissionsServic
       val user = call.receive<Role>()
       val id = roleService.addRole(user)
       call.respond(
-              HttpStatusCode.Created,
-              mapOf("id" to id, "message" to "Role added successfully")
+        HttpStatusCode.Created,
+        mapOf("id" to id, "message" to "Role added successfully")
       )
     }
   }
@@ -121,8 +121,8 @@ fun Route.roles(roleService: RolesService, permissionsService: PermissionsServic
       }
 
       call.respond(
-              HttpStatusCode.NoContent,
-              mapOf("id" to id, "message" to "Role deleted successfully")
+        HttpStatusCode.NoContent,
+        mapOf("id" to id, "message" to "Role deleted successfully")
       )
     }
   }

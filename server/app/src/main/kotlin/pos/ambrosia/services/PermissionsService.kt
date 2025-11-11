@@ -1,32 +1,32 @@
+14:29:50.514 [main] INFO com.pinterest.ktlint.cli.internal.KtlintCommandLine -- Enable default patterns [**/*.kt, **/*.kts]
 package pos.ambrosia.services
 
 import io.ktor.server.application.ApplicationEnvironment
-import java.sql.Connection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Permission
+import java.sql.Connection
 
 class PermissionsService(
-        private val env: ApplicationEnvironment,
-        private val connection: Connection
+  private val env: ApplicationEnvironment,
+  private val connection: Connection,
 ) {
-
   companion object {
     private const val SELECT_ALL =
-            "SELECT id, name, description, enabled FROM permissions ORDER BY name"
+      "SELECT id, name, description, enabled FROM permissions ORDER BY name"
     private const val SELECT_BY_ROLE =
-            """
-            SELECT p.id, p.name, p.description, p.enabled
-            FROM role_permissions rp
-            JOIN permissions p ON p.id = rp.permission_id
-            WHERE rp.role_id = ?
-            ORDER BY p.name
-            """
+      """
+    SELECT p.id, p.name, p.description, p.enabled
+    FROM role_permissions rp
+    JOIN permissions p ON p.id = rp.permission_id
+    WHERE rp.role_id = ?
+    ORDER BY p.name
+    """
     private const val SELECT_BY_NAMES =
-            "SELECT id FROM permissions WHERE name IN (%s) AND enabled = 1"
+      "SELECT id FROM permissions WHERE name IN (%s) AND enabled = 1"
     private const val ROLE_EXISTS = "SELECT id FROM roles WHERE id = ? AND is_deleted = 0"
     private const val DELETE_ROLE_PERMS = "DELETE FROM role_permissions WHERE role_id = ?"
     private const val INSERT_ROLE_PERM =
-            "INSERT OR IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)"
+      "INSERT OR IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)"
   }
 
   fun getAll(): List<Permission> {
@@ -35,12 +35,12 @@ class PermissionsService(
     val list = mutableListOf<Permission>()
     while (rs.next()) {
       list.add(
-              Permission(
-                      id = rs.getString("id"),
-                      name = rs.getString("name"),
-                      description = rs.getString("description"),
-                      enabled = rs.getBoolean("enabled")
-              )
+        Permission(
+          id = rs.getString("id"),
+          name = rs.getString("name"),
+          description = rs.getString("description"),
+          enabled = rs.getBoolean("enabled"),
+        ),
       )
     }
     return list
@@ -53,12 +53,12 @@ class PermissionsService(
     val list = mutableListOf<Permission>()
     while (rs.next()) {
       list.add(
-              Permission(
-                      id = rs.getString("id"),
-                      name = rs.getString("name"),
-                      description = rs.getString("description"),
-                      enabled = rs.getBoolean("enabled")
-              )
+        Permission(
+          id = rs.getString("id"),
+          name = rs.getString("name"),
+          description = rs.getString("description"),
+          enabled = rs.getBoolean("enabled"),
+        ),
       )
     }
     return list
@@ -71,7 +71,10 @@ class PermissionsService(
     return rs.next()
   }
 
-  fun replaceRolePermissions(roleId: String, permissionKeys: List<String>): Int {
+  fun replaceRolePermissions(
+    roleId: String,
+    permissionKeys: List<String>,
+  ): Int {
     if (!roleExists(roleId)) return 0
     connection.autoCommit = false
     try {
@@ -108,12 +111,14 @@ class PermissionsService(
       logger.error("Failed to replace role permissions: ${e.message}")
       try {
         connection.rollback()
-      } catch (_: Exception) {}
+      } catch (_: Exception) {
+      }
       return 0
     } finally {
       try {
         connection.autoCommit = true
-      } catch (_: Exception) {}
+      } catch (_: Exception) {
+      }
     }
   }
 }

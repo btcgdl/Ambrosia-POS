@@ -66,8 +66,8 @@ fun Route.ingredients(ingredientService: IngredientService) {
       val ingredient = call.receive<Ingredient>()
       val createdId = ingredientService.addIngredient(ingredient)
       call.respond(
-              HttpStatusCode.Created,
-              mapOf("id" to createdId, "message" to "Ingredient added successfully")
+        HttpStatusCode.Created,
+        mapOf("id" to createdId, "message" to "Ingredient added successfully")
       )
     }
   }
@@ -89,8 +89,8 @@ fun Route.ingredients(ingredientService: IngredientService) {
       }
 
       call.respond(
-              HttpStatusCode.OK,
-              mapOf("id" to id, "message" to "Ingredient updated successfully")
+        HttpStatusCode.OK,
+        mapOf("id" to id, "message" to "Ingredient updated successfully")
       )
     }
   }
@@ -109,8 +109,8 @@ fun Route.ingredients(ingredientService: IngredientService) {
       }
 
       call.respond(
-              HttpStatusCode.OK,
-              mapOf("id" to id, "message" to "Ingredient deleted successfully")
+        HttpStatusCode.OK,
+        mapOf("id" to id, "message" to "Ingredient deleted successfully")
       )
     }
   }

@@ -53,8 +53,8 @@ fun Route.suppliers(supplierService: SupplierService) {
       val supplier = call.receive<Supplier>()
       val createdId = supplierService.addSupplier(supplier)
       call.respond(
-              HttpStatusCode.Created,
-              mapOf("id" to createdId, "message" to "Supplier added successfully")
+        HttpStatusCode.Created,
+        mapOf("id" to createdId, "message" to "Supplier added successfully")
       )
     }
   }
@@ -76,8 +76,8 @@ fun Route.suppliers(supplierService: SupplierService) {
       }
 
       call.respond(
-              HttpStatusCode.OK,
-              mapOf("id" to id, "message" to "Supplier updated successfully")
+        HttpStatusCode.OK,
+        mapOf("id" to id, "message" to "Supplier updated successfully")
       )
     }
   }
@@ -96,8 +96,8 @@ fun Route.suppliers(supplierService: SupplierService) {
       }
 
       call.respond(
-              HttpStatusCode.OK,
-              mapOf("id" to id, "message" to "Supplier deleted successfully")
+        HttpStatusCode.OK,
+        mapOf("id" to id, "message" to "Supplier deleted successfully")
       )
     }
   }

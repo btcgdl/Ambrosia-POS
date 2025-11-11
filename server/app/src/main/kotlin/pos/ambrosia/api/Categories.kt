@@ -64,8 +64,8 @@ fun Route.categories(service: CategoryService) {
         return@post
       }
       call.respond(
-              HttpStatusCode.Created,
-              mapOf("id" to id, "message" to "Category added successfully")
+        HttpStatusCode.Created,
+        mapOf("id" to id, "message" to "Category added successfully")
       )
     }
   }
@@ -84,8 +84,8 @@ fun Route.categories(service: CategoryService) {
         return@put
       }
       call.respond(
-              HttpStatusCode.OK,
-              mapOf("id" to id, "message" to "Category updated successfully")
+        HttpStatusCode.OK,
+        mapOf("id" to id, "message" to "Category updated successfully")
       )
     }
   }
@@ -100,14 +100,14 @@ fun Route.categories(service: CategoryService) {
       val ok = service.deleteCategory(id, type)
       if (!ok) {
         call.respond(
-                HttpStatusCode.BadRequest,
-                "Cannot delete category - it may be in use or not found"
+          HttpStatusCode.BadRequest,
+          "Cannot delete category - it may be in use or not found"
         )
         return@delete
       }
       call.respond(
-              HttpStatusCode.NoContent,
-              mapOf("id" to id, "message" to "Category deleted successfully")
+        HttpStatusCode.NoContent,
+        mapOf("id" to id, "message" to "Category deleted successfully")
       )
     }
   }

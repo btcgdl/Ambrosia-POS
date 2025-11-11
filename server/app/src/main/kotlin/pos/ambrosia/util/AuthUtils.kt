@@ -36,9 +36,9 @@ fun ApplicationCall.getCurrentUser(): UserInfo? {
   val principal = principal<JWTPrincipal>() ?: return null
 
   return UserInfo(
-          userId = principal.getClaim("userId", String::class) ?: return null,
-          role = principal.getClaim("role", String::class) ?: return null,
-          isAdmin = principal.getClaim("isAdmin", Boolean::class) ?: false
+    userId = principal.getClaim("userId", String::class) ?: return null,
+    role = principal.getClaim("role", String::class) ?: return null,
+    isAdmin = principal.getClaim("isAdmin", Boolean::class) ?: false
   )
 }
 
@@ -68,9 +68,9 @@ suspend fun ApplicationCall.requireWallet() {
  * `authenticate`.
  */
 val AdminAccess =
-        createRouteScopedPlugin(name = "AdminAccess") {
-          on(AuthenticationChecked) { call -> call.requireAdmin() }
-        }
+createRouteScopedPlugin(name = "AdminAccess") {
+  on(AuthenticationChecked) { call -> call.requireAdmin() }
+}
 
 /**
  * Función de extensión para crear rutas que requieren autenticación y privilegios de administrador
@@ -89,13 +89,13 @@ suspend fun ApplicationCall.requirePermission(name: String) {
   val principal = principal<JWTPrincipal>() ?: throw PermissionDeniedException()
   val userId = principal.getClaim("userId", String::class) ?: throw PermissionDeniedException()
   val sql =
-          """
-    SELECT 1
-    FROM users u
-    JOIN roles r ON u.role_id = r.id
-    JOIN role_permissions rp ON rp.role_id = r.id
-    JOIN permissions p ON p.id = rp.permission_id
-    WHERE u.id = ? AND p.name = ? AND p.enabled = 1 AND u.is_deleted = 0
+  """
+  SELECT 1
+  FROM users u
+  JOIN roles r ON u.role_id = r.id
+  JOIN role_permissions rp ON rp.role_id = r.id
+  JOIN permissions p ON p.id = rp.permission_id
+  WHERE u.id = ? AND p.name = ? AND p.enabled = 1 AND u.is_deleted = 0
   """
   val connection: Connection = DatabaseConnection.getConnection()
   connection.prepareStatement(sql).use { st ->
@@ -107,9 +107,9 @@ suspend fun ApplicationCall.requirePermission(name: String) {
 }
 
 fun Route.authorizePermission(
-        key: String,
-        name: String = "auth-jwt",
-        build: Route.() -> Unit
+  key: String,
+  name: String = "auth-jwt",
+  build: Route.() -> Unit
 ): Route {
   return authenticate(name) {
     install(RequirePermission) { this.key = key }
@@ -122,10 +122,10 @@ class PermissionPluginConfig {
 }
 
 val RequirePermission =
-        createRouteScopedPlugin(
-                name = "RequirePermission",
-                createConfiguration = ::PermissionPluginConfig
-        ) {
-          val permissionKey = pluginConfig.key
-          on(AuthenticationChecked) { call -> call.requirePermission(permissionKey) }
-        }
+createRouteScopedPlugin(
+  name = "RequirePermission",
+  createConfiguration = ::PermissionPluginConfig
+) {
+  val permissionKey = pluginConfig.key
+  on(AuthenticationChecked) { call -> call.requirePermission(permissionKey) }
+}

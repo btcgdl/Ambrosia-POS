@@ -54,8 +54,8 @@ fun Route.shifts(shiftService: ShiftService) {
       val shift = call.receive<Shift>()
       val createdShift = shiftService.addShift(shift)
       call.respond(
-              HttpStatusCode.Created,
-              mapOf("id" to createdShift, "message" to "Shift added successfully")
+        HttpStatusCode.Created,
+        mapOf("id" to createdShift, "message" to "Shift added successfully")
       )
     }
   }

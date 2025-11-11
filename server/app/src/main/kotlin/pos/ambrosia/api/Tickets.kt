@@ -53,8 +53,8 @@ fun Route.tickets(ticketService: TicketService) {
       val ticket = call.receive<Ticket>()
       val generatedId = ticketService.addTicket(ticket)
       call.respond(
-              HttpStatusCode.Created,
-              mapOf("id" to generatedId, "message" to "Ticket added successfully")
+        HttpStatusCode.Created,
+        mapOf("id" to generatedId, "message" to "Ticket added successfully")
       )
     }
   }

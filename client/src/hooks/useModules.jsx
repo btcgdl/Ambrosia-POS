@@ -17,11 +17,6 @@ export function useModules() {
 
       setAvailableModules(modules);
       setAvailableNavigation(navigation);
-
-      console.log('📦 Módulos disponibles:', Object.keys(modules));
-      console.log('🧭 Navegación disponible:', navigation.map(nav => nav.path));
-      console.log("permisos", permissions)
-
     }
   }, [isAuth, isAdmin, isLoading, permissions]);
 

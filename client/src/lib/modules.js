@@ -180,7 +180,7 @@ export const modules = {
     ],
   },
   "color-test": {
-    enabled: true,
+    enabled: false,
     name: "Color Test",
     routes: [
       {

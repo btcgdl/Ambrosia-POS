@@ -30,14 +30,14 @@ fun Route.products(service: ProductService) {
     }
     get("/{id}") {
       val id =
-              call.parameters["id"]
-                      ?: return@get call.respond(
-                              HttpStatusCode.BadRequest,
-                              "Missing or malformed ID"
-                      )
+      call.parameters["id"]
+      ?: return@get call.respond(
+        HttpStatusCode.BadRequest,
+        "Missing or malformed ID"
+      )
       val item =
-              service.getProductById(id)
-                      ?: return@get call.respond(HttpStatusCode.NotFound, "Product not found")
+      service.getProductById(id)
+      ?: return@get call.respond(HttpStatusCode.NotFound, "Product not found")
       call.respond(HttpStatusCode.OK, item)
     }
   }
@@ -50,19 +50,19 @@ fun Route.products(service: ProductService) {
         return@post
       }
       call.respond(
-              HttpStatusCode.Created,
-              mapOf("id" to id, "message" to "Product added successfully")
+        HttpStatusCode.Created,
+        mapOf("id" to id, "message" to "Product added successfully")
       )
     }
   }
   authorizePermission("products_update") {
     put("/{id}") {
       val id =
-              call.parameters["id"]
-                      ?: return@put call.respond(
-                              HttpStatusCode.BadRequest,
-                              "Missing or malformed ID"
-                      )
+      call.parameters["id"]
+      ?: return@put call.respond(
+        HttpStatusCode.BadRequest,
+        "Missing or malformed ID"
+      )
       val body = call.receive<Product>()
       val ok = service.updateProduct(body.copy(id = id))
       if (!ok) {
@@ -70,23 +70,23 @@ fun Route.products(service: ProductService) {
         return@put
       }
       call.respond(
-              HttpStatusCode.OK,
-              mapOf("id" to id, "message" to "Product updated successfully")
+        HttpStatusCode.OK,
+        mapOf("id" to id, "message" to "Product updated successfully")
       )
     }
   }
   authorizePermission("products_delete") {
     delete("/{id}") {
       val id =
-              call.parameters["id"]
-                      ?: return@delete call.respond(
-                              HttpStatusCode.BadRequest,
-                              "Missing or malformed ID"
-                      )
+      call.parameters["id"]
+      ?: return@delete call.respond(
+        HttpStatusCode.BadRequest,
+        "Missing or malformed ID"
+      )
       service.deleteProduct(id)
       call.respond(
-              HttpStatusCode.NoContent,
-              mapOf("id" to id, "message" to "Product deleted successfully")
+        HttpStatusCode.NoContent,
+        mapOf("id" to id, "message" to "Product deleted successfully")
       )
     }
   }

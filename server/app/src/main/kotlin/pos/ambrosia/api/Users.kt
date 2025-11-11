@@ -29,9 +29,9 @@ fun Application.configureUsers() {
 }
 
 fun Route.users(
-        userService: UsersService,
-        tokenService: TokenService,
-        permissionsService: PermissionsService
+  userService: UsersService,
+  tokenService: TokenService,
+  permissionsService: PermissionsService
 ) {
   get("") {
     val users = userService.getUsers()
@@ -60,14 +60,14 @@ fun Route.users(
   authenticate("auth-jwt") {
     get("/me") {
       val refreshToken =
-              call.request.cookies["refreshToken"]
-                      ?: run {
-                        call.respond(
-                                HttpStatusCode.Unauthorized,
-                                mapOf("error" to "Refresh token no encontrado")
-                        )
-                        return@get
-                      }
+      call.request.cookies["refreshToken"]
+      ?: run {
+        call.respond(
+          HttpStatusCode.Unauthorized,
+          mapOf("error" to "Refresh token no encontrado")
+        )
+        return@get
+      }
       val isValidRefreshToken = tokenService.validateRefreshToken(refreshToken)
       if (!isValidRefreshToken) {
         call.respond(HttpStatusCode.Unauthorized)
@@ -89,13 +89,13 @@ fun Route.users(
       }
 
       val userResponse =
-              UserResponse(
-                      user_id = userInfo.id,
-                      name = userInfo.name,
-                      role = userInfo.role,
-                      role_id = userInfo.role,
-                      isAdmin = userInfo.isAdmin
-              )
+      UserResponse(
+        user_id = userInfo.id,
+        name = userInfo.name,
+        role = userInfo.role,
+        role_id = userInfo.role,
+        isAdmin = userInfo.isAdmin
+      )
 
       call.respond(UserMeResponse(userResponse, perms))
     }
@@ -109,8 +109,8 @@ fun Route.users(
         return@post
       }
       call.respond(
-              HttpStatusCode.Created,
-              mapOf("id" to result, "message" to "User added successfully")
+        HttpStatusCode.Created,
+        mapOf("id" to result, "message" to "User added successfully")
       )
     }
   }
@@ -149,8 +149,8 @@ fun Route.users(
       }
 
       call.respond(
-              HttpStatusCode.NoContent,
-              mapOf("id" to id, "message" to "User deleted successfully")
+        HttpStatusCode.NoContent,
+        mapOf("id" to id, "message" to "User deleted successfully")
       )
     }
   }

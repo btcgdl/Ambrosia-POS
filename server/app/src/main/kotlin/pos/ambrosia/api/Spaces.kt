@@ -53,8 +53,8 @@ fun Route.spaces(spaceService: SpaceService) {
       val space = call.receive<Space>()
       val createdId = spaceService.addSpace(space)
       call.respond(
-              HttpStatusCode.Created,
-              mapOf("id" to createdId, "message" to "Space added successfully")
+        HttpStatusCode.Created,
+        mapOf("id" to createdId, "message" to "Space added successfully")
       )
     }
   }
