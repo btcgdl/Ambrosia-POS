@@ -56,7 +56,7 @@ fi
 echo "Detected architecture: $ARCH"
 echo "Using URL: $PHOENIXD_ZIP"
 
-VERIFIER_URL="https://raw.githubusercontent.com/btcgdl/Mastering-phoenixd/master/scripts/verify.sh"
+VERIFIER_URL="https://raw.githubusercontent.com/btcgdl/Ambrosia-POS/master/scripts/verify.sh"
 
 echo ""
 echo ""
