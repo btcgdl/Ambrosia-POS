@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
       >
         <Providers>
           <div className="">
-            <ModuleNavigation>{children}</ModuleNavigation>
+            <ModuleNavigation show="none">{children}</ModuleNavigation>
           </div>
         </Providers>
       </body>
