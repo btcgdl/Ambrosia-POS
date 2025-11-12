@@ -10,6 +10,7 @@ import java.sql.Connection
 import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.models.Product
 import pos.ambrosia.services.ProductService
+import pos.ambrosia.utils.authorizePermission
 
 fun Application.configureProducts() {
   val connection: Connection = DatabaseConnection.getConnection()
@@ -18,7 +19,7 @@ fun Application.configureProducts() {
 }
 
 fun Route.products(service: ProductService) {
-  authenticate("auth-jwt") {
+  authorizePermission("products_read") {
     get("") {
       val items = service.getProducts()
       if (items.isEmpty()) {
@@ -28,10 +29,19 @@ fun Route.products(service: ProductService) {
       call.respond(HttpStatusCode.OK, items)
     }
     get("/{id}") {
-      val id = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
-      val item = service.getProductById(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Product not found")
+      val id =
+      call.parameters["id"]
+      ?: return@get call.respond(
+        HttpStatusCode.BadRequest,
+        "Missing or malformed ID"
+      )
+      val item =
+      service.getProductById(id)
+      ?: return@get call.respond(HttpStatusCode.NotFound, "Product not found")
       call.respond(HttpStatusCode.OK, item)
     }
+  }
+  authorizePermission("products_create") {
     post("") {
       val body = call.receive<Product>()
       val id = service.addProduct(body)
@@ -39,23 +49,45 @@ fun Route.products(service: ProductService) {
         call.respond(HttpStatusCode.BadRequest, mapOf("message" to "Invalid or duplicate product"))
         return@post
       }
-      call.respond(HttpStatusCode.Created, mapOf("id" to id, "message" to "Product added successfully"))
+      call.respond(
+        HttpStatusCode.Created,
+        mapOf("id" to id, "message" to "Product added successfully")
+      )
     }
+  }
+  authorizePermission("products_update") {
     put("/{id}") {
-      val id = call.parameters["id"] ?: return@put call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+      val id =
+      call.parameters["id"]
+      ?: return@put call.respond(
+        HttpStatusCode.BadRequest,
+        "Missing or malformed ID"
+      )
       val body = call.receive<Product>()
       val ok = service.updateProduct(body.copy(id = id))
       if (!ok) {
         call.respond(HttpStatusCode.NotFound, "Product with ID: $id not found")
         return@put
       }
-      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Product updated successfully"))
+      call.respond(
+        HttpStatusCode.OK,
+        mapOf("id" to id, "message" to "Product updated successfully")
+      )
     }
+  }
+  authorizePermission("products_delete") {
     delete("/{id}") {
-      val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+      val id =
+      call.parameters["id"]
+      ?: return@delete call.respond(
+        HttpStatusCode.BadRequest,
+        "Missing or malformed ID"
+      )
       service.deleteProduct(id)
-      call.respond(HttpStatusCode.NoContent, mapOf("id" to id, "message" to "Product deleted successfully"))
+      call.respond(
+        HttpStatusCode.NoContent,
+        mapOf("id" to id, "message" to "Product deleted successfully")
+      )
     }
   }
 }
-

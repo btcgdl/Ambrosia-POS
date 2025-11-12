@@ -9,12 +9,14 @@ export const modules = {
         component: "Roles",
         requiresAuth: true,
         requiresAdmin: true,
+        // permissions: ["roles.read"],
       },
       {
         path: "/users",
         component: "Users",
         requiresAuth: true,
-        requiresAdmin: true,
+        requiresAdmin: false,
+        permissions: ["users_read"],
       },
     ],
     services: () => import("../modules/auth/authService"),
@@ -23,14 +25,12 @@ export const modules = {
         path: "/roles",
         label: "Roles",
         icon: "user-lock",
-        roles: ["admin"],
         showInNavbar: true,
       },
       {
         path: "/users",
         label: "Usuarios",
         icon: "users",
-        roles: ["admin"],
         showInNavbar: true,
       },
     ],
@@ -52,7 +52,6 @@ export const modules = {
         path: "/dishes",
         label: "Platillos",
         icon: "salad",
-        roles: ["admin"],
         showInNavbar: true,
       },
     ],
@@ -92,28 +91,24 @@ export const modules = {
         path: "/open-turn",
         label: "Abrir Turno",
         icon: "play-circle",
-        roles: [], // Disponible para todos los usuarios autenticados
         showInNavbar: false,
       },
       {
         path: "/close-turn",
         label: "Cerrar Turno",
         icon: "pause-circle",
-        roles: [], // Disponible para todos los usuarios autenticados
         showInNavbar: false,
       },
       {
         path: "/wallet",
         label: "Cartera",
         icon: "wallet",
-        roles: ["admin"],
         showInNavbar: true,
       },
       {
         path: "/reports",
         label: "Reportes",
         icon: "chart-line",
-        roles: ["admin"],
         showInNavbar: false, // Oculto del navbar pero accesible por URL
       },
     ],
@@ -141,7 +136,6 @@ export const modules = {
         path: "/all-orders",
         label: "Ordenes",
         icon: "clipboard-clock",
-        roles: [], // Disponible para todos los usuarios autenticados
         showInNavbar: true,
       },
     ],
@@ -175,14 +169,12 @@ export const modules = {
         path: "/rooms",
         label: "Ver Salas",
         icon: "building",
-        roles: [], // Disponible para todos los usuarios autenticados
         showInNavbar: false,
       },
       {
         path: "/spaces",
         label: "Administrar Espacios",
         icon: "door-open",
-        roles: ["admin"],
         showInNavbar: true,
       },
     ],
@@ -204,14 +196,12 @@ export const modules = {
         path: "/color-test",
         label: "Ver colores",
         icon: "building",
-        roles: [], // Disponible para todos los usuarios autenticados
         showInNavbar: true,
       },
     ],
   },
 };
 
-// Funciones helper (como tu moduleRegistry original)
 export function getActiveModules() {
   return Object.entries(modules)
     .filter(([, config]) => config.enabled)
@@ -239,19 +229,15 @@ export function findRouteConfig(pathname) {
     if (!moduleConfig.enabled) continue;
 
     const route = moduleConfig.routes.find((r) => {
-      // Exact match
       if (r.path === pathname) return true;
 
-      // Para rutas dinámicas con parámetros como /tables/:roomId
       const pathSegments = pathname.split("/").filter(Boolean);
       const routeSegments = r.path.split("/").filter(Boolean);
 
       if (pathSegments.length !== routeSegments.length) return false;
 
       return routeSegments.every((segment, i) => {
-        // Si el segmento de la ruta empieza con :, es un parámetro dinámico
         if (segment.startsWith(":")) return true;
-        // Si no, debe coincidir exactamente
         return segment === pathSegments[i];
       });
     });
@@ -267,21 +253,28 @@ export function findRouteConfig(pathname) {
   return null;
 }
 
-export function getNavigationItems(userRoles = []) {
+export function getNavigationItems(permissions = [], isAdmin = false) {
   const navItems = [];
+  const permNames = new Set((permissions || []).map((p) => p.name));
 
+  console.log(permNames);
   Object.entries(modules).forEach(([moduleKey, config]) => {
     if (!config.enabled) return;
 
     config.navItems?.forEach((item) => {
-      // Si está marcado como oculto del navbar, no mostrarlo
       if (item.showInNavbar === false) return;
 
-      // Verificar roles
-      const hasPermission =
-        !item.roles || item.roles.some((role) => userRoles.includes(role));
+      // Determinar permisos y admin requeridos usando la ruta correspondiente si existe
+      const route =
+        (config.routes || []).find((r) => r.path === item.path) || {};
+      const requiresAdmin = item.requiresAdmin || route.requiresAdmin || false;
+      if (requiresAdmin && !isAdmin) return;
 
-      if (hasPermission) {
+      const requiredPerms = item.permissions || route.permissions;
+      const passesPerms =
+        !requiredPerms || requiredPerms.every((k) => permNames.has(k));
+
+      if (passesPerms) {
         navItems.push({
           ...item,
           module: moduleKey,
@@ -293,47 +286,51 @@ export function getNavigationItems(userRoles = []) {
   return navItems;
 }
 
-// Filtrar módulos basado en autenticación y permisos
-export function getAvailableModules(isAuthenticated = false, isAdmin = false) {
+export function getAvailableModules(
+  isAuthenticated = false,
+  isAdmin = false,
+  permissions = [],
+) {
+  const permNames = new Set((permissions || []).map((p) => p.name));
+  console.log("permisos en getava", permNames);
   const availableModules = {};
 
   Object.entries(modules).forEach(([moduleKey, moduleConfig]) => {
     if (!moduleConfig.enabled) return;
 
-    // Filtrar rutas del módulo
     const availableRoutes = moduleConfig.routes.filter((route) => {
-      // Si la ruta no requiere autenticación, siempre está disponible
       if (!route.requiresAuth) return true;
 
-      // Si la ruta requiere autenticación pero el usuario no está logueado
       if (route.requiresAuth && !isAuthenticated) return false;
 
-      // Si la ruta requiere admin pero el usuario no es admin
       if (route.requiresAdmin && !isAdmin) return false;
+
+      if (route.permissions && route.permissions.length > 0) {
+        return route.permissions.every((k) => permNames.has(k));
+      }
 
       return true;
     });
 
-    // Filtrar navItems del módulo
     const availableNavItems = (moduleConfig.navItems || []).filter(
       (navItem) => {
-        // Si no está autenticado, no puede ver nada
         if (!isAuthenticated) return false;
-
-        // Si está marcado como oculto del navbar, no mostrarlo
         if (navItem.showInNavbar === false) return false;
-
-        // Si no tiene roles definidos o es array vacío, está disponible para todos los autenticados
-        if (!navItem.roles || navItem.roles.length === 0) return true;
-
-        // Verificar si el usuario tiene el rol requerido
-        if (navItem.roles.includes("admin") && !isAdmin) return false;
-
+        // Empatar con la ruta para heredar requiresAdmin/permisos si el navItem no los define
+        const route =
+          (moduleConfig.routes || []).find((r) => r.path === navItem.path) ||
+          {};
+        const requiresAdmin =
+          navItem.requiresAdmin || route.requiresAdmin || false;
+        if (requiresAdmin && !isAdmin) return false;
+        const requiredPerms = navItem.permissions || route.permissions;
+        if (requiredPerms && requiredPerms.length > 0) {
+          return requiredPerms.every((k) => permNames.has(k));
+        }
         return true;
       },
     );
 
-    // Solo incluir el módulo si tiene rutas o navItems disponibles
     if (availableRoutes.length > 0 || availableNavItems.length > 0) {
       availableModules[moduleKey] = {
         ...moduleConfig,
@@ -346,12 +343,16 @@ export function getAvailableModules(isAuthenticated = false, isAdmin = false) {
   return availableModules;
 }
 
-// Obtener solo las rutas de navegación disponibles para el usuario
 export function getAvailableNavigation(
   isAuthenticated = false,
   isAdmin = false,
+  permissions = [],
 ) {
-  const availableModules = getAvailableModules(isAuthenticated, isAdmin);
+  const availableModules = getAvailableModules(
+    isAuthenticated,
+    isAdmin,
+    permissions,
+  );
   const navItems = [];
 
   Object.entries(availableModules).forEach(([moduleKey, config]) => {
@@ -366,25 +367,27 @@ export function getAvailableNavigation(
   return navItems;
 }
 
-// Verificar si el usuario tiene acceso a una ruta específica
 export function hasAccessToRoute(
   pathname,
   isAuthenticated = false,
   isAdmin = false,
+  permissions = [],
 ) {
   const routeConfig = findRouteConfig(pathname);
   if (!routeConfig) return false;
 
+  const permNames = new Set((permissions || []).map((p) => p.name));
   const route = routeConfig.route;
 
-  // Si la ruta no requiere autenticación, está disponible
   if (!route.requiresAuth) return true;
 
-  // Si requiere autenticación pero no está logueado
   if (route.requiresAuth && !isAuthenticated) return false;
 
-  // Si requiere admin pero no es admin
   if (route.requiresAdmin && !isAdmin) return false;
+
+  if (route.permissions && route.permissions.length > 0) {
+    return route.permissions.every((k) => permNames.has(k));
+  }
 
   return true;
 }

@@ -14,6 +14,7 @@ import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Table
 import pos.ambrosia.services.TableService
+import pos.ambrosia.utils.authorizePermission
 
 fun Application.configureTables() {
   val connection: Connection = DatabaseConnection.getConnection()
@@ -22,7 +23,7 @@ fun Application.configureTables() {
 }
 
 fun Route.tables(tableService: TableService) {
-  authenticate("auth-jwt") {
+  authorizePermission("tables_read") {
     get("") {
       val tables = tableService.getTables()
       if (tables.isEmpty()) {
@@ -60,11 +61,18 @@ fun Route.tables(tableService: TableService) {
 
       call.respond(HttpStatusCode.OK, table)
     }
+  }
+  authorizePermission("tables_create") {
     post("") {
       val table = call.receive<Table>()
       val createdId = tableService.addTable(table)
-      call.respond(HttpStatusCode.Created, mapOf("id" to createdId, "message" to "Table added successfully"))
+      call.respond(
+        HttpStatusCode.Created,
+        mapOf("id" to createdId, "message" to "Table added successfully")
+      )
     }
+  }
+  authorizePermission("tables_update") {
     put("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {
@@ -83,6 +91,8 @@ fun Route.tables(tableService: TableService) {
 
       call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Table updated successfully"))
     }
+  }
+  authorizePermission("tables_delete") {
     delete("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {

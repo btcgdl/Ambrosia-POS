@@ -16,8 +16,11 @@ import java.util.*
 import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.AuthRequest
+import pos.ambrosia.models.LoginResponse
 import pos.ambrosia.models.Message
+import pos.ambrosia.models.UserResponse
 import pos.ambrosia.services.AuthService
+import pos.ambrosia.services.PermissionsService
 import pos.ambrosia.services.TokenService
 import pos.ambrosia.utils.*
 
@@ -25,10 +28,15 @@ fun Application.configureAuth() {
   val connection: Connection = DatabaseConnection.getConnection()
   val authService = AuthService(environment, connection)
   val tokenService = TokenService(environment, connection)
-  routing { route("/auth") { auth(tokenService, authService) } }
+  val permissionsService = PermissionsService(environment, connection)
+  routing { route("/auth") { auth(tokenService, authService, permissionsService) } }
 }
 
-fun Route.auth(tokenService: TokenService, authService: AuthService) {
+fun Route.auth(
+  tokenService: TokenService,
+  authService: AuthService,
+  permissionsService: PermissionsService
+) {
 
   post("/login") {
     val loginRequest = call.receive<AuthRequest>()
@@ -41,38 +49,54 @@ fun Route.auth(tokenService: TokenService, authService: AuthService) {
     val accessTokenResponse = tokenService.generateAccessToken(userInfo)
     val refreshTokenResponse = tokenService.generateRefreshToken(userInfo)
 
+    val perms = permissionsService.getByRole(userInfo.role_id)
+    if (perms.isEmpty()) {
+      logger.info("The user doesn't have a permissions")
+      call.respond(HttpStatusCode.Forbidden)
+      return@post
+    }
+
     // Configurar cookies para los tokens
     call.response.cookies.append(
-            Cookie(
-                    name = "accessToken",
-                    value = accessTokenResponse,
-                    expires = GMTDate(System.currentTimeMillis() + (60 * 1000L)), // 60 s
-                    httpOnly = true, // Accesible desde JavaScript
-                    secure = false, // Cambiar a true en producción con HTTPS
-                    path = "/",
-            )
+      Cookie(
+        name = "accessToken",
+        value = accessTokenResponse,
+        expires = GMTDate(System.currentTimeMillis() + (60 * 1000L)), // 60 s
+        httpOnly = true, // Accesible desde JavaScript
+        secure = false, // Cambiar a true en producción con HTTPS
+        path = "/",
+      )
     )
 
     call.response.cookies.append(
-            Cookie(
-                    name = "refreshToken",
-                    value = refreshTokenResponse,
-                    maxAge = 30 * 24 * 60 * 60, // 30 días en segundos
-                    httpOnly = true,
-                    secure = false, // Cambiar a true en producción con HTTPS
-                    path = "/",
-            )
+      Cookie(
+        name = "refreshToken",
+        value = refreshTokenResponse,
+        maxAge = 30 * 24 * 60 * 60, // 30 días en segundos
+        httpOnly = true,
+        secure = false, // Cambiar a true en producción con HTTPS
+        path = "/",
+      )
     )
 
-    call.respond(Message(message = "Login successful"))
+    val userResponse =
+    UserResponse(
+      user_id = userInfo.id,
+      name = userInfo.name,
+      role = userInfo.role,
+      role_id = userInfo.role_id,
+      isAdmin = userInfo.isAdmin
+    )
+
+    call.respond(LoginResponse("Login successful", userResponse, perms))
   }
 
   post("/refresh") {
     try {
       // Obtener el refresh token desde las cookies
       val refreshToken =
-              call.request.cookies["refreshToken"]
-                      ?: throw InvalidTokenException("Refresh token is required")
+      call.request.cookies["refreshToken"]
+      ?: throw InvalidTokenException("Refresh token is required")
 
       logger.info("Refreshing token with: $refreshToken")
 
@@ -93,23 +117,23 @@ fun Route.auth(tokenService: TokenService, authService: AuthService) {
 
       // Actualizar SOLO la cookie del access token (60 s)
       call.response.cookies.append(
-              Cookie(
-                      name = "accessToken",
-                      value = newAccessToken,
-                      expires = GMTDate(System.currentTimeMillis() + (60 * 1000L)), // 60 s
-                      httpOnly = true,
-                      secure = true,
-                      path = "/"
-              )
+        Cookie(
+          name = "accessToken",
+          value = newAccessToken,
+          expires = GMTDate(System.currentTimeMillis() + (60 * 1000L)), // 60 s
+          httpOnly = true,
+          secure = true,
+          path = "/"
+        )
       )
 
       // NO actualizamos el refresh token - sigue siendo el mismo
 
       call.respond(
-              mapOf(
-                      "message" to "Access token refreshed successfully",
-                      "accessToken" to newAccessToken
-              )
+        mapOf(
+          "message" to "Access token refreshed successfully",
+          "accessToken" to newAccessToken
+        )
       )
     } catch (e: Exception) {
       logger.error("Error refreshing token: ${e.message}")
@@ -117,35 +141,33 @@ fun Route.auth(tokenService: TokenService, authService: AuthService) {
     }
   }
 
-  authenticate("auth-jwt") {
-    post("/logout") {
-      val principal = call.principal<JWTPrincipal>()
-      val userId = principal?.getClaim("userId", String::class)
+  post("/logout") {
+    val principal = call.principal<JWTPrincipal>()
+    val userId = principal?.getClaim("userId", String::class)
 
-      if (userId != null) {
-        tokenService.revokeRefreshToken(userId)
-      }
-
-      // Eliminar las cookies usando maxAge = 0
-      call.response.cookies.append(
-              Cookie(
-                      name = "accessToken",
-                      value = "",
-                      maxAge = 0, // Expira inmediatamente
-                      path = "/"
-              )
-      )
-
-      call.response.cookies.append(
-              Cookie(
-                      name = "refreshToken",
-                      value = "",
-                      maxAge = 0, // Expira inmediatamente
-                      path = "/"
-              )
-      )
-
-      call.respond(Message("Logout successful"))
+    if (userId != null) {
+      tokenService.revokeRefreshToken(userId)
     }
+
+    // Eliminar las cookies usando maxAge = 0
+    call.response.cookies.append(
+      Cookie(
+        name = "accessToken",
+        value = "",
+        maxAge = 0, // Expira inmediatamente
+        path = "/"
+      )
+    )
+
+    call.response.cookies.append(
+      Cookie(
+        name = "refreshToken",
+        value = "",
+        maxAge = 0, // Expira inmediatamente
+        path = "/"
+      )
+    )
+
+    call.respond(Message("Logout successful"))
   }
 }

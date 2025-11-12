@@ -15,6 +15,7 @@ import pos.ambrosia.models.Payment
 import pos.ambrosia.models.TicketPayment
 import pos.ambrosia.services.PaymentService
 import pos.ambrosia.services.TicketPaymentService
+import pos.ambrosia.utils.authorizePermission
 
 fun Application.configurePayments() {
   val connection: Connection = DatabaseConnection.getConnection()
@@ -24,7 +25,7 @@ fun Application.configurePayments() {
 }
 
 fun Route.payments(paymentService: PaymentService, ticketPaymentService: TicketPaymentService) {
-  authenticate("auth-jwt") {
+  authorizePermission("payments_read") {
     get("") {
       val payments = paymentService.getPayments()
       if (payments.isEmpty()) {
@@ -47,46 +48,6 @@ fun Route.payments(paymentService: PaymentService, ticketPaymentService: TicketP
       }
 
       call.respond(HttpStatusCode.OK, payment)
-    }
-    post("") {
-      val payment = call.receive<Payment>()
-      val paymentId = paymentService.addPayment(payment)
-      if (paymentId == null) {
-        call.respond(HttpStatusCode.BadRequest, "Failed to create payment")
-        return@post
-      }
-      call.respond(HttpStatusCode.Created, mapOf("id" to paymentId, "message" to "Payment added successfully"))
-    }
-    put("/{id}") {
-      val id = call.parameters["id"]
-      if (id == null) {
-        call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
-        return@put
-      }
-
-      val updatedPayment = call.receive<Payment>().copy(id = id)
-      val isUpdated = paymentService.updatePayment(updatedPayment)
-      if (!isUpdated) {
-        call.respond(HttpStatusCode.NotFound, "Payment with ID: $id not found")
-        return@put
-      }
-
-      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Payment updated successfully"))
-    }
-    delete("/{id}") {
-      val id = call.parameters["id"]
-      if (id == null) {
-        call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
-        return@delete
-      }
-
-      val isDeleted = paymentService.deletePayment(id)
-      if (!isDeleted) {
-        call.respond(HttpStatusCode.BadRequest, "Failed to delete payment or payment is in use")
-        return@delete
-      }
-
-      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Payment deleted successfully"))
     }
     get("/methods") {
       val paymentMethods = paymentService.getPaymentMethods()
@@ -134,22 +95,6 @@ fun Route.payments(paymentService: PaymentService, ticketPaymentService: TicketP
 
       call.respond(HttpStatusCode.OK, currency)
     }
-
-    // Ticket Payment endpoints - manage relationships between payments and tickets
-    post("/ticket-payments") {
-      val ticketPayment = call.receive<TicketPayment>()
-      val isAdded = ticketPaymentService.addTicketPayment(ticketPayment)
-      if (!isAdded) {
-        call.respond(HttpStatusCode.BadRequest, "Failed to create ticket payment relationship")
-        return@post
-      }
-      call.respond(HttpStatusCode.Created, mapOf(
-        "paymentId" to ticketPayment.payment_id,
-        "ticketId" to ticketPayment.ticket_id,
-        "message" to "Ticket payment relationship created successfully"
-      ))
-    }
-
     get("/ticket-payments/by-ticket/{ticketId}") {
       val ticketId = call.parameters["ticketId"]
       if (ticketId == null) {
@@ -179,6 +124,77 @@ fun Route.payments(paymentService: PaymentService, ticketPaymentService: TicketP
       }
       call.respond(HttpStatusCode.OK, tickets)
     }
+  }
+  authorizePermission("payments_create") {
+    post("") {
+      val payment = call.receive<Payment>()
+      val paymentId = paymentService.addPayment(payment)
+      if (paymentId == null) {
+        call.respond(HttpStatusCode.BadRequest, "Failed to create payment")
+        return@post
+      }
+      call.respond(
+        HttpStatusCode.Created,
+        mapOf("id" to paymentId, "message" to "Payment added successfully")
+      )
+    }
+  }
+  authorizePermission("payments_update") {
+    put("/{id}") {
+      val id = call.parameters["id"]
+      if (id == null) {
+        call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+        return@put
+      }
+
+      val updatedPayment = call.receive<Payment>().copy(id = id)
+      val isUpdated = paymentService.updatePayment(updatedPayment)
+      if (!isUpdated) {
+        call.respond(HttpStatusCode.NotFound, "Payment with ID: $id not found")
+        return@put
+      }
+
+      call.respond(
+        HttpStatusCode.OK,
+        mapOf("id" to id, "message" to "Payment updated successfully")
+      )
+    }
+    post("/ticket-payments") {
+      val ticketPayment = call.receive<TicketPayment>()
+      val isAdded = ticketPaymentService.addTicketPayment(ticketPayment)
+      if (!isAdded) {
+        call.respond(HttpStatusCode.BadRequest, "Failed to create ticket payment relationship")
+        return@post
+      }
+      call.respond(
+        HttpStatusCode.Created,
+        mapOf(
+          "paymentId" to ticketPayment.payment_id,
+          "ticketId" to ticketPayment.ticket_id,
+          "message" to "Ticket payment relationship created successfully"
+        )
+      )
+    }
+  }
+  authorizePermission("payments_delete") {
+    delete("/{id}") {
+      val id = call.parameters["id"]
+      if (id == null) {
+        call.respond(HttpStatusCode.BadRequest, "Missing or malformed ID")
+        return@delete
+      }
+
+      val isDeleted = paymentService.deletePayment(id)
+      if (!isDeleted) {
+        call.respond(HttpStatusCode.BadRequest, "Failed to delete payment or payment is in use")
+        return@delete
+      }
+
+      call.respond(
+        HttpStatusCode.OK,
+        mapOf("id" to id, "message" to "Payment deleted successfully")
+      )
+    }
 
     delete("/ticket-payments") {
       val paymentId = call.request.queryParameters["paymentId"]
@@ -195,11 +211,14 @@ fun Route.payments(paymentService: PaymentService, ticketPaymentService: TicketP
         return@delete
       }
 
-      call.respond(HttpStatusCode.OK, mapOf(
-        "paymentId" to paymentId,
-        "ticketId" to ticketId,
-        "message" to "Ticket payment relationship deleted successfully"
-      ))
+      call.respond(
+        HttpStatusCode.OK,
+        mapOf(
+          "paymentId" to paymentId,
+          "ticketId" to ticketId,
+          "message" to "Ticket payment relationship deleted successfully"
+        )
+      )
     }
 
     delete("/ticket-payments/by-ticket/{ticketId}") {
@@ -210,7 +229,13 @@ fun Route.payments(paymentService: PaymentService, ticketPaymentService: TicketP
       }
 
       ticketPaymentService.deleteTicketPaymentsByTicket(ticketId)
-      call.respond(HttpStatusCode.OK, mapOf("ticketId" to ticketId, "message" to "All payment relationships for ticket deleted"))
+      call.respond(
+        HttpStatusCode.OK,
+        mapOf(
+          "ticketId" to ticketId,
+          "message" to "All payment relationships for ticket deleted"
+        )
+      )
     }
   }
 }

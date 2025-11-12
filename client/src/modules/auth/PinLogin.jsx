@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getUsers, loginFromService } from "./authService";
+import { getUsers } from "./authService";
 import { ChefHat, Delete, LogIn, Users, Trash2 } from "lucide-react";
 import {
   addToast,
   Avatar,
-  Badge,
   Button,
   Card,
   CardBody,
@@ -31,8 +30,8 @@ export default function PinLoginNew() {
       avatar: "MG",
     },
   ]);
-  const { login, logout } = useAuth();
   const router = useRouter();
+  const { login } = useAuth();
 
   useEffect(() => {
     async function getUsersFromService() {
@@ -90,41 +89,25 @@ export default function PinLoginNew() {
 
     const employee = employees.find((emp) => emp.id === selectedUser);
 
-    setTimeout(async () => {
-      try {
-        const loginResponse = await loginFromService({
-          name: employee.name,
-          pin,
-        });
-        if (!loginResponse) {
-          throw new Error("Invalid credentials");
-        }
-        // Consultar usuario desde /api/auth/me (servidor) para datos derivados
-        const meRes = await fetch("/api/auth/me", { credentials: "include" });
-        if (meRes.ok) {
-          const me = await meRes.json();
-          // Mantener compatibilidad con módulos que leen localStorage
-          if (me?.userId) localStorage.setItem("userId", me.userId);
-          if (me?.role) localStorage.setItem("roleId", me.role);
-          // Nombre visible (no sensible) desde selección
-          localStorage.setItem("username", employee.name);
-        }
-
-        addToast({
-          title: "Inicio de sesión exitoso",
-          description: `¡Bienvenido ${employee.name}! Acceso concedido como ${employee.role}.`,
-          color: "success",
-        });
-        setPin("");
-        setSelectedUser("");
-        login();
-        router.push("/");
-        setIsLoading(false);
-      } catch (error) {
-        setError("PIN incorrecto para el empleado seleccionado.");
-        setIsLoading(false);
-      }
-    }, 1000);
+    try {
+      await login({
+        name: employee.name,
+        pin,
+      });
+      addToast({
+        title: "Inicio de sesión exitoso",
+        description: `¡Bienvenido ${employee.name}! Acceso concedido como ${employee.role}.`,
+        color: "success",
+      });
+      setPin("");
+      setSelectedUser("");
+      router.replace("/");
+    } catch (error) {
+      setError("PIN incorrecto para el empleado seleccionado.");
+      setPin("");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const numbers = [
@@ -272,11 +255,10 @@ export default function PinLoginNew() {
                 key={index}
                 variant={number ? "outline" : "ghost"}
                 size="md"
-                className={`h-14 text-xl font-bold transition-all duration-200 ${
-                  number
-                    ? "border-2 border-mint bg-cream/50 hover:bg-mint hover:text-deep hover:border-forest active:scale-95 shadow-md"
-                    : "invisible"
-                }`}
+                className={`h-14 text-xl font-bold transition-all duration-200 ${number
+                  ? "border-2 border-mint bg-cream/50 hover:bg-mint hover:text-deep hover:border-forest active:scale-95 shadow-md"
+                  : "invisible"
+                  }`}
                 onPress={() => number && handleNumberClick(number)}
                 disabled={isLoading || !number}
               >
