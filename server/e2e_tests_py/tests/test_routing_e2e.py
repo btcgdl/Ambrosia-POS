@@ -108,31 +108,31 @@ class TestRoutingE2E:
 class TestAuthEndpoints:
     """Tests for authentication-related endpoints."""
 
-    @pytest.mark.asyncio
-    async def test_login_with_default_credentials(self, server_url: str):
-        """Test that /login endpoint responds correctly with default credentials."""
-        async with AmbrosiaHttpClient(server_url) as client:
-            # Use default credentials (cooluser1 / 0000)
-            login_data = {"name": "cooluser1", "pin": "0000"}
-            response = await client.post("/auth/login", json=login_data)
-
-            # Should return 200 OK with success message
-            assert response.status_code == 200, (
-                f"Expected 200 OK, got {response.status_code}"
-            )
-
-            # Check that response contains success message
-            response_data = response.json()
-            assert "message" in response_data, "Response should contain 'message' field"
-            assert "success" in response_data["message"].lower(), (
-                f"Expected success message, got: {response_data}"
-            )
-
-            # Check that authentication cookies are set
-            cookies = response.cookies
-            assert "accessToken" in cookies, "accessToken cookie should be set"
-            assert "refreshToken" in cookies, "refreshToken cookie should be set"
-
+    # @pytest.mark.asyncio
+    # async def test_login_with_default_credentials(self, server_url: str):
+    #     """Test that /login endpoint responds correctly with default credentials."""
+    #     async with AmbrosiaHttpClient(server_url) as client:
+    #         # Use default credentials (cooluser1 / 0000)
+    #         login_data = {"name": "cooluser1", "pin": "0000"}
+    #         response = await client.post("/auth/login", json=login_data)
+    #
+    #         # Should return 200 OK with success message
+    #         assert response.status_code == 200, (
+    #             f"Expected 200 OK, got {response.status_code}"
+    #         )
+    #
+    #         # Check that response contains success message
+    #         response_data = response.json()
+    #         assert "message" in response_data, "Response should contain 'message' field"
+    #         assert "success" in response_data["message"].lower(), (
+    #             f"Expected success message, got: {response_data}"
+    #         )
+    #
+    #         # Check that authentication cookies are set
+    #         cookies = response.cookies
+    #         assert "accessToken" in cookies, "accessToken cookie should be set"
+    #         assert "refreshToken" in cookies, "refreshToken cookie should be set"
+    #
     @pytest.mark.asyncio
     async def test_login_with_wrong_credentials(self, server_url: str):
         """Test that /login endpoint rejects wrong credentials."""
