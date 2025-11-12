@@ -14,6 +14,7 @@ import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Shift
 import pos.ambrosia.services.ShiftService
+import pos.ambrosia.utils.authorizePermission
 
 fun Application.configureShifts() {
   val connection: Connection = DatabaseConnection.getConnection()
@@ -31,7 +32,7 @@ fun Route.shifts(shiftService: ShiftService) {
     }
     call.respond(HttpStatusCode.OK, shifts)
   }
-  authenticate("auth-jwt") {
+  authorizePermission("shifts_read") {
     get("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {
@@ -47,11 +48,18 @@ fun Route.shifts(shiftService: ShiftService) {
 
       call.respond(HttpStatusCode.OK, shift)
     }
+  }
+  authorizePermission("shifts_create") {
     post("") {
       val shift = call.receive<Shift>()
       val createdShift = shiftService.addShift(shift)
-      call.respond(HttpStatusCode.Created, mapOf("id" to createdShift, "message" to "Shift added successfully"))
+      call.respond(
+        HttpStatusCode.Created,
+        mapOf("id" to createdShift, "message" to "Shift added successfully")
+      )
     }
+  }
+  authorizePermission("shifts_update") {
     put("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {
@@ -70,6 +78,8 @@ fun Route.shifts(shiftService: ShiftService) {
 
       call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Shift updated successfully"))
     }
+  }
+  authorizePermission("shifts_delete") {
     delete("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {

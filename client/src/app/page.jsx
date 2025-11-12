@@ -8,23 +8,20 @@ import LoadingCard from "../components/LoadingCard";
 
 export default function HomePage() {
   const router = useRouter();
-  const { isAuthenticated, user, isLoading } = useContext(AuthContext);
+  const { user, isLoading, isAuth } = useContext(AuthContext);
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated) {
-        router.replace("/auth");
-      } else {
-        const homeRoute = getHomeRoute(user);
-        console.log(`🏠 Redirigiendo usuario a: ${homeRoute}`);
-        router.replace(homeRoute);
-      }
+    if (isLoading) {
+      return;
     }
-  }, [isAuthenticated, user, isLoading, router]);
+
+    const homeRoute = getHomeRoute(user);
+    router.replace(homeRoute);
+  }, [user, isAuth, isLoading, router]);
 
   return (
-    <LoadingCard 
-      message={isLoading ? "Verificando autenticación..." : "Redirigiendo..."} 
+    <LoadingCard
+      message={isLoading ? "Verificando autenticación..." : "Redirigiendo..."}
     />
   );
 }

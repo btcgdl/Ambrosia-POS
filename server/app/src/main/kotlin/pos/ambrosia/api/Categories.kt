@@ -11,6 +11,7 @@ import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.models.CategoryItem
 import pos.ambrosia.models.CategoryUpsert
 import pos.ambrosia.services.CategoryService
+import pos.ambrosia.utils.authorizePermission
 
 fun Application.configureCategories() {
   val connection: Connection = DatabaseConnection.getConnection()
@@ -19,7 +20,7 @@ fun Application.configureCategories() {
 }
 
 fun Route.categories(service: CategoryService) {
-  authenticate("auth-jwt") {
+  authorizePermission("categories_read") {
     get("") {
       val type = call.request.queryParameters["type"]
       if (type.isNullOrBlank()) {
@@ -48,7 +49,8 @@ fun Route.categories(service: CategoryService) {
       }
       call.respond(HttpStatusCode.OK, item)
     }
-
+  }
+  authorizePermission("categories_create") {
     post("") {
       val body = call.receive<CategoryUpsert>()
       val type = body.type
@@ -61,9 +63,13 @@ fun Route.categories(service: CategoryService) {
         call.respond(HttpStatusCode.BadRequest, "Failed to create category")
         return@post
       }
-      call.respond(HttpStatusCode.Created, mapOf("id" to id, "message" to "Category added successfully"))
+      call.respond(
+        HttpStatusCode.Created,
+        mapOf("id" to id, "message" to "Category added successfully")
+      )
     }
-
+  }
+  authorizePermission("categories_update") {
     put("/{id}") {
       val id = call.parameters["id"]
       val body = call.receive<CategoryUpsert>()
@@ -77,9 +83,13 @@ fun Route.categories(service: CategoryService) {
         call.respond(HttpStatusCode.NotFound, "Category with ID: $id not found")
         return@put
       }
-      call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Category updated successfully"))
+      call.respond(
+        HttpStatusCode.OK,
+        mapOf("id" to id, "message" to "Category updated successfully")
+      )
     }
-
+  }
+  authorizePermission("categories_delete") {
     delete("/{id}") {
       val id = call.parameters["id"]
       val type = call.request.queryParameters["type"]
@@ -89,11 +99,16 @@ fun Route.categories(service: CategoryService) {
       }
       val ok = service.deleteCategory(id, type)
       if (!ok) {
-        call.respond(HttpStatusCode.BadRequest, "Cannot delete category - it may be in use or not found")
+        call.respond(
+          HttpStatusCode.BadRequest,
+          "Cannot delete category - it may be in use or not found"
+        )
         return@delete
       }
-      call.respond(HttpStatusCode.NoContent, mapOf("id" to id, "message" to "Category deleted successfully"))
+      call.respond(
+        HttpStatusCode.NoContent,
+        mapOf("id" to id, "message" to "Category deleted successfully")
+      )
     }
   }
 }
-

@@ -2,8 +2,6 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useModules } from "../hooks/useModules";
-import { useContext } from "react";
-import { AuthContext } from "../modules/auth/AuthProvider";
 import { getHomeRoute } from "../lib/getHomeRoute";
 import LoadingCard from "./LoadingCard";
 import * as LucideIcons from "lucide-react";
@@ -39,13 +37,11 @@ function NavBarButton({ text, icon, onClick, isActive }) {
 export default function ModuleNavigation({ children }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout } = useContext(AuthContext);
-  const { availableNavigation, isAuthenticated, isAdmin, user, isLoading } =
+  const { availableNavigation, isAuth, isAdmin, user, logout, isLoading } =
     useModules();
 
   // Si está cargando, mostrar spinner
   if (isLoading) {
-    console.log(user);
     return <LoadingCard message="Cargando módulos..." />;
   }
 
@@ -54,13 +50,13 @@ export default function ModuleNavigation({ children }) {
       <aside className="w-1/6 h-full bg-[#1c7c54] flex flex-col">
         <div className="h-[25%] flex flex-col items-center justify-end pb-4">
           <Link
-            href={isAuthenticated ? getHomeRoute(user) : "/auth"}
+            href={isAuth ? getHomeRoute(user) : "/auth"}
             className="group"
           >
             <LucideIcons.Home className="w-24 h-24 text-white cursor-pointer group-hover:scale-110 transition-transform" />
           </Link>
           <div className="text-center">
-            {isAuthenticated ? (
+            {isAuth ? (
               <>
                 <p className="text-white text-[13px] mt-1">
                   {user?.name || localStorage.getItem("username") || "Usuario"}
@@ -77,7 +73,7 @@ export default function ModuleNavigation({ children }) {
 
         <div className="h-[75%] overflow-y-auto flex flex-col gap-2 py-4 scrollbar-hide">
           {/* Mostrar navegación solo si está autenticado */}
-          {isAuthenticated ? (
+          {isAuth ? (
             <>
               {availableNavigation.map((item, index) => (
                 <NavBarButton

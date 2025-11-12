@@ -18,31 +18,33 @@ import pos.ambrosia.utils.*
 import io.ktor.server.application.ApplicationEnvironment
 
 /** Service for interacting with Phoenix Lightning node */
-class PhoenixService(app: ApplicationEnvironment) {
+class PhoenixService(app: ApplicationEnvironment, private val httpClient: HttpClient) {
   private val config = app.config
   private val phoenixdUrl = config.property("phoenixd-url").getString()
   private val phoenixdPassword = config.property("phoenixd-password").getString()
-  private val httpClient =
-          HttpClient(CIO) {
-            install(Auth) {
-              basic {
-                credentials {
-                  BasicAuthCredentials(
-                          username = "",
-                          password = config.property("phoenixd-password").getString()
-                  )
-                }
-              }
-            }
-            install(ContentNegotiation) {
-              json(
-                      Json {
-                        ignoreUnknownKeys = true
-                        prettyPrint = true
-                      }
-              )
-            }
+  constructor(app: ApplicationEnvironment) : this(
+    app,
+    HttpClient(CIO) {
+      install(Auth) {
+        basic {
+          credentials {
+            BasicAuthCredentials(
+              username = "",
+              password = app.config.property("phoenixd-password").getString()
+            )
           }
+        }
+      }
+      install(ContentNegotiation) {
+        json(
+          Json {
+            ignoreUnknownKeys = true
+            prettyPrint = true
+          }
+        )
+      }
+    }
+  )
 
   /** Get node information from Phoenix */
   suspend fun getNodeInfo(): NodeInfo {
@@ -50,7 +52,7 @@ class PhoenixService(app: ApplicationEnvironment) {
       val response: HttpResponse = httpClient.get("$phoenixdUrl/getinfo")
       if (response.status.value != 200) {
         throw PhoenixNodeInfoException(
-                "Phoenix node returned status code: ${response.status.value}"
+          "Phoenix node returned status code: ${response.status.value}"
         )
       }
 
@@ -80,25 +82,25 @@ class PhoenixService(app: ApplicationEnvironment) {
 
   /** Get seed from Phoenix */
   suspend fun getSeed(): String {
-      return AppConfig.loadPhoenixSeed()
+    return AppConfig.loadPhoenixSeed()
   }
 
   /** Create a new Bolt11 invoice on Phoenix */
   suspend fun createInvoice(request: CreateInvoiceRequest): CreateInvoiceResponse {
     try {
       val response: HttpResponse =
-              httpClient.submitForm(
-                      url = "$phoenixdUrl/createinvoice",
-                      formParameters =
-                              Parameters.build {
-                                append("description", request.description)
-                                request.amountSat?.let { append("amountSat", it.toString()) }
-                                request.externalId?.let { append("externalId", it) }
-                                request.expirySeconds?.let {
-                                  append("expirySeconds", it.toString())
-                                }
-                              }
-              )
+      httpClient.submitForm(
+        url = "$phoenixdUrl/createinvoice",
+        formParameters =
+        Parameters.build {
+          append("description", request.description)
+          request.amountSat?.let { append("amountSat", it.toString()) }
+          request.externalId?.let { append("externalId", it) }
+          request.expirySeconds?.let {
+            append("expirySeconds", it.toString())
+          }
+        }
+      )
       if (response.status.value != 200) {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
@@ -113,14 +115,14 @@ class PhoenixService(app: ApplicationEnvironment) {
   suspend fun createOffer(request: CreateOffer): String {
     try {
       val response: HttpResponse =
-              httpClient.submitForm(
-                      url = "$phoenixdUrl/createoffer",
-                      formParameters =
-                              Parameters.build {
-                                request.description?.let { append("description", it) }
-                                request.amountSat?.let { append("amountSat", it.toString()) }
-                              }
-              )
+      httpClient.submitForm(
+        url = "$phoenixdUrl/createoffer",
+        formParameters =
+        Parameters.build {
+          request.description?.let { append("description", it) }
+          request.amountSat?.let { append("amountSat", it.toString()) }
+        }
+      )
       if (response.status.value != 200) {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
@@ -135,14 +137,14 @@ class PhoenixService(app: ApplicationEnvironment) {
   suspend fun payInvoice(request: PayInvoiceRequest): PaymentResponse {
     try {
       val response: HttpResponse =
-              httpClient.submitForm(
-                      url = "$phoenixdUrl/payinvoice",
-                      formParameters =
-                              Parameters.build {
-                                append("invoice", request.invoice)
-                                request.amountSat?.let { append("amountSat", it.toString()) }
-                              }
-              )
+      httpClient.submitForm(
+        url = "$phoenixdUrl/payinvoice",
+        formParameters =
+        Parameters.build {
+          append("invoice", request.invoice)
+          request.amountSat?.let { append("amountSat", it.toString()) }
+        }
+      )
       if (response.status.value != 200) {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
@@ -156,15 +158,15 @@ class PhoenixService(app: ApplicationEnvironment) {
   suspend fun payOffer(request: PayOfferRequest): PaymentResponse {
     try {
       val response: HttpResponse =
-              httpClient.submitForm(
-                      url = "$phoenixdUrl/payoffer",
-                      formParameters =
-                              Parameters.build {
-                                append("offer", request.offer)
-                                request.amountSat?.let { append("amountSat", it.toString()) }
-                                request.message?.let { append("message", it) }
-                              }
-              )
+      httpClient.submitForm(
+        url = "$phoenixdUrl/payoffer",
+        formParameters =
+        Parameters.build {
+          append("offer", request.offer)
+          request.amountSat?.let { append("amountSat", it.toString()) }
+          request.message?.let { append("message", it) }
+        }
+      )
       if (response.status.value != 200) {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
@@ -178,15 +180,15 @@ class PhoenixService(app: ApplicationEnvironment) {
   suspend fun payOnchain(request: PayOnchainRequest): PaymentResponse {
     try {
       val response: HttpResponse =
-              httpClient.submitForm(
-                      url = "$phoenixdUrl/payonchain",
-                      formParameters =
-                              Parameters.build {
-                                append("address", request.address)
-                                append("amountSat", request.amountSat.toString())
-                                append("feerateSatByte", request.feerateSatByte.toString())
-                              }
-              )
+      httpClient.submitForm(
+        url = "$phoenixdUrl/payonchain",
+        formParameters =
+        Parameters.build {
+          append("address", request.address)
+          append("amountSat", request.amountSat.toString())
+          append("feerateSatByte", request.feerateSatByte.toString())
+        }
+      )
       if (response.status.value != 200) {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
@@ -200,13 +202,13 @@ class PhoenixService(app: ApplicationEnvironment) {
   suspend fun bumpOnchainFees(feerateSatByte: Int): String {
     try {
       val response: HttpResponse =
-              httpClient.submitForm(
-                      url = "$phoenixdUrl/bumpfee",
-                      formParameters =
-                              Parameters.build {
-                                append("feerateSatByte", feerateSatByte.toString())
-                              }
-              )
+      httpClient.submitForm(
+        url = "$phoenixdUrl/bumpfee",
+        formParameters =
+        Parameters.build {
+          append("feerateSatByte", feerateSatByte.toString())
+        }
+      )
       if (response.status.value != 200) {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
@@ -219,23 +221,23 @@ class PhoenixService(app: ApplicationEnvironment) {
 
   /** List incoming payments from Phoenix */
   suspend fun listIncomingPayments(
-          from: Long = 0,
-          to: Long? = null,
-          limit: Int = 20,
-          offset: Int = 0,
-          all: Boolean = false,
-          externalId: String? = null
+    from: Long = 0,
+    to: Long? = null,
+    limit: Int = 20,
+    offset: Int = 0,
+    all: Boolean = false,
+    externalId: String? = null
   ): List<IncomingPayment> {
     try {
       val response: HttpResponse =
-              httpClient.get("$phoenixdUrl/payments/incoming") {
-                parameter("from", from)
-                to?.let { parameter("to", it) }
-                parameter("limit", limit)
-                parameter("offset", offset)
-                if (all) parameter("all", "true")
-                externalId?.let { parameter("externalId", it) }
-              }
+      httpClient.get("$phoenixdUrl/payments/incoming") {
+        parameter("from", from)
+        to?.let { parameter("to", it) }
+        parameter("limit", limit)
+        parameter("offset", offset)
+        if (all) parameter("all", "true")
+        externalId?.let { parameter("externalId", it) }
+      }
       if (response.status.value != 200) {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
@@ -262,21 +264,21 @@ class PhoenixService(app: ApplicationEnvironment) {
 
   /** List outgoing payments from Phoenix */
   suspend fun listOutgoingPayments(
-          from: Long = 0,
-          to: Long? = null,
-          limit: Int = 20,
-          offset: Int = 0,
-          all: Boolean = false
+    from: Long = 0,
+    to: Long? = null,
+    limit: Int = 20,
+    offset: Int = 0,
+    all: Boolean = false
   ): List<OutgoingPayment> {
     try {
       val response: HttpResponse =
-              httpClient.get("$phoenixdUrl/payments/outgoing") {
-                parameter("from", from)
-                to?.let { parameter("to", it) }
-                parameter("limit", limit)
-                parameter("offset", offset)
-                if (all) parameter("all", "true")
-              }
+      httpClient.get("$phoenixdUrl/payments/outgoing") {
+        parameter("from", from)
+        to?.let { parameter("to", it) }
+        parameter("limit", limit)
+        parameter("offset", offset)
+        if (all) parameter("all", "true")
+      }
       if (response.status.value != 200) {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
@@ -305,7 +307,7 @@ class PhoenixService(app: ApplicationEnvironment) {
   suspend fun getOutgoingPaymentByHash(paymentHash: String): OutgoingPayment {
     try {
       val response: HttpResponse =
-              httpClient.get("$phoenixdUrl/payments/outgoingbyhash/$paymentHash")
+      httpClient.get("$phoenixdUrl/payments/outgoingbyhash/$paymentHash")
       if (response.status.value != 200) {
         throw PhoenixServiceException("Phoenix node returned ${response.status.value}")
       }
@@ -313,7 +315,7 @@ class PhoenixService(app: ApplicationEnvironment) {
       return response.body<OutgoingPayment>()
     } catch (e: Exception) {
       throw PhoenixServiceException(
-              "Failed to get outgoing payment by hash on Phoenix: ${e.message}"
+        "Failed to get outgoing payment by hash on Phoenix: ${e.message}"
       )
     }
   }

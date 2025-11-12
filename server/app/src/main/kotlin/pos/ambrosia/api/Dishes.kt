@@ -14,6 +14,7 @@ import pos.ambrosia.db.DatabaseConnection
 import pos.ambrosia.logger
 import pos.ambrosia.models.Dish
 import pos.ambrosia.services.DishService
+import pos.ambrosia.utils.authorizePermission
 
 fun Application.configureDishes() {
   val connection: Connection = DatabaseConnection.getConnection()
@@ -22,7 +23,7 @@ fun Application.configureDishes() {
 }
 
 fun Route.dishes(dishService: DishService) {
-  authenticate("auth-jwt") {
+  authorizePermission("dish_read") {
     get("") {
       val dishes = dishService.getDishes()
       if (dishes.isEmpty()) {
@@ -46,11 +47,18 @@ fun Route.dishes(dishService: DishService) {
 
       call.respond(HttpStatusCode.OK, dish)
     }
+  }
+  authorizePermission("dish_create") {
     post("") {
       val dish = call.receive<Dish>()
       val id = dishService.addDish(dish)
-      call.respond(HttpStatusCode.Created, mapOf("id" to id, "message" to "Dish added successfully" ))
+      call.respond(
+        HttpStatusCode.Created,
+        mapOf("id" to id, "message" to "Dish added successfully")
+      )
     }
+  }
+  authorizePermission("dish_update") {
     put("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {
@@ -69,6 +77,8 @@ fun Route.dishes(dishService: DishService) {
 
       call.respond(HttpStatusCode.OK, mapOf("id" to id, "message" to "Dish updated successfully"))
     }
+  }
+  authorizePermission("dish_delete") {
     delete("/{id}") {
       val id = call.parameters["id"]
       if (id == null) {
@@ -77,7 +87,10 @@ fun Route.dishes(dishService: DishService) {
       }
 
       dishService.deleteDish(id)
-      call.respond(HttpStatusCode.NoContent, mapOf("id" to id, "message" to "Dish deleted successfully"))
+      call.respond(
+        HttpStatusCode.NoContent,
+        mapOf("id" to id, "message" to "Dish deleted successfully")
+      )
     }
   }
 }
