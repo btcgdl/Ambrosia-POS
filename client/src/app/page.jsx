@@ -24,6 +24,6 @@ export default function HomePage() {
     // <LoadingCard
     //   message={isLoading ? "Verificando autenticación..." : "Redirigiendo..."}
     // />
-    <OnboardingWizard />
+    <Onboarding />
   );
 }
