@@ -18,20 +18,38 @@ for arg in "$@"; do
   esac
 done
 
-TAG="0.6.2"
+TAG="0.7.1"
 PHOENIXD_URL="https://github.com/ACINQ/phoenixd/releases/download/v${TAG}"
 
 # Detect the OS architecture and set the appropriate URL
 ARCH=$(uname -m)
 OS=$(uname -s)
-if [[ "$ARCH" == "x86_64" ]]; then
-  PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-linux-x64.zip"
-  OS="linux-x64"
-elif [[ "$ARCH" == "aarch64" ]]; then
-  PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-linux-arm64.zip"
-  OS="linux-arm64"
+
+if [[ "$OSTYPE" == "linux"* ]]; then
+  if [[ "$ARCH" == "x86_64" ]]; then
+    PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-linux-x64.zip"
+    OS="linux-x64"
+  elif [[ "$ARCH" == "aarch64" ]]; then
+    PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-linux-arm64.zip"
+    OS="linux-arm64"
+  else
+    echo "❌ Unsupported architecture: $ARCH"
+    exit 1
+  fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+
+  if [[ "$ARCH" == "x86_64" ]]; then
+    PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-macos-x64.zip"
+    OS="macos-x64"
+  elif [[ "$ARCH" == "arm64" ]]; then
+    PHOENIXD_ZIP="${PHOENIXD_URL}/phoenixd-${TAG}-macos-arm64.zip"
+    OS="macos-arm64"
+  else
+    echo "❌ Unsupported architecture: $ARCH"
+    exit 1
+  fi
 else
-  echo "❌ Unsupported architecture: $ARCH"
+  echo "❌ Unsupported OS type: $OSTYPE"
   exit 1
 fi
 
@@ -44,7 +62,7 @@ echo ""
 echo ""
 echo "⚡️ Welcome to Mastering phoenixd installer"
 echo "-----------------------------------------"
-echo "This script will install linux-${OS} version of phoenixd"
+echo "This script will install ${OS} version of phoenixd"
 echo "-----------------------------------------"
 
 # Check if phoenixd and phoenix-cli are already installed
@@ -78,14 +96,14 @@ sudo mkdir -p $INSTALL_DIR
 
 # Download and extract phoenixd
 echo "Downloading phoenixd..."
-if ! wget -q "$PHOENIXD_ZIP"; then
+if ! curl -sL -O "$PHOENIXD_ZIP"; then
   echo "❌ Failed to download phoenixd from ${PHOENIXD_ZIP}" >&2
   exit 1
 fi
 
 if [[ ! -f "verify.sh" ]]; then
   echo "Downloading the verification script..."
-  if ! wget -q "$VERIFIER_URL"; then
+  if ! curl -sL -O "$VERIFIER_URL"; then
     echo "❌ Failed to download the verification script." >&2
     exit 1
   fi
@@ -108,6 +126,15 @@ sudo unzip -j phoenixd-${TAG}-${OS}.zip -d /usr/local/bin
 rm -f phoenixd-${TAG}-${OS}.zip
 
 echo "✅ phoenixd installed to $INSTALL_DIR"
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  echo ""
+  echo "MacOS detected. Please ensure that $INSTALL_DIR is in your PATH."
+  echo "You can add the following line to your ~/.zshrc or ~/.bash_profile:"
+  echo 'export PATH="/usr/local/bin:$PATH"'
+  echo ""
+  exit 0
+fi
 
 # optionally create a systemd service to start phoenixd
 if [[ "$AUTO_YES" == true ]]; then
@@ -141,7 +168,7 @@ Description=Phoenix Daemon
 After=network.target
 
 [Service]
-ExecStart=$INSTALL_DIR/phoenixd --agree-to-terms-of-service --chain=testnet
+ExecStart=$INSTALL_DIR/phoenixd --agree-to-terms-of-service
 User=$USER
 Restart=always
 RestartSec=5
