@@ -41,9 +41,9 @@ class TicketFactory(private val template: TicketTemplate) {
   private fun resolveValue(value: String, data: TicketData, config: Config?): String {
     var resolved = value
     config?.let {
-      resolved = resolved.replace("{{config.restaurantName}}", it.restaurantName)
-      resolved = resolved.replace("{{config.address}}", it.address ?: "")
-      resolved = resolved.replace("{{config.phone}}", it.phone ?: "")
+      resolved = resolved.replace("{{config.businessName}}", it.businessName)
+      resolved = resolved.replace("{{config.businessAddress}}", it.businessAddress ?: "")
+      resolved = resolved.replace("{{config.businessPhone}}", it.businessPhone ?: "")
     }
 
     return resolved.replace("{{ticket.id}}", data.ticketId)

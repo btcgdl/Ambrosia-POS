@@ -125,5 +125,7 @@ class Api() {
     configureTicketTemplates()
     configureProducts()
     configureCategories()
+    configureCurrency()
+    configureInitialSetup()
   }
 }

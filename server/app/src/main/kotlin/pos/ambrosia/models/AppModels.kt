@@ -228,12 +228,13 @@ enum class TicketType {
 @Serializable
 data class Config(
   val id: Int = 1,
-  val restaurantName: String,
-  val address: String?,
-  val phone: String?,
-  val email: String?,
-  val taxId: String?,
-  val logo: ByteArray?,
+  val businessType: String = "restaurant",
+  val businessName: String,
+  val businessAddress: String?,
+  val businessPhone: String?,
+  val businessEmail: String?,
+  val businessTaxId: String?,
+  val businessLogoUrl: String?,
 )
 
 @Serializable
@@ -257,4 +258,31 @@ data class Product(
 @Serializable data class CategoryUpsert(
   val name: String,
   val type: String? = null,
+)
+
+@Serializable
+data class InitialSetupRequest(
+  val businessType: String,
+  val userName: String,
+  val userPassword: String,
+  val userPin: String,
+  val businessName: String,
+  val businessAddress: String? = null,
+  val businessPhone: String? = null,
+  val businessEmail: String? = null,
+  val businessRFC: String? = null,
+  val businessTaxId: String? = null,
+  val businessCurrency: String,
+  val businessLogo: String? = null,
+  val businessLogoUrl: String? = null,
+)
+
+@Serializable
+data class InitialSetupStatus(
+  val initialized: Boolean,
+)
+
+@Serializable
+data class SetBaseCurrencyRequest(
+  val acronym: String,
 )
