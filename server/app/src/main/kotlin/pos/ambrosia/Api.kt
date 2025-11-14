@@ -18,24 +18,15 @@ import org.slf4j.LoggerFactory
 import pos.ambrosia.api.*
 import pos.ambrosia.config.AppConfig
 import pos.ambrosia.utils.UnauthorizedApiException
-import pos.ambrosia.utils.DefaultCredentialsService
 import pos.ambrosia.db.DatabaseConnection
 import kotlinx.coroutines.*
 
 public val logger = LoggerFactory.getLogger("Server")
 
 class Api() {
-
-  fun blockingAddUser(environment: ApplicationEnvironment) = runBlocking {
-    launch { DefaultCredentialsService(environment, DatabaseConnection.getConnection()).addUser()}
-  }
-
-  fun Application.module() {
+    fun Application.module() {
     AppConfig.loadConfig() // Load the configuration
-    val config = environment.config // Configure the application 
-
-    blockingAddUser(environment) // Add default user if there are no users
-    
+    val config = environment.config // Configure the application
     Handler() // Install exception handlers
     install(ContentNegotiation) { json() }
     install(CORS) {
@@ -100,7 +91,7 @@ class Api() {
           if (credential.payload.getClaim("scope").asString() == "wallet_access") {
             JWTPrincipal(credential.payload)
           } else {
-            null 
+            null
           }
         }
       }
