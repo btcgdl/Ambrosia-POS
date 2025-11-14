@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { Button, Progress, Divider } from "@heroui/react";
+import { Button, Progress, Divider, addToast } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { BusinessTypeStep } from "./SelectBusiness";
 import { UserAccountStep } from "./AddUserAccount";
 import { BusinessDetailsStep } from "./AddBusinessData";
 import { WizardSummary } from "./StepsSummary";
+import { submitInitialSetup } from "../../../services/initialSetupService";
+import { useRouter } from "next/navigation";
 
 export function Onboarding() {
   const t = useTranslations();
@@ -15,6 +17,7 @@ export function Onboarding() {
     businessType: "store",
     userName: "",
     userPassword: "",
+    userPin: "",
     businessName: "",
     businessAddress: "",
     businessPhone: "",
@@ -23,9 +26,14 @@ export function Onboarding() {
     businessCurrency: "MXN",
     businessLogo: null,
   })
+  const router = useRouter();
 
   function isPasswordStrong(password) {
     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
+  }
+
+  function isPinValid(pin) {
+    return /^\d{4}$/.test(pin);
   }
 
   function isRFCValid(rfc) {
@@ -49,7 +57,21 @@ export function Onboarding() {
   }
 
   const handleComplete = async () => {
-    console.log("Datos del wizard:", data)
+    try {
+      await submitInitialSetup(data);
+      addToast({
+        title: t("submitOnboardingToast.title"),
+        description: t("submitOnboardingToast.description"),
+        color: "success",
+      });
+      router.push("/");
+    } catch (error) {
+      addToast({
+        title: "Error",
+        description: error.message,
+        color: "danger",
+      });
+    }
   }
 
   return (
@@ -61,9 +83,8 @@ export function Onboarding() {
             {[1, 2, 3, 4].map((num) => (
               <div
                 key={num}
-                className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold transition-all ${
-                  num <= step ? "bg-primary text-primary-foreground" : "bg-gray-300 text-muted-foreground"
-                }`}
+                className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold transition-all ${num <= step ? "bg-primary text-primary-foreground" : "bg-gray-300 text-muted-foreground"
+                  }`}
               >
                 {num}
               </div>
@@ -87,6 +108,7 @@ export function Onboarding() {
               data={{
                 userName: data.userName,
                 userPassword: data.userPassword,
+                userPin: data.userPin,
               }}
               onChange={(userData) => handleDataChange(userData)}
             />
@@ -128,7 +150,7 @@ export function Onboarding() {
                 onPress={handleNext}
                 isDisabled={
                   (step === 1 && !data.businessType) ||
-                  (step === 2 && (!data.userName || !data.userPassword || isPasswordStrong(data.userPassword) === false)) ||
+                  (step === 2 && (!data.userName || !data.userPassword || !isPasswordStrong(data.userPassword) || !isPinValid(data.userPin))) ||
                   (step === 3 && (!data.businessName || !data.businessAddress || !data.businessRFC || !isRFCValid(data.businessRFC)))
                 }
                 className="gradient-forest text-white"

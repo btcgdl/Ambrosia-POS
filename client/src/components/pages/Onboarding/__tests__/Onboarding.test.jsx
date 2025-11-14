@@ -48,10 +48,15 @@ describe("Onboarding Wizard", () => {
     await act(async () => {
       renderOnboarding();
     });
+    const storeButton = screen.getByLabelText("store");
+    await act(async () => {
+      fireEvent.click(storeButton);
+    });
     const nextButton = screen.getByText("buttons.next");
     await act(async () => {
       fireEvent.click(nextButton);
     });
+
     expect(screen.getByText("2")).toHaveClass("bg-primary");
   });
 
@@ -66,6 +71,7 @@ describe("Onboarding Wizard", () => {
     await act(async () => {
       fireEvent.click(backButton);
     });
+    
     expect(screen.getByText("1")).toHaveClass("bg-primary");
   });
 
@@ -74,6 +80,39 @@ describe("Onboarding Wizard", () => {
       renderOnboarding();
     });
     expect(screen.getByText("buttons.back")).toBeDisabled();
+  });
+
+  it("disables the Next button if Pin not added", async () => {
+    await act(async () => {
+      renderOnboarding();
+    });
+
+    const nextButton = screen.getByText("buttons.next");
+    await act(async () => {
+      fireEvent.click(nextButton);
+    });
+
+    const userNameInput = screen.getByPlaceholderText("step2.fields.userNamePlaceholder");
+    await act(async () => {
+      fireEvent.change(userNameInput, { target: { value: "testuser" } });
+    });
+
+    const passwordInput = screen.getByPlaceholderText("step2.fields.passwordPlaceholder");
+
+    await act(async () => {
+      fireEvent.change(passwordInput, { target: { value: "abc123" } });
+    });
+    expect(nextButton).toBeDisabled();
+
+    await act(async () => {
+      fireEvent.change(passwordInput, { target: { value: "Abcdef12" } });
+    });
+    expect(nextButton).toBeDisabled();
+
+    await act(async () => {
+      fireEvent.change(passwordInput, { target: { value: "Abcd123$" } });
+    });
+    expect(nextButton).toBeDisabled();
   });
 
   it("disables the Next button if password does not meet requirements in step 2", async () => {
@@ -89,6 +128,11 @@ describe("Onboarding Wizard", () => {
     const userNameInput = screen.getByPlaceholderText("step2.fields.userNamePlaceholder");
     await act(async () => {
       fireEvent.change(userNameInput, { target: { value: "testuser" } });
+    });
+
+    const userPinInput = screen.getByPlaceholderText("step2.fields.userPinPlaceholder");
+    await act(async () => {
+      fireEvent.change(userPinInput, { target: { value: "0000" } });
     });
 
     const passwordInput = screen.getByPlaceholderText("step2.fields.passwordPlaceholder");
@@ -121,9 +165,11 @@ describe("Onboarding Wizard", () => {
 
     await act(async () => {
       const userNameInput = screen.getByPlaceholderText("step2.fields.userNamePlaceholder");
+      const userPinInput = screen.getByPlaceholderText("step2.fields.userPinPlaceholder");
       const passwordInput = screen.getByPlaceholderText("step2.fields.passwordPlaceholder");
 
       fireEvent.change(userNameInput, { target: { value: "testuser" } });
+      fireEvent.change(userPinInput, { target: { value: "0000" } });
       fireEvent.change(passwordInput, { target: { value: "Abcd123$" } });
 
       fireEvent.click(nextButton);

@@ -6,8 +6,8 @@ import pos.ambrosia.models.Config
 
 class ConfigService(private val connection: Connection) {
     companion object {
-        private const val GET_CONFIG = "SELECT id, restaurant_name, address, phone, email, tax_id, logo FROM config WHERE id = 1"
-        private const val UPDATE_CONFIG = "INSERT OR REPLACE INTO config (id, restaurant_name, address, phone, email, tax_id, logo) VALUES (1, ?, ?, ?, ?, ?, ?)"
+        private const val GET_CONFIG = "SELECT id, business_type, business_name, business_address, business_phone, business_email, business_tax_id, business_logo_url FROM config WHERE id = 1"
+        private const val UPDATE_CONFIG = "INSERT OR REPLACE INTO config (id, business_type, business_name, business_address, business_phone, business_email, business_tax_id, business_logo_url) VALUES (1, ?, ?, ?, ?, ?, ?, ?)"
     }
 
     suspend fun getConfig(): Config? {
@@ -16,12 +16,13 @@ class ConfigService(private val connection: Connection) {
         return if (resultSet.next()) {
             Config(
                 id = resultSet.getInt("id"),
-                restaurantName = resultSet.getString("restaurant_name"),
-                address = resultSet.getString("address"),
-                phone = resultSet.getString("phone"),
-                email = resultSet.getString("email"),
-                taxId = resultSet.getString("tax_id"),
-                logo = resultSet.getBytes("logo")
+                businessType = resultSet.getString("business_type"),
+                businessName = resultSet.getString("business_name"),
+                businessAddress = resultSet.getString("business_address"),
+                businessPhone = resultSet.getString("business_phone"),
+                businessEmail = resultSet.getString("business_email"),
+                businessTaxId = resultSet.getString("business_tax_id"),
+                businessLogoUrl = resultSet.getString("business_logo_url")
             )
         } else {
             logger.warn("Config not found")
@@ -31,12 +32,13 @@ class ConfigService(private val connection: Connection) {
 
     suspend fun updateConfig(config: Config): Boolean {
         val statement = connection.prepareStatement(UPDATE_CONFIG)
-        statement.setString(1, config.restaurantName)
-        statement.setString(2, config.address)
-        statement.setString(3, config.phone)
-        statement.setString(4, config.email)
-        statement.setString(5, config.taxId)
-        statement.setBytes(6, config.logo)
+        statement.setString(1, config.businessType)
+        statement.setString(2, config.businessName)
+        statement.setString(3, config.businessAddress)
+        statement.setString(4, config.businessPhone)
+        statement.setString(5, config.businessEmail)
+        statement.setString(6, config.businessTaxId)
+        statement.setString(7, config.businessLogoUrl)
 
         val rowsUpdated = statement.executeUpdate()
         if (rowsUpdated > 0) {

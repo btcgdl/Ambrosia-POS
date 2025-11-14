@@ -15,6 +15,7 @@ export function BusinessTypeStep({ value, onChange }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card
+          aria-label="store"
           isPressable
           onPress={() => onChange("store")}
           className={`hover:bg-green-200 py-4 ${

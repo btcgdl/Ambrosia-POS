@@ -20,12 +20,13 @@ class ConfigServiceTest {
         whenever(mockStatement.executeQuery()).thenReturn(mockResultSet)
         whenever(mockResultSet.next()).thenReturn(true)
         whenever(mockResultSet.getInt("id")).thenReturn(config.id)
-        whenever(mockResultSet.getString("restaurant_name")).thenReturn(config.restaurantName)
-        whenever(mockResultSet.getString("address")).thenReturn(config.address)
-        whenever(mockResultSet.getString("phone")).thenReturn(config.phone)
-        whenever(mockResultSet.getString("email")).thenReturn(config.email)
-        whenever(mockResultSet.getString("tax_id")).thenReturn(config.taxId)
-        whenever(mockResultSet.getBytes("logo")).thenReturn(config.logo)
+        whenever(mockResultSet.getString("business_type")).thenReturn(config.businessType)
+        whenever(mockResultSet.getString("business_name")).thenReturn(config.businessName)
+        whenever(mockResultSet.getString("business_address")).thenReturn(config.businessAddress)
+        whenever(mockResultSet.getString("business_phone")).thenReturn(config.businessPhone)
+        whenever(mockResultSet.getString("business_email")).thenReturn(config.businessEmail)
+        whenever(mockResultSet.getString("business_tax_id")).thenReturn(config.businessTaxId)
+        whenever(mockResultSet.getString("business_logo_url")).thenReturn(config.businessLogoUrl)
     }
 
     // Helper function to set up mock behavior for when `getConfig` finds no data.
@@ -37,7 +38,7 @@ class ConfigServiceTest {
 
     @Test
     fun `getConfig returns config when found`() = runBlocking {
-        val expectedConfig = Config(1, "Test Cafe", "123 Lane", "555", "a@b.com", "T123", byteArrayOf()) // Arrange
+        val expectedConfig = Config(1, "restaurant", "Test Cafe", "123 Lane", "555", "a@b.com", "T123", null) // Arrange
         setupGetConfigMock(expectedConfig) // Arrange
         val service = ConfigService(mockConnection) // Arrange
         val result = service.getConfig() // Act
@@ -54,7 +55,7 @@ class ConfigServiceTest {
 
     @Test
     fun `updateConfig returns true on success`() = runBlocking {
-        val configToUpdate = Config(1, "New Name", "", "", "", "", byteArrayOf()) // Arrange
+        val configToUpdate = Config(1, "restaurant", "New Name", "", "", "", "", null) // Arrange
         whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
         whenever(mockStatement.executeUpdate()).thenReturn(1) // Arrange
         val service = ConfigService(mockConnection) // Arrange
@@ -64,7 +65,7 @@ class ConfigServiceTest {
 
     @Test
     fun `updateConfig returns false when database update fails`() = runBlocking {
-        val configToUpdate = Config(1, "New Name", "", "", "", "", byteArrayOf()) // Arrange
+        val configToUpdate = Config(1, "restaurant", "New Name", "", "", "", "", null) // Arrange
         whenever(mockConnection.prepareStatement(any())).thenReturn(mockStatement) // Arrange
         whenever(mockStatement.executeUpdate()).thenReturn(0) // Arrange
         val service = ConfigService(mockConnection) // Arrange

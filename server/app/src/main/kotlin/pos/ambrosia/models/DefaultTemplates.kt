@@ -4,9 +4,9 @@ object DefaultTemplates {
     val defaultCustomerTicket = TicketTemplate(
         name = "Default Customer Ticket",
         elements = listOf(
-            TicketElement(ElementType.HEADER, "{{config.restaurantName}}", ElementStyle(bold = true, justification = Justification.CENTER, fontSize = FontSize.LARGE)),
-            TicketElement(ElementType.TEXT, "{{config.address}}", ElementStyle(justification = Justification.CENTER)),
-            TicketElement(ElementType.TEXT, "TEL: {{config.phone}}", ElementStyle(justification = Justification.CENTER)),
+            TicketElement(ElementType.HEADER, "{{config.businessName}}", ElementStyle(bold = true, justification = Justification.CENTER, fontSize = FontSize.LARGE)),
+            TicketElement(ElementType.TEXT, "{{config.businessAddress}}", ElementStyle(justification = Justification.CENTER)),
+            TicketElement(ElementType.TEXT, "TEL: {{config.businessPhone}}", ElementStyle(justification = Justification.CENTER)),
             TicketElement(ElementType.LINE_BREAK, ""),
             TicketElement(ElementType.TEXT, "Table: {{ticket.tableName}}   Date: {{ticket.date}}"),
             TicketElement(ElementType.TEXT, "Room: {{ticket.roomName}}"),

@@ -19,7 +19,7 @@ class TicketFactoryTest {
             elements = listOf(
                 TicketElement(
                     type = ElementType.TEXT,
-                    value = "Welcome to {{config.restaurantName}}"
+                    value = "Welcome to {{config.businessName}}"
                 )
             )
         )
@@ -32,12 +32,13 @@ class TicketFactoryTest {
             total = 0.0
         )
         val config = Config(
-            restaurantName = "Ambrosia",
-            address = null,
-            phone = null,
-            email = null,
-            taxId = null,
-            logo = null
+            businessType = "restaurant",
+            businessName = "Ambrosia",
+            businessAddress = null,
+            businessPhone = null,
+            businessEmail = null,
+            businessTaxId = null,
+            businessLogoUrl = null
         )
 
         val ticketFactory = TicketFactory(template)
@@ -76,12 +77,13 @@ class TicketFactoryTest {
             total = 18.50
         )
         val config = Config(
-            restaurantName = "Ambrosia",
-            address = null,
-            phone = null,
-            email = null,
-            taxId = null,
-            logo = null
+            businessType = "restaurant",
+            businessName = "Ambrosia",
+            businessAddress = null,
+            businessPhone = null,
+            businessEmail = null,
+            businessTaxId = null,
+            businessLogoUrl = null
         )
 
         val ticketFactory = TicketFactory(template)
@@ -123,12 +125,13 @@ class TicketFactoryTest {
             total = 0.0
         )
         val config = Config(
-            restaurantName = "Ambrosia",
-            address = null,
-            phone = null,
-            email = null,
-            taxId = null,
-            logo = null
+            businessType = "restaurant",
+            businessName = "Ambrosia",
+            businessAddress = null,
+            businessPhone = null,
+            businessEmail = null,
+            businessTaxId = null,
+            businessLogoUrl = null
         )
 
         val ticketFactory = TicketFactory(template)
@@ -162,12 +165,13 @@ class TicketFactoryTest {
             total = 0.0
         )
         val config = Config(
-            restaurantName = "Ambrosia",
-            address = null,
-            phone = null,
-            email = null,
-            taxId = null,
-            logo = null
+            businessType = "restaurant",
+            businessName = "Ambrosia",
+            businessAddress = null,
+            businessPhone = null,
+            businessEmail = null,
+            businessTaxId = null,
+            businessLogoUrl = null
         )
 
         val ticketFactory = TicketFactory(template)

@@ -2,12 +2,13 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl";
-import { Input } from "@heroui/react"
+import { Input, Tooltip } from "@heroui/react"
 import { Eye, EyeOff } from "lucide-react"
 
 export function UserAccountStep({ data, onChange }) {
   const t = useTranslations();
   const [showPassword, setShowPassword] = useState(false)
+  const [showPin, setShowPin] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState(0)
 
   const handlePasswordChange = (password) => {
@@ -52,22 +53,73 @@ export function UserAccountStep({ data, onChange }) {
           onChange={(e) => onChange({ ...data, userName: e.target.value })}
         />
 
-        <Input
-          label={t("step2.fields.passwordLabel")}
-          type={showPassword ? "text" : "password"}
-          placeholder={t("step2.fields.passwordPlaceholder")}
-          value={data.userPassword}
-          onChange={(e) => handlePasswordChange(e.target.value)}
-          endContent={
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-            </button>
+        <Tooltip
+          content={
+            <div className="px-1 py-2">
+              <div className="text-small font-bold">{t("step2.fields.userPinLabel")}</div>
+              <div className="text-tiny">{t("step2.tooltips.userPin")}</div>
+            </div>
           }
-        />
+          showArrow={true}
+          delay={10}
+          placement="top-end"
+        >
+          <div className="relative">
+            <Input
+              label={t("step2.fields.userPinLabel")}
+              type={showPin ? "text" : "password"}
+              placeholder={t("step2.fields.userPinPlaceholder")}
+              maxLength={4}
+              value={data.userPin}
+              onChange={(e) => {
+                const onlyNumbers = e.target.value.replace(/\D/g, "");
+                onChange({ ...data, userPin: onlyNumbers });
+              }}
+              endContent={
+                <button
+                  type="button"
+                  onClick={() => setShowPin(!showPin)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPin ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              }
+            />
+          </div>
+        </Tooltip>
+
+        <Tooltip
+          content={
+            <div className="px-1 py-2">
+              <div className="text-small font-bold">{t("step2.fields.passwordLabel")}</div>
+              <div className="text-tiny">{t("step2.tooltips.userPassword")}</div>
+            </div>
+          }
+          showArrow={true}
+          delay={10}
+          placement="top-end"
+        >
+          <div className="relative">
+            <Input
+              aria-label="hide-show-password"
+              label={t("step2.fields.passwordLabel")}
+              type={showPassword ? "text" : "password"}
+              placeholder={t("step2.fields.passwordPlaceholder")}
+              value={data.userPassword}
+              onChange={(e) => handlePasswordChange(e.target.value)}
+              endContent={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              }
+            />
+          </div>
+        </Tooltip>
+
         <div>
           {data.userPassword && (
             <div className="mt-3">

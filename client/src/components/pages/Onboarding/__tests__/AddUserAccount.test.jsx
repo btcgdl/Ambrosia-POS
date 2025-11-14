@@ -33,41 +33,56 @@ describe("Step 2 User Account", () => {
   });
 
   it("calls onChange and updates password strength", () => {
-  const { rerender } = render(
-    <UserAccountStep data={defaultData} onChange={mockChange} />
-  );
+    const { rerender } = render(
+      <UserAccountStep data={defaultData} onChange={mockChange} />
+    );
 
-  const passwordInput = screen.getByPlaceholderText("step2.fields.passwordPlaceholder");
-  fireEvent.change(passwordInput, { target: { value: "abc123!!" } });
+    const passwordInput = screen.getByPlaceholderText("step2.fields.passwordPlaceholder");
+    fireEvent.change(passwordInput, { target: { value: "abc123!!" } });
 
-  rerender(
-    <UserAccountStep
-      data={{ ...defaultData, userPassword: "abc123!!" }}
-      onChange={mockChange}
-    />
-  );
+    rerender(
+      <UserAccountStep
+        data={{ ...defaultData, userPassword: "abc123!!" }}
+        onChange={mockChange}
+      />
+    );
 
-  expect(mockChange).toHaveBeenCalledWith({
-    userName: "",
-    userPassword: "abc123!!",
+    expect(mockChange).toHaveBeenCalledWith({
+      userName: "",
+      userPassword: "abc123!!",
+    });
+
+    expect(screen.getByText(/step2.strength.title:/)).toBeInTheDocument();
+    expect(screen.getByText(/step2.strength.weak|step2.strength.regular|step2.strength.good|step2.strength.strong/)).toBeInTheDocument();
   });
 
-  expect(screen.getByText(/step2.strength.title:/)).toBeInTheDocument();
-  expect(screen.getByText(/step2.strength.weak|step2.strength.regular|step2.strength.good|step2.strength.strong/)).toBeInTheDocument();
-});
+  it("toggles pin visibility when clicking the eye icon", () => {
+    render(<UserAccountStep data={{ userName: "", userPassword: "abc123!!" }} onChange={mockChange} />);
+
+    const toggleButtons = screen.getAllByRole("button");
+    const input = screen.getByPlaceholderText("step2.fields.userPinPlaceholder");
+
+    expect(input).toHaveAttribute("type", "password");
+
+    fireEvent.click(toggleButtons[0]);
+    expect(input).toHaveAttribute("type", "text");
+
+    fireEvent.click(toggleButtons[0]);
+    expect(input).toHaveAttribute("type", "password");
+  });
 
   it("toggles password visibility when clicking the eye icon", () => {
     render(<UserAccountStep data={{ userName: "", userPassword: "abc123!!" }} onChange={mockChange} />);
 
-    const toggleBtn = screen.getByRole("button");
+    const toggleButtons = screen.getAllByRole("button");
     const input = screen.getByPlaceholderText("step2.fields.passwordPlaceholder");
 
     expect(input).toHaveAttribute("type", "password");
 
-    fireEvent.click(toggleBtn);
+    fireEvent.click(toggleButtons[1]);
     expect(input).toHaveAttribute("type", "text");
 
-    fireEvent.click(toggleBtn);
+    fireEvent.click(toggleButtons[1]);
     expect(input).toHaveAttribute("type", "password");
   });
 });

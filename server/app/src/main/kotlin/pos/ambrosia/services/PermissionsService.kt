@@ -26,6 +26,7 @@ class PermissionsService(
     private const val DELETE_ROLE_PERMS = "DELETE FROM role_permissions WHERE role_id = ?"
     private const val INSERT_ROLE_PERM =
       "INSERT OR IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)"
+    private const val SELECT_ENABLED_PERMISSION_IDS = "SELECT id FROM permissions WHERE enabled = 1"
   }
 
   fun getAll(): List<Permission> {
@@ -119,5 +120,24 @@ class PermissionsService(
       } catch (_: Exception) {
       }
     }
+  }
+
+  fun assignAllEnabledToRole(roleId: String): Int {
+    if (!roleExists(roleId)) return 0
+    val ids = mutableListOf<String>()
+    connection.prepareStatement(SELECT_ENABLED_PERMISSION_IDS).use { st ->
+      val rs = st.executeQuery()
+      while (rs.next()) ids.add(rs.getString("id"))
+    }
+
+    var count = 0
+    connection.prepareStatement(INSERT_ROLE_PERM).use { st ->
+      ids.forEach { id ->
+        st.setString(1, roleId)
+        st.setString(2, id)
+        count += st.executeUpdate()
+      }
+    }
+    return count
   }
 }

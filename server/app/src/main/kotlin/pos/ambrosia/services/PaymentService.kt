@@ -27,8 +27,8 @@ class PaymentService(private val connection: Connection) {
     private const val CHECK_PAYMENT_METHOD_EXISTS = "SELECT id FROM payment_methods WHERE id = ?"
 
     // Currency queries
-    private const val GET_CURRENCIES = "SELECT id, acronym FROM currency"
-    private const val GET_CURRENCY_BY_ID = "SELECT id, acronym FROM currency WHERE id = ?"
+    private const val GET_CURRENCIES = "SELECT id, acronym, name, country_name, country_code FROM currency"
+    private const val GET_CURRENCY_BY_ID = "SELECT id, acronym, name, country_name, country_code FROM currency WHERE id = ?"
     private const val CHECK_CURRENCY_EXISTS = "SELECT id FROM currency WHERE id = ?"
   }
 
@@ -88,8 +88,13 @@ class PaymentService(private val connection: Connection) {
     val resultSet = statement.executeQuery()
     val currencies = mutableListOf<Currency>()
     while (resultSet.next()) {
-      val currency =
-              Currency(id = resultSet.getString("id"), acronym = resultSet.getString("acronym"))
+      val currency = Currency(
+        id = resultSet.getString("id"),
+        acronym = resultSet.getString("acronym"),
+        name = resultSet.getString("name"),
+        country_name = resultSet.getString("country_name"),
+        country_code = resultSet.getString("country_code"),
+      )
       currencies.add(currency)
     }
     logger.info("Retrieved ${currencies.size} currencies")
@@ -101,7 +106,13 @@ class PaymentService(private val connection: Connection) {
     statement.setString(1, id)
     val resultSet = statement.executeQuery()
     return if (resultSet.next()) {
-      Currency(id = resultSet.getString("id"), acronym = resultSet.getString("acronym"))
+      Currency(
+        id = resultSet.getString("id"),
+        acronym = resultSet.getString("acronym"),
+        name = resultSet.getString("name"),
+        country_name = resultSet.getString("country_name"),
+        country_code = resultSet.getString("country_code"),
+      )
     } else {
       logger.warn("Currency not found with ID: $id")
       null
