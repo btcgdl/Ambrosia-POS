@@ -57,7 +57,6 @@ export function Onboarding() {
   }
 
   const handleComplete = async () => {
-    console.log("Datos del wizard:", data)
     try {
       await submitInitialSetup(data);
       addToast({
