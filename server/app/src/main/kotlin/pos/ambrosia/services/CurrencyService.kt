@@ -6,12 +6,12 @@ import pos.ambrosia.models.Currency
 
 class CurrencyService(private val connection: Connection) {
   companion object {
-    private const val SELECT_BY_ACRONYM = "SELECT id, acronym FROM currency WHERE acronym = ?"
-    private const val SELECT_ALL = "SELECT id, acronym FROM currency"
+    private const val SELECT_BY_ACRONYM = "SELECT id, acronym, name, country_name, country_code FROM currency WHERE acronym = ?"
+    private const val SELECT_ALL = "SELECT id, acronym, name, country_name, country_code FROM currency"
     private const val UPSERT_BASE = "INSERT OR REPLACE INTO base_currency (id, currency_id) VALUES (1, ?)"
     private const val SELECT_BASE_JOIN =
       """
-      SELECT c.id, c.acronym
+      SELECT c.id, c.acronym, c.name, c.country_name, c.country_code
       FROM base_currency b
       JOIN currency c ON c.id = b.currency_id
       WHERE b.id = 1
@@ -22,7 +22,15 @@ class CurrencyService(private val connection: Connection) {
     connection.prepareStatement(SELECT_BY_ACRONYM).use { st ->
       st.setString(1, acronym)
       val rs = st.executeQuery()
-      return if (rs.next()) Currency(id = rs.getString("id"), acronym = rs.getString("acronym")) else null
+      return if (rs.next())
+        Currency(
+          id = rs.getString("id"),
+          acronym = rs.getString("acronym"),
+          name = rs.getString("name"),
+          country_name = rs.getString("country_name"),
+          country_code = rs.getString("country_code"),
+        )
+      else null
     }
   }
 
@@ -30,7 +38,16 @@ class CurrencyService(private val connection: Connection) {
     val out = mutableListOf<Currency>()
     connection.prepareStatement(SELECT_ALL).use { st ->
       val rs = st.executeQuery()
-      while (rs.next()) out.add(Currency(id = rs.getString("id"), acronym = rs.getString("acronym")))
+      while (rs.next())
+        out.add(
+          Currency(
+            id = rs.getString("id"),
+            acronym = rs.getString("acronym"),
+            name = rs.getString("name"),
+            country_name = rs.getString("country_name"),
+            country_code = rs.getString("country_code"),
+          )
+        )
     }
     return out
   }
@@ -52,7 +69,15 @@ class CurrencyService(private val connection: Connection) {
   fun getBaseCurrency(): Currency? {
     connection.prepareStatement(SELECT_BASE_JOIN).use { st ->
       val rs = st.executeQuery()
-      return if (rs.next()) Currency(id = rs.getString("id"), acronym = rs.getString("acronym")) else null
+      return if (rs.next())
+        Currency(
+          id = rs.getString("id"),
+          acronym = rs.getString("acronym"),
+          name = rs.getString("name"),
+          country_name = rs.getString("country_name"),
+          country_code = rs.getString("country_code"),
+        )
+      else null
     }
   }
 }

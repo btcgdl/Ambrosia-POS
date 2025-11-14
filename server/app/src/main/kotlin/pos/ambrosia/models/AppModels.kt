@@ -177,6 +177,9 @@ data class Ticket(
 @Serializable data class Currency(
   val id: String? = null,
   val acronym: String,
+  val name: String? = null,
+  val country_name: String? = null,
+  val country_code: String? = null,
 )
 
 @Serializable data class TicketPayment(
