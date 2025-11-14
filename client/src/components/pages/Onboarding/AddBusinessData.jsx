@@ -16,10 +16,9 @@ export function BusinessDetailsStep({ data, onChange }) {
   const [CURRENCIES, setCURRENCIES] = useState(CURRENCIES_ES);
   const fileInputRef = useRef(null);
 
-
   const validateRFC = (value) => {
     const upperValue = value.toUpperCase();
-    const rfcRegex = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
+    const rfcRegex = /^[A-ZÑ&]{3,4}(?:\d{2})(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])[A-Z0-9]{3}$/;
 
     if (!upperValue) {
       setRfcError("");

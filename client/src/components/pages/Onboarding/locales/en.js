@@ -23,7 +23,13 @@ const onboarding_en = {
       userNameLabel: "User Name",
       userNamePlaceholder: "Enter your user name",
       passwordLabel: "Password",
-      passwordPlaceholder: "Enter a secure password"
+      passwordPlaceholder: "Enter a secure password",
+      userPinLabel: "PIN",
+      userPinPlaceholder: "Enter a 4-digit PIN"
+    },
+    tooltips: {
+      userPin: "To access the application.",
+      userPassword: "Required for performing important actions."
     },
     strength: {
       title: "Password Strength",
