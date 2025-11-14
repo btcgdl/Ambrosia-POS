@@ -42,8 +42,9 @@ export default async function proxy(request) {
     if (!evaluated) {
       setupIncomplete = false;
     }
-  } catch (_) {
+  } catch (error) {
     setupIncomplete = false;
+    console.error(error);
   }
 
   if (setupIncomplete && !isOnboardingRoute) {

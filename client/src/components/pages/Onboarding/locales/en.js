@@ -1,20 +1,25 @@
 const onboarding_en = {
+  submitOnboardingToast: {
+    title: "Success",
+    description: "The data is saved succesfully",
+  },
   buttons: {
     next: "Next",
     back: "Back",
-    finish: "Finish"
+    finish: "Finish",
   },
   step1: {
     title: "What type of business do you have?",
     subtitle: "Select your business type to personalize your experience.",
     businessType: {
       store: "Store",
-      restaurant: "Restaurant"
+      restaurant: "Restaurant",
     },
     descriptions: {
       store: "A retail business selling products directly to consumers.",
-      restaurant: "A food service business preparing and serving meals to customers."
-    }
+      restaurant:
+        "A food service business preparing and serving meals to customers.",
+    },
   },
   step2: {
     title: "Admin account",
@@ -25,20 +30,21 @@ const onboarding_en = {
       passwordLabel: "Password",
       passwordPlaceholder: "Enter a secure password",
       userPinLabel: "PIN",
-      userPinPlaceholder: "Enter a 4-digit PIN"
+      userPinPlaceholder: "Enter a 4-digit PIN",
     },
     tooltips: {
       userPin: "To access the application.",
-      userPassword: "Required for performing important actions."
+      userPassword: "Required for performing important actions.",
     },
     strength: {
       title: "Password Strength",
       weak: "Weak",
       regular: "Regular",
       good: "Good",
-      strong: "Strong"
+      strong: "Strong",
     },
-    passwordSecure: "The password must be at least 8 characters long, include uppercase, lowercase, numbers, and special characters.",
+    passwordSecure:
+      "The password must be at least 8 characters long, include uppercase, lowercase, numbers, and special characters.",
   },
   step3: {
     titleStore: "Store Details",
@@ -62,8 +68,8 @@ const onboarding_en = {
       businessLogoLabelStore: "Store logo",
       businessLogoLabelRestaurant: "Restaurant logo",
       businessLogoUpload: "Upload your logo",
-      businessLogoUploadMessage: "PNG, JPG or GIF (máx. 5MB)"
-    }
+      businessLogoUploadMessage: "PNG, JPG or GIF (máx. 5MB)",
+    },
   },
   step4: {
     title: "Summary of your setup",
@@ -72,12 +78,12 @@ const onboarding_en = {
       businessType: {
         title: "Business type",
         store: "Store",
-        restaurant: "Restaurant"
+        restaurant: "Restaurant",
       },
       adminAccount: {
         title: "Admin account",
         userName: "User Name",
-        password: "Password"
+        password: "Password",
       },
       businessDetails: {
         title: "Business details",
@@ -86,9 +92,9 @@ const onboarding_en = {
         businessPhone: "Phone",
         businessEmail: "Email",
         businessRFC: "RFC",
-        businessCurrency: "Currency"
-      }
-    }
-  }
-}
+        businessCurrency: "Currency",
+      },
+    },
+  },
+};
 export default onboarding_en;

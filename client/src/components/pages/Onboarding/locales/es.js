@@ -1,20 +1,26 @@
 const onboarding_es = {
+  submitOnboardingToast: {
+    title: "Guardado Exitoso",
+    description: "La información se almaceno correctamente",
+  },
   buttons: {
     next: "Siguiente",
     back: "Atrás",
-    finish: "Completar"
+    finish: "Completar",
   },
   step1: {
     title: "¿Qué tipo de negocio tienes?",
     subtitle: "Selecciona el tipo de negocio para personalizar tu experiencia.",
     businessType: {
       store: "Tienda",
-      restaurant: "Restaurante"
+      restaurant: "Restaurante",
     },
     descriptions: {
-      store: "Venta de productos al por menor. Ideal para tiendas de ropa, electrónica, etc.",
-      restaurant: "Servicio de alimentos y bebidas. Incluye gestión de mesas y pedidos."
-    }
+      store:
+        "Venta de productos al por menor. Ideal para tiendas de ropa, electrónica, etc.",
+      restaurant:
+        "Servicio de alimentos y bebidas. Incluye gestión de mesas y pedidos.",
+    },
   },
   step2: {
     title: "Cuenta de administrador",
@@ -25,20 +31,21 @@ const onboarding_es = {
       passwordLabel: "Contraseña",
       passwordPlaceholder: "Ingresa una contraseña segura",
       userPinLabel: "PIN",
-      userPinPlaceholder: "Ingresa un PIN de 4 dígitos"
+      userPinPlaceholder: "Ingresa un PIN de 4 dígitos",
     },
     tooltips: {
       userPin: "Sirve para accesar a la aplicación.",
-      userPassword: "Requerida para realizar acciones importantes."
+      userPassword: "Requerida para realizar acciones importantes.",
     },
-     strength: {
+    strength: {
       title: "Fortaleza",
       weak: "Debil",
       regular: "Regular",
       good: "Buena",
-      strong: "Fuerte"
+      strong: "Fuerte",
     },
-    passwordSecure: "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres especiales."
+    passwordSecure:
+      "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres especiales.",
   },
   step3: {
     titleStore: "Datos de la tienda",
@@ -62,8 +69,8 @@ const onboarding_es = {
       businessLogoLabelStore: "Logo de la tienda",
       businessLogoLabelRestaurant: "Logo del restaurante",
       businessLogoUpload: "Sube tu logo",
-      businessLogoUploadMessage: "PNG, JPG o GIF (máx. 5MB)"
-    }
+      businessLogoUploadMessage: "PNG, JPG o GIF (máx. 5MB)",
+    },
   },
   step4: {
     title: "Resumen de tu configuración",
@@ -72,12 +79,12 @@ const onboarding_es = {
       businessType: {
         title: "Tipo de negocio",
         store: "Tienda",
-        restaurant: "Restaurante"
+        restaurant: "Restaurante",
       },
       adminAccount: {
         title: "Cuenta de administrador",
         userName: "Nombre de usuario",
-        password: "Contraseña"
+        password: "Contraseña",
       },
       businessDetails: {
         title: "Detalles del negocio",
@@ -86,10 +93,10 @@ const onboarding_es = {
         businessPhone: "Teléfono",
         businessEmail: "Correo electrónico",
         businessRFC: "RFC",
-        businessCurrency: "Moneda"
-      }
-    }
-  }
-}
+        businessCurrency: "Moneda",
+      },
+    },
+  },
+};
 
 export default onboarding_es;
