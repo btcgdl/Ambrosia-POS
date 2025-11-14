@@ -27,6 +27,10 @@ const onboarding_es = {
       userPinLabel: "PIN",
       userPinPlaceholder: "Ingresa un PIN de 4 dígitos"
     },
+    tooltips: {
+      userPin: "Sirve para accesar a la aplicación.",
+      userPassword: "Requerida para realizar acciones importantes."
+    },
      strength: {
       title: "Fortaleza",
       weak: "Debil",
