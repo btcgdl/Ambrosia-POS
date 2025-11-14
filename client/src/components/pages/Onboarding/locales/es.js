@@ -23,7 +23,9 @@ const onboarding_es = {
       userNameLabel: "Nombre de Usuario",
       userNamePlaceholder: "Ingresa tu nombre de usuario",
       passwordLabel: "Contraseña",
-      passwordPlaceholder: "Ingresa una contraseña segura"
+      passwordPlaceholder: "Ingresa una contraseña segura",
+      userPinLabel: "PIN",
+      userPinPlaceholder: "Ingresa un PIN de 4 dígitos"
     },
      strength: {
       title: "Fortaleza",

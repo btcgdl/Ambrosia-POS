@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Button, Progress, Divider } from "@heroui/react";
+import { Button, Progress, Divider, user } from "@heroui/react";
 import { useTranslations } from "next-intl";
 import { BusinessTypeStep } from "./SelectBusiness";
 import { UserAccountStep } from "./AddUserAccount";
@@ -15,6 +15,7 @@ export function Onboarding() {
     businessType: "store",
     userName: "",
     userPassword: "",
+    userPin: "",
     businessName: "",
     businessAddress: "",
     businessPhone: "",
@@ -26,6 +27,10 @@ export function Onboarding() {
 
   function isPasswordStrong(password) {
     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
+  }
+
+  function isPinValid(pin) {
+    return /^\d{4}$/.test(pin);
   }
 
   function isRFCValid(rfc) {
@@ -87,6 +92,7 @@ export function Onboarding() {
               data={{
                 userName: data.userName,
                 userPassword: data.userPassword,
+                userPin: data.userPin,
               }}
               onChange={(userData) => handleDataChange(userData)}
             />
@@ -128,7 +134,7 @@ export function Onboarding() {
                 onPress={handleNext}
                 isDisabled={
                   (step === 1 && !data.businessType) ||
-                  (step === 2 && (!data.userName || !data.userPassword || isPasswordStrong(data.userPassword) === false)) ||
+                  (step === 2 && (!data.userName || !data.userPassword || !isPasswordStrong(data.userPassword) || !isPinValid(data.userPin))) ||
                   (step === 3 && (!data.businessName || !data.businessAddress || !data.businessRFC || !isRFCValid(data.businessRFC)))
                 }
                 className="gradient-forest text-white"

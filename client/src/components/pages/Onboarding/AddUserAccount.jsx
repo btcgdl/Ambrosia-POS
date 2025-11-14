@@ -8,6 +8,7 @@ import { Eye, EyeOff } from "lucide-react"
 export function UserAccountStep({ data, onChange }) {
   const t = useTranslations();
   const [showPassword, setShowPassword] = useState(false)
+  const [showPin, setShowPin] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState(0)
 
   const handlePasswordChange = (password) => {
@@ -53,6 +54,28 @@ export function UserAccountStep({ data, onChange }) {
         />
 
         <Input
+          label={t("step2.fields.userPinLabel")}
+          type={showPin ? "text" : "password"}
+          placeholder={t("step2.fields.userPinPlaceholder")}
+          maxLength={4}
+          value={data.userPin}
+          onChange={(e) => {
+            const onlyNumbers = e.target.value.replace(/\D/g, "");
+            onChange({ ...data, userPin: onlyNumbers });
+          }}
+          endContent={
+            <button
+              type="button"
+              onClick={() => setShowPin(!showPin)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              {showPin ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          }
+        />
+
+        <Input
+          aria-label="hide-show-password"
           label={t("step2.fields.passwordLabel")}
           type={showPassword ? "text" : "password"}
           placeholder={t("step2.fields.passwordPlaceholder")}
@@ -68,6 +91,7 @@ export function UserAccountStep({ data, onChange }) {
             </button>
           }
         />
+
         <div>
           {data.userPassword && (
             <div className="mt-3">
