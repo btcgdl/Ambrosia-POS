@@ -19,15 +19,15 @@ const config = {
   },
 
   // Set the production url of your site here
-  url: "https://btcgdl.github.io",
+  url: "https://olympus-btc.github.io",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: "/Ambrosia-POS/",
+  baseUrl: "/ambrosia/",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: "btcgdl", // Usually your GitHub org/user name.
-  projectName: "Ambrosia-POS", // Usually your repo name.
+  organizationName: "olympus-btc", // Usually your GitHub org/user name.
+  projectName: "ambrosia", // Usually your repo name.
 
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
