@@ -1,1 +1,1 @@
-export * from "./StoreLayout";
+export * from "./Store";

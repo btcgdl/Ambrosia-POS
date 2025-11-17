@@ -4,17 +4,20 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Users, Package, ShoppingCart, Settings, LogOut } from 'lucide-react';
+import { useTranslations } from "next-intl";
 import ambrosia from "../../../../public/ambrosia.svg";
 
-const storeNavItems = [
-  { path: "/store/users", label: "Usuarios", icon: Users },
-  { path: "/store/products", label: "Productos", icon: Package },
-  { path: "/store/cart", label: "Caja", icon: ShoppingCart },
-  { path: "/store/settings", label: "Configuración", icon: Settings },
-];
 
 export function StoreLayout({ children }) {
   const pathname = usePathname();
+  const t = useTranslations("navbar");
+
+  const storeNavItems = [
+    { path: "/store/users", label: t("users"), icon: Users },
+    { path: "/store/products", label: t("products"), icon: Package },
+    { path: "/store/cart", label: t("checkout"), icon: ShoppingCart },
+    { path: "/store/settings", label: t("settings"), icon: Settings },
+  ];
 
   return (
     <div className="flex min-h-screen">
@@ -56,7 +59,7 @@ export function StoreLayout({ children }) {
             className="flex text-2xl items-center space-x-2 p-2 rounded-md transition-colors text-slate-100 hover:bg-green-300 hover:text-green-800"
           >
             <LogOut className="w-7 h-7" />
-            <span className="pl-2">Cerrar sesión</span>
+            <span className="pl-2">{t("logout")}</span>
           </Link>
         </div>
       </aside>

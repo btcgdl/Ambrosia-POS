@@ -1,7 +1,7 @@
 "use client";
 
-import { StoreLayout } from "../../components/pages/Store";
+import { Store } from "../../components/pages/Store";
 
 export default function StorePage() {
-  return <StoreLayout />;
+  return <Store />;
 }
