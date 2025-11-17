@@ -1,25 +1,27 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { Users, Package, ShoppingCart, Settings, LogOut } from 'lucide-react';
+import ambrosia from "../../../../public/ambrosia.svg";
 
 const storeNavItems = [
-  { path: "/store/users", label: "Usuarios" },
-  { path: "/store/products", label: "Productos" },
-  { path: "/store/cart", label: "Caja" },
-  { path: "/store/settings", label: "Configuración" }, // placeholder
+  { path: "/store/users", label: "Usuarios", icon: Users },
+  { path: "/store/products", label: "Productos", icon: Package },
+  { path: "/store/cart", label: "Caja", icon: ShoppingCart },
+  { path: "/store/settings", label: "Configuración", icon: Settings },
 ];
 
-export default function StoreLayout({ children }) {
+export function StoreLayout({ children }) {
   const pathname = usePathname();
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="w-64 bg-[#d7f0c3] border-r border-gray-200">
-        <div className="p-4 border-b border-gray-200">
-          <h1 className="text-lg font-semibold">AMBROSIA</h1>
-          <p className="text-xs text-gray-600">Simple Store</p>
+      <aside className="w-64 bg-primary-500 relative">
+        <div className="p-4 border-b border-green-300">
+          <Image src={ambrosia} alt="ambrosia" />
+          <p className=" text-slate-100 text-center mt-4">LSS Hardware Shop</p>
         </div>
 
         <nav className="p-4">
@@ -33,13 +35,14 @@ export default function StoreLayout({ children }) {
                 <li key={item.path}>
                   <Link
                     href={item.path}
-                    className={`flex items-center space-x-2 p-2 rounded-md transition-colors ${
+                    className={`flex text-2xl items-center space-x-2 p-2 rounded-md transition-colors  hover:bg-green-300 hover:text-green-800 ${
                       isActive
-                        ? "bg-white text-green-800 font-semibold shadow-sm"
-                        : "hover:bg-gray-100 text-gray-800"
+                        ? "bg-green-300 text-green-800"
+                        : "text-slate-100"
                     }`}
                   >
-                    <span className="text-sm font-medium">{item.label}</span>
+                    <item.icon className="w-7 h-7" />
+                    <span className="pl-2">{item.label}</span>
                   </Link>
                 </li>
               );
@@ -47,16 +50,18 @@ export default function StoreLayout({ children }) {
           </ul>
         </nav>
 
-        <div className="mt-auto p-4 border-t border-green-200 text-sm">
-          <button className="w-full flex items-center justify-between text-gray-700 hover:text-green-800">
-            <span>Cerrar sesión</span>
-            <span>⏻</span>
-          </button>
+        <div className="mt-auto p-4 border-t border-green-300 text-sm absolute bottom-0 w-full">
+          <Link
+            href="/logout"
+            className="flex text-2xl items-center space-x-2 p-2 rounded-md transition-colors text-slate-100 hover:bg-green-300 hover:text-green-800"
+          >
+            <LogOut className="w-7 h-7" />
+            <span className="pl-2">Cerrar sesión</span>
+          </Link>
         </div>
       </aside>
 
-      {/* Store main content */}
-      <main className="flex-1 bg-[#e8f6df] p-6">{children}</main>
+      <main className="flex-1 gradient-fresh p-6">{children}</main>
     </div>
   );
 }
