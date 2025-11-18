@@ -2,6 +2,7 @@ import { findRouteConfig } from "../../../lib/modules";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 import LoadingCard from "../../../components/LoadingCard";
+import RequireOpenTurn from "../../../components/guards/RequireOpenTurn";
 
 export default async function ModuleSubPage({ params, searchParams }) {
   const { module, slug } = await params;
@@ -49,12 +50,24 @@ export default async function ModuleSubPage({ params, searchParams }) {
 
   // ✅ Solo pasar datos serializables
   return (
-    <ComponentToRender
-      moduleKey={routeConfig.module}
-      params={{ module, slug, ...dynamicParams }}
-      route={pathname}
-      dynamicParams={dynamicParams}
-      searchParams={resolvedSearchParams}
-    />
+    routeConfig.route.requiresOpenTurn ? (
+      <RequireOpenTurn>
+        <ComponentToRender
+          moduleKey={routeConfig.module}
+          params={{ module, slug, ...dynamicParams }}
+          route={pathname}
+          dynamicParams={dynamicParams}
+          searchParams={resolvedSearchParams}
+        />
+      </RequireOpenTurn>
+    ) : (
+      <ComponentToRender
+        moduleKey={routeConfig.module}
+        params={{ module, slug, ...dynamicParams }}
+        route={pathname}
+        dynamicParams={dynamicParams}
+        searchParams={resolvedSearchParams}
+      />
+    )
   );
 }
