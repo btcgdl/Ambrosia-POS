@@ -6,13 +6,17 @@ import { Languages } from "lucide-react"
 
 import onboarding_es from "../components/pages/Onboarding/locales/es.js";
 import onboarding_en from "../components/pages/Onboarding/locales/en.js";
+import store_es from "../components/pages/Store/locales/es.js";
+import store_en from "../components/pages/Store/locales/en.js";
 
 const translations = {
   en: {
-    onboarding: onboarding_en
+    onboarding: onboarding_en,
+    store: store_en,
   },
   es: {
-    onboarding: onboarding_es
+    onboarding: onboarding_es,
+    store: store_es,
   },
 }
 

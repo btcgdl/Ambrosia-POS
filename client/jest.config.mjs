@@ -8,6 +8,8 @@ const config = {
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
     "^@/(.*)$": "<rootDir>/$1",
     "^next-intl$": "<rootDir>/__tests__/__mocks__/next/next-intl.js",
+    "^next/image$": "<rootDir>/__tests__/__mocks__/next/image.js",
+    "\\.(svg)$": "<rootDir>/__tests__/__mocks__/svgMock.js",
   },
   transform: {
     "^.+\\.(js|jsx|ts|tsx)$": [
