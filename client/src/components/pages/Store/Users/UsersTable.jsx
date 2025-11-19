@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Button, Chip } from "@heroui/react";
 import { Pencil, Trash } from 'lucide-react';
 
-export function UsersTable({ users, onEditUser }) {
+export function UsersTable({ users, onEditUser, onDeleteUser }) {
   const t = useTranslations("users");
 
   return (
@@ -55,6 +55,7 @@ export function UsersTable({ users, onEditUser }) {
                   isIconOnly
                   color="danger"
                   className="text-xs text-white"
+                  onPress={() => onDeleteUser(user)}
                 >
                   <Trash />
                 </Button>

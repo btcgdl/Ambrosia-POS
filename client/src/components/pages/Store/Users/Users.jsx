@@ -7,6 +7,7 @@ import { StoreLayout } from "../StoreLayout";
 import { UsersTable } from "./UsersTable";
 import { AddUsersModal } from "./AddUsersModal";
 import { EditUsersModal } from "./EditUsersModal";
+import { DeleteUsersModal } from "./DeleteUsersModal";
 
 const USERS = [
   {
@@ -39,7 +40,9 @@ export function Users() {
 
   const [addUsersShowModal, setAddUsersShowModal] = useState(false);
   const [editUsersShowModal, setEditUsersShowModal] = useState(false);
+  const [deleteUsersShowModal, setDeleteUsersShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const [data, setData] = useState({
     userName: "",
@@ -61,6 +64,11 @@ export function Users() {
     });
 
     setEditUsersShowModal(true);
+  };
+
+  const handleDeleteUser = (user) => {
+    setUserToDelete(user);
+    setDeleteUsersShowModal(true);
   };
 
   const handleDataChange = (newData) => {
@@ -94,7 +102,8 @@ export function Users() {
       <div className="bg-white rounded-lg shadow-lg p-8">
         <UsersTable
           users={USERS}
-          onEditUser={handleEditUser} 
+          onEditUser={handleEditUser}
+          onDeleteUser={handleDeleteUser}
         />
       </div>
       {addUsersShowModal && (
@@ -116,6 +125,16 @@ export function Users() {
           onChange={handleDataChange}
           editUsersShowModal={editUsersShowModal}
           setEditUsersShowModal={setEditUsersShowModal}
+        />
+      )}
+      {deleteUsersShowModal && (
+        <DeleteUsersModal
+          user={userToDelete}
+          deleteUsersShowModal={deleteUsersShowModal}
+          setDeleteUsersShowModal={setDeleteUsersShowModal}
+          onConfirm={() => {
+            setDeleteUsersShowModal(false);
+          }}
         />
       )}
     </StoreLayout>
