@@ -28,6 +28,9 @@ const store_es = {
     modal: {
       titleAdd: "Agregar Usuario",
       titleEdit: "Editar Usuario",
+      titleDelete: "Eliminar Usuario",
+      subtitleDelete: "Estás seguro que deseas eliminar a",
+      warningDelete: "Esta acción no se puede deshacer.",
       userNameLabel: "Nombre",
       userNamePlaceholder: "Introduce el Nombre del Usuario",
       userPinLabel: "PIN",
@@ -40,6 +43,7 @@ const store_es = {
       submitButton: "Agregar",
       editButton: "Guardar",
       cancelButton: "Cancelar",
+      deleteButton: "Eliminar",
     }
   },
 };

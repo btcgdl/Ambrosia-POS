@@ -28,6 +28,9 @@ const store_en = {
     modal: {
       titleAdd: "Add User",
       titleEdit: "Edit User",
+      titleDelete: "Delete User",
+      subtitleDelete: "Are you sure you want to delete",
+      warningDelete: "This action cannot be undone.",
       userNameLabel: "Name",
       userNamePlaceholder: "Enter User Name",
       userPinLabel: "PIN",
@@ -40,6 +43,7 @@ const store_en = {
       submitButton: "Add",
       editButton: "Save",
       cancelButton: "Cancel",
+      deleteButton: "Delete",
     }
   },
 };

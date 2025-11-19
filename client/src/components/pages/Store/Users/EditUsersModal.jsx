@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Eye, EyeOff } from 'lucide-react';
-import { Button, Input, Select, SelectItem, Divider } from "@heroui/react";
+import { Button, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, } from "@heroui/react";
 
-export function EditUsersModal({ data, setData, roles, onChange, setEditUsersShowModal }) {
+export function EditUsersModal({ data, setData, roles, onChange, editUsersShowModal, setEditUsersShowModal }) {
   const t = useTranslations("users");
   const [showPin, setShowPin] = useState(false)
   const handleOnCloseModal = () => {
@@ -20,29 +20,34 @@ export function EditUsersModal({ data, setData, roles, onChange, setEditUsersSho
     setEditUsersShowModal(false)
   }
   return (
-    <div className="fixed inset-0 flex items-center justify-center">
-      <div className="w-full max-w-xl bg-white rounded-lg shadow-lg p-6 z-10">
-        <h2 className="text-xl font-semibold text-green-900 mb-4">
+    <Modal
+      isOpen={editUsersShowModal}
+      onOpenChange={setEditUsersShowModal}
+      backdrop="blur"
+      classNames={{
+        backdrop: "backdrop-blur-xs bg-white/10",
+      }}
+    >
+      <ModalContent>
+        <ModalHeader>
           {t("modal.titleEdit")}
-        </h2>
-        <Divider
-          className="mb-6 bg-green-600"
-        />
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            console.log("User data to submit:", data);
-            setData({
-              userName: "",
-              userPin: "",
-              userPhone: "",
-              userEmail: "",
-              userRole: "Vendedor",
-            });
-            setEditUsersShowModal(false);
-          }}
-        >
+        </ModalHeader>
+        <ModalBody>
+          <form
+            className="space-y-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              console.log("User data to submit:", data);
+              setData({
+                userName: "",
+                userPin: "",
+                userPhone: "",
+                userEmail: "",
+                userRole: "Vendedor",
+              });
+              setEditUsersShowModal(false);
+            }}
+          >
           <Input
             label={t("modal.userNameLabel")}
             type="text"
@@ -101,7 +106,7 @@ export function EditUsersModal({ data, setData, roles, onChange, setEditUsersSho
             ))}
           </Select>
 
-          <div className="mt-6 flex justify-between">
+          <ModalFooter className="flex justify-between p-0 my-4">
             <Button
               variant="bordered"
               type="button"
@@ -117,13 +122,10 @@ export function EditUsersModal({ data, setData, roles, onChange, setEditUsersSho
             >
               {t("modal.editButton")}
             </Button>
-          </div>
+          </ModalFooter>
         </form>
-      </div>
-      <div
-        className="fixed inset-0 flex items-center justify-center backdrop-blur-xs"
-        onClick={() => handleOnCloseModal()}
-      />
-    </div>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }
