@@ -9,7 +9,6 @@ export const modules = {
         component: "Roles",
         requiresAuth: true,
         requiresAdmin: true,
-        // permissions: ["roles.read"],
       },
       {
         path: "/users",
@@ -294,7 +293,6 @@ export function getAvailableModules(
   permissions = [],
 ) {
   const permNames = new Set((permissions || []).map((p) => p.name));
-  console.log("permisos en getava", permNames);
   const availableModules = {};
 
   Object.entries(modules).forEach(([moduleKey, moduleConfig]) => {
