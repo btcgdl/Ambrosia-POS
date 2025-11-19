@@ -14,7 +14,32 @@ const store_es = {
       products: "Productos",
       sales: "Ventas",
     },
-  }
+  },
+  users: {
+    title: "Usuarios",
+    subtitle: "Gestiona el personal de tu tienda",
+    addUser: "Agregar Usuario",
+    name: "Nombre",
+    role: "Rol",
+    email: "Email",
+    phone: "Teléfono",
+    status: "Estado",
+    actions: "Acciones",
+    modal: {
+      title: "Agregar Usuario",
+      userNameLabel: "Nombre",
+      userNamePlaceholder: "Introduce el Nombre del Usuario",
+      userPinLabel: "PIN",
+      userPinPlaceholder: "Introduce un PIN de 4 dígitos",
+      userPhoneLabel: "Teléfono",
+      userPhonePlaceholder: "Ej: 3312345678",
+      userEmailLabel: "Email",
+      userEmailPlaceholder: "contact@awesomebusiness.com",
+      userRoleLabel: "Rol",
+      submitButton: "Agregar",
+      cancelButton: "Cancelar",
+    }
+  },
 };
 
 export default store_es;
