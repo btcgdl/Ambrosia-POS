@@ -26,7 +26,6 @@ export function UserAccountStep({ data, onChange }) {
     if (passwordStrength === 0) return "bg-muted"
     if (passwordStrength === 1) return "bg-red-500"
     if (passwordStrength === 2) return "bg-yellow-500"
-    /* Updated password strength colors to use green palette */
     if (passwordStrength === 3) return "bg-emerald-500"
     return "bg-green-600"
   }
