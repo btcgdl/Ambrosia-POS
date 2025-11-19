@@ -4,7 +4,6 @@ export default async function proxy(request) {
   const { pathname } = new URL(request.url);
   const refreshToken = request.cookies.get("refreshToken");
 
-  console.log("middleware running");
   const isAuthRoute = pathname.startsWith("/auth");
   const isApiRoute = pathname.startsWith("/api");
   const isOnboardingRoute = pathname.startsWith("/onboarding");
@@ -67,7 +66,28 @@ export default async function proxy(request) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  return NextResponse.next();
+  let businessType = null;
+  try {
+    const headers = { cookie: request.headers.get("cookie") || "" };
+    const configUrl = new URL("/api/config", request.url);
+    const res = await fetch(configUrl, { headers });
+    if (res.ok) {
+      const data = await res.json();
+      const bt = data?.businessType;
+      if (bt === "store" || bt === "restaurant") {
+        businessType = bt;
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  const next = NextResponse.next();
+  if (businessType) {
+    next.headers.set("x-business-type", businessType);
+    next.cookies.set("businessType", businessType, { path: "/" });
+  }
+  return next;
 }
 
 export const config = {

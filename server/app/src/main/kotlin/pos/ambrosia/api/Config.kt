@@ -19,7 +19,6 @@ fun Application.configureConfig() {
 }
 
 fun Route.config(configService: ConfigService) {
-  authorizePermission("settings_read") {
     get("") {
       val config = configService.getConfig()
       if (config == null) {
@@ -28,7 +27,6 @@ fun Route.config(configService: ConfigService) {
       }
       call.respond(HttpStatusCode.OK, config)
     }
-  }
   authorizePermission("settings_update") {
     put("") {
       val config = call.receive<Config>()

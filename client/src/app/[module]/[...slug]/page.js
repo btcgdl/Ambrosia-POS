@@ -2,6 +2,7 @@ import { findRouteConfig } from "../../../lib/modules";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 import LoadingCard from "../../../components/LoadingCard";
+import { ModuleWrapper } from "../../../components/auth/ModuleWrapper";
 
 export default async function ModuleSubPage({ params, searchParams }) {
   const { module, slug } = await params;
@@ -49,12 +50,14 @@ export default async function ModuleSubPage({ params, searchParams }) {
 
   // ✅ Solo pasar datos serializables
   return (
-    <ComponentToRender
-      moduleKey={routeConfig.module}
-      params={{ module, slug, ...dynamicParams }}
-      route={pathname}
-      dynamicParams={dynamicParams}
-      searchParams={resolvedSearchParams}
-    />
+    <ModuleWrapper>
+      <ComponentToRender
+        moduleKey={routeConfig.module}
+        params={{ module, slug, ...dynamicParams }}
+        route={pathname}
+        dynamicParams={dynamicParams}
+        searchParams={resolvedSearchParams}
+      />
+    </ModuleWrapper>
   );
 }

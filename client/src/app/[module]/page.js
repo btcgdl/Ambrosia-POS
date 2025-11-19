@@ -2,6 +2,7 @@ import { modules, findRouteConfig } from "../../lib/modules";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 import LoadingCard from "../../components/LoadingCard";
+import { ModuleWrapper } from "../../components/auth/ModuleWrapper";
 
 export function generateStaticParams() {
   return Object.keys(modules)
@@ -18,25 +19,28 @@ export default async function ModulePage({ params }) {
     notFound();
   }
 
-  // Determinar la carpeta del componente
   const componentPath =
     routeConfig.moduleConfig.componentPath || routeConfig.module;
 
-  // Cargar el componente dinámicamente desde la carpeta correcta
   const ComponentToRender = dynamic(
     () =>
       import(`../../modules/${componentPath}/${routeConfig.route.component}`),
     {
-      loading: () => <LoadingCard message={`Cargando ${modules[routeConfig.module].name}...`} />,
+      loading: () => (
+        <LoadingCard
+          message={`Cargando ${modules[routeConfig.module].name}...`}
+        />
+      ),
       ssr: true,
     },
   );
 
-  // ✅ Solo pasar datos serializables
   return (
-    <ComponentToRender
-      moduleKey={routeConfig.module}
-      moduleName={routeConfig.moduleConfig.name}
-    />
+    <ModuleWrapper>
+      <ComponentToRender
+        moduleKey={routeConfig.module}
+        moduleName={routeConfig.moduleConfig.name}
+      />
+    </ModuleWrapper>
   );
 }
