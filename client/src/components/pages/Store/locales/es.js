@@ -26,7 +26,8 @@ const store_es = {
     status: "Estado",
     actions: "Acciones",
     modal: {
-      title: "Agregar Usuario",
+      titleAdd: "Agregar Usuario",
+      titleEdit: "Editar Usuario",
       userNameLabel: "Nombre",
       userNamePlaceholder: "Introduce el Nombre del Usuario",
       userPinLabel: "PIN",
@@ -37,6 +38,7 @@ const store_es = {
       userEmailPlaceholder: "contact@awesomebusiness.com",
       userRoleLabel: "Rol",
       submitButton: "Agregar",
+      editButton: "Guardar",
       cancelButton: "Cancelar",
     }
   },

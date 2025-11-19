@@ -1,7 +1,7 @@
 "use client";
 
-import UsersPage from "@/components/pages/Store/Users/UsersPage";
+import { Users } from "@/components/pages/Store/Users";
 
 export default function StoreUsersPage() {
-  return <UsersPage />;
+  return <Users />;
 }

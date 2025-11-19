@@ -6,6 +6,7 @@ import { Button } from "@heroui/react";
 import { StoreLayout } from "../StoreLayout";
 import { UsersTable } from "./UsersTable";
 import { AddUsersModal } from "./AddUsersModal";
+import { EditUsersModal } from "./EditUsersModal";
 
 const USERS = [
   {
@@ -34,9 +35,12 @@ const USERS = [
   },
 ];
 
-export default function UsersPage() {
+export function Users() {
 
-  const [showModal, setShowModal] = useState(false);
+  const [addUsersShowModal, setAddUsersShowModal] = useState(false);
+  const [editUsersShowModal, setEditUsersShowModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
   const [data, setData] = useState({
     userName: "",
     userPin: "",
@@ -44,6 +48,21 @@ export default function UsersPage() {
     userEmail: "",
     userRole: "Vendedor",
   })
+
+  const handleEditUser = (user) => {
+    setSelectedUser(user);
+
+    setData({
+      userName: user.name,
+      userPin: "",
+      userPhone: user.phone,
+      userEmail: user.email,
+      userRole: user.role,
+    });
+
+    setEditUsersShowModal(true);
+  };
+
   const handleDataChange = (newData) => {
     setData((prev) => ({ ...prev, ...newData }))
   }
@@ -67,22 +86,36 @@ export default function UsersPage() {
         <Button
           color="primary"
           className="bg-green-800"
-          onPress={() => setShowModal(true)}
+          onPress={() => setAddUsersShowModal(true)}
         >
           {t("addUser")}
         </Button>
       </header>
       <div className="bg-white rounded-lg shadow-lg p-8">
-        <UsersTable users={USERS} />
+        <UsersTable
+          users={USERS}
+          onEditUser={handleEditUser} 
+        />
       </div>
-      {showModal && (
+      {addUsersShowModal && (
         <AddUsersModal
           data={data}
           setData={setData}
           roles={ROLES}
           onChange={handleDataChange}
-          showModal={showModal}
-          setShowModal={setShowModal}
+          addUsersShowModal={addUsersShowModal}
+          setAddUsersShowModal={setAddUsersShowModal}
+        />
+      )}
+      {editUsersShowModal && (
+        <EditUsersModal
+          data={data}
+          setData={setData}
+          roles={ROLES}
+          user={selectedUser}
+          onChange={handleDataChange}
+          editUsersShowModal={editUsersShowModal}
+          setEditUsersShowModal={setEditUsersShowModal}
         />
       )}
     </StoreLayout>

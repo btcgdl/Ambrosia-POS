@@ -5,14 +5,25 @@ import { useTranslations } from "next-intl";
 import { Eye, EyeOff } from 'lucide-react';
 import { Button, Input, Select, SelectItem, Divider } from "@heroui/react";
 
-export function AddUsersModal({ data, setData, roles, onChange, setAddUsersShowModal }) {
+export function EditUsersModal({ data, setData, roles, onChange, setEditUsersShowModal }) {
   const t = useTranslations("users");
   const [showPin, setShowPin] = useState(false)
+  const handleOnCloseModal = () => {
+    setData({
+      userName: "",
+      userPin: "",
+      userPhone: "",
+      userEmail: "",
+      userRole: "Vendedor",
+    });
+
+    setEditUsersShowModal(false)
+  }
   return (
     <div className="fixed inset-0 flex items-center justify-center">
       <div className="w-full max-w-xl bg-white rounded-lg shadow-lg p-6 z-10">
         <h2 className="text-xl font-semibold text-green-900 mb-4">
-          {t("modal.titleAdd")}
+          {t("modal.titleEdit")}
         </h2>
         <Divider
           className="mb-6 bg-green-600"
@@ -29,7 +40,7 @@ export function AddUsersModal({ data, setData, roles, onChange, setAddUsersShowM
               userEmail: "",
               userRole: "Vendedor",
             });
-            setAddUsersShowModal(false);
+            setEditUsersShowModal(false);
           }}
         >
           <Input
@@ -95,7 +106,7 @@ export function AddUsersModal({ data, setData, roles, onChange, setAddUsersShowM
               variant="bordered"
               type="button"
               className="px-6 py-2 border border-border text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              onPress={() => setAddUsersShowModal(false)}
+              onPress={() => handleOnCloseModal()}
             >
               {t("modal.cancelButton")}
             </Button>
@@ -104,14 +115,14 @@ export function AddUsersModal({ data, setData, roles, onChange, setAddUsersShowM
               className="bg-green-800"
               type="submit"
             >
-              {t("modal.submitButton")}
+              {t("modal.editButton")}
             </Button>
           </div>
         </form>
       </div>
       <div
         className="fixed inset-0 flex items-center justify-center backdrop-blur-xs"
-        onClick={() => setAddUsersShowModal(false)}
+        onClick={() => handleOnCloseModal()}
       />
     </div>
   );
