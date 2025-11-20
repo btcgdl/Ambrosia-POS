@@ -45,6 +45,7 @@ export function UsersTable({ users, onEditUser, onDeleteUser }) {
               </td>
               <td className="flex justify-end space-x-4 py-2 px-3">
                 <Button
+                  aria-label="Edit User"
                   isIconOnly
                   className="text-xs text-white bg-blue-500"
                   onPress={() => onEditUser(user)}
@@ -52,6 +53,7 @@ export function UsersTable({ users, onEditUser, onDeleteUser }) {
                   <Pencil />
                 </Button>
                 <Button
+                  aria-label="Delete User"
                   isIconOnly
                   color="danger"
                   className="text-xs text-white"
