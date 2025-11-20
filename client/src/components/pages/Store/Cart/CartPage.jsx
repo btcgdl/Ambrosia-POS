@@ -1,6 +1,6 @@
 "use client";
 
-import StoreLayout from "../StoreLayout";
+import { StoreLayout } from "../StoreLayout";
 
 const PRODUCTS = [
   {

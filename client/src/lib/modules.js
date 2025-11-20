@@ -200,6 +200,36 @@ export const modules = {
       },
     ],
   },
+  store: {
+    enabled: true,
+    name: "Store",
+    componentBase: "components/pages",
+    componentPath: "Store",
+    routes: [
+      {
+        path: "/store",
+        component: "Store",
+        requiresAuth: true,
+        requiresAdmin: false,
+        types: ["store"],
+        default: true,
+      },
+    ],
+    navItems: [
+      {
+        path: "/store",
+        label: "Inicio Store",
+        icon: "store",
+        showInNavbar: true,
+      },
+      {
+        path: "/store/dashboard",
+        label: "Dashboard",
+        icon: "layout-dashboard",
+        showInNavbar: true,
+      },
+    ],
+  },
 };
 
 export function getActiveModules() {
@@ -317,7 +347,6 @@ export function getAvailableModules(
   businessType = null,
 ) {
   const permNames = new Set((permissions || []).map((p) => p.name));
-  console.log("permisos en getava", permNames);
   const availableModules = {};
 
   Object.entries(modules).forEach(([moduleKey, moduleConfig]) => {
