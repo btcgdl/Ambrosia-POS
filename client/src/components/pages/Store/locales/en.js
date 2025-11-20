@@ -3,6 +3,7 @@ const store_en = {
     users: "Users",
     products: "Products",
     checkout: "Checkout",
+    wallet: "Wallet",
     settings: "Settings",
     logout: "Log Out",
   },
@@ -44,7 +45,7 @@ const store_en = {
       editButton: "Save",
       cancelButton: "Cancel",
       deleteButton: "Delete",
-    }
+    },
   },
 };
 

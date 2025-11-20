@@ -100,7 +100,7 @@ export const modules = {
       },
       {
         path: "/wallet",
-        label: "Cartera",
+        label: "wallet",
         icon: "wallet",
         showInNavbar: true,
       },
@@ -225,14 +225,8 @@ export const modules = {
     ],
     navItems: [
       {
-        path: "/store",
-        label: "Inicio Store",
-        icon: "store",
-        showInNavbar: true,
-      },
-      {
-        path: "/store/Users",
-        label: "Users",
+        path: "/store/users",
+        label: "users",
         icon: "users",
         showInNavbar: true,
       },
