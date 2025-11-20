@@ -44,7 +44,7 @@ class AuthService(
       val isValidPin = SecurePinProcessor.verifyPin(pin, userIdString, storedPinHash, env)
       pin.fill('\u0000') // Limpiar PIN de memoria
 
-      logger.info("SAuthentication result for user pin: $isValidPin")
+      logger.info("Authentication result for user pin: $isValidPin")
       if (isValidPin) {
         return AuthResponse(
           id = userIdString,
