@@ -1,7 +1,10 @@
-import { findRouteConfig } from "../../../lib/modules";
+import { findRouteConfig, matchesBusiness } from "../../../lib/modules";
 import { notFound } from "next/navigation";
-import dynamic from "next/dynamic";
-import LoadingCard from "../../../components/LoadingCard";
+import DynamicModuleRenderer from "../../../components/DynamicModuleRenderer";
+import { cookies } from "next/headers";
+
+export const dynamic = "force-dynamic";
+import { ModuleWrapper } from "../../../components/auth/ModuleWrapper";
 
 export default async function ModuleSubPage({ params, searchParams }) {
   const { module, slug } = await params;
@@ -10,6 +13,15 @@ export default async function ModuleSubPage({ params, searchParams }) {
 
   const routeConfig = findRouteConfig(pathname);
   if (!routeConfig) {
+    notFound();
+  }
+
+  const cookieStore = await cookies();
+  const businessType = cookieStore.get("businessType")?.value || null;
+  const routePath = routeConfig?.route?.path || pathname;
+  if (
+    !matchesBusiness({ path: routePath, ...routeConfig.route }, businessType)
+  ) {
     notFound();
   }
 
@@ -34,27 +46,24 @@ export default async function ModuleSubPage({ params, searchParams }) {
   // Determinar la carpeta del componente
   const componentPath =
     routeConfig.moduleConfig.componentPath || routeConfig.module;
-
-  // Cargar componente específico desde la carpeta correcta
-  const ComponentToRender = dynamic(
-    () =>
-      import(
-        `../../../modules/${componentPath}/${routeConfig.route.component}`
-      ),
-    {
-      loading: () => <LoadingCard message="Cargando componente..." />,
-      ssr: true,
-    },
-  );
+  const componentBase = routeConfig.moduleConfig.componentBase || "modules"; // allow switching base dir (e.g., "components/pages")
 
   // ✅ Solo pasar datos serializables
   return (
-    <ComponentToRender
-      moduleKey={routeConfig.module}
-      params={{ module, slug, ...dynamicParams }}
-      route={pathname}
-      dynamicParams={dynamicParams}
-      searchParams={resolvedSearchParams}
-    />
+    <ModuleWrapper>
+      <DynamicModuleRenderer
+        componentBase={componentBase}
+        componentPath={componentPath}
+        componentFile={routeConfig.route.component}
+        loadingMessage="Cargando componente..."
+        passProps={{
+          moduleKey: routeConfig.module,
+          params: { module, slug, ...dynamicParams },
+          route: pathname,
+          dynamicParams,
+          searchParams: resolvedSearchParams,
+        }}
+      />
+    </ModuleWrapper>
   );
 }

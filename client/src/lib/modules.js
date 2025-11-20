@@ -5,14 +5,13 @@ export const modules = {
     routes: [
       { path: "/auth", component: "PinLogin", requiresAuth: false },
       {
-        path: "/roles",
+        path: "/restaurant/roles",
         component: "Roles",
         requiresAuth: true,
         requiresAdmin: true,
-        // permissions: ["roles.read"],
       },
       {
-        path: "/users",
+        path: "/restaurant/users",
         component: "Users",
         requiresAuth: true,
         requiresAdmin: false,
@@ -22,13 +21,13 @@ export const modules = {
     services: () => import("../modules/auth/authService"),
     navItems: [
       {
-        path: "/roles",
+        path: "/restaurant/roles",
         label: "Roles",
         icon: "user-lock",
         showInNavbar: true,
       },
       {
-        path: "/users",
+        path: "/restaurant/users",
         label: "Usuarios",
         icon: "users",
         showInNavbar: true,
@@ -40,7 +39,7 @@ export const modules = {
     name: "Platillos",
     routes: [
       {
-        path: "/dishes",
+        path: "/restaurant/dishes",
         component: "Dishes",
         requiresAuth: true,
         requiresAdmin: true,
@@ -49,7 +48,7 @@ export const modules = {
     services: () => import("../modules/dishes/dishesService"),
     navItems: [
       {
-        path: "/dishes",
+        path: "/restaurant/dishes",
         label: "Platillos",
         icon: "salad",
         showInNavbar: true,
@@ -118,13 +117,14 @@ export const modules = {
     name: "Ordenes",
     routes: [
       {
-        path: "/all-orders",
+        path: "/restaurant/all-orders",
         component: "Orders",
         requiresAuth: true,
         requiresAdmin: false,
+        default: true,
       },
       {
-        path: "/modify-order/:pedidoId",
+        path: "/restaurant/modify-order/:pedidoId",
         component: "EditOrder",
         requiresAuth: true,
         requiresAdmin: false,
@@ -133,7 +133,7 @@ export const modules = {
     services: () => import("../modules/orders/ordersService"),
     navItems: [
       {
-        path: "/all-orders",
+        path: "/restaurant/all-orders",
         label: "Ordenes",
         icon: "clipboard-clock",
         showInNavbar: true,
@@ -145,19 +145,19 @@ export const modules = {
     name: "Salas",
     routes: [
       {
-        path: "/rooms",
+        path: "/restaurant/rooms",
         component: "Rooms",
         requiresAuth: true,
         requiresAdmin: false,
       },
       {
-        path: "/tables/:roomId",
+        path: "/restaurant/tables/:roomId",
         component: "Tables",
         requiresAuth: true,
         requiresAdmin: false,
       },
       {
-        path: "/spaces",
+        path: "/restaurant/spaces",
         component: "Spaces",
         requiresAuth: true,
         requiresAdmin: true,
@@ -166,13 +166,13 @@ export const modules = {
     services: () => import("../modules/spaces/spacesService"),
     navItems: [
       {
-        path: "/rooms",
+        path: "/restaurant/rooms",
         label: "Ver Salas",
         icon: "building",
         showInNavbar: false,
       },
       {
-        path: "/spaces",
+        path: "/restaurant/spaces",
         label: "Administrar Espacios",
         icon: "door-open",
         showInNavbar: true,
@@ -196,6 +196,36 @@ export const modules = {
         path: "/color-test",
         label: "Ver colores",
         icon: "building",
+        showInNavbar: true,
+      },
+    ],
+  },
+  store: {
+    enabled: true,
+    name: "Store",
+    componentBase: "components/pages",
+    componentPath: "Store",
+    routes: [
+      {
+        path: "/store",
+        component: "Store",
+        requiresAuth: true,
+        requiresAdmin: false,
+        types: ["store"],
+        default: true,
+      },
+    ],
+    navItems: [
+      {
+        path: "/store",
+        label: "Inicio Store",
+        icon: "store",
+        showInNavbar: true,
+      },
+      {
+        path: "/store/dashboard",
+        label: "Dashboard",
+        icon: "layout-dashboard",
         showInNavbar: true,
       },
     ],
@@ -253,7 +283,31 @@ export function findRouteConfig(pathname) {
   return null;
 }
 
-export function getNavigationItems(permissions = [], isAdmin = false) {
+export function matchesBusiness(target, businessType) {
+  if (!businessType) return true;
+  if (target && typeof target === "object") {
+    const types = Array.isArray(target.types) ? target.types : null;
+    if (types && types.length > 0) return types.includes(businessType);
+    const path = target.path;
+    if (typeof path === "string") {
+      if (path.startsWith("/restaurant/")) return businessType === "restaurant";
+      if (path.startsWith("/store/")) return businessType === "store";
+    }
+    return true;
+  }
+  if (typeof target === "string") {
+    const path = target;
+    if (path.startsWith("/restaurant/")) return businessType === "restaurant";
+    if (path.startsWith("/store/")) return businessType === "store";
+  }
+  return true;
+}
+
+export function getNavigationItems(
+  permissions = [],
+  isAdmin = false,
+  businessType = null,
+) {
   const navItems = [];
   const permNames = new Set((permissions || []).map((p) => p.name));
 
@@ -263,8 +317,8 @@ export function getNavigationItems(permissions = [], isAdmin = false) {
 
     config.navItems?.forEach((item) => {
       if (item.showInNavbar === false) return;
+      if (!matchesBusiness(item.path, businessType)) return;
 
-      // Determinar permisos y admin requeridos usando la ruta correspondiente si existe
       const route =
         (config.routes || []).find((r) => r.path === item.path) || {};
       const requiresAdmin = item.requiresAdmin || route.requiresAdmin || false;
@@ -290,15 +344,16 @@ export function getAvailableModules(
   isAuthenticated = false,
   isAdmin = false,
   permissions = [],
+  businessType = null,
 ) {
   const permNames = new Set((permissions || []).map((p) => p.name));
-  console.log("permisos en getava", permNames);
   const availableModules = {};
 
   Object.entries(modules).forEach(([moduleKey, moduleConfig]) => {
     if (!moduleConfig.enabled) return;
 
     const availableRoutes = moduleConfig.routes.filter((route) => {
+      if (!matchesBusiness(route, businessType)) return false;
       if (!route.requiresAuth) return true;
 
       if (route.requiresAuth && !isAuthenticated) return false;
@@ -316,10 +371,11 @@ export function getAvailableModules(
       (navItem) => {
         if (!isAuthenticated) return false;
         if (navItem.showInNavbar === false) return false;
-        // Empatar con la ruta para heredar requiresAdmin/permisos si el navItem no los define
         const route =
           (moduleConfig.routes || []).find((r) => r.path === navItem.path) ||
           {};
+        if (!matchesBusiness(navItem, businessType)) return false;
+        if (!matchesBusiness(route, businessType)) return false;
         const requiresAdmin =
           navItem.requiresAdmin || route.requiresAdmin || false;
         if (requiresAdmin && !isAdmin) return false;
@@ -347,11 +403,13 @@ export function getAvailableNavigation(
   isAuthenticated = false,
   isAdmin = false,
   permissions = [],
+  businessType = null,
 ) {
   const availableModules = getAvailableModules(
     isAuthenticated,
     isAdmin,
     permissions,
+    businessType,
   );
   const navItems = [];
 
@@ -372,9 +430,11 @@ export function hasAccessToRoute(
   isAuthenticated = false,
   isAdmin = false,
   permissions = [],
+  businessType = null,
 ) {
   const routeConfig = findRouteConfig(pathname);
   if (!routeConfig) return false;
+  if (!matchesBusiness(routeConfig.route || {}, businessType)) return false;
 
   const permNames = new Set((permissions || []).map((p) => p.name));
   const route = routeConfig.route;

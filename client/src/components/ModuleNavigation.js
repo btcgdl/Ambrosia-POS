@@ -5,6 +5,7 @@ import { useModules } from "../hooks/useModules";
 import { getHomeRoute } from "../lib/getHomeRoute";
 import LoadingCard from "./LoadingCard";
 import * as LucideIcons from "lucide-react";
+import { useConfigurations } from "../providers/configurations/configurationsProvider";
 
 // Componente para iconos Lucide React dinámico
 function Icon({ name, className = "w-5 h-5" }) {
@@ -39,6 +40,7 @@ export default function ModuleNavigation({ children, show }) {
   const router = useRouter();
   const { availableNavigation, isAuth, isAdmin, user, logout, isLoading } =
     useModules();
+  const { businessType } = useConfigurations();
 
   // Si está cargando, mostrar spinner
   if (isLoading) {
@@ -54,7 +56,7 @@ export default function ModuleNavigation({ children, show }) {
       <aside className="w-1/6 h-full bg-primary-500 flex flex-col">
         <div className="h-[25%] flex flex-col items-center justify-end pb-4">
           <Link
-            href={isAuth ? getHomeRoute(user) : "/auth"}
+            href={isAuth ? getHomeRoute(user, businessType) : "/auth"}
             className="group"
           >
             <LucideIcons.Home className="w-24 h-24 text-white cursor-pointer group-hover:scale-110 transition-transform" />

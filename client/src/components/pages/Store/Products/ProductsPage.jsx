@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import StoreLayout from "../StoreLayout";
+import { StoreLayout } from "../StoreLayout";
 
 const PRODUCTS = [
   {

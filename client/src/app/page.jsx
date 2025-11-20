@@ -5,19 +5,21 @@ import { useContext } from "react";
 import { AuthContext } from "../modules/auth/AuthProvider";
 import { getHomeRoute } from "../lib/getHomeRoute";
 import LoadingCard from "../components/LoadingCard";
+import { useConfigurations } from "../providers/configurations/configurationsProvider";
 
 export default function HomePage() {
   const router = useRouter();
   const { user, isLoading, isAuth } = useContext(AuthContext);
+  const { businessType } = useConfigurations();
 
   useEffect(() => {
     if (isLoading) {
       return;
     }
 
-    const homeRoute = getHomeRoute(user);
+    const homeRoute = getHomeRoute(user, businessType);
     router.replace(homeRoute);
-  }, [user, isAuth, isLoading, router]);
+  }, [user, isAuth, isLoading, router, businessType]);
 
   return (
     <LoadingCard
