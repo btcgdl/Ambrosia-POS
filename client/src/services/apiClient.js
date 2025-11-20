@@ -16,7 +16,8 @@ export async function apiClient(
     credentials = "include",
     timeout = DEFAULT_TIMEOUT,
     skipRefresh = false,
-    silentAuth = false
+    silentAuth = false,
+    notShowError = true,
   } = {},
 ) {
   const controller = new AbortController();
@@ -47,7 +48,12 @@ export async function apiClient(
     const isAuthEndpoint = endpoint.startsWith("/auth");
     const isWalletEndpoint = endpoint.startsWith("/wallet");
 
-    if (response.status === 401 && !isAuthEndpoint && !isWalletEndpoint && !skipRefresh) {
+    if (
+      response.status === 401 &&
+      !isAuthEndpoint &&
+      !isWalletEndpoint &&
+      !skipRefresh
+    ) {
       const refreshed = await handleTokenRefresh();
 
       if (refreshed) {
@@ -67,7 +73,6 @@ export async function apiClient(
     }
 
     return data;
-
   } catch (error) {
     clearTimeout(timeoutId);
 
@@ -85,9 +90,11 @@ export async function apiClient(
     }
 
     const isLoginEndpoint = endpoint.startsWith("/auth/login");
-    const isSilentError = ["AUTH_EXPIRED", "UNAUTHORIZED", "TIMEOUT"].includes(error.message);
+    const isSilentError = ["AUTH_EXPIRED", "UNAUTHORIZED", "TIMEOUT"].includes(
+      error.message,
+    );
 
-    if (!isLoginEndpoint && !isSilentError) {
+    if (!isLoginEndpoint && !isSilentError && !notShowError) {
       addToast({
         title: "Error",
         description: error.message || "Error de conexión",
@@ -148,7 +155,10 @@ async function handleHttpError(status, endpoint, data, silentAuth = false) {
   // 401: No autenticado -> intentar refresh (ya hecho antes) o cerrar sesión
   if (status === 401) {
     if (isAuthEndpoint) {
-      const msg = typeof data === "string" ? data : data?.message || "Credenciales inválidas";
+      const msg =
+        typeof data === "string"
+          ? data
+          : data?.message || "Credenciales inválidas";
       const error = new Error(msg);
       error.status = status;
       throw error;
@@ -178,7 +188,8 @@ async function handleHttpError(status, endpoint, data, silentAuth = false) {
   // 403: Prohibido (sin permisos) -> NO cerrar sesión; navegar a /unauthorized
   if (status === 403) {
     if (isAuthEndpoint) {
-      const msg = typeof data === "string" ? data : data?.message || "No autorizado";
+      const msg =
+        typeof data === "string" ? data : data?.message || "No autorizado";
       const error = new Error(msg);
       error.status = status;
       throw error;
@@ -208,7 +219,8 @@ async function handleHttpError(status, endpoint, data, silentAuth = false) {
 function extractErrorMessage(data, status) {
   if (typeof data === "string") return data;
   if (data?.message) return data.message;
-  if (data?.error) return typeof data.error === "string" ? data.error : data.error.message;
+  if (data?.error)
+    return typeof data.error === "string" ? data.error : data.error.message;
 
   const statusMessages = {
     400: "Solicitud inválida",
@@ -228,8 +240,7 @@ async function performLogout() {
       credentials: "include",
       signal: AbortSignal.timeout(5000),
     });
-  } catch {
-  }
+  } catch {}
 }
 
 function dispatchAuthEvent(eventName, detail = null) {

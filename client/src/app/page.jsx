@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { AuthContext } from "../modules/auth/AuthProvider";
@@ -10,20 +10,33 @@ import { useConfigurations } from "../providers/configurations/configurationsPro
 export default function HomePage() {
   const router = useRouter();
   const { user, isLoading, isAuth } = useContext(AuthContext);
-  const { businessType } = useConfigurations();
+  const {
+    businessType,
+    isLoading: isConfigLoading,
+    refreshConfig,
+  } = useConfigurations();
+  const hasRequestedConfigRef = useRef(false);
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || isConfigLoading) return;
+
+    if (isAuth && !businessType && !hasRequestedConfigRef.current) {
+      hasRequestedConfigRef.current = true;
+      refreshConfig?.();
       return;
     }
 
     const homeRoute = getHomeRoute(user, businessType);
     router.replace(homeRoute);
-  }, [user, isAuth, isLoading, router, businessType]);
+  }, [user, isAuth, isLoading, isConfigLoading, router, businessType, refreshConfig]);
 
   return (
     <LoadingCard
-      message={isLoading ? "Verificando autenticación..." : "Redirigiendo..."}
+      message={
+        isLoading || isConfigLoading || (isAuth && !businessType && !hasRequestedConfigRef.current)
+          ? "Verificando autenticación y configuración..."
+          : "Redirigiendo..."
+      }
     />
   );
 }
