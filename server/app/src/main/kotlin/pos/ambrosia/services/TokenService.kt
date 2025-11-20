@@ -81,7 +81,7 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
       // Obtener la información del usuario desde la base de datos usando el refresh token
       val sql =
       """
-      SELECT u.id, u.name, r.role, r.isAdmin, u.role_id
+      SELECT u.id, u.name, r.role, r.isAdmin, u.role_id, u.email, u.phone
       FROM users u
       JOIN roles r ON u.role_id = r.id
       WHERE u.refresh_token = ? AND u.is_deleted = 0
@@ -97,7 +97,9 @@ class TokenService(environment: ApplicationEnvironment, private val connection: 
             name = resultSet.getString("name"),
             role_id = resultSet.getString("role_id"),
             role = resultSet.getString("role"),
-            isAdmin = resultSet.getBoolean("isAdmin")
+            isAdmin = resultSet.getBoolean("isAdmin"),
+            email = resultSet.getString("email"),
+            phone = resultSet.getString("phone")
           )
         }
       }

@@ -85,7 +85,9 @@ fun Route.auth(
       name = userInfo.name,
       role = userInfo.role,
       role_id = userInfo.role_id,
-      isAdmin = userInfo.isAdmin
+      isAdmin = userInfo.isAdmin,
+      email = userInfo.email,
+      phone = userInfo.phone
     )
 
     call.respond(LoginResponse("Login successful", userResponse, perms))

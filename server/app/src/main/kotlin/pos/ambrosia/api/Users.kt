@@ -92,9 +92,11 @@ fun Route.users(
       UserResponse(
         user_id = userInfo.id,
         name = userInfo.name,
+        email = userInfo.email,
+        phone = userInfo.phone,
         role = userInfo.role,
         role_id = userInfo.role,
-        isAdmin = userInfo.isAdmin
+        isAdmin = userInfo.isAdmin,
       )
 
       call.respond(UserMeResponse(userResponse, perms))

@@ -15,6 +15,8 @@ data class AuthResponse(
   val role: String,
   val role_id: String? = null,
   val isAdmin: Boolean,
+  val email: String? = null,
+  val phone: String? = null,
 )
 
 @Serializable data class TokenResponse(
@@ -26,6 +28,8 @@ data class AuthResponse(
 data class UserResponse(
   val user_id: String,
   val name: String,
+  val email: String? = null,
+  val phone: String? = null,
   val role: String,
   val role_id: String? = null,
   val isAdmin: Boolean,
@@ -55,6 +59,8 @@ data class User(
   val refreshToken: String? = null,
   val role: String? = null,
   val role_id: String? = null,
+  val email: String? = null,
+  val phone: String? = null,
   val isAdmin: Boolean? = false,
 )
 
