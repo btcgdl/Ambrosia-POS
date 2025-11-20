@@ -12,11 +12,11 @@ from pathlib import Path
 
 import pytest
 
-from ambrosia_tests.http_client import AmbrosiaHttpClient
+from ambrosia.http_client import AmbrosiaHttpClient
 
 # Import fixtures from test_server to make them available to tests
 # These are pytest fixtures that will be used by tests and other fixtures
-from ambrosia_tests.test_server import (  # noqa: F401
+from ambrosia.test_server import (  # noqa: F401
     manage_server_lifecycle,
     server_url,
     test_server,

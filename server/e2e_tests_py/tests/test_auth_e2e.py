@@ -14,8 +14,8 @@ import logging
 
 import pytest
 
-from ambrosia_tests.http_client import AmbrosiaHttpClient
-from ambrosia_tests.test_utils import assert_status_code
+from ambrosia.http_client import AmbrosiaHttpClient
+from ambrosia.test_utils import assert_status_code
 
 logger = logging.getLogger(__name__)
 
@@ -90,10 +90,13 @@ class TestAuthenticationFlow:
     async def test_refresh_with_invalid_token_fails(self, server_url: str):
         """Test that refresh endpoint fails with invalid refreshToken."""
         async with AmbrosiaHttpClient(server_url) as client:
-            # Set an invalid refresh token cookie
-            response = await client.post(
-                "/auth/refresh", cookies={"refreshToken": "invalid_token_12345"}
-            )
+            # Set an invalid refresh token cookie on the client itself
+            # NOTE: Setting per-request cookies is deprecated in httpx; mutating the
+            # client's cookie jar is the recommended approach.
+            assert client._client is not None, "HTTP client should be initialized"
+            client._client.cookies.set("refreshToken", "invalid_token_12345")
+
+            response = await client.post("/auth/refresh")
 
             # TODO: Server returns 500 because InvalidTokenException is not handled in Handler.kt
             # Should return 401 Unauthorized - see TODO.md for fix
