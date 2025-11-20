@@ -3,12 +3,12 @@ info:
   title: Swagger AmbrosiaPos
   description: |
     Esta es la documentación de la API de Ambrosia POS.
-    
-    **Autenticación:** 
+
+    **Autenticación:**
 
     - La autenticación se maneja mediante cookies HTTP con tokens JWT
 
-    - El `accessToken` tiene una duración de 15 minutos
+    - El `accessToken` tiene una duración de 60 segundos (1 minuto)
 
     - El `refreshToken` tiene una duración de 30 días
 
@@ -36,10 +36,10 @@ paths:
       summary: Autentica a un usuario específico y establece cookies de sesión con tokens JWT
       description: |
         Autentica a un usuario específico y establece cookies de sesión con tokens JWT (access token y refresh token).
-        
+
         **Notas importantes:**
         - La autenticación se maneja mediante cookies HTTP con tokens JWT
-        - El `accessToken` tiene una duración de 15 minutos
+        - El `accessToken` tiene una duración de 60 segundos (1 minuto)
         - El `refreshToken` tiene una duración de 30 días
         - Para endpoints protegidos, el access token se envía automáticamente via cookies
         - Cuando el access token expira, usar `/auth/refresh` para obtener uno nuevo
@@ -86,15 +86,15 @@ paths:
                     message: "Login successful"
           headers:
             Set-Cookie:
-              description: "Se establecen cookies `accessToken` (15 min) y `refreshToken` (30 días)"
+              description: "Se establecen cookies `accessToken` (60 segundos / 1 minuto) y `refreshToken` (30 días)"
               schema:
                 type: array
                 items:
                   type: string
               examples:
                 accessToken:
-                  summary: Access Token Cookie (15 min)
-                  value: "accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; Max-Age=900; Path=/"
+                  summary: Access Token Cookie (60 segundos / 1 minuto)
+                  value: "accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; Max-Age=60; Path=/"
                 refreshToken:
                   summary: Refresh Token Cookie (30 días)
                   value: "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; Max-Age=2592000; Path=/"
@@ -118,7 +118,7 @@ paths:
       summary: Renueva el access token usando el refresh token almacenado en cookies
       description: |
         Renueva el access token usando el refresh token almacenado en cookies.
-        
+
         **Request:** El refresh token debe estar presente en las cookies
       responses:
         "200":
@@ -135,10 +135,10 @@ paths:
                     example: "Access token refreshed successfully"
           headers:
             Set-Cookie:
-              description: "Se actualiza la cookie `accessToken`"
+              description: "Se actualiza la cookie `accessToken` (60 segundos / 1 minuto)"
               schema:
                 type: string
-              example: "accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; Max-Age=900; Path=/"
+              example: "accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; Max-Age=60; Path=/"
         "401":
           description: "Error - Invalid refresh token"
           content:
@@ -159,7 +159,7 @@ paths:
       summary: Cierra la sesión del usuario, revoca el refresh token y elimina las cookies de autenticación
       description: |
         Cierra la sesión del usuario, revoca el refresh token y elimina las cookies de autenticación.
-        
+
         **Authorization:** Requiere access token válido (enviado automáticamente via cookies)
       security:
         - accessTokenAuth: []
