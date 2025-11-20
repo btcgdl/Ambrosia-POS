@@ -13,7 +13,7 @@ class AuthService(
   companion object {
     private const val GET_USER_FOR_AUTH_BY_NAME =
       """
-    SELECT u.id, u.name, u.pin, u.role_id as role_id, r.role, r.isAdmin as isAdmin
+    SELECT u.id, u.name, u.pin, u.role_id as role_id, u.email, u.phone, r.role, r.isAdmin as isAdmin
     FROM users u
     JOIN roles r ON u.role_id = r.id
     WHERE u.name = ? AND u.is_deleted = 0
@@ -52,6 +52,8 @@ class AuthService(
           role = resultSet.getString("role"),
           role_id = resultSet.getString("role_id"),
           isAdmin = resultSet.getBoolean("isAdmin"),
+          email = resultSet.getString("email"),
+          phone = resultSet.getString("phone"),
         )
       }
     }
