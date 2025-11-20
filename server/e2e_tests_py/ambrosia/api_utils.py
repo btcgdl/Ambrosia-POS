@@ -1,7 +1,7 @@
-"""Test utilities and helpers for API testing.
+"""HTTP response utilities and assertions for API testing.
 
-This module provides utility functions and helpers that make it easier
-to write and maintain API tests.
+This module provides utility functions for asserting HTTP response properties
+such as status codes and response body content.
 """
 
 import httpx

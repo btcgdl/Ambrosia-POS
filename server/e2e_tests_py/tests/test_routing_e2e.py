@@ -9,8 +9,8 @@ import time
 
 import pytest
 
+from ambrosia.api_utils import assert_response_contains, assert_status_code
 from ambrosia.http_client import AmbrosiaHttpClient
-from ambrosia.test_utils import assert_response_contains, assert_status_code
 
 logger = logging.getLogger(__name__)
 

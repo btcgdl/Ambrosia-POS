@@ -120,7 +120,7 @@ pytest --run-slow
 
 - **`ambrosia/http_client.py`** - HTTP client for making async requests
 - **`ambrosia/test_server.py`** - Server lifecycle management (start/stop)
-- **`ambrosia/test_utils.py`** - Assertion helper functions
+- **`ambrosia/api_utils.py`** - HTTP response assertion helper functions
 
 ## Test Workflow
 
@@ -231,7 +231,7 @@ class TestMyAPI:
 ### Using Test Utilities
 
 ```python
-from ambrosia.test_utils import assert_status_code, assert_response_contains
+from ambrosia.api_utils import assert_status_code, assert_response_contains
 import time
 
 # Assertions (module-level functions)
