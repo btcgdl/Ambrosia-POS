@@ -4,7 +4,6 @@ import DynamicModuleRenderer from "../../components/DynamicModuleRenderer";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
-import { ModuleWrapper } from "../../components/auth/ModuleWrapper";
 
 export function generateStaticParams() {
   return Object.keys(modules)
@@ -35,17 +34,15 @@ export default async function ModulePage({ params }) {
   const componentBase = routeConfig.moduleConfig.componentBase || "modules"; // allow switching base dir (e.g., "components/pages")
 
   return (
-    <ModuleWrapper>
-      <DynamicModuleRenderer
-        componentBase={componentBase}
-        componentPath={componentPath}
-        componentFile={routeConfig.route.component}
-        loadingMessage={`Cargando ${modules[routeConfig.module].name}...`}
-        passProps={{
-          moduleKey: routeConfig.module,
-          moduleName: routeConfig.moduleConfig.name,
-        }}
-      />
-    </ModuleWrapper>
+    <DynamicModuleRenderer
+      componentBase={componentBase}
+      componentPath={componentPath}
+      componentFile={routeConfig.route.component}
+      loadingMessage={`Cargando ${modules[routeConfig.module].name}...`}
+      passProps={{
+        moduleKey: routeConfig.module,
+        moduleName: routeConfig.moduleConfig.name,
+      }}
+    />
   );
 }

@@ -101,7 +101,7 @@ export default function PinLoginNew() {
       });
       setPin("");
       setSelectedUser("");
-      router.replace("/");
+      router.push("/");
     } catch (error) {
       setError("PIN incorrecto para el empleado seleccionado.");
       setPin("");

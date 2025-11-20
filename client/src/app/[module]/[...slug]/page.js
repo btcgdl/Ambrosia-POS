@@ -4,7 +4,6 @@ import DynamicModuleRenderer from "../../../components/DynamicModuleRenderer";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
-import { ModuleWrapper } from "../../../components/auth/ModuleWrapper";
 
 export default async function ModuleSubPage({ params, searchParams }) {
   const { module, slug } = await params;
@@ -25,7 +24,6 @@ export default async function ModuleSubPage({ params, searchParams }) {
     notFound();
   }
 
-  // Extraer parámetros dinámicos de la ruta
   const extractDynamicParams = (routePath, actualPath) => {
     const routeSegments = routePath.split("/").filter(Boolean);
     const pathSegments = actualPath.split("/").filter(Boolean);
@@ -43,27 +41,23 @@ export default async function ModuleSubPage({ params, searchParams }) {
 
   const dynamicParams = extractDynamicParams(routeConfig.route.path, pathname);
 
-  // Determinar la carpeta del componente
   const componentPath =
     routeConfig.moduleConfig.componentPath || routeConfig.module;
   const componentBase = routeConfig.moduleConfig.componentBase || "modules"; // allow switching base dir (e.g., "components/pages")
 
-  // ✅ Solo pasar datos serializables
   return (
-    <ModuleWrapper>
-      <DynamicModuleRenderer
-        componentBase={componentBase}
-        componentPath={componentPath}
-        componentFile={routeConfig.route.component}
-        loadingMessage="Cargando componente..."
-        passProps={{
-          moduleKey: routeConfig.module,
-          params: { module, slug, ...dynamicParams },
-          route: pathname,
-          dynamicParams,
-          searchParams: resolvedSearchParams,
-        }}
-      />
-    </ModuleWrapper>
+    <DynamicModuleRenderer
+      componentBase={componentBase}
+      componentPath={componentPath}
+      componentFile={routeConfig.route.component}
+      loadingMessage="Cargando componente..."
+      passProps={{
+        moduleKey: routeConfig.module,
+        params: { module, slug, ...dynamicParams },
+        route: pathname,
+        dynamicParams,
+        searchParams: resolvedSearchParams,
+      }}
+    />
   );
 }
