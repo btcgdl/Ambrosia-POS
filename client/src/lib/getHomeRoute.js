@@ -4,14 +4,18 @@ import { homeRoutesByUserType, homeRoutePriority } from "./homeRoutes";
 function firstRouteForModule(moduleKey, businessType = null) {
   const mod = modules[moduleKey];
   if (!mod || !mod.enabled) return null;
-  const route = (mod.routes || []).find((r) => matchesBusiness(r, businessType));
+  const route = (mod.routes || []).find((r) =>
+    matchesBusiness(r, businessType),
+  );
   return route ? route.path : null;
 }
 
 function fallbackAnyRoute(businessType = null) {
-  for (const [key, mod] of Object.entries(modules)) {
+  for (const [mod] of Object.entries(modules)) {
     if (!mod.enabled) continue;
-    const route = (mod.routes || []).find((r) => matchesBusiness(r, businessType));
+    const route = (mod.routes || []).find((r) =>
+      matchesBusiness(r, businessType),
+    );
     if (route) return route.path;
   }
   return "/";
