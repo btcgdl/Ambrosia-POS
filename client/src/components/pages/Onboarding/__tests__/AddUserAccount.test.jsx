@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { UserAccountStep } from "../AddUserAccount";
 
 describe("Step 2 User Account", () => {
@@ -13,18 +13,25 @@ describe("Step 2 User Account", () => {
     mockChange.mockClear();
   });
 
-  it("renders username and password fields", () => {
-    render(<UserAccountStep data={defaultData} onChange={mockChange} />);
+  it("renders username and password fields", async () => {
+    await act(async () => {
+      render(<UserAccountStep data={defaultData} onChange={mockChange} />);
+    });
 
     expect(screen.getByPlaceholderText("step2.fields.userNamePlaceholder")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("step2.fields.passwordPlaceholder")).toBeInTheDocument();
   });
 
-  it("calls onChange when username is typed", () => {
-    render(<UserAccountStep data={defaultData} onChange={mockChange} />);
+  it("calls onChange when username is typed", async () => {
+    await act(async () => {
+      render(<UserAccountStep data={defaultData} onChange={mockChange} />);
+    });
 
     const userInput = screen.getByPlaceholderText("step2.fields.userNamePlaceholder");
-    fireEvent.change(userInput, { target: { value: "Ivan" } });
+
+    await act(async () => {
+      fireEvent.change(userInput, { target: { value: "Ivan" } });
+    });
 
     expect(mockChange).toHaveBeenCalledWith({
       userName: "Ivan",
@@ -32,13 +39,16 @@ describe("Step 2 User Account", () => {
     });
   });
 
-  it("calls onChange and updates password strength", () => {
+  it("calls onChange and updates password strength", async () => {
     const { rerender } = render(
       <UserAccountStep data={defaultData} onChange={mockChange} />
     );
 
     const passwordInput = screen.getByPlaceholderText("step2.fields.passwordPlaceholder");
-    fireEvent.change(passwordInput, { target: { value: "abc123!!" } });
+
+    await act(async () => {
+      fireEvent.change(passwordInput, { target: { value: "abc123!!" } });
+    });
 
     rerender(
       <UserAccountStep
@@ -56,22 +66,28 @@ describe("Step 2 User Account", () => {
     expect(screen.getByText(/step2.strength.weak|step2.strength.regular|step2.strength.good|step2.strength.strong/)).toBeInTheDocument();
   });
 
-  it("toggles pin visibility when clicking the eye icon", () => {
-    render(<UserAccountStep data={{ userName: "", userPassword: "abc123!!" }} onChange={mockChange} />);
+  it("toggles pin visibility when clicking the eye icon", async () => {
+    await act(async () => {
+      render(<UserAccountStep data={{ userName: "", userPassword: "abc123!!" }} onChange={mockChange} />);
+    });
 
     const toggleButtons = screen.getAllByRole("button");
     const input = screen.getByPlaceholderText("step2.fields.userPinPlaceholder");
 
     expect(input).toHaveAttribute("type", "password");
 
-    fireEvent.click(toggleButtons[0]);
+    await act(async () => {
+      fireEvent.click(toggleButtons[0]);
+    });
     expect(input).toHaveAttribute("type", "text");
 
-    fireEvent.click(toggleButtons[0]);
+    await act(async () => {
+      fireEvent.click(toggleButtons[0]);
+    });
     expect(input).toHaveAttribute("type", "password");
   });
 
-  it("toggles password visibility when clicking the eye icon", () => {
+  it("toggles password visibility when clicking the eye icon", async () => {
     render(<UserAccountStep data={{ userName: "", userPassword: "abc123!!" }} onChange={mockChange} />);
 
     const toggleButtons = screen.getAllByRole("button");
@@ -79,10 +95,15 @@ describe("Step 2 User Account", () => {
 
     expect(input).toHaveAttribute("type", "password");
 
-    fireEvent.click(toggleButtons[1]);
+    await act(async () => {
+      fireEvent.click(toggleButtons[1]);
+    });
     expect(input).toHaveAttribute("type", "text");
 
-    fireEvent.click(toggleButtons[1]);
+    await act(async () => {
+      fireEvent.click(toggleButtons[1]);
+    });
+
     expect(input).toHaveAttribute("type", "password");
   });
 });

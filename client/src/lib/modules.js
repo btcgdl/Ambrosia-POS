@@ -214,6 +214,14 @@ export const modules = {
         types: ["store"],
         default: true,
       },
+      {
+        path: "/store/users",
+        component: "Users",
+        requiresAuth: true,
+        requiresAdmin: false,
+        types: ["store"],
+        default: true,
+      },
     ],
     navItems: [
       {
@@ -223,9 +231,9 @@ export const modules = {
         showInNavbar: true,
       },
       {
-        path: "/store/dashboard",
-        label: "Dashboard",
-        icon: "layout-dashboard",
+        path: "/store/Users",
+        label: "Users",
+        icon: "users",
         showInNavbar: true,
       },
     ],

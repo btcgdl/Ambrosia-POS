@@ -14,7 +14,38 @@ const store_en = {
       products: "Products",
       sales: "Sales",
     },
-  }
+  },
+  users: {
+    title: "Users",
+    subtitle: "Manage your store staff",
+    addUser: "Add User",
+    name: "Name",
+    role: "Role",
+    email: "Email",
+    phone: "Phone",
+    status: "Status",
+    actions: "Actions",
+    modal: {
+      titleAdd: "Add User",
+      titleEdit: "Edit User",
+      titleDelete: "Delete User",
+      subtitleDelete: "Are you sure you want to delete",
+      warningDelete: "This action cannot be undone.",
+      userNameLabel: "Name",
+      userNamePlaceholder: "Enter User Name",
+      userPinLabel: "PIN",
+      userPinPlaceholder: "Enter a 4-digit PIN",
+      userPhoneLabel: "Phone",
+      userPhonePlaceholder: "Ej: 3312345678",
+      userEmailLabel: "Email",
+      userEmailPlaceholder: "contact@awesomebusiness.com",
+      userRoleLabel: "Role",
+      submitButton: "Add",
+      editButton: "Save",
+      cancelButton: "Cancel",
+      deleteButton: "Delete",
+    }
+  },
 };
 
 export default store_en;
