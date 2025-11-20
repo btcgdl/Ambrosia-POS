@@ -211,6 +211,20 @@ pip install -e '.[dev]'
 This installs:
 - ruff - code formatting and linting
 
+### Upgrading Dependencies
+
+To upgrade packages to their latest compatible versions:
+
+```bash
+# Update all dependencies including dev dependencies
+uv sync --all-extras --upgrade
+
+# Or update lock file first, review changes, then sync
+uv lock --upgrade
+git diff uv.lock      # Review what will be updated
+uv sync --all-extras
+```
+
 ### Writing Tests
 
 Basic test structure:
