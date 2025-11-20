@@ -33,6 +33,32 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+
+# Pytest hooks for custom CLI options
+def pytest_addoption(parser):
+    """Add custom command-line options."""
+    parser.addoption(
+        "--run-slow",
+        action="store_true",
+        default=False,
+        help="Include slow tests in the test run (default: skip slow tests)",
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    """Modify test collection based on command-line options."""
+    run_slow = config.getoption("--run-slow")
+
+    if not run_slow:
+        # Mark slow tests to be skipped
+        skip_slow = pytest.mark.skipif(
+            True, reason="Slow test skipped (use --run-slow to include)"
+        )
+        for item in items:
+            if "slow" in item.keywords:
+                item.add_marker(skip_slow)
+
+
 # Set up test environment variables
 os.environ.setdefault("TESTING", "true")
 os.environ.setdefault("LOG_LEVEL", "INFO")

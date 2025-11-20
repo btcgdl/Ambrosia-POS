@@ -81,6 +81,29 @@ pytest -v
 pytest -s
 ```
 
+### Test Filtering
+
+#### Default Behavior (Fast Tests Only)
+
+By default, `pytest` skips slow tests for faster feedback during development:
+
+```bash
+pytest  # Skips tests marked with @pytest.mark.slow
+```
+
+#### Run All Tests (Including Slow)
+
+To run all tests including slow ones (useful before committing or in CI):
+
+```bash
+pytest --run-slow
+```
+
+**Slow tests** include:
+- `test_access_token_expires_after_one_minute` - Waits 65 seconds for token expiration
+
+**Note**: CI automatically runs all tests with `--run-slow`.
+
 ## Test Structure
 
 ### Test Files

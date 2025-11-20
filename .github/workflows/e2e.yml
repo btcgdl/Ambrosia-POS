@@ -9,27 +9,27 @@ on:
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Set up Java 21
       uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: 'temurin'
-        
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-        
+
     - name: Install uv
       uses: astral-sh/setup-uv@v4
       with:
         version: "latest"
-        
+
     - name: Cache Gradle dependencies
       uses: actions/cache@v4
       with:
@@ -39,7 +39,7 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-          
+
     - name: Cache Python dependencies
       uses: actions/cache@v4
       with:
@@ -47,27 +47,27 @@ jobs:
         key: ${{ runner.os }}-uv-${{ hashFiles('server/e2e_tests_py/pyproject.toml') }}
         restore-keys: |
           ${{ runner.os }}-uv-
-          
+
     - name: Install Python dependencies
       run: |
         cd server/e2e_tests_py
         uv venv
         source .venv/bin/activate
         uv pip install -e '.[dev]'
-        
+
     - name: Build server
       run: |
         cd server
         ./gradlew build -x test
-        
+
     - name: Run ruff checks (format & lint)
       run: |
         cd server/e2e_tests_py
         source .venv/bin/activate
         ruff format --check . && ruff check .
-        
+
     - name: Run E2E tests
       run: |
         cd server/e2e_tests_py
         source .venv/bin/activate
-        pytest tests/ -v --tb=short
+        pytest tests/ -v --tb=short --run-slow  # Run all tests including slow ones in CI
