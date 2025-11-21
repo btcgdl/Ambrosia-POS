@@ -81,6 +81,29 @@ pytest -v
 pytest -s
 ```
 
+### Test Filtering
+
+#### Default Behavior (Fast Tests Only)
+
+By default, `pytest` skips slow tests for faster feedback during development:
+
+```bash
+pytest  # Skips tests marked with @pytest.mark.slow
+```
+
+#### Run All Tests (Including Slow)
+
+To run all tests including slow ones (useful before committing or in CI):
+
+```bash
+pytest --run-slow
+```
+
+**Slow tests** include:
+- `test_access_token_expires_after_one_minute` - Waits 65 seconds for token expiration
+
+**Note**: CI automatically runs all tests with `--run-slow`.
+
 ## Test Structure
 
 ### Test Files
@@ -95,9 +118,9 @@ pytest -s
 
 ### Test Utilities
 
-- **`ambrosia_tests/http_client.py`** - HTTP client for making async requests
-- **`ambrosia_tests/test_server.py`** - Server lifecycle management (start/stop)
-- **`ambrosia_tests/test_utils.py`** - Assertion helper functions
+- **`ambrosia/http_client.py`** - HTTP client for making async requests
+- **`ambrosia/test_server.py`** - Server lifecycle management (start/stop)
+- **`ambrosia/api_utils.py`** - HTTP response assertion helper functions
 
 ## Test Workflow
 
@@ -188,13 +211,27 @@ pip install -e '.[dev]'
 This installs:
 - ruff - code formatting and linting
 
+### Upgrading Dependencies
+
+To upgrade packages to their latest compatible versions:
+
+```bash
+# Update all dependencies including dev dependencies
+uv sync --all-extras --upgrade
+
+# Or update lock file first, review changes, then sync
+uv lock --upgrade
+git diff uv.lock      # Review what will be updated
+uv sync --all-extras
+```
+
 ### Writing Tests
 
 Basic test structure:
 
 ```python
 import pytest
-from ambrosia_tests.http_client import AmbrosiaHttpClient
+from ambrosia.http_client import AmbrosiaHttpClient
 
 class TestMyAPI:
     @pytest.mark.asyncio
@@ -208,7 +245,7 @@ class TestMyAPI:
 ### Using Test Utilities
 
 ```python
-from ambrosia_tests.test_utils import assert_status_code, assert_response_contains
+from ambrosia.api_utils import assert_status_code, assert_response_contains
 import time
 
 # Assertions (module-level functions)

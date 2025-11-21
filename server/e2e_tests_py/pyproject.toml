@@ -4,17 +4,17 @@ version = "0.1.0"
 description = "API tests for Ambrosia POS server using pytest"
 requires-python = ">=3.12"
 dependencies = [
-    "pytest>=8.0.0",
-    "pytest-asyncio>=0.23.0",
-    "httpx>=0.27.0",
-    "pytest-xdist>=3.5.0",
-    "pytest-timeout>=2.2.0",
-    "psutil>=5.9.0",
+    "pytest>=9.0.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.28.0",
+    "pytest-xdist>=3.6.0",
+    "pytest-timeout>=2.3.0",
+    "psutil>=6.1.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "ruff>=0.14.1",
+    "ruff>=0.14.5",
 ]
 
 [build-system]
@@ -22,14 +22,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["ambrosia_tests"]
+packages = ["ambrosia"]
 
 [tool.pytest.ini_options]
-minversion = "8.0"
+minversion = "9.0"
+strict = true
 addopts = [
     "-ra",
-    "--strict-markers",
-    "--strict-config",
     "--timeout=300",
     "-v"
 ]
@@ -40,6 +39,10 @@ python_functions = ["test_*"]
 
 asyncio_mode = "auto"
 timeout = 300
+
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')"
+]
 
 # Ruff handles both linting and formatting
 
@@ -70,4 +73,4 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["ambrosia_tests"]
+known-first-party = ["ambrosia"]

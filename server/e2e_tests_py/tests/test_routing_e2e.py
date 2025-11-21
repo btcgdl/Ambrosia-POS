@@ -9,8 +9,8 @@ import time
 
 import pytest
 
-from ambrosia_tests.http_client import AmbrosiaHttpClient
-from ambrosia_tests.test_utils import assert_response_contains, assert_status_code
+from ambrosia.api_utils import assert_response_contains, assert_status_code
+from ambrosia.http_client import AmbrosiaHttpClient
 
 logger = logging.getLogger(__name__)
 
@@ -102,55 +102,3 @@ class TestRoutingE2E:
             for header in optional_headers:
                 if header in response.headers:
                     logger.info(f"Found optional CORS header: {header}")
-
-
-# Additional test classes for specific API modules
-class TestAuthEndpoints:
-    """Tests for authentication-related endpoints."""
-
-    # @pytest.mark.asyncio
-    # async def test_login_with_default_credentials(self, server_url: str):
-    #     """Test that /login endpoint responds correctly with default credentials."""
-    #     async with AmbrosiaHttpClient(server_url) as client:
-    #         # Use default credentials (cooluser1 / 0000)
-    #         login_data = {"name": "cooluser1", "pin": "0000"}
-    #         response = await client.post("/auth/login", json=login_data)
-    #
-    #         # Should return 200 OK with success message
-    #         assert response.status_code == 200, (
-    #             f"Expected 200 OK, got {response.status_code}"
-    #         )
-    #
-    #         # Check that response contains success message
-    #         response_data = response.json()
-    #         assert "message" in response_data, "Response should contain 'message' field"
-    #         assert "success" in response_data["message"].lower(), (
-    #             f"Expected success message, got: {response_data}"
-    #         )
-    #
-    #         # Check that authentication cookies are set
-    #         cookies = response.cookies
-    #         assert "accessToken" in cookies, "accessToken cookie should be set"
-    #         assert "refreshToken" in cookies, "refreshToken cookie should be set"
-    #
-    @pytest.mark.asyncio
-    async def test_login_with_wrong_credentials(self, server_url: str):
-        """Test that /login endpoint rejects wrong credentials."""
-        async with AmbrosiaHttpClient(server_url) as client:
-            # Use wrong credentials
-            login_data = {"name": "cooluser1", "pin": "wrongpin"}
-            response = await client.post("/auth/login", json=login_data)
-
-            # Should return 401 Unauthorized or 400 Bad Request
-            assert response.status_code in [400, 401], (
-                f"Expected 400/401, got {response.status_code}"
-            )
-
-            # Should not set authentication cookies
-            cookies = response.cookies
-            assert "accessToken" not in cookies, (
-                "accessToken cookie should not be set for failed login"
-            )
-            assert "refreshToken" not in cookies, (
-                "refreshToken cookie should not be set for failed login"
-            )
