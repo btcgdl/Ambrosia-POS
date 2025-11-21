@@ -6,7 +6,7 @@ const config = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   moduleNameMapper: {
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
-    "^@/(.*)$": "<rootDir>/$1",
+    "^@/(.*)$": "<rootDir>/src/$1",
     "^next-intl$": "<rootDir>/__tests__/__mocks__/next/next-intl.js",
     "^next/image$": "<rootDir>/__tests__/__mocks__/next/image.js",
     "\\.(svg)$": "<rootDir>/__tests__/__mocks__/svgMock.js",
