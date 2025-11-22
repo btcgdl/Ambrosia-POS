@@ -1,30 +1,38 @@
 "use client";
 
-import {Card, CardHeader, CardBody } from "@heroui/card";
+import { Card, CardHeader, CardBody } from "@heroui/card";
 import { Users, Package, ShoppingCart } from 'lucide-react';
 import { useTranslations } from "next-intl";
 import { StoreLayout } from "./StoreLayout";
+import { useUsers } from "./hooks/useUsers";
+import { useProducts } from "./hooks/useProducts";
+import { useOrders } from "./hooks/useOrders";
 
 export function Store() {
   const t = useTranslations("dashboard");
+  const { users } = useUsers();
+  const { products } = useProducts();
+  const { orders } = useOrders();
+
+  const paidOrdersCount = orders?.filter(order => order.status === "paid")?.length || 0;
 
   const STATS = [
     {
       id: 1,
       name: t("stats.users"),
-      quantity: 12,
+      quantity: users?.length,
       icon: Users,
     },
     {
       id: 2,
       name: t("stats.products"),
-      quantity: 42,
+      quantity: products?.length,
       icon: Package,
     },
     {
       id: 3,
       name: t("stats.sales"),
-      quantity: 8,
+      quantity: paidOrdersCount,
       icon: ShoppingCart,
     },
   ];

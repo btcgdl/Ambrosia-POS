@@ -3,6 +3,7 @@ const store_es = {
     users: "Usuarios",
     products: "Productos",
     checkout: "Caja",
+    wallet: "Billetera",
     settings: "Configuración",
     logout: "Cerrar sesión",
   },
@@ -44,7 +45,7 @@ const store_es = {
       editButton: "Guardar",
       cancelButton: "Cancelar",
       deleteButton: "Eliminar",
-    }
+    },
   },
 };
 
