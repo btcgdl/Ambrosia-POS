@@ -8,23 +8,6 @@ jest.mock("next/navigation", () => ({
   usePathname: jest.fn(() => "/store/users"),
 }));
 
-jest.mock("lucide-react", () => ({
-  Users: () => <div>Users Icon</div>,
-  Package: () => <div>Package Icon</div>,
-  ShoppingCart: () => <div>ShoppingCart Icon</div>,
-  Settings: () => <div>Settings Icon</div>,
-  LogOut: () => <div>LogOut Icon</div>,
-  FileText: () => <div>FileText Icon</div>,
-  Languages: () => <div>Languages Icon</div>,
-  Edit: () => <div>Edit Icon</div>,
-  Trash2: () => <div>Trash2 Icon</div>,
-  Plus: () => <div>Plus Icon</div>,
-  Pencil: () => <div>Pencil Icon</div>,
-  Trash: () => <div>Trash Icon</div>,
-  Eye: () => <div>Eye Icon</div>,
-  EyeOff: () => <div>EyeOff Icon</div>,
-}));
-
 jest.mock("@/services/apiClient", () => ({
   apiClient: jest.fn(() => Promise.resolve([
     {

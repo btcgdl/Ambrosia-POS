@@ -45,7 +45,6 @@ export function StoreLayout({ children }) {
   const { availableNavigation, isAuth, logout } =
     useModules();
 
-  console.log(config)
   return (
     <div className="flex min-h-screen">
       <aside className="w-64 bg-primary-500 relative">
